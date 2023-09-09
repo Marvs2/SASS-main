@@ -1,0 +1,115 @@
+<!-- NAV BAR IN LANDING PAGE-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Academic Support System</title>   
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <link rel="stylesheet" href="{{ url_for ('static', filename='/css/base.css')}}">
+</head>
+<body>
+
+  <header>
+    <a href="{{ url_for('index') }}" class="logo">Student Academic Support System</a>
+    <div class="navigation">
+        <ul class="menu">      
+          <li class="close-btn"></li>  
+
+            <li class="menu-item"><a href="{{ url_for('index') }}"><i class="fa-solid fa-house nav-img"></i>Home</a></li>
+            
+            <li class="menu-item"></i>
+                <a class="sub-btn" href="#"><i class="fa-solid fa-phone-volume nav-img"></i>Services</a>
+                <ul class="sub-menu">
+                    <li class="sub-item"><a href="{{ url_for ('overload') }}">Application for Overload of Subjects</a></li>
+                    <li class="sub-item more"> 
+                        <a class="more-btn" href="#">Change of Enrollment <i class="fas fa-angle-right"></i></a>
+                        <ul class="more-menu">
+                            <li class="more-item"> <a href="{{ url_for ('adding') }}">Adding of Subjects</a></li>
+                            <li class="more-item"> <a href="{{ url_for ('change') }}">Change of Schedule/Subjects</a></li>
+                         </ul>
+                    </li>
+                    <li class="sub-item"><a href="{{ url_for ('correction') }}">Correction of Grade Entry</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('cross_enrollment') }}">Application for Cross-Enrollment</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('shifting') }}">Application for Shifting</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('enrollment') }}">Manual Enrollment</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('petition') }}">Online Petition of Subjects</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('tutorial') }}">Online Request for Tutorial of Subjects</a></li>
+                    <li class="sub-item"><a href="{{ url_for ('certification') }}">Request for Certification</a></li>
+       <!---            <li class="sub-item more">
+                         <a class="more-btn" href="#">More Item <i class="fas fa-angle-right"></i></a>
+                         <ul class="more-menu">
+                            <li class="more-item"> <a href="#">Services</a></li>
+                            <li class="more-item"> <a href="#">Services</a></li>
+                         </ul>
+                    </li> -->
+                </ul>
+            </li>
+           
+            <li class="menu-item"></i>
+                <a class="sub-btn" href="#"><i class="fa-solid fa-chalkboard-user nav-img"></i>Academic</a>
+                <ul class="sub-menu">
+                    <li class="sub-item"> <a href="#">1</a></li>
+                    <li class="sub-item"> <a href="#">2</a></li>
+                    <li class="sub-item"> <a href="#">3</a></li>                       
+                </ul>
+            </li>
+           
+            <li class="menu-item">
+                <a class="sub-btn" href="#"><i class="fa-solid fa-handshake-angle nav-img"></i>Accessibility</a>
+                <ul class="sub-menu">
+                    <li class="sub-item"> <a href="#">1</a></li>
+                    <li class="sub-item"> <a href="#">2</a></li>
+                    <li class="sub-item"> <a href="#">3</a></li>   
+                </ul>
+            </li>
+         
+            <li class="menu-item">
+                <a class="sub-btn" href="#"><i class="fa-solid fa-calendar-days nav-img"></i> Programs</a>
+                <ul class="sub-menu">
+                    <li class="sub-item"> <a href="#">1</a></li>
+                    <li class="sub-item"> <a href="#">2</a></li>
+                    <li class="sub-item"> <a href="#">3</a></li>
+                </ul>
+            </li>
+           
+            <li class="menu-item">
+                <a class="sub-btn" href="#"><i class="fa-solid fa-user-lock"></i>Log-in</a>
+                <ul class="sub-menu">
+                    <li class="sub-item"> <i class="fa-solid fa-user-graduate"></i><a href="{{ url_for ('student_portal') }}">Student</a></li>
+                    <li class="sub-item"> <i class="fa-solid fa-user-gear"></i><a href="{{ url_for ('faculty_portal') }}">Admin</a></li>                  
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="menu-btn"></div>
+</header>
+
+    <main>
+        {% block content %} {% endblock %}
+    </main>
+   
+    <footer>
+        <p> &copy; <script>document.write(new Date().getFullYear());</script> 
+        <a href="https://www.pup.edu.ph/" target="_blank" rel="noopener noreferrer">Polytechnic University of the Philippines</a> |  
+        <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use</a>  | 
+        <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a></p>
+    </footer>
+    
+    <button id="scrollToTop" title="Scroll to top">Scroll to the Top<i class="fa-solid fa-arrow-up"></i></button>
+
+    <script src="{{url_for ('static', filename='/js/script.js')}}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    
+
+</body>
+</html>
+

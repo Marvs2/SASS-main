@@ -1,0 +1,84 @@
+{% extends "main/base.html" %} {% block content %}
+
+<div
+  class="flex h-screen w-screen items-center px-6 py-20 md:px-28 lg:w-[42rem] lg:pr-0"
+>
+  <div class="bg-black bg-opacity-80 p-10 text-center rounded-lg">
+    <div>
+      <img
+        src="{{ url_for('static', filename='images/pup.png') }}"
+        alt="Logo"
+        class="object-cover object-center rounded-lg mx-auto w-16 md:w-28 lg:w-32"
+      />
+
+      <h1
+        class="text-white font-poppins text-2xl font-extrabold mt-3 md:text-4xl md:mt-8"
+      >
+        SASS Admin Module
+      </h1>
+      <p class="text-white text-md font-poppins mt-3 mb-3 md:text-lg">
+        Sign in to start your session
+      </p>
+    </div>
+
+    <form
+      class="flex flex-col gap-3"
+      method="POST"
+      action="{{ url_for('admin_api.login') }}"
+    >
+      <div class="">
+        <label
+          htmlFor="email"
+          class="flex text-left mb-2 font-medium text-white"
+        >
+          Your email
+        </label>
+        <input
+          id="email"
+          name="email"
+          placeholder="username@gmail.com"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"
+        />
+      </div>
+
+      <div class="">
+        <label
+          htmlFor="password"
+          class="flex text-left mb-2 font-medium text-white"
+        >
+          Your password
+        </label>
+        <input
+          id="password"
+          name="password"
+          type="password"
+          placeholder="password"
+          class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-sky-500 focus:border-sky-500 block w-full p-2.5"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="text-white bg-sky-700 hover:bg-sky-600 focus:ring-4 focus:outline-none mt-4 focus:ring-sky-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center"
+      >
+        Sign In
+      </button>
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul class="messages text-red-500">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+    </form>
+
+    <div>
+      <p class="text-sm text-white mt-3">
+        By using this service, you understood and agree to the PUP Online
+        Services Terms of Use and Privacy Statement
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}
