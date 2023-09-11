@@ -18,7 +18,7 @@ def login():
         admin = Admin.query.filter_by(email=email).first()
         if admin and check_password_hash(admin.password, password):
             # Successfully authenticated
-            access_token = create_access_token(identity=admin.id)
+            access_token = create_access_token(identity=admin.adm_Id)
             session['access_token'] = access_token
             session['user_role'] = 'admin'
             return redirect(url_for('admin_home'))

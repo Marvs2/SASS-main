@@ -20,19 +20,18 @@ def login():
         faculty = Faculty.query.filter_by(email=email).first()
         if faculty and check_password_hash(faculty.password, password):
             # Successfully authenticated
-            access_token = create_access_token(identity=faculty.id)
+            access_token = create_access_token(identity=faculty.facultyID)
             session['access_token'] = access_token
             session['user_role'] = 'faculty'
             return redirect(url_for('faculty_home'))
         else:
             flash('Invalid email or password', 'danger')
-    return redirect(url_for('faculty_portal'))
+    return redirect(url_for('faculty_login'))
 
 
 #===================================================
 # TESTING AREA
 @faculty_api.route('/profile', methods=['GET'])
-@faculty_required
 @jwt_required()
 def profile():
     current_user_id = get_jwt_identity()
