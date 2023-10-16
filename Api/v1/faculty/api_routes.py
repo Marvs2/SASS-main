@@ -17,16 +17,19 @@ def login():
         email = request.form['email']
         password = request.form['password']
         
+        print("EMAIL: ", email)
+        print("passworD: ", password)
+
+
         faculty = Faculty.query.filter_by(email=email).first()
         if faculty and check_password_hash(faculty.password, password):
-            # Successfully authenticated
-            access_token = create_access_token(identity=faculty.facultyID)
-            session['access_token'] = access_token
+       
+            session['user_id'] = faculty.facultyID
             session['user_role'] = 'faculty'
             return redirect(url_for('faculty_home'))
         else:
             flash('Invalid email or password', 'danger')
-    return redirect(url_for('faculty_login'))
+    return redirect(url_for('faculty_api.login'))
 
 
 #===================================================

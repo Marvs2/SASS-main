@@ -9,8 +9,8 @@ db = SQLAlchemy()
 class Student(db.Model, UserMixin):
     __tablename__ = 'students'
 
-    id = db.Column(db.Integer, primary_key=True)
-    studentsNumber = db.Column(db.String(50), unique=True, nullable=False)
+    student_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(50), unique=True, nullable=False)
     name = db.Column(db.String(50), nullable=False)  
     email = db.Column(db.String(50), unique=True, nullable=False) 
     address = db.Column(db.String(50), nullable=True) 
@@ -23,8 +23,8 @@ class Student(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'id': self.id,
-            'studentsNumber': self.studentsNumber,
+            'student_id': self.student_id,
+            'studentNumber': self.studentNumber,
             'name': self.name,
             'email': self.email,
             'address': self.address, 
@@ -43,12 +43,11 @@ class Payment(db.Model, UserMixin):
     __tablename__ = 'payments'
 
     paymentID = db.Column(db.Integer, primary_key=True)
-#   # id = db.Column(db.Integer, db.ForeignKey('students.id'))
     modeofPayment = db.Column(db.String(50))
     totalPayment = db.Column(db.DECIMAL)  # You can specify precision and scale if needed
     dateofPayment = db.Column(db.Date)
     proofofPayment = db.Column(db.String(255))  # Modify the length as needed
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
 
 
     def to_dict(self):
@@ -75,7 +74,7 @@ class Service(db.Model, UserMixin):
     status = db.Column(db.String(50)) #Modifythelength
     dateofServices = db.Column(db.Date)
     proofofServices = db.Column(db.String(255))
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
 
     def to_dict(self):
         return {
@@ -100,7 +99,7 @@ class Feedback(db.Model, UserMixin):
     emailAddress = db.Column(db.String(50))
     ratings = db.Column(db.Integer)  # Assuming ratings are integers
     feedBacks = db.Column(db.TEXT)  # Modify the data type as needed
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
 
     def to_dict(self):
         return {
@@ -126,7 +125,7 @@ class Complaint(db.Model, UserMixin):
     complaintDetails = db.Column(db.TEXT)
     complaintFile = db.Column(db.String(255))  # Modify the length as needed
     dateofComplaint = db.Column(db.Date)
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
 
 
     def to_dict(self):
@@ -152,7 +151,7 @@ class Announcement(db.Model, UserMixin):
     announcementDetails = db.Column(db.TEXT)
     date = db.Column(db.Date)
     time = db.Column(db.Time)
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
     fac_id = db.Column(db.Integer, db.ForeignKey('faculties.facultyID'), nullable=False)
 
 
@@ -189,7 +188,7 @@ class Faculty(db.Model, UserMixin):
     __tablename__ = 'faculties'
 
     facultyID = db.Column(db.Integer, primary_key=True)  # UserID
-    faculty_Number = db.Column(db.String(30), unique=True, nullable=False) #Faculty_Number
+    facultyNumber = db.Column(db.String(30), unique=True, nullable=False) #Faculty_Number
     userType = db.Column(db.String(50))  # e.g., 'Admin', 'Professor', etc.
     name = db.Column(db.String(50), nullable=False)  # Name
     email = db.Column(db.String(50), unique=True, nullable=False)  # Email
@@ -205,7 +204,7 @@ class Faculty(db.Model, UserMixin):
     def to_dict(self):
         return {
             'facultyID': self.facultyID,
-            'faculty_Number': self.faculty_Number,
+            'facultyNumber': self.facultyNumber,
             'userType': self.userType,
             'name': self.name,
             'email': self.email,
@@ -266,7 +265,7 @@ def create_sample_data():
     # Create and insert students data
     students_data = [
         {   
-            'id':'1',
+            'student_id':'1',
             'studentNumber': '2020-00001-CM-0',
             'name': 'Students 1',
             'email': 'students1@example.com',
@@ -279,8 +278,8 @@ def create_sample_data():
             'userImg': 'default.jpg'
         },
         {
-            'id':'2',
-            'studentsNumber': '2020-00002-CM-0',
+            'student_id':'2',
+            'studentNumber': '2020-00002-CM-0',
             'name': 'Students 2',
             'email': 'students2@example.com',
             'address': '201 Don Juan st. Commonwealth City 2',
@@ -303,7 +302,7 @@ def create_sample_data():
     faculty_data = [
         {
             'facultyID':'1',
-            'faculty_Number': '2020-00001-TC-0',
+            'facultyNumber': '2020-00001-TC-0',
             'userType': 'Professor',
             'name': 'Faculty 1',
             'email': 'faculty1@example.com',
@@ -318,7 +317,7 @@ def create_sample_data():
         },
         {
             'facultyID': '2',
-            'faculty_Number': '2020-00002-TC-0',
+            'facultyNumber': '2020-00002-TC-0',
             'userType': 'Professor',
             'name': 'Faculty 2',
             'email': 'faculty2@example.com',

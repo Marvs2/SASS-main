@@ -16,6 +16,8 @@ from flask_login import LoginManager, logout_user, current_user
 
 from decorators.auth_decorators import student_required, faculty_required, prevent_authenticated, admin_required
 
+faculty_base_api_url = os.getenv('FACULTY_BASE_URL')
+
 load_dotenv()  # Load environment variables from .env file
 app = Flask(__name__)
 # SETUP YOUR POSTGRE DATABASE HERE
@@ -136,10 +138,10 @@ def profile():
 @app.route('/faculty')
 @prevent_authenticated
 def faculty_portal():
-    return render_template('faculty/login.html')
+    session.permanent=True
+    return render_template('faculty/login.html', api_base_url=faculty_base_api_url)
 
 @app.route('/faculty/home')
-@prevent_authenticated
 @faculty_required
 def faculty_home():
     session.permanent = True
@@ -151,6 +153,7 @@ def faculty_home():
 @app.route('/admin')
 @prevent_authenticated
 def admin_login():
+    session.permanent = True
     return render_template('admin/login.html')
 
 @app.route('/admin/home')
@@ -162,7 +165,7 @@ def admin_home():
 # ========================================================================
 # Register the API blueprint
 app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
-app.register_blueprint(faculty_api, url_prefix='/api/v1/faculty')
+app.register_blueprint(faculty_api, url_prefix=faculty_base_api_url)
 app.register_blueprint(student_api, url_prefix='/api/v1/student')
 
 # ========================================================================

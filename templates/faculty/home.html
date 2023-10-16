@@ -9,37 +9,12 @@
   <body>
     <div>
       <h2>Welcome to Faculty Home</h2>
-      {% if authenticated %}
-      <li><a href="{{ url_for('logout') }}">Logout</a></li>
-      {% endif %}
+ 
 
       <div id="profile-data"></div>
     </div>
 
     <!-- SCRIPT FOR INTERACTING WITH THE BACKEND OR API -->
-    <script>
-      async function fetchProfileData() {
-        const accessToken = '{{ session["access_token"] }}'; // Access the stored access token
-
-        const response = await fetch('/api/v1/faculty/profile', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const profileData = await response.json();
-        displayProfileData(profileData);
-      }
-
-      function displayProfileData(data) {
-        const profileDiv = document.getElementById('profile-data');
-        profileDiv.innerHTML = `
-          <p>Name: ${data.name}</p>
-          <p>Email: ${data.email}</p>
-          <!-- Add more fields as needed -->
-        `;
-      }
-
-      fetchProfileData();
-    </script>
+ 
   </body>
 </html>
