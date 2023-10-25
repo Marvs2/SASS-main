@@ -47,17 +47,52 @@
                                 Dashboard
                             </a>
                             <div class="sb-sidenav-menu-heading">Services</div>
+                            <a class="nav-link" href="{{url_for('stud_overload') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Application for Overload of Subjects
+                            </a>
+                            
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                New Request
+                                Change of Enrollment
                                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                             </a>
                             <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="layout-static.html">Static Navigation</a>
-                                    <a class="nav-link" href="layout-sidenav-light.html">Light Sidenav</a>
+                                    <a class="nav-link" href="{{ url_for('stud_adding') }}">Adding Subjects</a>
+                                    <a class="nav-link" href="{{ url_for('stud_change') }}">Subjects/Schedule</a>
                                 </nav>
                             </div>
+                            <a class="nav-link" href="{{url_for('stud_correction') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Correction of Grade Entry
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_cross_enrollment') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Cross-Enrollment
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_shifting') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Shifting
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_enrollment') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Manual Enrollment
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_petition') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Petition
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_tutorial') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Tutorial
+                            </a>
+                            <a class="nav-link" href="{{url_for('stud_certification') }}">
+                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                Certification
+                            </a>
+
+
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
                                 <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
                                 Service History

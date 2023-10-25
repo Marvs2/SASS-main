@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Application for Change of Enrollment (Adding of Subjects)</title>
+    <title>Application for Change of Enrollment (Change of Schedule/Subjects)</title>
 </head>
 <body>
-    <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
-    <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
+    <h1>Application for Change of Enrollment (Change of Schedule/Subjects)</h1>
+    <p>Process requests for application for change of enrollment specifically for changing schedules or subjects. This is applicable to both regular and irregular students of the University and is done during the adjustment period.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Accomplished and printed copy of ACE form (Change of Schedule/Subject) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a>.</li>
+    </ul>
 
     <h2>Application Form</h2>
     <form action="#" method="post">
@@ -21,8 +26,8 @@
             <option value="Irregular">Irregular</option>
         </select><br><br>
 
-        <label for="subjectsToAdd">Subjects to Add (comma-separated):</label><br>
-        <input type="text" id="subjectsToAdd" name="subjectsToAdd" required><br><br>
+        <label for="aceForm">ACE Form (Change of Schedule/Subject):</label><br>
+        <input type="file" id="aceForm" name="aceForm" required><br><br>
 
         <button type="submit">Submit Application</button>
     </form>

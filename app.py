@@ -109,43 +109,43 @@ def certification():
 # ========================================================================
 # STUDENT
 @app.route('/student/foroverloadofsubject')
-def overload():
+def stud_overload():
     return render_template("/student/subject_overload.html")
 
 @app.route('/student/addingofsubject')
-def adding():
+def stud_adding():
     return render_template("/student/adding_of_subject.html")
 
 @app.route('/student/changeofsubject/schedule')
-def change():
+def stud_change():
     return render_template("/student/change_of_subject.html")
 
 @app.route('/student/gradeentry')
-def correction():
+def stud_correction():
     return render_template("/student/grade_entry.html")
 
 @app.route('/student/crossenrollment')
-def cross_enrollment():
+def stud_cross_enrollment():
     return render_template("/student/cross_enrollment.html")
 
 @app.route('/student/shifting')
-def shifting():
+def stud_shifting():
     return render_template("/student/shifting.html")
 
 @app.route('/student/manualenrollment')
-def enrollment():
+def stud_enrollment():
     return render_template("/student/manual_enrollment.html")
 
 @app.route('/student/onlinepetitionofsubject')
-def petition():
+def stud_petition():
     return render_template("/student/petition.html")
 
 @app.route('/student/requestfortutorialofsubjects')
-def tutorial():
+def stud_tutorial():
     return render_template("/student/tutorial.html")
 
 @app.route('/student/certification')
-def certification():
+def stud_certification():
     return render_template("/student/certification.html")
 
 # ================================================================
