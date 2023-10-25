@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manual Enrollment Request</title>
+</head>
+<body>
+    <h1>Manual Enrollment Request</h1>
+    <p>This service is for both regular and irregular students of the University and is done during the adjustment period. It is used when the student fails to enroll during the online registration period set by the University.</p>
+
+    <h2>Request Form</h2>
+    <form action="#" method="post">
+        <label for="studentID">Student ID:</label><br>
+        <input type="text" id="studentID" name="studentID" required><br><br>
+
+        <label for="studentName">Student Name:</label><br>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+
+        <label for="enrollmentType">Enrollment Type:</label><br>
+        <select id="enrollmentType" name="enrollmentType" required>
+            <option value="Regular">Regular</option>
+            <option value="Irregular">Irregular</option>
+        </select><br><br>
+
+        <label for="reason">Reason for Manual Enrollment:</label><br>
+        <textarea id="reason" name="reason" rows="4" cols="50" required></textarea><br><br>
+
+        <button type="submit">Submit Request</button>
+    </form>
+</body>
+</html>

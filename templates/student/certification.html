@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Request for Certification (Grades, Bonafide Student, General Weighted Average)</title>
+</head>
+<body>
+    <h1>Request for Certification (Grades, Bonafide Student, General Weighted Average)</h1>
+    <p>Process requests for certification of students and alumni. The certification is based on the records available at the respective colleges. These certifications are issued for evaluation purposes and are not a substitute for the Official Transcript of Record issued by the University Registrar.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Accomplished Request Form from Respective Branch/Campus Offices.</li>
+        <li>Identification Card (ID).</li>
+    </ul>
+
+    <h2>If Representative:</h2>
+    <ul>
+        <li>Authorization Letter and Identification Card (ID) if the claimant is not the owner of the document.</li>
+    </ul>
+
+    <h2>Request Form</h2>
+    <form action="#" method="post">
+        <label for="studentID">Student ID:</label><br>
+        <input type="text" id="studentID" name="studentID" required><br><br>
+
+        <label for="studentName">Student Name:</label><br>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+
+        <label for="certificationType">Certification Type:</label><br>
+        <select id="certificationType" name="certificationType" required>
+            <option value="Grades">Grades</option>
+            <option value="Bonafide Student">Bonafide Student</option>
+            <option value="General Weighted Average">General Weighted Average</option>
+        </select><br><br>
+
+        <label for="requestForm">Request Form from Respective Branch/Campus Offices:</label><br>
+        <input type="file" id="requestForm" name="requestForm" required><br><br>
+
+        <label for="identificationCard">Identification Card (ID):</label><br>
+        <input type="file" id="identificationCard" name="identificationCard" required><br><br>
+
+        <label for="isRepresentative">Is there a representative?</label>
+        <input type="checkbox" id="isRepresentative" name="isRepresentative"><br><br>
+
+        <div id="representativeInfo" style="display: none;">
+            <label for="authorizationLetter">Authorization Letter:</label><br>
+            <input type="file" id="authorizationLetter" name="authorizationLetter" required><br><br>
+
+            <label for="representativeID">Representative's Identification Card (ID):</label><br>
+            <input type="file" id="representativeID" name="representativeID" required><br><br>
+        </div>
+
+        <button type="submit">Submit Request</button>
+    </form>
+
+    <script>
+        const isRepresentativeCheckbox = document.getElementById('isRepresentative');
+        const representativeInfoDiv = document.getElementById('representativeInfo');
+
+        isRepresentativeCheckbox.addEventListener('change', function() {
+            if (isRepresentativeCheckbox.checked) {
+                representativeInfoDiv.style.display = 'block';
+            } else {
+                representativeInfoDiv.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

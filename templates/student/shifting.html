@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application for Shifting</title>
+</head>
+<body>
+    <h1>Application for Shifting</h1>
+    <p>Process requests for students who intend to shift to another program in the University. Students must have one (1) year residency from the current program to qualify for shifting to another program. Application for shifting shall be accomplished prior to the start of the next academic school year. Qualifications may vary depending on the program to which the student intends to shift.</p>
+
+    <h2>Application Form</h2>
+    <form action="#" method="post">
+        <label for="studentID">Student ID:</label><br>
+        <input type="text" id="studentID" name="studentID" required><br><br>
+
+        <label for="studentName">Student Name:</label><br>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+
+        <label for="currentProgram">Current Program:</label><br>
+        <input type="text" id="currentProgram" name="currentProgram" required><br><br>
+
+        <label for="residencyYear">Years of Residency in Current Program:</label><br>
+        <input type="number" id="residencyYear" name="residencyYear" required><br><br>
+
+        <label for="intendedProgram">Intended Program:</label><br>
+        <input type="text" id="intendedProgram" name="intendedProgram" required><br><br>
+
+        <label for="qualifications">Qualifications for Shifting (if any):</label><br>
+        <textarea id="qualifications" name="qualifications" rows="4" cols="50"></textarea><br><br>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</body>
+</html>

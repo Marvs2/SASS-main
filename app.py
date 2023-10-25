@@ -106,6 +106,50 @@ def tutorial():
 def certification():
     return render_template("/services/certification.html")
 
+# ========================================================================
+# STUDENT
+@app.route('/student/foroverloadofsubject')
+def overload():
+    return render_template("/student/subject_overload.html")
+
+@app.route('/student/addingofsubject')
+def adding():
+    return render_template("/student/adding_of_subject.html")
+
+@app.route('/student/changeofsubject/schedule')
+def change():
+    return render_template("/student/change_of_subject.html")
+
+@app.route('/student/gradeentry')
+def correction():
+    return render_template("/student/grade_entry.html")
+
+@app.route('/student/crossenrollment')
+def cross_enrollment():
+    return render_template("/student/cross_enrollment.html")
+
+@app.route('/student/shifting')
+def shifting():
+    return render_template("/student/shifting.html")
+
+@app.route('/student/manualenrollment')
+def enrollment():
+    return render_template("/student/manual_enrollment.html")
+
+@app.route('/student/onlinepetitionofsubject')
+def petition():
+    return render_template("/student/petition.html")
+
+@app.route('/student/requestfortutorialofsubjects')
+def tutorial():
+    return render_template("/student/tutorial.html")
+
+@app.route('/student/certification')
+def certification():
+    return render_template("/student/certification.html")
+
+# ================================================================
+
 # ALL STUDENT ROUTES HERE
 @app.route('/student')
 @prevent_authenticated
@@ -145,7 +189,15 @@ def faculty_portal():
 @faculty_required
 def faculty_home():
     session.permanent = True
-    return render_template('faculty/home.html')
+
+    # Retrieve the user's name from the session (you should set it during login)
+    user_name = session.get('user_name')
+     # Check if the name is in the session
+     
+    if user_name:
+        return render_template('faculty/home.html', user_name=user_name)
+    else:
+        return render_template('faculty/home.html', user_name="Guest")  # Provide a default if the name is not in the session
 
 
 # ========================================================================

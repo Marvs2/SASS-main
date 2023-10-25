@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application for Cross Enrollment</title>
+</head>
+<body>
+    <h1>Application for Cross Enrollment</h1>
+    <p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Application Letter for Cross-Enrollment.</li>
+        <li>Permit to Cross-Enroll from the Office of the University Registrar.</li>
+    </ul>
+
+    <h2>Application Form</h2>
+    <form action="#" method="post">
+        <label for="studentID">Student ID:</label><br>
+        <input type="text" id="studentID" name="studentID" required><br><br>
+
+        <label for="studentName">Student Name:</label><br>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+
+        <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
+        <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
+
+        <label for="crossEnrollmentUnits">Total Number of Units:</label><br>
+        <input type="number" id="crossEnrollmentUnits" name="crossEnrollmentUnits" required><br><br>
+
+        <label for="authorizedSubjects">Authorized Subjects to Take:</label><br>
+        <textarea id="authorizedSubjects" name="authorizedSubjects" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="applicationLetter">Application Letter for Cross-Enrollment:</label><br>
+        <input type="file" id="applicationLetter" name="applicationLetter" required><br><br>
+
+        <label for="permitToCrossEnroll">Permit to Cross-Enroll from the Office of the University Registrar:</label><br>
+        <input type="file" id="permitToCrossEnroll" name="permitToCrossEnroll" required><br><br>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</body>
+</html>

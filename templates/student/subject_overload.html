@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Application for Overload of Subjects</title>
+</head>
+<body>
+    <h1>Application for Overload of Subjects</h1>
+    <p>Process a request for overload of subjects for students who intend to add additional subject/s more than the prescribed number of units specified in the curriculum for the current semester, prior to the opening of classes or within the adjustment period specified in the University calendar, and approved by the Director/Head of Academic Program.</p>
+
+    <p>Request for overload may be allowed for graduating students during the last school term. For undergraduate students, overload may be allowed under the following considerations:</p>
+
+    <ul>
+        <li>Academically outstanding student as certified by the Director/Head of Academic Program.</li>
+        <li>Transferee/Shiftiee who is in good standing (no failing grade in the previous semester).</li>
+    </ul>
+
+    <h2>Application Form</h2>
+    <form action="#" method="post">
+        <label for="studentName">Student Name:</label><br>
+        <input type="text" id="studentName" name="studentName" required><br><br>
+
+        <label for="studentID">Student ID:</label><br>
+        <input type="text" id="studentID" name="studentID" required><br><br>
+
+        <label for="semester">Semester:</label><br>
+        <select id="semester" name="semester" required>
+            <option value="Spring">Spring</option>
+            <option value="Summer">Summer</option>
+            <option value="Fall">Fall</option>
+        </select><br><br>
+
+        <label for="subjectsToAdd">Subjects to Add (comma-separated):</label><br>
+        <input type="text" id="subjectsToAdd" name="subjectsToAdd" required><br><br>
+
+        <label for="justification">Justification for Overload:</label><br>
+        <textarea id="justification" name="justification" rows="4" required></textarea><br><br>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</body>
+</html>
