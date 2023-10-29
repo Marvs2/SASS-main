@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Application for Cross Enrollment</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
+
     <h1>Application for Cross Enrollment</h1>
     <p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
 
@@ -38,5 +36,4 @@
 
         <button type="submit">Submit Application</button>
     </form>
-</body>
-</html>
+{% endblock %}

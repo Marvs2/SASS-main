@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Application for Change of Enrollment (Change of Schedule/Subjects)</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
     <h1>Application for Change of Enrollment (Change of Schedule/Subjects)</h1>
     <p>Process requests for application for change of enrollment specifically for changing schedules or subjects. This is applicable to both regular and irregular students of the University and is done during the adjustment period.</p>
 
@@ -31,5 +28,4 @@
 
         <button type="submit">Submit Application</button>
     </form>
-</body>
-</html>
+{% endblock %}

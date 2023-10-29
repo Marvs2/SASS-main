@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manual Enrollment Request</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
+
     <h1>Manual Enrollment Request</h1>
     <p>This service is for both regular and irregular students of the University and is done during the adjustment period. It is used when the student fails to enroll during the online registration period set by the University.</p>
 
@@ -26,5 +24,5 @@
 
         <button type="submit">Submit Request</button>
     </form>
-</body>
-</html>
+
+    {% endblock %}

@@ -1,9 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Application for Overload of Subjects</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
     <h1>Application for Overload of Subjects</h1>
     <p>Process a request for overload of subjects for students who intend to add additional subject/s more than the prescribed number of units specified in the curriculum for the current semester, prior to the opening of classes or within the adjustment period specified in the University calendar, and approved by the Director/Head of Academic Program.</p>
 
@@ -35,7 +32,10 @@
         <label for="justification">Justification for Overload:</label><br>
         <textarea id="justification" name="justification" rows="4" required></textarea><br><br>
 
-        <button type="submit">Submit Application</button>
+        <label for="fileLink">Download ACE Form:</label><br>
+        <a href="http://www.pup.edu.ph/downloads/students/ace_form.pdf" target="_blank">ACE Form</a><br><br>
+
+        <button type="submit">Send Application</button>
     </form>
-</body>
-</html>
+
+{% endblock %}

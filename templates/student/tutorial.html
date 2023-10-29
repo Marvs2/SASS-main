@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Online Request for Tutorial of Subject</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
+
     <h1>Online Request for Tutorial of Subject</h1>
     <p>Process online requests for the tutorial of a subject not offered for the current semester. A retake of a subject by less than the minimum (35) number of students shall be endorsed by the Director/Head of Academic Program to the Office of the Vice President for Branches and Campuses for approval as a tutorial.</p>
 
@@ -31,5 +29,4 @@
 
         <button type="submit">Submit Request</button>
     </form>
-</body>
-</html>
+{% endblock %}

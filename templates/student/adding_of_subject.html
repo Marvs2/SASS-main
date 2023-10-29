@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Application for Change of Enrollment (Adding of Subjects)</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
+
     <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
     <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
 
@@ -26,5 +24,4 @@
 
         <button type="submit">Submit Application</button>
     </form>
-</body>
-</html>
+{% endblock %}

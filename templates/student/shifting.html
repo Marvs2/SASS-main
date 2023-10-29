@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Application for Shifting</title>
-</head>
-<body>
+{% extends "student/home.html" %}
+
+{% block services %}
+
     <h1>Application for Shifting</h1>
     <p>Process requests for students who intend to shift to another program in the University. Students must have one (1) year residency from the current program to qualify for shifting to another program. Application for shifting shall be accomplished prior to the start of the next academic school year. Qualifications may vary depending on the program to which the student intends to shift.</p>
 
@@ -29,5 +27,5 @@
 
         <button type="submit">Submit Application</button>
     </form>
-</body>
-</html>
+
+{% endblock %}

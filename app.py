@@ -108,6 +108,10 @@ def certification():
 
 # ========================================================================
 # STUDENT
+@app.route('/student/dashboard')
+def stud_dashboard():
+    return render_template('/student/dashboard.html')
+
 @app.route('/student/foroverloadofsubject')
 def stud_overload():
     return render_template("/student/subject_overload.html")
