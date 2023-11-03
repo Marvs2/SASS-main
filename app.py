@@ -1,5 +1,9 @@
-from flask import Flask, render_template, jsonify, redirect, url_for, session
-from flask_sqlalchemy import SQLAlchemy
+from multiprocessing import connection
+from flask import Flask, render_template, jsonify, redirect, request, flash, send_file, url_for, session
+from models import db
+from werkzeug.utils import secure_filename
+import psycopg2
+from sqlalchemy import Connection
 
 from Api.v1.student.api_routes import student_api  
 from Api.v1.faculty.api_routes import faculty_api
@@ -9,10 +13,9 @@ import os
 from dotenv import load_dotenv
 
 
-from models import init_db, Student, Faculty, Admin
+from models import Add_Subjects, init_db, Student
 
 from flask_jwt_extended import JWTManager
-from flask_login import LoginManager, logout_user, current_user
 
 from decorators.auth_decorators import student_required, faculty_required, prevent_authenticated, admin_required
 
@@ -64,6 +67,15 @@ def logout():
     session.clear()
     return redirect(url_for('student_portal'))  # Redirect to home or appropriate route
 
+# =======================================================================
+#Downloadable files
+@app.route('/download/pdf_file')
+def download_AddingSubs():
+    pdf_path = "static/pdf_files/Adding_subject_form.pdf"  # Replace with the actual path to your PDF file
+    return send_file(pdf_path, as_attachment=True, download_name="Adding_subject_form.pdf")
+
+
+
 # ========================================================================
 #SERVICES
 @app.route('/services/foroverloadofsubject')
@@ -106,7 +118,11 @@ def tutorial():
 def certification():
     return render_template("/services/certification.html")
 
-# ========================================================================
+#========================================================================
+# Define your allowed file function (you can customize it)
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png', 'gif'}
+#========================================================================
 # STUDENT
 @app.route('/student/dashboard')
 def stud_dashboard():
@@ -119,6 +135,49 @@ def stud_overload():
 @app.route('/student/addingofsubject')
 def stud_adding():
     return render_template("/student/adding_of_subject.html")
+
+@app.route('/student/addingofsubject/add_subjects', methods=['POST'])
+def add_subjects():
+    if request.method == 'POST':
+        student_number = request.form['student_number']
+        student_name = request.form['student_name']
+        subject_names = request.form['subject_Names']  # Get the subject names as a single string
+        enrollment_type = request.form['enrollment_type']
+
+        # Check if a file is provided
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+
+        file = request.files['file']
+        # Check if the file field is empty
+        if file.filename == '':
+            flash('No selected file')
+            return redirect(request.url)
+
+        file_data = file.read()  # Read the file data
+        file_name = secure_filename(file.filename)
+
+        try:
+            new_subject = Add_Subjects(
+                student_number=student_number,
+                student_name=student_name,
+                subject_Names=subject_names,  # Assign the whole string to subject_Names
+                enrollment_type=enrollment_type,
+                file_data=file_data,
+                file_name=file_name
+            )
+
+            db.session.add(new_subject)
+            db.session.commit()
+            flash('Subject Added successfully')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}')
+        finally:
+            db.session.close()
+
+    return redirect(url_for('stud_adding'))
 
 @app.route('/student/changeofsubject/schedule')
 def stud_change():

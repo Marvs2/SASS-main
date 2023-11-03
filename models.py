@@ -21,6 +21,9 @@ class Student(db.Model, UserMixin):
     mobileNumber = db.Column(db.String(11))
     userImg = db.Column(db.String, nullable=False) 
 
+    # Define the 'subjects' relationship in the Student model
+    subjects = db.relationship('Add_Subjects', back_populates='student')
+
     def to_dict(self):
         return {
             'student_id': self.student_id,
@@ -39,7 +42,41 @@ class Student(db.Model, UserMixin):
     def get_id(self):
         return str(self.id)  # Convert to string to ensure compatibility
 
-class Payment(db.Model, UserMixin):
+class Add_Subjects(db.Model, UserMixin):
+    __tablename__ = 'subjects'
+
+    subject_ID = db.Column(db.Integer, primary_key=True)
+    student_number = db.Column(db.String(50), db.ForeignKey('students.studentNumber'))
+    student_name = db.Column(db.String(50))
+    subject_Names = db.Column(db.String(50), nullable=False)
+    enrollment_type = db.Column(db.String(20))  # 'regular' or 'irregular'
+    file_data = db.Column(db.LargeBinary)  # Store binary data for the file
+    file_name = db.Column(db.String(255))  # Store the filename
+    faculty_number = db.Column(db.String(50), db.ForeignKey('faculties.facultyNumber'))
+
+    # Establish a relationship with the Student class
+    student = db.relationship('Student', back_populates='subjects')
+
+    # Establish a relationship with the Faculty class
+    faculty = db.relationship('Faculty', back_populates='subjects', foreign_keys=[faculty_number])
+
+    def to_dict(self):
+        return {
+            'subject_ID': self.subject_ID,
+            'student_number': self.student_number,
+            'student_name': self.student_name,
+            'subject_Names': self.subject_Names,
+            'enrollment_type': self.enrollment_type,
+            'file_data': self.file_data,
+            'file_name': self.file_name,
+            'faculty_number': self.faculty_number
+        }
+    def get_Add_SubjectsID(self):
+        return str(self.subject_ID)
+
+
+
+"""class Payment(db.Model, UserMixin):
     __tablename__ = 'payments'
 
     paymentID = db.Column(db.Integer, primary_key=True)
@@ -64,9 +101,9 @@ class Payment(db.Model, UserMixin):
     #payment = Payment.query.get(some_payment_id)
     #payment_data = payment.to_dict()
         def get_paymentID(self):
-            return str(self.paymentID)  # Convert to string to ensure compatibility
+            return str(self.paymentID)  # Convert to string to ensure compatibility"""
 
-class Service(db.Model, UserMixin):
+"""class Service(db.Model, UserMixin):
     __tablename__ = 'services'
 
     serviceID = db.Column(db.Integer, primary_key=True)
@@ -181,7 +218,7 @@ class Announcement(db.Model, UserMixin):
     # announcement = Announcement.query.get(some_announcement_id)
     # announcement_data = announcement.to_dict()
     def get_announcementID(self):
-        return str(self.announcementID)  # Convert to string to ensure compatibility
+        return str(self.announcementID)  # Convert to string to ensure compatibility"""
 
 
 class Faculty(db.Model, UserMixin):
@@ -200,6 +237,9 @@ class Faculty(db.Model, UserMixin):
     mobile_number = db.Column(db.String(20))  # MobileNumber
     userImg = db.Column(db.String(255))  # Modify the length as needed
     is_active = db.Column(db.Boolean, default=True)
+
+    # Define the 'subjects' relationship in the Faculty model
+    subjects = db.relationship('Add_Subjects', back_populates='faculty')
 
     def to_dict(self):
         return {
