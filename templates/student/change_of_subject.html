@@ -8,24 +8,58 @@
     <ul>
         <li>Accomplished and printed copy of ACE form (Change of Schedule/Subject) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a>.</li>
     </ul>
+    <br>
+        <p><a href="{{url_for('download_Change_Sched_Subs')}}">Download Application file for Change of Subject/Sched</a></p>
+    <br>   
+     {% with messages = get_flashed_messages()  %}
+          {% if messages %}
+          {% for message in messages %}
+          <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+    <br>
 
     <h2>Application Form</h2>
-    <form action="#" method="post">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
 
-        <label for="studentName">Student Name:</label><br>
-        <input type="text" id="studentName" name="studentName" required><br><br>
-
-        <label for="enrollmentType">Enrollment Type:</label><br>
-        <select id="enrollmentType" name="enrollmentType" required>
+    <form action="{{ url_for('change_of_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <label for="student_number">Student No.:</label><br>
+        <input type="text" id="student_number" name="student_number" required><br><br>
+    
+        <label for="student_name">Student Name:</label><br>
+        <input type="text" id="student_name" name="student_name" required><br><br>
+    
+        <label for="enrollment_type">Enrollment Type:</label><br>
+        <select id="enrollment_type" name="enrollment_type" required>
             <option value="Regular">Regular</option>
             <option value="Irregular">Irregular</option>
         </select><br><br>
-
+    
         <label for="aceForm">ACE Form (Change of Schedule/Subject):</label><br>
-        <input type="file" id="aceForm" name="aceForm" required><br><br>
+        <input type="file" id="aceForm" name="aceForm" required><br><br> <!-- File input field -->
 
-        <button type="submit">Submit Application</button>
+        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
     </form>
+    <script>
+        function validateForm() {
+            var studentNumber = document.getElementById('student_number').value;
+            var studentName = document.getElementById('student_name').value;
+            var enrollmentType = document.getElementById('enrollment_type').value;
+            var aceForm = document.getElementById('aceForm').value;
+    
+            if (!studentNumber || !studentName || !enrollmentType || !aceForm) {
+                alert('Error: Please fill out all required fields.');
+                return false;
+            }
+    
+            // Add additional validation checks here if needed
+    
+            return true;
+        }
+    </script>
 {% endblock %}

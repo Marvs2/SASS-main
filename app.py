@@ -1,6 +1,6 @@
 from multiprocessing import connection
 from flask import Flask, render_template, jsonify, redirect, request, flash, send_file, url_for, session
-from models import db
+from models import ChangeOfSubjects, db, Add_Subjects, init_db, Student
 from werkzeug.utils import secure_filename
 import psycopg2
 from sqlalchemy import Connection
@@ -11,9 +11,6 @@ from Api.v1.admin.api_routes import admin_api
 
 import os
 from dotenv import load_dotenv
-
-
-from models import Add_Subjects, init_db, Student
 
 from flask_jwt_extended import JWTManager
 
@@ -68,13 +65,35 @@ def logout():
     return redirect(url_for('student_portal'))  # Redirect to home or appropriate route
 
 # =======================================================================
-#Downloadable files
-@app.route('/download/pdf_file')
+#Downloadable files for Adding Subjects
+@app.route('/download/pdf_file/Adding_subject_form')
 def download_AddingSubs():
     pdf_path = "static/pdf_files/Adding_subject_form.pdf"  # Replace with the actual path to your PDF file
     return send_file(pdf_path, as_attachment=True, download_name="Adding_subject_form.pdf")
 
+#Downloadable files for Change of Schedule and Subjects
+@app.route('/download/pdf_file/Change_of_subjects')
+def download_Change_Sched_Subs():
+    pdf_path = "static/pdf_files/Change_of_subjects.pdf"  # Replace with the actual path to your PDF file
+    return send_file(pdf_path, as_attachment=True, download_name="Change_of_subjects.pdf")
 
+#Downloadable files for Accreditation
+@app.route('/download/pdf_file/Accreditation-for-Shiftees-and-Regular')
+def download_Accreditation():
+    pdf_path = "static/pdf_files/Accreditation-for-Shiftees-and-Regular.pdf"  # Replace with the actual path to your PDF file
+    return send_file(pdf_path, as_attachment=True, download_name="Accreditation-for-Shiftees-and-Regular.pdf")
+
+#Downloadable files for OverLoads
+@app.route('/download/pdf_file/Overload-3-6-units')
+def download_Overload_Subs():
+    pdf_path = "static/pdf_files/Overload-3-6-units.pdf"  # Replace with the actual path to your PDF file
+    return send_file(pdf_path, as_attachment=True, download_name="Overload-3-6-units.pdf")
+
+#Downloadable files for RO Form
+@app.route('/download/pdf_file/RO-Form')
+def download_RO_form():
+    pdf_path = "static/pdf_files/RO-Form.pdf"  # Replace with the actual path to your PDF file
+    return send_file(pdf_path, as_attachment=True, download_name="RO-Form.pdf")
 
 # ========================================================================
 #SERVICES
@@ -182,6 +201,49 @@ def add_subjects():
 @app.route('/student/changeofsubject/schedule')
 def stud_change():
     return render_template("/student/change_of_subject.html")
+
+
+@app.route('/student/changeofsubject/schedule/changeofsuborsched', methods=['POST'])
+def change_of_subjects():
+    if request.method == 'POST':
+        student_number = request.form['student_number']
+        student_name = request.form['student_name']
+        enrollment_type = request.form['enrollment_type']
+
+        # Check if ACE Form file is provided
+        if 'aceForm' not in request.files:
+            flash('No ACE Form file provided')
+            return redirect(request.url)
+
+        ace_form_file = request.files['aceForm']
+        # Check if the ACE Form file field is empty
+        if ace_form_file.filename == '':
+            flash('No ACE Form file selected')
+            return redirect(request.url)
+
+        ace_form_data = ace_form_file.read()  # Read the ACE Form file data
+        ace_form_filename = secure_filename(ace_form_file.filename)
+
+        try:
+            new_change_of_subjects = ChangeOfSubjects(
+                student_number=student_number,
+                student_name=student_name,
+                enrollment_type=enrollment_type,
+                ace_form_filename=ace_form_filename,
+                ace_form_data=ace_form_data
+            )
+
+            db.session.add(new_change_of_subjects)
+            db.session.commit()
+            flash('Change of Subjects Added successfully')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}')
+        finally:
+            db.session.close()
+
+    return redirect(url_for('stud_change'))
+
 
 @app.route('/student/gradeentry')
 def stud_correction():

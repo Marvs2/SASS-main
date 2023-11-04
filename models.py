@@ -1,5 +1,6 @@
+from datetime import datetime  
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import inspect
+from sqlalchemy import TIMESTAMP, inspect
 from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
 
@@ -73,7 +74,37 @@ class Add_Subjects(db.Model, UserMixin):
         }
     def get_Add_SubjectsID(self):
         return str(self.subject_ID)
+    
 
+class ChangeOfSubjects(db.Model, UserMixin):
+    __tablename__ = 'changesubjects'
+
+    Changesubject_ID = db.Column(db.Integer, primary_key=True)
+    student_number = db.Column(db.String(50), db.ForeignKey('students.studentNumber'))
+    student_name = db.Column(db.String(50))
+    enrollment_type = db.Column(db.String(20))  # 'regular' or 'irregular'
+    ace_form_filename = db.Column(db.String(255))
+    ace_form_data = db.Column(db.LargeBinary)
+    created_at = db.Column(TIMESTAMP, default=datetime.utcnow)
+    updated_at = db.Column(TIMESTAMP)
+
+    # Add a relationship to the 'students' table
+    student = db.relationship('Student', foreign_keys=[student_number])
+
+    def to_dict(self):
+        return {
+            'Changesubject_ID': self.Changesubject_ID,
+            'student_number': self.student_number,
+            'student_name': self.student_name,
+            'enrollment_type': self.enrollment_type,
+            'ace_form_filename': self.ace_form_filename,
+            'ace_form_data': self.ace_form_data,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+    
+    def get_ChangesubjectID(self):
+        return str(self.Changesubject_ID)    
 
 
 """class Payment(db.Model, UserMixin):
