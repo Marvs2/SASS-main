@@ -6,7 +6,69 @@ from flask_login import UserMixin
 
 db = SQLAlchemy()
 
+"""class Subject(Base):
+    __tablename__ = 'subjects'
+    subjectID = Column(Integer, primary_key=True)
+    subject_Code = Column(String)
+    pre_Requisite = Column(ARRAY(String))
+    description = Column(String)
+    lecture_hours = Column(Integer)
+    laboratory_hours = Column(Integer)
+    credit_Unit = Column(Integer)
+    tuition_Hours = Column(Integer)
+    faculty_name = Column(String)
+    day = Column(String)
+    time = Column(String)
+    room = Column(String)
 
+class Course(Base):
+    __tablename__ = 'courses'
+    courseID = Column(Integer, primary_key=True)
+    courseName = Column(String)
+    students = relationship('Student', back_populates='course')
+
+class StudentSubjects(Base):
+    __tablename__ = 'student_subjects'
+    student_subject_ID = Column(Integer, primary_key=True)
+    subjectID = Column(Integer, ForeignKey('subjects.subjectID'))
+    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
+    total_Units = Column(Integer)
+    Status = Column(String)
+    student = relationship('Student', back_populates='student_subjects')
+    subject = relationship('Subject', back_populates='student_subjects')
+
+class Request(Base):
+    __tablename__ = 'requests'
+    requestID = Column(Integer, primary_key=True)
+    type = Column(String)
+    body = Column(String)
+    status = Column(String)
+    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
+    faculy_ID = Column(Integer, ForeignKey('faculties.facultyID'))
+    student = relationship('Student', back_populates='requests')
+
+class Curriculum(Base):
+    __tablename__ = 'curriculums'
+    curriculumID = Column(Integer, primary_key=True)
+    courseID = Column(Integer, ForeignKey('courses.courseID'))
+    year = Column(String)
+    semester = Column(String)
+    subject = Column(ARRAY(Integer, ForeignKey('subjects.subjectID')))
+    totalcredits = Column(Integer)
+    total_tuition_hours = Column(Integer)
+    course = relationship('Course', back_populates='curriculums')
+
+class Services(Base):
+    __tablename__ = 'services'
+    serviceID = Column(Integer, primary_key=True)
+    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
+    student_subject_ID = Column(Integer, ForeignKey('student_subjects.student_subject_ID'))
+    status = Column(String)
+    faculy_ID = Column(Integer, ForeignKey('faculties.facultyID'))
+    student = relationship('Student', back_populates='services')
+    student_subject = relationship('StudentSubjects', back_populates='services')"""
+
+    
 class Student(db.Model, UserMixin):
     __tablename__ = 'students'
 
@@ -104,7 +166,36 @@ class ChangeOfSubjects(db.Model, UserMixin):
         }
     
     def get_ChangesubjectID(self):
-        return str(self.Changesubject_ID)    
+        return str(self.Changesubject_ID)
+
+class ManualEnrollment(db.Model, UserMixin):
+    __tablename__ = 'manual_Enrollments'
+
+    m_enrollment_ID = db.Column(db.Integer, primary_key=True)
+    student_number = db.Column(db.String(50), db.ForeignKey('students.studentNumber'))
+    student_name = db.Column(db.String(255), nullable=False)
+    enrollment_type = db.Column(db.String(50), nullable=False)
+    reason = db.Column(db.Text, nullable=False)
+    me_file_filename = db.Column(db.String(255))
+    me_file_data = db.Column(db.LargeBinary)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+     # Add a relationship to the 'students' table
+    student = db.relationship('Student', foreign_keys=[student_number])
+
+    def to_dict(self):
+        return {
+            'm_enrollment_ID': self.m_enrollment_ID,
+            'student_number': self.student_number,
+            'student_name': self.student_name,
+            'enrollment_type': self.enrollment_type,
+            'reason': self.reason,
+            'me_file_filename': self.me_file_filename,
+            'me_file_data': self.me_file_data,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
 
 
 """class Payment(db.Model, UserMixin):

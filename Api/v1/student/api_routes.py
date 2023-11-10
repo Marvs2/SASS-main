@@ -29,7 +29,94 @@ student_api = Blueprint('student_api', __name__)
 CORS(student_api)  # Apply CORS to the student_api blueprint
 
 # Api/v1/student/api_routes.py
+#================================================================
+# Function to check if the user is logged in
+def is_user_logged_in_overload():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return 'access_token' in session and session['access_token'] is not None
 
+
+# Login function for students to goto student_overload
+@student_api.route('/login-Overload', methods=['GET', 'POST'])
+def login_Overload():
+    if is_user_logged_in_overload():
+        # If the user is already logged in, redirect to the overload subjects page
+        return redirect(url_for('student_portal_overload'))
+
+    if request.method == 'POST':
+        studentNumber = request.form['studentNumber']
+        password = request.form['password']
+        
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student and check_password_hash(student.password, password):
+            # Successfully authenticated
+            access_token = create_access_token(identity=student.student_id)
+            session['access_token'] = access_token
+            session['user_role'] = 'student'
+            return redirect(url_for('student_portal_overload'))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('student/login.html')
+
+#========================================================
+
+def is_user_logged_in_certification():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return 'access_token' in session and session['access_token'] is not None
+
+# Login function for students to goto certification
+@student_api.route('/login-Certification', methods=['GET', 'POST'])
+def login_Certification():
+    if is_user_logged_in_certification():
+        # If the user is already logged in, redirect to the certifications page
+        return redirect(url_for('student_portal_certification'))
+
+    if request.method == 'POST':
+        studentNumber = request.form['studentNumber']
+        password = request.form['password']
+        
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student and check_password_hash(student.password, password):
+            # Successfully authenticated
+            access_token = create_access_token(identity=student.student_id)
+            session['access_token'] = access_token
+            session['user_role'] = 'student'
+            return redirect(url_for('student_portal_certification'))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('student/login.html')
+#=============================================================
+def is_user_logged_in_changesubsched():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return 'access_token' in session and session['access_token'] is not None
+
+# Login function for students to goto changesubsched
+@student_api.route('/login-Changesubsched', methods=['GET', 'POST'])
+def login_Changesubsched():
+    if is_user_logged_in_changesubsched():
+        # If the user is already logged in, redirect to the changesubsched page
+        return redirect(url_for('student_portal_changesubsched'))
+
+    if request.method == 'POST':
+        studentNumber = request.form['studentNumber']
+        password = request.form['password']
+        
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student and check_password_hash(student.password, password):
+            # Successfully authenticated
+            access_token = create_access_token(identity=student.student_id)
+            session['access_token'] = access_token
+            session['user_role'] = 'student'
+            return redirect(url_for('student_portal_changesubsched'))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('student/login.html')
+#=============================================================
+
+
+
+#=============================================================
+#for All Students
 @student_api.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':

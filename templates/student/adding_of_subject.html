@@ -1,4 +1,28 @@
 {% extends "student/home.html" %}
+<script>
+    function getStudentNumber() {
+        var studentName = document.getElementById('student_name').value;
+        var studentNumberField = document.getElementById('student_number');
+
+        // Make an AJAX request to fetch the student number
+        fetch('/get_student_number', {
+            method: 'POST',
+            body: new URLSearchParams({ student_name: studentName }),
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        })
+        .then(response => response.text())
+        .then(studentNumber => {
+            if (studentNumber !== 'Student not found') {
+                studentNumberField.value = studentNumber;
+            } else {
+                studentNumberField.value = '';
+                alert('Student not found');
+            }
+        });
+    }
+</script>
 
 {% block services %}
 
@@ -22,12 +46,12 @@
           {% endif %}
           {% endwith %}
     <h2>Application Form</h2>
-    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <label for="student_number">Student No.:</label><br>
         <input type="text" id="student_number" name="student_number" required><br><br>
     
         <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <input type="text" id="student_name" name="student_name" required onblur="getStudentNumber()"><br><br>
     
         <label for="enrollment_type">Enrollment Type:</label><br>
         <select id="enrollment_type" name="enrollment_type" required>
@@ -35,22 +59,23 @@
             <option value="Irregular">Irregular</option>
         </select><br><br>
     
-        <label for="subject_Names">Subjects to Add (comma-separated):</label><br>
+        <label for="subject_Names">Subject Names to Add (comma-separated):</label><br>
         <input type="text" id="subject_Names" name="subject_Names" required><br><br>
     
         <input type="file" name="file"> <!-- File input field -->
         <br>
-    <br>
-    <br>
+        <br>
+        <br>
         <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
     </form>
+    
         <!-- JavaScript function to validate the form and log any errors -->
         <script>
             function validateForm() {
                 var studentNumber = document.getElementById('student_number').value;
                 var studentName = document.getElementById('student_name').value;
                 var enrollmentType = document.getElementById('enrollment_type').value;
-                var subjectsToAdd = document.getElementById('subject_Names').value;
+                var subject_Names = document.getElementById('subject_Names').value;
     
                 // You can add your custom validation logic here
                 if (!studentNumber || !studentName || !enrollmentType || !subject_Names) {

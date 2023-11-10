@@ -1,0 +1,55 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for ('static', filename='/css/portal.css')}}">
+
+    <section>           
+        <div class="box">   
+            <div class="inner-box">    
+                <div class="forms-wrap">
+                    <form action="{{ url_for('student_api.login_Overload') }}" name="form" method="POST" autocomplete="off" class="sign-in-form">
+                        <div class="logo">
+                        
+                            <h1>SASS</h1>
+                        </div>
+                        <div class="actual-form">                           
+                            <div class="input-wrap-text">
+                                <input title="Student Number" id="studentNumber" type="text" maxlength="15" name="studentNumber" class="input-field" autocomplete="off" required>
+                                <label>Enter your Student Number</label>
+                            </div>
+                            <div class="input-wrap">
+                                <input title="Password" id="password" type="password" maxlength="20" name="password" class="input-field" autocomplete="off" required>
+                                <label>Password</label>
+                            </div>
+                            <p class="text text-password">
+                               <a href="../Student/forgotpassword">Forgot Password?</a>
+                            </p>
+                            <input class="sign-btn btn btn-danger" id="btn" type="submit" name="submit" value="Sign-in">
+                            {% with messages = get_flashed_messages() %} {% if messages %}
+                            <ul class="messages text-red-500">
+                                {% for message in messages %}
+                                <li>{{ message }}</li>
+                                {% endfor %}
+                              </ul>
+                              {% endif %} {% endwith %}
+                            <p class="text">
+                                By signing up, I agree to the PUP Online Services
+                                <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Services</a> and
+                                <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+                            </p>
+                        </div>
+                    </form>
+                </div>
+              <!----  <div class="carousel">
+                    <div class="images-wrapper">
+                        <img src=".//img/complaint1.png" class="image img-1 show" alt="">
+                        <img src=".//img/complaints.jpg" class="image img-2" alt="">
+                        <img src=".//img/PUP.jpg" class="image img-3" alt="">
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </section>  
+
+    {% endblock %}

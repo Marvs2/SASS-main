@@ -40,8 +40,40 @@ def custom_context_processor():
 
 #=========================================================================
 # TESTING AREA
+"""# Login function for students
+@app.route('/student/foroverloadofsubject')
+def student_overload():
+    session.permanent = True
+    # Check if the user is logged in
+    if is_user_logged_in():
+        # If logged in, render the overload subject page
+        return render_template('student/subject_overload.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('student_portal'))
+# Login function for students
+@app.route('/student/foroverloadofsubject')
+def student_portal_overload():
+    session.permanent = True
+    return render_template('student/login/subject_overload.html')
+# Link for overload of subject
+@app.route('/student/foroverloadofsubject')
+def stud_overload():
+    return render_template("/student/subject_overload.html")
 
+# Function to check if the user is logged in
+def is_user_logged_in():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
 
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login')
+def redirect_based_on_login():
+    if is_user_logged_in():
+        return redirect(url_for('stud_overload'))
+    else:
+        return redirect(url_for('student_portal'))
+"""
 
 #===========================================================================
 
@@ -282,6 +314,27 @@ def student_portal():
     session.permanent = True
     return render_template('student/login.html')
 
+#foroverload
+@app.route('/student/login_for_overload')
+@prevent_authenticated
+def portal_overload():
+    session.permanent = True
+    return render_template('student/login_for_overload.html')
+
+#certification
+@app.route('/student/login_certification')
+@prevent_authenticated
+def portal_certification():
+    session.permanent = True
+    return render_template('student/login_certification.html')
+
+#changesubsched
+@app.route('/student/login_changesubsched')
+@prevent_authenticated
+def portal_changesubsched():
+    session.permanent = True
+    return render_template('student/login_changesubsched.html')
+
 @app.route('/student/home')
 @student_required
 def student_home():
@@ -303,6 +356,79 @@ def profile():
 
 
 # ========================================================================
+#Student directly Services
+
+# Overload subjects function for students
+@app.route('/student/foroverloadofsubject')
+def student_portal_overload():
+    session.permanent = True
+    if is_user_logged_in_overload():
+        return render_template('student/subject_overload.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_overload'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_overload():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_overload')
+def redirect_based_on_login_overload():
+    if is_user_logged_in_overload():
+        return redirect(url_for('student_portal_overload'))
+    else:
+        return redirect(url_for('portal_overload'))
+
+#================================================================
+# Certification function for students
+@app.route('/student/certification')
+def student_portal_certification():
+    session.permanent = True
+    if is_user_logged_in_certification():
+        return render_template('student/certification.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_certification'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_certification():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_certification')
+def redirect_based_on_login_certification():
+    if is_user_logged_in_certification():
+        return redirect(url_for('student_portal_certification'))
+    else:
+        return redirect(url_for('portal_certification'))
+#========================================================================
+# Change of subject or sched function for students
+@app.route('/student/changesubsched')
+def student_portal_changesubsched():
+    session.permanent = True
+    if is_user_logged_in_changesubsched():
+        return render_template('student/change_of_subject.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_changesubsched'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_changesubsched():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_changesubsched')
+def redirect_based_on_login_changesubsched():
+    if is_user_logged_in_certification():
+        return redirect(url_for('student_portal_changesubsched'))
+    else:
+        return redirect(url_for('portal_changesubsched'))
+#========================================================================
+
 # ALL FACULTY ROUTES HERE
 @app.route('/faculty')
 @prevent_authenticated
