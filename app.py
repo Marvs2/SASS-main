@@ -179,13 +179,13 @@ def allowed_file(filename):
 def stud_dashboard():
     return render_template('/student/dashboard.html')
 
-@app.route('/student/foroverloadofsubject')
+@app.route('/student/foroverloadofsubject') #
 def stud_overload():
-    return render_template("/student/subject_overload.html")
+    return render_template("/student/subject_overload.html")# 
 
-@app.route('/student/addingofsubject')
+@app.route('/student/addingofsubject')#
 def stud_adding():
-    return render_template("/student/adding_of_subject.html")
+    return render_template("/student/adding_of_subject.html")#
 
 @app.route('/student/addingofsubject/add_subjects', methods=['POST'])
 def add_subjects():
@@ -230,9 +230,9 @@ def add_subjects():
 
     return redirect(url_for('stud_adding'))
 
-@app.route('/student/changeofsubject/schedule')
+@app.route('/student/changeofsubject/schedule')#
 def stud_change():
-    return render_template("/student/change_of_subject.html")
+    return render_template("/student/change_of_subject.html")#
 
 
 @app.route('/student/changeofsubject/schedule/changeofsuborsched', methods=['POST'])
@@ -277,36 +277,39 @@ def change_of_subjects():
     return redirect(url_for('stud_change'))
 
 
-@app.route('/student/gradeentry')
+@app.route('/student/gradeentry')#
 def stud_correction():
-    return render_template("/student/grade_entry.html")
+    return render_template("/student/grade_entry.html")#
 
-@app.route('/student/crossenrollment')
+@app.route('/student/crossenrollment')#
 def stud_cross_enrollment():
-    return render_template("/student/cross_enrollment.html")
+    return render_template("/student/cross_enrollment.html")#
 
-@app.route('/student/shifting')
+@app.route('/student/shifting')#
 def stud_shifting():
-    return render_template("/student/shifting.html")
+    return render_template("/student/shifting.html")#
 
-@app.route('/student/manualenrollment')
+@app.route('/student/manualenrollment')#
 def stud_enrollment():
-    return render_template("/student/manual_enrollment.html")
+    return render_template("/student/manual_enrollment.html")#
 
-@app.route('/student/onlinepetitionofsubject')
+@app.route('/student/onlinepetitionofsubject')#
 def stud_petition():
-    return render_template("/student/petition.html")
+    return render_template("/student/petition.html")#
 
-@app.route('/student/requestfortutorialofsubjects')
+@app.route('/student/requestfortutorialofsubjects')#
 def stud_tutorial():
-    return render_template("/student/tutorial.html")
+    return render_template("/student/tutorial.html")#
 
-@app.route('/student/certification')
+@app.route('/student/certification')#
 def stud_certification():
-    return render_template("/student/certification.html")
+    return render_template("/student/certification.html")#
 
 # ================================================================
-
+#routes for the redirection to the portal of the login in different routes
+# ====================================================================================================================#
+#===================================================== PORTALS =======================================================#
+#=====================================================================================================================#
 # ALL STUDENT ROUTES HERE
 @app.route('/student')
 @prevent_authenticated
@@ -335,6 +338,56 @@ def portal_changesubsched():
     session.permanent = True
     return render_template('student/login_changesubsched.html')
 
+#enrollment
+@app.route('/student/login_manualenroll')
+@prevent_authenticated
+def portal_enrollment():
+    session.permanent = True
+    return render_template('student/login_manualenroll.html')
+
+#addsubjects
+@app.route('/student/login_addsubjects')
+@prevent_authenticated
+def portal_addingofsubject():
+    session.permanent = True
+    return render_template('student/login_addsubjects.html')
+
+#requestfortutorialofsubjects
+@app.route('/student/login_tutorial')
+@prevent_authenticated
+def portal_tutorial():
+    session.permanent = True
+    return render_template('student/login_tutorial.html')
+
+#shifting
+@app.route('/student/login_shifting')
+@prevent_authenticated
+def portal_shifting():
+    session.permanent = True
+    return render_template('student/login_shifting.html')
+
+#petition onlinepetitionofsubject
+@app.route('/student/login_petition')
+@prevent_authenticated
+def portal_petition():
+    session.permanent = True
+    return render_template('student/login_petition.html')
+
+#gradeentry
+@app.route('/student/login_gradeentry')
+@prevent_authenticated
+def portal_gradeentry():
+    session.permanent = True
+    return render_template('student/login_gradeentry.html')
+
+#crossenrollment
+@app.route('/student/login_crossenrollment')
+@prevent_authenticated
+def portal_crossenrollment():
+    session.permanent = True
+    return render_template('student/login_crossenrollment.html')
+
+#for the home
 @app.route('/student/home')
 @student_required
 def student_home():
@@ -406,7 +459,7 @@ def redirect_based_on_login_certification():
         return redirect(url_for('portal_certification'))
 #========================================================================
 # Change of subject or sched function for students
-@app.route('/student/changesubsched')
+@app.route('/student/changeofsubject/schedule')
 def student_portal_changesubsched():
     session.permanent = True
     if is_user_logged_in_changesubsched():
@@ -428,7 +481,181 @@ def redirect_based_on_login_changesubsched():
     else:
         return redirect(url_for('portal_changesubsched'))
 #========================================================================
+# Enrollment function for students
+@app.route('/student/manualenrollment')
+def student_portal_enrollment():
+    session.permanent = True
+    if is_user_logged_in_enrollment():
+        return render_template('student/manual_enrollment.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_enrollment'))
 
+# Function to check if the user is logged in
+def is_user_logged_in_enrollment():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_enrollment')
+def redirect_based_on_login_enrollment():
+    if is_user_logged_in_enrollment():
+        return redirect(url_for('student_portal_enrollment'))
+    else:
+        return redirect(url_for('portal_enrollment'))
+
+#========================================================================
+
+# addingsubject subjects function for students
+@app.route('/student/addingofsubject')
+def student_portal_addingsubject():
+    session.permanent = True
+    if is_user_logged_in_addingofsubject():
+        return render_template('student/adding_of_subject.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_addingofsubject'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_addingofsubject():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_addingofsubject')
+def redirect_based_on_login_addingofsubject():
+    if is_user_logged_in_addingofsubject():
+        return redirect(url_for('student_portal_addingofsubject'))
+    else:
+        return redirect(url_for('portal_addingofsubject'))
+
+#================================================================
+# shifting function for students
+@app.route('/student/shifting')
+def student_portal_shifting():
+    session.permanent = True
+    if is_user_logged_in_shifting():
+        return render_template('student/shifting.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_shifting'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_shifting():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_shifting')
+def redirect_based_on_login_shifting():
+    if is_user_logged_in_shifting():
+        return redirect(url_for('student_portal_shifting'))
+    else:
+        return redirect(url_for('portal_shifting'))
+
+
+#========================================================================
+
+# tutorial subjects function for students
+@app.route('/student/requestfortutorialofsubjects')
+def student_portal_tutorial():
+    session.permanent = True
+    if is_user_logged_in_tutorial():
+        return render_template('student/tutorial.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_tutorial'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_tutorial():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_tutorial')
+def redirect_based_on_login_tutorial():
+    if is_user_logged_in_tutorial():
+        return redirect(url_for('student_portal_tutorial'))
+    else:
+        return redirect(url_for('portal_tutorial'))
+
+#================================================================
+# online petition subjects function for students
+@app.route('/student/onlinepetitionofsubject')
+def student_portal_petition():
+    session.permanent = True
+    if is_user_logged_in_petition():
+        return render_template('student/petition.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_petition'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_petition():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_petition')
+def redirect_based_on_login_petition():
+    if is_user_logged_in_petition():
+        return redirect(url_for('student_portal_petition'))
+    else:
+        return redirect(url_for('portal_petition'))
+    
+#================================================================
+# gradeentry function for students
+@app.route('/student/gradeentry')
+def student_portal_gradeentry():
+    session.permanent = True
+    if is_user_logged_in_gradeentry():
+        return render_template('student/grade_entry.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_gradeentry'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_gradeentry():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_gradeentry')
+def redirect_based_on_login_gradeentry():
+    if is_user_logged_in_gradeentry():
+        return redirect(url_for('student_portal_gradeentry'))
+    else:
+        return redirect(url_for('portal_gradeentry'))
+
+#================================================================
+# gradeentry function for students
+@app.route('/student/crossenrollment')
+def student_portal_crossenrollment():
+    session.permanent = True
+    if is_user_logged_in_crossenrollment():
+        return render_template('student/cross_enrollment.html')
+    else:
+        # If not logged in, redirect to the login page
+        return redirect(url_for('portal_crossenrollment'))
+
+# Function to check if the user is logged in
+def is_user_logged_in_crossenrollment():
+    # Replace this condition with your actual logic for checking if the user is logged in
+    return session.get("user_id") is not None
+
+# Main function to handle redirection based on user login status
+@app.route('/student/redirect_based_on_login_crossenrollment')
+def redirect_based_on_login_crossenrollment():
+    if is_user_logged_in_gradeentry():
+        return redirect(url_for('student_portal_crossenrollment'))
+    else:
+        return redirect(url_for('portal_crossenrollment'))
+
+
+
+
+
+#================================================================
 # ALL FACULTY ROUTES HERE
 @app.route('/faculty')
 @prevent_authenticated
