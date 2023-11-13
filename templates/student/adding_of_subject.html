@@ -22,6 +22,11 @@
             }
         });
     }
+
+    function handleAlertClose() {
+        var alertDiv = document.getElementById('successAlert');
+        alertDiv.style.display = 'none';  // Hide the alert
+    }
 </script>
 
 {% block services %}
@@ -30,21 +35,22 @@
     <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.
     </p>
     <br>
-        <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
+    <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
     <br>
 
-    {% with messages = get_flashed_messages()  %}
-          {% if messages %}
-          {% for message in messages %}
-          <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-              <span aria-hidden="true">×</span>
-            </button>
-          </div>
-          {% endfor %}
-          {% endif %}
-          {% endwith %}
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <h2>Application Form</h2>
     <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <label for="student_number">Student No.:</label><br>
@@ -69,24 +75,24 @@
         <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
     </form>
     
-        <!-- JavaScript function to validate the form and log any errors -->
-        <script>
-            function validateForm() {
-                var studentNumber = document.getElementById('student_number').value;
-                var studentName = document.getElementById('student_name').value;
-                var enrollmentType = document.getElementById('enrollment_type').value;
-                var subject_Names = document.getElementById('subject_Names').value;
-    
-                // You can add your custom validation logic here
-                if (!studentNumber || !studentName || !enrollmentType || !subject_Names) {
-                    console.error('Error: Please fill out all required fields.');
-                    // Return false to prevent form submission
-                    return false;
-                }
-    
-                // Add additional validation checks here
-    
-                return true;
+    <!-- JavaScript function to validate the form and log any errors -->
+    <script>
+        function validateForm() {
+            var studentNumber = document.getElementById('student_number').value;
+            var studentName = document.getElementById('student_name').value;
+            var enrollmentType = document.getElementById('enrollment_type').value;
+            var subject_Names = document.getElementById('subject_Names').value;
+
+            // You can add your custom validation logic here
+            if (!studentNumber || !studentName || !enrollmentType || !subject_Names) {
+                console.error('Error: Please fill out all required fields.');
+                // Return false to prevent form submission
+                return false;
             }
-        </script>
+
+            // Add additional validation checks here
+
+            return true;
+        }
+    </script>
 {% endblock %}

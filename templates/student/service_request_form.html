@@ -1,0 +1,67 @@
+{% extends "student/home.html" %}
+
+{% block services %}
+<h1>Service Request Form</h1>
+
+<form action="{{url_for('submit_services_request')}}" enctype="multipart/form-data">
+    <!-- Add other fields based on your requirements -->
+    <label for="serviceType">Service Type:</label>
+    <select id="serviceType" name="serviceType" required>
+        <option value="subject">Subject</option>
+        <option value="change_of_subjects">Change of Subjects</option>
+        <option value="add_subjects">Adding of Subjects</option>
+        <option value="overload_application">Overload of Subjects</option>
+        <option value="certification_request">Certification</option>
+        <option value="change_of_subjects">Manual enroll</option>
+        <option value="tutorial_request">Tutorial</option>
+        <option value="grade_entry">Gradeentry</option>
+        <option value="cross_enrollment">Crossenrollment</option>
+        <option value="petition_request">Petition</option>
+        <option value="manual_enrollment">Manual enrollment</option>
+        <option value="shifting_application">Shifting</option>
+        <!-- Add other service types as options -->
+    </select>
+    <br>
+    <br>
+
+    <label for="studentID">Student ID:</label>
+    <input type="text" id="studentID" name="studentID" required>
+    <br>
+    <br>
+
+    <label for="studentName">Student Name:</label>
+    <input type="text" id="studentName" name="studentName" required>
+    <br>
+    <br>
+    <!-- Add other fields based on your requirements -->
+
+    <label for="file">File:</label>
+    <input type="file" id="file" name="file">
+    <br>
+    <br>
+    <button type="button" onclick="submitServiceRequest()">Submit Request</button>
+</form>
+
+<script>
+    function submitServiceRequest() {
+        const form = document.getElementById('serviceRequestForm');
+        const formData = new FormData(form);
+
+        fetch('/student/submit_service_request/form', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            // Handle the response as needed
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle errors as needed
+        });
+    }
+</script>
+
+{% endblock %}
+

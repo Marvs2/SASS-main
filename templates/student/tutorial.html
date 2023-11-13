@@ -10,8 +10,24 @@
         <li>Online Petition of Subject from <a href="https://sis1.pup.edu.ph/">https://sis1.pup.edu.ph/</a></li>
     </ul>
 
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+<div class="form-container">
     <h2>Request Form</h2>
-    <form action="#" method="post">
+    <form action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
         <label for="studentID">Student ID:</label><br>
         <input type="text" id="studentID" name="studentID" required><br><br>
 
@@ -24,9 +40,10 @@
         <label for="subjectName">Subject Name:</label><br>
         <input type="text" id="subjectName" name="subjectName" required><br><br>
 
-        <label for="onlinePetitionLink">Online Petition Link:</label><br>
-        <input type="url" id="onlinePetitionLink" name="onlinePetitionLink" required><br><br>
+        <label for="file">File:</label><br>
+        <input type="file" id="file" name="file" required><br><br>
 
         <button type="submit">Submit Request</button>
     </form>
+</div>
 {% endblock %}

@@ -1,4 +1,5 @@
-from datetime import datetime  
+from datetime import datetime
+from sqlalchemy import DateTime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import TIMESTAMP, inspect
 from werkzeug.security import generate_password_hash
@@ -116,6 +117,7 @@ class Add_Subjects(db.Model, UserMixin):
     file_data = db.Column(db.LargeBinary)  # Store binary data for the file
     file_name = db.Column(db.String(255))  # Store the filename
     faculty_number = db.Column(db.String(50), db.ForeignKey('faculties.facultyNumber'))
+    user_role = db.Column(db.String(50))  # Add user role attribute
 
     # Establish a relationship with the Student class
     student = db.relationship('Student', back_populates='subjects')
@@ -132,8 +134,10 @@ class Add_Subjects(db.Model, UserMixin):
             'enrollment_type': self.enrollment_type,
             'file_data': self.file_data,
             'file_name': self.file_name,
-            'faculty_number': self.faculty_number
+            'faculty_number': self.faculty_number,
+            'user_role': self.user_role  # Include user role in the dictionary
         }
+
     def get_Add_SubjectsID(self):
         return str(self.subject_ID)
     
@@ -149,6 +153,7 @@ class ChangeOfSubjects(db.Model, UserMixin):
     ace_form_data = db.Column(db.LargeBinary)
     created_at = db.Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(TIMESTAMP)
+    user_role = db.Column(db.String(50))  # Add user role attribute
 
     # Add a relationship to the 'students' table
     student = db.relationship('Student', foreign_keys=[student_number])
@@ -162,14 +167,15 @@ class ChangeOfSubjects(db.Model, UserMixin):
             'ace_form_filename': self.ace_form_filename,
             'ace_form_data': self.ace_form_data,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'user_role': self.user_role  # Include user role in the dictionary
         }
-    
+
     def get_ChangesubjectID(self):
         return str(self.Changesubject_ID)
-
+        
 class ManualEnrollment(db.Model, UserMixin):
-    __tablename__ = 'manual_Enrollments'
+    __tablename__ = 'manual_enrollments'
 
     m_enrollment_ID = db.Column(db.Integer, primary_key=True)
     student_number = db.Column(db.String(50), db.ForeignKey('students.studentNumber'))
@@ -178,8 +184,9 @@ class ManualEnrollment(db.Model, UserMixin):
     reason = db.Column(db.Text, nullable=False)
     me_file_filename = db.Column(db.String(255))
     me_file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = db.Column(DateTime, default=datetime.utcnow)
+    updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    user_role = db.Column(db.String(50))  # Add user role attribute
 
      # Add a relationship to the 'students' table
     student = db.relationship('Student', foreign_keys=[student_number])
@@ -194,8 +201,218 @@ class ManualEnrollment(db.Model, UserMixin):
             'me_file_filename': self.me_file_filename,
             'me_file_data': self.me_file_data,
             'created_at': self.created_at,
-            'updated_at': self.updated_at
+            'updated_at': self.updated_at,
+            'user_role': self.user_role  # Include user role in the dictionary
         }
+
+    def get_ManualEnrollmentID(self):
+        return str(self.m_enrollment_ID)
+    
+class CertificationRequest(db.Model, UserMixin):
+    __tablename__ = 'certification_requests'
+
+    certification_request_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    certification_type = db.Column(db.String(50), nullable=False)
+    request_form_filename = db.Column(db.String(255), nullable=False)
+    identification_card_filename = db.Column(db.String(255), nullable=False)
+    is_representative = db.Column(db.Boolean, default=False)
+    authorization_letter_filename = db.Column(db.String(255))
+    representative_id_filename = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'certification_request_id': self.certification_request_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'certification_type': self.certification_type,
+            'request_form_filename': self.request_form_filename,
+            'identification_card_filename': self.identification_card_filename,
+            'is_representative': self.is_representative,
+            'authorization_letter_filename': self.authorization_letter_filename,
+            'representative_id_filename': self.representative_id_filename,
+            'created_at': self.created_at,
+        }
+
+    def get_CertificationRequestID(self):
+        return str(self.certification_request_id)
+    
+class GradeEntry(db.Model):
+    __tablename__ = 'grade_entries'
+
+    grade_entry_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    application_type = db.Column(db.String(50), nullable=False)
+    completion_form_filename = db.Column(db.String(255), nullable=False)
+    completion_form_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    class_record_filename = db.Column(db.String(255), nullable=False)
+    class_record_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    affidavit_filename = db.Column(db.String(255), nullable=False)
+    affidavit_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'grade_entry_id': self.grade_entry_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'application_type': self.application_type,
+            'completion_form_data': self.completion_form_data,  # Add this line
+            'class_record_filename': self.class_record_filename,
+            'class_record_data': self.class_record_data,  # Add this line
+            'affidavit_filename': self.affidavit_filename,
+            'affidavit_data': self.affidavit_data,  # Add this line
+            'created_at': self.created_at,
+        }
+
+    def get_GradeEntryID(self):
+        return str(self.grade_entry_id)
+    
+class CrossEnrollment(db.Model):
+    __tablename__ = 'cross_enrollments'
+
+    cross_enrollment_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    school_for_cross_enrollment = db.Column(db.String(255), nullable=False)
+    total_number_of_units = db.Column(db.Integer, nullable=False)
+    authorized_subjects_to_take = db.Column(db.Text, nullable=False)
+    application_letter_filename = db.Column(db.String(255), nullable=False)
+    permit_to_cross_enroll_filename = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'cross_enrollment_id': self.cross_enrollment_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'school_for_cross_enrollment': self.school_for_cross_enrollment,
+            'total_number_of_units': self.total_number_of_units,
+            'authorized_subjects_to_take': self.authorized_subjects_to_take,
+            'application_letter_filename': self.application_letter_filename,
+            'permit_to_cross_enroll_filename': self.permit_to_cross_enroll_filename,
+            'created_at': self.created_at,
+        }
+
+    def get_CrossEnrollmentID(self):
+        return str(self.cross_enrollment_id)
+    
+class PetitionRequest(db.Model):
+    __tablename__ = 'petition_requests'
+
+    petition_request_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)#/Student number dpat ito/
+    student_name = db.Column(db.String(255), nullable=False)
+    subject_code = db.Column(db.String(50), nullable=False)
+    subject_name = db.Column(db.String(255), nullable=False)
+    petition_type = db.Column(db.String(50), nullable=False)
+    request_reason = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'petition_request_id': self.petition_request_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'subject_code': self.subject_code,
+            'subject_name': self.subject_name,
+            'petition_type': self.petition_type,
+            'request_reason': self.request_reason,
+            'created_at': self.created_at,
+        }
+
+    def get_PetitionRequestID(self):
+        return str(self.petition_request_id)
+    
+class ShiftingApplication(db.Model):
+    __tablename__ = 'shifting_applications'
+
+    shifting_application_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    current_program = db.Column(db.String(255), nullable=False)
+    residency_year = db.Column(db.Integer, nullable=False)
+    intended_program = db.Column(db.String(255), nullable=False)
+    qualifications = db.Column(db.Text)
+    file_filename = db.Column(db.String(255))
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'shifting_application_id': self.shifting_application_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'current_program': self.current_program,
+            'residency_year': self.residency_year,
+            'intended_program': self.intended_program,
+            'qualifications': self.qualifications,
+            'file_filename': self.file_filename,
+            'file_data': self.file_data,
+            'created_at': self.created_at,
+        }
+
+    def get_ShiftingApplicationID(self):
+        return str(self.shifting_application_id)
+
+class OverloadApplication(db.Model):
+    __tablename__ = 'overload_applications'
+
+    overload_application_id = db.Column(db.Integer, primary_key=True)
+    student_name = db.Column(db.String(255), nullable=False)
+    student_id = db.Column(db.String(50), nullable=False)
+    semester = db.Column(db.String(20), nullable=False)
+    subjects_to_add = db.Column(db.String(255), nullable=False)
+    justification = db.Column(db.Text, nullable=False)
+    file_filename = db.Column(db.String(255))
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'overload_application_id': self.overload_application_id,
+            'student_name': self.student_name,
+            'student_id': self.student_id,
+            'semester': self.semester,
+            'subjects_to_add': self.subjects_to_add,
+            'justification': self.justification,
+            'file_filename': self.file_filename,
+            'file_data': self.file_data,
+            'created_at': self.created_at,
+        }
+
+    def get_OverloadApplicationID(self):
+        return str(self.overload_application_id)
+
+class TutorialRequest(db.Model):
+    __tablename__ = 'tutorial_requests'
+
+    tutorial_request_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    subject_code = db.Column(db.String(50), nullable=False)
+    subject_name = db.Column(db.String(255), nullable=False)
+    file_filename = db.Column(db.String(255), nullable=False)
+    file_data = db.Column(db.LargeBinary, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'tutorial_request_id': self.tutorial_request_id,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'subject_code': self.subject_code,
+            'subject_name': self.subject_name,
+            'file_filename': self.file_filename,
+            'created_at': self.created_at,
+        }
+
+    def get_TutorialRequestID(self):
+        return str(self.tutorial_request_id)
+
 
 
 """class Payment(db.Model, UserMixin):
@@ -421,7 +638,169 @@ def init_db(app):
             db.create_all()
             create_sample_data()
         
-#=====================================================================================================
+#=====================================================================================================#
+class Services(db.Model):
+    __tablename__ = 'services'
+
+    service_id = db.Column(db.Integer, primary_key=True)
+    service_type = db.Column(db.String(50), nullable=False)
+    student_id = db.Column(db.String(50), nullable=False)
+    student_name = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Common fields for all services
+    file_filename = db.Column(db.String(255))
+    user_role = db.Column(db.String(50))  # Add user role attribute
+
+    # Additional fields for specific service types
+    # Subject-related fields
+    subject_name = db.Column(db.String(50))
+    enrollment_type = db.Column(db.String(20))
+    file_data = db.Column(db.LargeBinary)
+    faculty_number = db.Column(db.String(50))
+
+    # Change of Subjects fields
+    ace_form_filename = db.Column(db.String(255))
+    ace_form_data = db.Column(db.LargeBinary)
+    updated_at = db.Column(db.TIMESTAMP)
+
+    # Manual Enrollment fields
+    enrollment_type_manual = db.Column(db.String(50))
+    reason = db.Column(db.Text)
+    me_file_data = db.Column(db.LargeBinary)
+
+    # Certification Request fields
+    certification_type = db.Column(db.String(50))
+    request_form_filename = db.Column(db.String(255))
+    identification_card_filename = db.Column(db.String(255))
+    is_representative = db.Column(db.Boolean, default=False)
+    authorization_letter_filename = db.Column(db.String(255))
+    representative_id_filename = db.Column(db.String(255))
+
+    # Grade Entry fields
+    application_type = db.Column(db.String(50))
+    completion_form_filename = db.Column(db.String(255))
+    class_record_filename = db.Column(db.String(255))
+    affidavit_filename = db.Column(db.String(255))
+
+    # Cross Enrollment fields
+    school_for_cross_enrollment = db.Column(db.String(255))
+    total_number_of_units = db.Column(db.Integer)
+    authorized_subjects_to_take = db.Column(db.Text)
+    application_letter_filename_cross = db.Column(db.String(255))
+    permit_to_cross_enroll_filename = db.Column(db.String(255))
+
+    # Petition Request fields
+    subject_code_petition = db.Column(db.String(50))
+    subject_name_petition = db.Column(db.String(255))
+    request_reason = db.Column(db.Text)
+
+    # Shifting Application fields
+    current_program_shifting = db.Column(db.String(255))
+    residency_year_shifting = db.Column(db.Integer)
+    intended_program_shifting = db.Column(db.String(255))
+    qualifications_shifting = db.Column(db.Text)
+    file_filename_shifting = db.Column(db.String(255))
+
+    # Overload Application fields
+    semester_overload = db.Column(db.String(20))
+    subjects_to_add_overload = db.Column(db.String(255))
+    justification_overload = db.Column(db.Text)
+    file_filename_overload = db.Column(db.String(255))
+
+    # Tutorial Request fields
+    subject_code_tutorial = db.Column(db.String(50))
+    subject_name_tutorial = db.Column(db.String(255))
+    online_petition_link_tutorial = db.Column(db.String(255))
+
+    def to_dict(self):
+        service_dict = {
+            'service_id': self.service_id,
+            'service_type': self.service_type,
+            'student_id': self.student_id,
+            'student_name': self.student_name,
+            'created_at': self.created_at,
+            'file_filename': self.file_filename,
+            'user_role': self.user_role
+        }
+
+        # Add specific fields based on service type
+        if self.service_type == 'subject':
+            service_dict.update({
+                'subject_name': self.subject_name,
+                'enrollment_type': self.enrollment_type,
+                'file_data': self.file_data,
+                'faculty_number': self.faculty_number
+            })
+        elif self.service_type == 'change_of_subjects':
+            service_dict.update({
+                'ace_form_filename': self.ace_form_filename,
+                'ace_form_data': self.ace_form_data,
+                'updated_at': self.updated_at
+            })
+        elif self.service_type == 'manual_enrollment':
+            service_dict.update({
+                'enrollment_type_manual': self.enrollment_type_manual,
+                'reason': self.reason,
+                'me_file_data': self.me_file_data
+            })
+        elif self.service_type == 'certification_request':
+            service_dict.update({
+                'certification_type': self.certification_type,
+                'request_form_filename': self.request_form_filename,
+                'identification_card_filename': self.identification_card_filename,
+                'is_representative': self.is_representative,
+                'authorization_letter_filename': self.authorization_letter_filename,
+                'representative_id_filename': self.representative_id_filename
+            })
+        elif self.service_type == 'grade_entry':
+            service_dict.update({
+                'application_type': self.application_type,
+                'completion_form_filename': self.completion_form_filename,
+                'class_record_filename': self.class_record_filename,
+                'affidavit_filename': self.affidavit_filename
+            })
+        elif self.service_type == 'cross_enrollment':
+            service_dict.update({
+                'school_for_cross_enrollment': self.school_for_cross_enrollment,
+                'total_number_of_units': self.total_number_of_units,
+                'authorized_subjects_to_take': self.authorized_subjects_to_take,
+                'application_letter_filename_cross': self.application_letter_filename_cross,
+                'permit_to_cross_enroll_filename': self.permit_to_cross_enroll_filename
+            })
+        elif self.service_type == 'petition_request':
+            service_dict.update({
+                'subject_code_petition': self.subject_code_petition,
+                'subject_name_petition': self.subject_name_petition,
+                'request_reason': self.request_reason
+            })
+        elif self.service_type == 'shifting_application':
+            service_dict.update({
+                'current_program_shifting': self.current_program_shifting,
+                'residency_year_shifting': self.residency_year_shifting,
+                'intended_program_shifting': self.intended_program_shifting,
+                'qualifications_shifting': self.qualifications_shifting,
+                'file_filename_shifting': self.file_filename_shifting
+            })
+        elif self.service_type == 'overload_application':
+            service_dict.update({
+                'semester_overload': self.semester_overload,
+                'subjects_to_add_overload': self.subjects_to_add_overload,
+                'justification_overload': self.justification_overload,
+                'file_filename_overload': self.file_filename_overload
+            })
+        elif self.service_type == 'tutorial_request':
+            service_dict.update({
+                'subject_code_tutorial': self.subject_code_tutorial,
+                'subject_name_tutorial': self.subject_name_tutorial,
+                'online_petition_link_tutorial': self.online_petition_link_tutorial
+            })
+
+        return service_dict
+
+    def get_ServiceID(self):
+        return str(self.service_id)
+#=====================================================================================================#
 # INSERTING DATA
 def create_sample_data():
     # Create and insert students data

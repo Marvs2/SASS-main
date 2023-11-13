@@ -7,11 +7,26 @@
 
     <p><a href="{{url_for('download_RO_form')}}">Download Application file for Request Form</a></p>
     <br>  
-
-    <h2>Request Form</h2>
-    <form action="#" method="post">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+    <br>
+    <h1>Manual Enrollment Form</h1>
+    <form action="{{ url_for('submit_manual_enrollment') }}" method="POST" enctype="multipart/form-data">
+        <label for="studentNumber">Student Number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
         <label for="studentName">Student Name:</label><br>
         <input type="text" id="studentName" name="studentName" required><br><br>
@@ -20,12 +35,17 @@
         <select id="enrollmentType" name="enrollmentType" required>
             <option value="Regular">Regular</option>
             <option value="Irregular">Irregular</option>
+            <option value="Special">Special</option>
+            <!-- Add more options as needed -->
         </select><br><br>
-
-        <label for="reason">Reason for Manual Enrollment:</label><br>   
+    
+        <label for="reason">Reason:</label><br>
         <textarea id="reason" name="reason" rows="4" cols="50" required></textarea><br><br>
 
-        <button type="submit">Submit Request</button>
-    </form>
+        <label for="meFile">File:</label><br>
+        <input type="file" id="meFile" name="meFile" required><br><br>
 
-    {% endblock %}
+        <button type="submit">Submit</button>
+    </form>
+{% endblock %}
+

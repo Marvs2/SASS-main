@@ -1,6 +1,21 @@
 {% extends "student/home.html" %}
 
 {% block services %}
+<style>
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: auto;
+        max-width: 600px; /* Adjust the width as needed */
+        padding: 20px;
+    }
+
+    /* Add other styles as needed */
+</style>
+
     <h1>Application for Overload of Subjects</h1>
     <p>Process a request for overload of subjects for students who intend to add additional subject/s more than the prescribed number of units specified in the curriculum for the current semester, prior to the opening of classes or within the adjustment period specified in the University calendar, and approved by the Director/Head of Academic Program.</p>
 
@@ -15,8 +30,24 @@
     <p><a href="{{url_for('download_Overload_Subs')}}">Download Application file for Overloads Subjects</a></p>
 <br>   
 
+<br>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<br>
+<br>
+<div class="form-container">
     <h2>Application Form</h2>
-    <form action="#" method="post">
+    <form action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data">
         <label for="studentName">Student Name:</label><br>
         <input type="text" id="studentName" name="studentName" required><br><br>
 
@@ -43,5 +74,6 @@
 
         <button type="submit">Send Application</button>
     </form>
+</div>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import  Student
-
+from models import Student
+from models import Services
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import  login_user
@@ -323,7 +323,7 @@ def login_Crossenrollment():
 #================The real login in the true manners==================#
 #====================================================================#
 #for All Students
-@student_api.route('/login', methods=['GET', 'POST'])
+@student_api.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
         studentNumber = request.form['studentNumber']
@@ -335,11 +335,50 @@ def login():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_home'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return render_template('student/home.html', student_details=session)
+
         else:
             flash('Invalid email or password', 'danger')
-    return redirect(url_for('student_portal'))
 
+    return redirect(url_for('student_portal'))
+#===================================================
+"""@app.route('/api/submit_service_request', methods=['POST'])
+def api_submit_service_request():
+    # Retrieve form data and create a new Services object
+    service_type = request.form.get('serviceType')
+    student_id = request.form.get('studentID')
+    student_name = request.form.get('studentName')
+
+    # Add other fields based on your requirements
+
+    # Create a new Services object
+    new_service = Services(
+        service_type=service_type,
+        student_id=student_id,
+        student_name=student_name,
+        created_at=datetime.utcnow(),
+        # Add other fields based on your requirements
+    )
+
+    # Save the new service request to the database
+    db.session.add(new_service)
+    db.session.commit()
+
+    # Return a response (you can customize this based on your needs)
+    return jsonify({'message': 'Service request submitted successfully!'})"""
 
 
 #===================================================

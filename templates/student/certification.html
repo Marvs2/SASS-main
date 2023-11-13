@@ -1,6 +1,23 @@
 {% extends "student/home.html" %}
 
 {% block services %}
+<script>
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(event) {
+        const studentID = document.getElementById('studentID').value.trim();
+        const studentName = document.getElementById('studentName').value.trim();
+
+        if (studentID === '' || studentName === '') {
+            alert('Please fill out Student ID and Student Name');
+            event.preventDefault();  // Prevent form submission
+        }
+
+        // Additional validation logic can be added here
+
+        return true;  // Allow form submission
+    });
+</script>
 
     <h1>Request for Certification (Grades, Bonafide Student, General Weighted Average)</h1>
     <p>Process requests for certification of students and alumni. The certification is based on the records available at the respective colleges. These certifications are issued for evaluation purposes and are not a substitute for the Official Transcript of Record issued by the University Registrar.</p>
@@ -15,9 +32,22 @@
     <ul>
         <li>Authorization Letter and Identification Card (ID) if the claimant is not the owner of the document.</li>
     </ul>
-
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
     <h2>Request Form</h2>
-    <form action="#" method="post">
+    <form action="{{url_for('submit_certification_request')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <label for="studentID">Student ID:</label><br>
         <input type="text" id="studentID" name="studentID" required><br><br>
 
@@ -61,6 +91,16 @@
             } else {
                 representativeInfoDiv.style.display = 'none';
             }
+        });
+
+                // Automatically close the alert messages after 3 seconds
+                setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000);
+
+        // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
+        $('#applicationForm').submit(function (event) {
+            // Add your form submission logic here
         });
     </script>
 {% endblock %}
