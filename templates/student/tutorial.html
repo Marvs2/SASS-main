@@ -28,22 +28,39 @@
 <div class="form-container">
     <h2>Request Form</h2>
     <form action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
+        <label for="student_number">Student Number:</label>
+        <input type="text" id="student_number" name="student_number"><br><br>
 
-        <label for="studentName">Student Name:</label><br>
-        <input type="text" id="studentName" name="studentName" required><br><br>
-
-        <label for="subjectCode">Subject Code:</label><br>
-        <input type="text" id="subjectCode" name="subjectCode" required><br><br>
-
-        <label for="subjectName">Subject Name:</label><br>
-        <input type="text" id="subjectName" name="subjectName" required><br><br>
-
-        <label for="file">File:</label><br>
-        <input type="file" id="file" name="file" required><br><br>
-
-        <button type="submit">Submit Request</button>
+        <label for="student_name">Student Name:</label>
+        <input type="text" id="student_name" name="student_name"><br><br>
+    
+        <label for="subject_code">Subject Code:</label>
+        <input type="text" id="subject_code" name="subject_code"><br><br>
+    
+        <label for="subject_name">Subject Name:</label>
+        <input type="text" id="subject_name" name="subject_name"><br><br>
+    
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file"><br><br>
+    
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="-Director/ Head of Academic Program">
+                -Director/ Head of Academic Program
+            </option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
+        </select><br><br>
+    
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Default</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+    
+        <input type="submit" value="Submit">
     </form>
 </div>
 {% endblock %}

@@ -4,7 +4,7 @@
         var studentName = document.getElementById('student_name').value;
         var studentNumberField = document.getElementById('student_number');
 
-        // Make an AJAX request to fetch the student number
+        // AJAX request to fetch the student number
         fetch('/get_student_number', {
             method: 'POST',
             body: new URLSearchParams({ student_name: studentName }),
@@ -58,20 +58,34 @@
     
         <label for="student_name">Student Name:</label><br>
         <input type="text" id="student_name" name="student_name" required onblur="getStudentNumber()"><br><br>
+
+        <label for="subject_Names">Subject Name (comma-separated):</label>
+        <input type="text" id="subject_Names" name="subject_Names" required><br><br>
     
         <label for="enrollment_type">Enrollment Type:</label><br>
         <select id="enrollment_type" name="enrollment_type" required>
             <option value="Regular">Regular</option>
             <option value="Irregular">Irregular</option>
         </select><br><br>
-    
-        <label for="subject_Names">Subject Names to Add (comma-separated):</label><br>
-        <input type="text" id="subject_Names" name="subject_Names" required><br><br>
-    
-        <input type="file" name="file"> <!-- File input field -->
-        <br>
-        <br>
-        <br>
+
+        <label for="file">File:</label>
+        <input type="file" id="file" name="file"><br><br><!-- File input field -->
+        
+        <label for="user_responsible">User Responsible:</label>
+        <select name="user_responsible" id="user_responsible">
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+        </select><br><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
         <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
     </form>
     
@@ -80,8 +94,9 @@
         function validateForm() {
             var studentNumber = document.getElementById('student_number').value;
             var studentName = document.getElementById('student_name').value;
-            var enrollmentType = document.getElementById('enrollment_type').value;
             var subject_Names = document.getElementById('subject_Names').value;
+            var enrollmentType = document.getElementById('enrollment_type').value;
+
 
             // You can add your custom validation logic here
             if (!studentNumber || !studentName || !enrollmentType || !subject_Names) {

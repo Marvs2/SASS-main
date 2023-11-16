@@ -31,8 +31,11 @@ def login():
             flash('Invalid email or password', 'danger')
     return redirect(url_for('faculty_api.login'))
 
+#===============================================================================================================#
+#==================================================FACULTY======================================================#
+#===============================================================================================================#
 
-#===================================================
+
 # TESTING AREA
 @faculty_api.route('/profile', methods=['GET'])
 @jwt_required()
@@ -45,3 +48,4 @@ def profile():
     else:
         flash('User not found', 'danger')
         return redirect(url_for('faculty_api.login'))
+    

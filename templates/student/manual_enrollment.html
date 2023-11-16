@@ -24,7 +24,7 @@
     <br>
     <br>
     <h1>Manual Enrollment Form</h1>
-    <form action="{{ url_for('submit_manual_enrollment') }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ url_for('submit_manual_enrollment') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <label for="studentNumber">Student Number:</label><br>
         <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
@@ -45,7 +45,69 @@
         <label for="meFile">File:</label><br>
         <input type="file" id="meFile" name="meFile" required><br><br>
 
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Faculty Member/s Assigned Room/s based on Teaching Assignment of Faculty Room">
+                Faculty Member/s Assigned Room/s based on Teaching Assignment of Faculty Room
+            </option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+        </select><br><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
         <button type="submit">Submit</button>
     </form>
+
+    <script>
+        function validateForm() {
+            var studentNumber = document.getElementById('studentNumber').value;
+            var studentName = document.getElementById('studentName').value;
+            var enrollmentType = document.getElementById('enrollmentType').value;
+            var reason = document.getElementById('reason').value;
+
+            if (!studentNumber || !studentName || !enrollmentType || !reason) {
+                alert('Please fill out all required fields.');
+                return false;
+            }
+
+            // Additional validation logic can be added here
+
+            return true;
+        }
+
+        // Handling submission success and error messages
+        var form = document.querySelector('form');
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(form);
+
+            fetch('/submit_manual_enrollment', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(data => {
+                alert('Request submitted successfully: ' + data);
+                // Redirect or perform any other action upon successful submission
+            })
+            .catch(error => {
+                alert('Error submitting request: ' + error.message);
+                // Handle errors or display appropriate message
+            });
+        });
+    </script>
 {% endblock %}
 

@@ -76,7 +76,26 @@
 
             <label for="representativeID">Representative's Identification Card (ID):</label><br>
             <input type="file" id="representativeID" name="representativeID" required><br><br>
-        </div>
+        </div><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Student Services">
+                Student Services
+            </option>
+            <option value="Receiving Staff Registrar's Office">Receiving Staff Registrar's Office</option>
+            <option value="Administrative Staff Director/ Head of Academic Program">Administrative Staff Director/ Head of Academic Program</option>
+            <option value="Administrative Staff Registrar's Office">Administrative Staff Registrar's Office</option>
+        </select><br><br>
+        
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
 
         <button type="submit">Submit Request</button>
     </form>

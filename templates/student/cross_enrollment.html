@@ -19,65 +19,82 @@
         // Additional validation logic can be added here
     });
 </script>
-    <h1>Application for Cross Enrollment</h1>
-    <p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
 
-    <h2>Checklist of Requirements:</h2>
-    <ul>
-        <li>Application Letter for Cross-Enrollment.</li>
-        <li>Permit to Cross-Enroll from the Office of the University Registrar.</li>
-    </ul>
-    <br>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <br>
+<h1>Application for Cross Enrollment</h1>
+<p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
 
-    <br>
+<h2>Checklist of Requirements:</h2>
+<ul>
+    <li>Application Letter for Cross-Enrollment.</li>
+    <li>Permit to Cross-Enroll from the Office of the University Registrar.</li>
+</ul>
+<br>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<br>
 
-    <h2>Application Form</h2>
-    <form action="{{url_for('submit_cross_enrollment')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
+<h2>Application Form</h2>
+<form id="crossEnrollmentForm" action="{{url_for('submit_cross_enrollment')}}" method="POST" enctype="multipart/form-data">
+    <label for="studentID">Student ID:</label><br>
+    <input type="text" id="studentID" name="studentID" required><br><br>
 
-        <label for="studentName">Student Name:</label><br>
-        <input type="text" id="studentName" name="studentName" required><br><br>
+    <label for="studentName">Student Name:</label><br>
+    <input type="text" id="studentName" name="studentName" required><br><br>
 
-        <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
-        <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
+    <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
+    <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
 
-        <label for="crossEnrollmentUnits">Total Number of Units:</label><br>
-        <input type="number" id="crossEnrollmentUnits" name="crossEnrollmentUnits" required><br><br>
+    <label for="crossEnrollmentUnits">Total Number of Units:</label><br>
+    <input type="number" id="crossEnrollmentUnits" name="crossEnrollmentUnits" required><br><br>
 
-        <label for="authorizedSubjects">Authorized Subjects to Take:</label><br>
-        <textarea id="authorizedSubjects" name="authorizedSubjects" rows="4" cols="50" required></textarea><br><br>
+    <label for="authorizedSubjects">Authorized Subjects to Take:</label><br>
+    <textarea id="authorizedSubjects" name="authorizedSubjects" rows="4" cols="50" required></textarea><br><br>
 
-        <label for="applicationLetter">Application Letter for Cross-Enrollment:</label><br>
-        <input type="file" id="applicationLetter" name="applicationLetter" required><br><br>
+    <label for="applicationLetter">Application Letter for Cross-Enrollment:</label><br>
+    <input type="file" id="applicationLetter" name="applicationLetter" required><br><br>
 
-        <label for="permitToCrossEnroll">Permit to Cross-Enroll from the Office of the University Registrar:</label><br>
-        <input type="file" id="permitToCrossEnroll" name="permitToCrossEnroll" required><br><br>
+    <label for="permitToCrossEnroll">Permit to Cross-Enroll from the Office of the University Registrar:</label><br>
+    <input type="file" id="permitToCrossEnroll" name="permitToCrossEnroll" required><br><br>
 
-        <button type="submit">Submit Application</button>
-    </form>
-    <script>
-        // Automatically close the alert messages after 3 seconds
-        setTimeout(function () {
-            $('.alert').alert('close');
-        }, 3000);
+    <label for="user_responsible">User Responsible:</label>
+    <select id="user_responsible" name="user_responsible" required>
+        <option value="Student Services">
+            Student Services
+        </option>
+        <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+        <option value="Branch">Branch Registrar</option>
+    </select><br><br>
+    
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+        <option value="Sent" selected>Sending</option>
+        <option value="Pending" disabled>Pending</option>
+        <option value="Approved" disabled>Approved</option>
+        <option value="Rejected" disabled>Rejected</option>
+    </select><br><br>
 
-        // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
-        $('#applicationForm').submit(function (event) {
-            // Add your form submission logic here
-        });
-    </script>
+
+    <button type="submit">Submit Application</button>
+</form>
+<script>
+    // Automatically close the alert messages after 3 seconds
+    setTimeout(function () {
+        $('.alert').alert('close');
+    }, 3000);
+
+    // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
+    $('#crossEnrollmentForm').submit(function (event) {
+        // Add your form submission logic here
+    });
+</script>
 {% endblock %}

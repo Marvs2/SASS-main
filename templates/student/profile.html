@@ -2,18 +2,20 @@
 
 {% block content %}
 <style>
-    .form-container {
+.form-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh; /* Adjust as needed */
+    justify-content: flex-start; /* Adjusted alignment */
+    padding-top: 50px; /* Add space for the navbar */
+    height: calc(100vh - 50px); /* Adjust height to accommodate the navbar */
+    overflow-y: auto; /* Add scrollbar if content exceeds height */
 }
 
 form {
     max-width: 400px; /* Adjust as needed */
     width: 100%;
-    padding: 20px;
+    padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -42,8 +44,23 @@ input:disabled {
     cursor: not-allowed;
 }
 
+
+/* Adjust the layoutSidenav styles */
+#layoutSidenav {
+    display: flex;
+    min-height: 100vh;
+}
+
+#layoutSidenav_nav {
+    flex: 0 0 auto;
+}
+
+#layoutSidenav_content {
+    flex: 1 1 0;
+    overflow: auto;
+}
 </style>
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark fixed-top">
     <!-- Sidebar Toggle-->
 <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button"><i class="fas fa-bars"></i></button>
 <!-- Navbar Brand-->
@@ -221,7 +238,7 @@ input:disabled {
                     <input type="text" id="userImg" name="userImg" value="{{ student_details['userImg'] }}" disabled required>
                     <br>
                 </form>
-            </div>            
+            </div>           
         </main>
 
 {% endblock %}

@@ -1,11 +1,11 @@
 from datetime import datetime
 from multiprocessing import connection
 from flask import Flask, render_template, jsonify, redirect, request, flash, send_file, url_for, session
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, Add_Subjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, Add_Subjects, init_db, Student
 from werkzeug.utils import secure_filename
 import psycopg2
 from sqlalchemy import Connection
-from models import Services
+#from models import Services
 
 from Api.v1.student.api_routes import student_api  
 from Api.v1.faculty.api_routes import faculty_api
@@ -189,22 +189,24 @@ def stud_overload():
 @app.route('/submit_overload_application', methods=['POST'])
 def submit_overload_application():
     if request.method == 'POST':
-        student_id = request.form['studentID']
         student_name = request.form['studentName']
+        student_id = request.form['studentID']
         semester = request.form['semester']
         subjects_to_add = request.form['subjectsToAdd']
         justification = request.form['justification']
-        
+        user_responsible = request.form['user_responsible']
+        status = request.form['status']
+
         # Check if a file is provided
         if 'file' not in request.files:
             flash('No file part', 'danger')
-            return redirect(url_for('your_overload_page'))  # Replace 'your_overload_page' with the actual route
+            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
 
         file = request.files['file']
         # Check if the file field is empty
         if file.filename == '':
             flash('No selected file', 'danger')
-            return redirect(url_for('your_overload_page'))  # Replace 'your_overload_page' with the actual route
+            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
 
         file_data = file.read()  # Read the file data
         file_filename = secure_filename(file.filename)
@@ -212,19 +214,22 @@ def submit_overload_application():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not student_id or not student_name or not semester or not subjects_to_add or not justification:
+        if not student_name or not student_id or not semester or not subjects_to_add or not justification:
             flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('stud_overload'))  # Replace 'your_overload_page' with the actual route
+            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
 
         try:
             new_overload_application = OverloadApplication(
-                student_id=student_id,
                 student_name=student_name,
+                student_id=student_id,
+                student_number=student_id,  # Assuming student_id here represents student_number
                 semester=semester,
                 subjects_to_add=subjects_to_add,
                 justification=justification,
                 file_filename=file_filename,
-                file_data=file_data
+                file_data=file_data,
+                user_responsible=user_responsible,
+                status=status
             )
 
             db.session.add(new_overload_application)
@@ -238,6 +243,9 @@ def submit_overload_application():
 
     return redirect(url_for('stud_overload'))
 
+
+#=============================================================================================================
+
 @app.route('/student/addingofsubject')#
 def stud_adding():
     return render_template("/student/adding_of_subject.html")#
@@ -249,6 +257,8 @@ def add_subjects():
         student_name = request.form['student_name']
         subject_names = request.form['subject_Names']  # Get the subject names as a single string
         enrollment_type = request.form['enrollment_type']
+        faculty_number = request.form['faculty_number']  # Assuming you have a faculty number in your form
+
 
         # Check if a file is provided
         if 'file' not in request.files:
@@ -265,13 +275,21 @@ def add_subjects():
         file_name = secure_filename(file.filename)
 
         try:
+            # Retrieve the student and faculty based on the provided numbers
+            student = Student.query.filter_by(student_number=student_number).first()
+            faculty = Faculty.query.filter_by(facultyNumber=faculty_number).first()
+
+            # Create a new subject with the retrieved student and faculty
             new_subject = Add_Subjects(
                 student_number=student_number,
                 student_name=student_name,
                 subject_Names=subject_names,  # Assign the whole string to subject_Names
                 enrollment_type=enrollment_type,
                 file_data=file_data,
-                file_name=file_name
+                file_name=file_name,
+                faculty=faculty,
+                user_responsible="Role",  # Add user role attribute
+                status="Status"
             )
 
             db.session.add(new_subject)
@@ -288,6 +306,7 @@ def add_subjects():
 
 @app.route('/student/service_service_form')#
 def stud_services():
+
     return render_template("/student/service_request_form.html")#
 
 """@app.route('/student/submit_service_form/request', methods=['POST'])
@@ -368,12 +387,22 @@ def change_of_subjects():
         ace_form_filename = secure_filename(ace_form_file.filename)
 
         try:
+            # Retrieve the student based on the provided number
+            student = Student.query.filter_by(student_number=student_number).first()
+
+            # Create a new change of subjects record with the retrieved student
             new_change_of_subjects = ChangeOfSubjects(
+                student=student,
                 student_number=student_number,
                 student_name=student_name,
                 enrollment_type=enrollment_type,
                 ace_form_filename=ace_form_filename,
-                ace_form_data=ace_form_data
+                ace_form_data=ace_form_data,
+                created_at=datetime.utcnow(),  # Assuming you want to set the creation time
+                updated_at=None,  # Assuming the record is not updated yet
+                faculty_number=request.form['faculty_number'],  # Assuming faculty number is in the form
+                user_responsible="Role",  # Add user role attribute
+                status="Status"
             )
 
             db.session.add(new_change_of_subjects)
@@ -387,6 +416,7 @@ def change_of_subjects():
 
     return redirect(url_for('stud_change'))
 
+#==========================================================================================================================#
 
 @app.route('/student/gradeentry')#
 def stud_correction():
@@ -398,65 +428,46 @@ def submit_grade_correction():
     student_name = request.form['studentName']
     application_type = request.form['applicationType']
 
-    # Additional validation logic can be added here
-
+    #additional logic here
     if not student_id or not student_name or not application_type:
         flash('Please fill out all fields and provide valid values.', 'danger')
         return render_template('student/grade_correction.html')  # Replace with the actual template name
 
-    # Check if Completion Form file is provided
-    if 'completionForm' not in request.files:
-        flash('No Completion Form file provided')
-        return redirect(request.url)
+    files = {
+        'completionForm': 'Completion Form',
+        'classRecord': 'Class Record',
+        'affidavit': 'Affidavit'
+    }
 
-    completion_form_file = request.files['completionForm']
-    # Check if the Completion Form file field is empty
-    if completion_form_file.filename == '':
-        flash('No Completion Form file selected')
-        return redirect(request.url)
+    for field, display_name in files.items():
+        if field not in request.files:
+            flash(f'No {display_name} file provided')
+            return redirect(request.url)
 
-    completion_form_data = completion_form_file.read()  # Read the Completion Form file data
-    completion_form_filename = secure_filename(completion_form_file.filename)
+        file = request.files[field]
+        if file.filename == '':
+            flash(f'No {display_name} file selected')
+            return redirect(request.url)
 
-    # Check if Class Record file is provided
-    if 'classRecord' not in request.files:
-        flash('No Class Record file provided')
-        return redirect(request.url)
-
-    class_record_file = request.files['classRecord']
-    # Check if the Class Record file field is empty
-    if class_record_file.filename == '':
-        flash('No Class Record file selected')
-        return redirect(request.url)
-
-    class_record_data = class_record_file.read()  # Read the Class Record file data
-    class_record_filename = secure_filename(class_record_file.filename)
-
-    # Check if Affidavit file is provided
-    if 'affidavit' not in request.files:
-        flash('No Affidavit file provided')
-        return redirect(request.url)
-
-    affidavit_file = request.files['affidavit']
-    # Check if the Affidavit file field is empty
-    if affidavit_file.filename == '':
-        flash('No Affidavit file selected')
-        return redirect(request.url)
-
-    affidavit_data = affidavit_file.read()  # Read the Affidavit file data
-    affidavit_filename = secure_filename(affidavit_file.filename)
+        data = file.read()
+        setattr(request, f'{field}_filename', secure_filename(file.filename))
+        setattr(request, f'{field}_data', data)
 
     try:
         new_application = GradeEntry(
             student_id=student_id,
+            student_number=student_id,  # Assuming student_id here represents student_number
             student_name=student_name,
             application_type=application_type,
-            completion_form_filename=completion_form_filename,
-            completion_form_data=completion_form_data,
-            class_record_filename=class_record_filename,
-            class_record_data=class_record_data,
-            affidavit_filename=affidavit_filename,
-            affidavit_data=affidavit_data
+            completion_form_filename=request.completionForm_filename,
+            completion_form_data=request.completionForm_data,
+            class_record_filename=request.classRecord_filename,
+            class_record_data=request.classRecord_data,
+            affidavit_filename=request.affidavit_filename,
+            affidavit_data=request.affidavit_data,
+            user_responsible=request.form.get('user_responsible'),  # Added user_responsible
+            status=request.form.get('status'),  # Added status
+            created_at=datetime.utcnow()
         )
 
         db.session.add(new_application)
@@ -469,7 +480,10 @@ def submit_grade_correction():
     finally:
         db.session.close()
 
-    return render_template('student/grade_entry.html') 
+    return render_template('student/grade_entry.html')
+
+
+#==============================================================================================================
 
 @app.route('/student/crossenrollment')#
 def stud_cross_enrollment():
@@ -482,6 +496,8 @@ def submit_cross_enrollment():
     school_for_cross_enrollment = request.form['crossEnrollmentSchool']
     total_units = int(request.form['crossEnrollmentUnits'])
     authorized_subjects = request.form['authorizedSubjects']
+    user_responsible = request.form['user_responsible']
+    status = request.form['status']
 
     # Additional validation logic can be added here
 
@@ -489,7 +505,7 @@ def submit_cross_enrollment():
         flash('Please fill out all fields and provide valid values.', 'danger')
         return render_template('student/cross_enrollment.html')  # Replace with the actual template name
 
-    # Check if ACE Form file is provided
+    # Check if Application Letter file is provided
     if 'applicationLetter' not in request.files:
         flash('No Application Letter file provided')
         return redirect(request.url)
@@ -520,12 +536,17 @@ def submit_cross_enrollment():
     try:
         new_cross_enrollment = CrossEnrollment(
             student_id=student_id,
+            student_number=student_id,  # Assuming student_id here represents student_number
             student_name=student_name,
             school_for_cross_enrollment=school_for_cross_enrollment,
             total_number_of_units=total_units,
             authorized_subjects_to_take=authorized_subjects,
             application_letter_filename=application_letter_filename,
+            application_letter_data=application_letter_data,
             permit_to_cross_enroll_filename=permit_to_cross_enroll_filename,
+            permit_to_cross_enroll_data=permit_to_cross_enroll_data,
+            user_responsible=user_responsible,
+            status=status,
         )
 
         db.session.add(new_cross_enrollment)
@@ -538,7 +559,8 @@ def submit_cross_enrollment():
     finally:
         db.session.close()
 
-    return render_template('student/cross_enrollment.html')  # Replace with the actual template name
+    return render_template('student/cross_enrollment.html')
+ # Replace with the actual template name
 
 #==================================================================================================================================
 #==================================================================================================================================
@@ -557,7 +579,9 @@ def submit_shifting_application():
         residency_year = int(request.form['residencyYear'])
         intended_program = request.form['intendedProgram']
         qualifications = request.form['qualifications']
-        
+        user_responsible = request.form['user_responsible']
+        status = request.form['status']
+
         # Check if a file is provided
         if 'file' not in request.files:
             flash('No file part', 'danger')
@@ -582,13 +606,16 @@ def submit_shifting_application():
         try:
             new_shifting_application = ShiftingApplication(
                 student_id=student_id,
+                student_number=student_id,  # Assuming student_id here represents student_number
                 student_name=student_name,
                 current_program=current_program,
                 residency_year=residency_year,
                 intended_program=intended_program,
                 qualifications=qualifications,
                 file_filename=file_filename,
-                file_data=file_data
+                file_data=file_data,
+                user_responsible=user_responsible,
+                status=status,
             )
 
             db.session.add(new_shifting_application)
@@ -601,6 +628,7 @@ def submit_shifting_application():
             db.session.close()
 
     return redirect(url_for('stud_shifting'))
+
 #========================================================================================================================================
 #================ManualEnrollment=================#
 @app.route('/student/manualenrollment')#
@@ -616,13 +644,13 @@ def submit_manual_enrollment():
 
     # Check if the file is provided
     if 'meFile' not in request.files:
-        flash('No file part')
+        flash('No file part', 'danger')
         return redirect(request.url)
 
     file = request.files['meFile']
     # Check if the file field is empty
     if file.filename == '':
-        flash('No selected file')
+        flash('No selected file', 'danger')
         return redirect(request.url)
 
     file_data = file.read()  # Read the file data
@@ -636,7 +664,8 @@ def submit_manual_enrollment():
             reason=reason,
             me_file_filename=file_name,
             me_file_data=file_data,
-            user_role='student'  # Set the user role (you can adjust this based on your authentication logic)
+            user_responsible=request.form['user_responsible'],  # Adjust based on your form
+            status=request.form['status']  # Adjust based on your form
         )
 
         db.session.add(new_manual_enrollment)
@@ -650,6 +679,7 @@ def submit_manual_enrollment():
 
     return redirect(url_for('stud_enrollment'))
 
+
 #====================================================================================================================================
 
 @app.route('/student/onlinepetitionofsubject')#
@@ -657,57 +687,13 @@ def stud_petition():
     return render_template("/student/petition.html")#
 
 # Assuming your route for this page is '/submit_petition'
-@app.route('/student/onlinepetitionofsubject/submit_petition', methods=['POST'])
-def submit_petition():
-    if request.method == 'POST':
-        student_id = request.form['studentID']
-        student_name = request.form['studentName']
-        subject_code = request.form['subjectCode']
-        subject_name = request.form['subjectName']
-        petition_type = request.form['petitionType']  # Assuming you added a dropdown with name 'petitionType' in your HTML form
-        request_reason = request.form['requestReason']
-
-        # Additional validation logic can be added here
-
-        # Check if any of the required fields is empty
-        if not student_id or not student_name or not subject_code or not subject_name or not petition_type or not request_reason:
-            flash('Please fill out all fields.', 'danger')
-            return redirect(url_for('stud_petition'))  # Replace 'your_petition_page' with the actual route
-
-        try:
-            new_petition = PetitionRequest(
-                student_id=student_id,
-                student_name=student_name,
-                subject_code=subject_code,
-                subject_name=subject_name,
-                petition_type=petition_type,
-                request_reason=request_reason
-            )
-
-            db.session.add(new_petition)
-            db.session.commit()
-            flash('Petition submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
-
-    return redirect(url_for('stud_petition'))
-#====================================================================================================================================
-
-@app.route('/student/requestfortutorialofsubjects')#
-def stud_tutorial():
-    return render_template("/student/tutorial.html")#
-
-# Assuming your route for this page is '/submit_tutorial_request'
 @app.route('/submit_tutorial_request', methods=['POST'])
 def submit_tutorial_request():
     if request.method == 'POST':
-        student_id = request.form['studentID']
-        student_name = request.form['studentName']
-        subject_code = request.form['subjectCode']
-        subject_name = request.form['subjectName']
+        student_number = request.form['student_number']
+        student_name = request.form['student_name']
+        subject_code = request.form['subject_code']
+        subject_name = request.form['subject_name']
         
         # Check if a file is provided
         if 'file' not in request.files:
@@ -726,18 +712,20 @@ def submit_tutorial_request():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not student_id or not student_name or not subject_code or not subject_name:
+        if not student_number or not student_name or not subject_code or not subject_name:
             flash('Please fill out all required fields.', 'danger')
             return redirect(url_for('stude_tutorial'))  # Replace 'stude_tutorial' with the actual route
 
         try:
             new_tutorial_request = TutorialRequest(
-                student_id=student_id,
+                student_number=student_number,
                 student_name=student_name,
                 subject_code=subject_code,
                 subject_name=subject_name,
                 file_filename=file_filename,
-                file_data=file_data
+                file_data=file_data,
+                user_responsible=request.form.get('user_responsible'),
+                status=request.form.get('status')
             )
 
             db.session.add(new_tutorial_request)
@@ -750,8 +738,9 @@ def submit_tutorial_request():
             db.session.close()
 
     return redirect(url_for('stude_tutorial'))  # Redirect to the tutorial request page after submission
+ # Redirect to the tutorial request page after submission
 
-
+#====================================================================================================================
 @app.route('/student/certification')#
 def stud_certification():
     return render_template("/student/certification.html")#
@@ -759,86 +748,71 @@ def stud_certification():
 @app.route('/student/submit_certification_request', methods=['POST'])
 def submit_certification_request():
     if request.method == 'POST':
+        # Retrieve form data
         student_id = request.form.get('studentID')
         student_name = request.form.get('studentName')
         certification_type = request.form.get('certificationType')
 
-        # Check if a file is provided
-        if 'requestForm' not in request.files or 'identificationCard' not in request.files:
-            flash('Please provide both Request Form and Identification Card files')
-            return redirect(request.url)
-
+        # Check file uploads
         request_form_file = request.files['requestForm']
         identification_card_file = request.files['identificationCard']
 
-        # Check if the file fields are empty
         if request_form_file.filename == '' or identification_card_file.filename == '':
-            flash('Please select files for both Request Form and Identification Card')
+            flash('Please select files for Request Form and Identification Card')
             return redirect(request.url)
 
+        # Read file data
         request_form_data = request_form_file.read()
         identification_card_data = identification_card_file.read()
 
         is_representative = request.form.get('isRepresentative') == 'on'
 
-        if is_representative:
-            # If there is a representative, handle the representative files
-            authorization_letter_file = request.files['authorizationLetter']
-            representative_id_file = request.files['representativeID']
+        try:
+            new_request = CertificationRequest(
+                student_id=student_id,
+                student_number=student_id,  # Assuming student_id here represents student_number
+                student_name=student_name,
+                certification_type=certification_type,
+                request_form_filename=secure_filename(request_form_file.filename),
+                request_form_data=request_form_data,
+                identification_card_filename=secure_filename(identification_card_file.filename),
+                identification_card_data=identification_card_data,
+                is_representative=is_representative,
+                created_at=datetime.utcnow()
+            )
 
-            # Check if the representative files are provided
-            if 'authorizationLetter' not in request.files or 'representativeID' not in request.files:
-                flash('Please provide both Authorization Letter and Representative ID files for the representative')
-                return redirect(request.url)
+            if is_representative:
+                # Handle representative files
+                authorization_letter_file = request.files['authorizationLetter']
+                representative_id_file = request.files['representativeID']
 
-            authorization_letter_data = authorization_letter_file.read()
-            representative_id_data = representative_id_file.read()
+                if authorization_letter_file.filename == '' or representative_id_file.filename == '':
+                    flash('Please select files for Authorization Letter and Representative ID')
+                    return redirect(request.url)
 
-            try:
-                new_request = CertificationRequest(
-                    student_id=student_id,
-                    student_name=student_name,
-                    certification_type=certification_type,
-                    request_form_filename=secure_filename(request_form_file.filename),
-                    identification_card_filename=secure_filename(identification_card_file.filename),
-                    is_representative=is_representative,
-                    authorization_letter_filename=secure_filename(authorization_letter_file.filename),
-                    representative_id_filename=secure_filename(representative_id_file.filename),
-                    created_at=datetime.utcnow()
-                )
+                authorization_letter_data = authorization_letter_file.read()
+                representative_id_data = representative_id_file.read()
 
-                db.session.add(new_request)
-                db.session.commit()
-                flash('Certification request submitted successfully')
-            except Exception as e:
-                db.session.rollback()
-                flash(f'Error: {str(e)}')
-            finally:
-                db.session.close()
+                new_request.authorization_letter_filename = secure_filename(authorization_letter_file.filename)
+                new_request.authorization_letter_data = authorization_letter_data
+                new_request.representative_id_filename = secure_filename(representative_id_file.filename)
+                new_request.representative_id_data = representative_id_data
 
-        else:
-            # If there is no representative, handle the request without representative files
-            try:
-                new_request = CertificationRequest(
-                    student_id=student_id,
-                    student_name=student_name,
-                    certification_type=certification_type,
-                    request_form_filename=secure_filename(request_form_file.filename),
-                    identification_card_filename=secure_filename(identification_card_file.filename),
-                    created_at=datetime.utcnow()
-                )
+            new_request.user_responsible = request.form.get('user_responsible')
+            new_request.status = request.form.get('status')
 
-                db.session.add(new_request)
-                db.session.commit()
-                flash('Certification request submitted successfully')
-            except Exception as e:
-                db.session.rollback()
-                flash(f'Error: {str(e)}')
-            finally:
-                db.session.close()
+            db.session.add(new_request)
+            db.session.commit()
+            flash('Certification request submitted successfully')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}')
+        finally:
+            db.session.close()
 
     return redirect(url_for('stud_certification'))
 
+#============================================================================================================================
 """@app.route('/student/submit_service_request', methods=['GET'])
 def submit_service_request():
     return render_template('service_request_form.html')"""
@@ -1024,7 +998,36 @@ def profile():
         'userImg': session.get('userImg'),
     }
 
+    # Map gender numerical values to strings
+    if student_details['gender'] == 1:
+        student_details['gender'] = 'Male'
+    elif student_details['gender'] == 2:
+        student_details['gender'] = 'Female'
+    else:
+        student_details['gender'] = 'Undefined'  # Handle any other values
+
     return render_template('student/profile.html', student_details=student_details)
+
+
+"""@app.route('/student/home/profile')
+@student_required
+def profile():
+    session.update()
+
+    # Retrieve student details from the session
+    student_details = {
+        'studentNumber': session.get('studentNumber'),
+        'name': session.get('name'),
+        'gender': session.get('gender'),
+        'email': session.get('email'),
+        'address': session.get('address'),
+        'dateofBirth': session.get('dateofBirth'),
+        'placeofBirth': session.get('placeofBirth'),
+        'mobileNumber': session.get('mobileNumber'),
+        'userImg': session.get('userImg'),
+    }
+
+    return render_template('student/profile.html', student_details=student_details)"""
 
 
 # ========================================================================
