@@ -53,7 +53,20 @@ def login_Overload():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_overload'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_overload', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -81,7 +94,20 @@ def login_Certification():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_certification'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_certification', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -108,7 +134,19 @@ def login_Changesubsched():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_changesubsched'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+            return redirect(url_for('student_portal_changesubsched', student_details=session))
 
         else:
             flash('Invalid email or password', 'danger')
@@ -138,7 +176,20 @@ def login_Enrollment():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_enrollment'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_enrollment', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -167,7 +218,19 @@ def login_Addingofsubject():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_addingsubject'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+            return redirect(url_for('student_portal_addingsubject', student_detail=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -196,7 +259,20 @@ def login_Tutorial():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_tutorial'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_tutorial', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -225,7 +301,20 @@ def login_Shifting():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_shifting'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_shifting', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -254,7 +343,20 @@ def login_Petition():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_petition'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return redirect(url_for('student_portal_petition', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -272,7 +374,7 @@ def login_Gradeentry():
     if is_user_logged_in_gradeentry():
         # If the user is already logged in, redirect to the overload subjects page
         return redirect(url_for('student_portal_gradeentry'))
-
+    
     if request.method == 'POST':
         studentNumber = request.form['studentNumber']
         password = request.form['password']
@@ -283,7 +385,19 @@ def login_Gradeentry():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_gradeentry'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+            return redirect(url_for('student_portal_gradeentry', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -313,7 +427,19 @@ def login_Crossenrollment():
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
             session['user_role'] = 'student'
-            return redirect(url_for('student_portal_crossenrollment'))
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+            return redirect(url_for('student_portal_crossenrollment', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')

@@ -5,8 +5,8 @@
     const form = document.querySelector('form');
 
     form.addEventListener('submit', function(event) {
-        const studentID = document.getElementById('studentID').value.trim();
-        const studentName = document.getElementById('studentName').value.trim();
+        const student_number = document.getElementById('student_number').value.trim();
+        const student_name = document.getElementById('student_name').value.trim();
 
         if (studentID === '' || studentName === '') {
             alert('Please fill out Student ID and Student Name');
@@ -48,14 +48,15 @@
     <br>
     <h2>Request Form</h2>
     <form action="{{url_for('submit_certification_request')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
+        <label for="student_number">Student number:</label><br>
+        <input type="text" id="student_number" name="student
+        _number" required><br><br>
 
-        <label for="studentName">Student Name:</label><br>
-        <input type="text" id="studentName" name="studentName" required><br><br>
+        <label for="student_name">Student Name:</label><br>
+        <input type="text" id="student_name" name="student_name" required><br><br>
 
-        <label for="certificationType">Certification Type:</label><br>
-        <select id="certificationType" name="certificationType" required>
+        <label for="certification_type">Certification Type:</label><br>
+        <select id="certification_type" name="certification_type" required>
             <option value="Grades">Grades</option>
             <option value="Bonafide Student">Bonafide Student</option>
             <option value="General Weighted Average">General Weighted Average</option>
@@ -67,8 +68,8 @@
         <label for="identificationCard">Identification Card (ID):</label><br>
         <input type="file" id="identificationCard" name="identificationCard" required><br><br>
 
-        <label for="isRepresentative">Is there a representative?</label>
-        <input type="checkbox" id="isRepresentative" name="isRepresentative"><br><br>
+        <label for="is_representative">Is there a representative?</label>
+        <input type="checkbox" id="is_representative" name="is_representative"><br><br>
 
         <div id="representativeInfo" style="display: none;">
             <label for="authorizationLetter">Authorization Letter:</label><br>
@@ -101,11 +102,11 @@
     </form>
 
     <script>
-        const isRepresentativeCheckbox = document.getElementById('isRepresentative');
+        const is_representativeCheckbox = document.getElementById('is_representative');
         const representativeInfoDiv = document.getElementById('representativeInfo');
 
-        isRepresentativeCheckbox.addEventListener('change', function() {
-            if (isRepresentativeCheckbox.checked) {
+        is_RepresentativeCheckbox.addEventListener('change', function() {
+            if (is_RepresentativeCheckbox.checked) {
                 representativeInfoDiv.style.display = 'block';
             } else {
                 representativeInfoDiv.style.display = 'none';

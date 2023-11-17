@@ -21,8 +21,8 @@
 
     <h2>Petition Form</h2>
     <form id="petitionForm" action="{{url_for('submit_petition')}}" method="POST" enctype="multipart/form-data">
-        <label for="studentID">Student ID:</label><br>
-        <input type="text" id="studentID" name="studentID" required><br><br>
+        <label for="student_number">Student Number:</label><br>
+        <input type="text" id="student_number" name="student_number" required><br><br>
 
         <label for="studentName">Student Name:</label><br>
         <input type="text" id="studentName" name="studentName" required><br><br>
@@ -61,10 +61,9 @@
     </form>
 
     <script>
-        // Add your form validation logic here
         const form = document.getElementById('petitionForm');
         form.addEventListener('submit', function(event) {
-            const studentID = document.getElementById('studentID').value.trim();
+            const studentNumber = document.getElementById('student_number').value.trim();
             const studentName = document.getElementById('studentName').value.trim();
             const subjectCode = document.getElementById('subjectCode').value.trim();
             const subjectName = document.getElementById('subjectName').value.trim();
@@ -72,7 +71,7 @@
             const requestReason = document.getElementById('requestReason').value.trim();
             const userResponsible = document.getElementById('userResponsible').value.trim();
 
-            if (!studentID || !studentName || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
+            if (!studentNumber || !studentName || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
                 alert('Please fill out all fields.');
                 event.preventDefault();
             }

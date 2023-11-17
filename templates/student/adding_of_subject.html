@@ -53,11 +53,11 @@
 
     <h2>Application Form</h2>
     <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student No.:</label><br>
-        <input type="text" id="student_number" name="student_number" required><br><br>
+        <label for="student_number">Student number:</label><br>
+        <input type="text" id="student_number" name="student_number" required onblur="getStudentNumber()"><br><br>
     
         <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required onblur="getStudentNumber()"><br><br>
+        <input type="text" id="student_name" name="student_name" required><br><br>
 
         <label for="subject_Names">Subject Name (comma-separated):</label>
         <input type="text" id="subject_Names" name="subject_Names" required><br><br>

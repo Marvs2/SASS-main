@@ -75,13 +75,13 @@ class Student(db.Model, UserMixin):
 
     student_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(50), unique=True, nullable=False)
-    name = db.Column(db.String(50), nullable=False)  
+    name = db.Column(db.String(255), nullable=False)  
     email = db.Column(db.String(50), unique=True, nullable=False) 
     address = db.Column(db.String(50), nullable=True) 
     password = db.Column(db.String(128), nullable=False)
     gender = db.Column(db.Integer)  
     dateofBirth = db.Column(db.Date)  
-    placeofBirth = db.Column(db.String(50), nullable=True)
+    placeofBirth = db.Column(db.String(255), nullable=True)
     mobileNumber = db.Column(db.String(11))
     userImg = db.Column(db.String, nullable=False) 
 
@@ -120,13 +120,13 @@ class Add_Subjects(db.Model, UserMixin):
 
     subject_ID = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
-    student_name = db.Column(db.String(50))
-    subject_Names = db.Column(db.String(50), nullable=False)
-    enrollment_type = db.Column(db.String(20))  # 'regular' or 'irregular'
+    student_number = db.Column(db.String(100), nullable=False)
+    student_name = db.Column(db.String(255))
+    subject_Names = db.Column(db.String(255), nullable=False)
+    enrollment_type = db.Column(db.String(20))  # 'regular50or 'irregular'
     file_data = db.Column(db.LargeBinary)  # Store binary data for the file
     file_name = db.Column(db.String(255))  # Store the filename
-    user_responsible = db.Column(db.String(50))  # Add user role attribute
+    user_responsible = db.Column(db.String(255))  # Add user role attribute
     status = db.Column(db.String(50)) #status 
 
     # Establish a relationship with the Student class
@@ -155,14 +155,14 @@ class ChangeOfSubjects(db.Model, UserMixin):
 
     Changesubject_ID = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))    
-    student_number = db.Column(db.String(50), nullable=False)
-    student_name = db.Column(db.String(50))
-    enrollment_type = db.Column(db.String(20))  # 'regular' or 'irregular'
+    student_number = db.Column(db.String(100), nullable=False)
+    student_name = db.Column(db.String(255))
+    enrollment_type = db.Column(db.String(50))  # 'regular' or 'irregular'
     ace_form_filename = db.Column(db.String(255))
     ace_form_data = db.Column(db.LargeBinary)
     created_at = db.Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(TIMESTAMP)
-    user_responsible = db.Column(db.String(50))
+    user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(50)) #status 
  
 
@@ -192,7 +192,7 @@ class ManualEnrollment(db.Model, UserMixin):
 
     m_enrollment_ID = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(100), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
     enrollment_type = db.Column(db.String(50), nullable=False)
     reason = db.Column(db.Text, nullable=False)
@@ -200,7 +200,7 @@ class ManualEnrollment(db.Model, UserMixin):
     me_file_data = db.Column(db.LargeBinary)
     created_at = db.Column(DateTime, default=datetime.utcnow)
     updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    user_responsible = db.Column(db.String(50))  # Add user role attribute
+    user_responsible = db.Column(db.String(255))  # Add user role attribute
     status = db.Column(db.String(50)) #status 
 
 
@@ -231,7 +231,7 @@ class CertificationRequest(db.Model, UserMixin):
 
     certification_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(255), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
     certification_type = db.Column(db.String(50), nullable=False)
     request_form_filename = db.Column(db.String(255), nullable=False)
@@ -244,7 +244,7 @@ class CertificationRequest(db.Model, UserMixin):
     representative_id_filename = db.Column(db.String(255))
     representative_id_date = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50)) 
+    user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(50)) #status 
 
      # Add a relationship to the 'students' table
@@ -279,9 +279,9 @@ class GradeEntry(db.Model, UserMixin):
 
     grade_entry_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number =db.Column(db.Integer, nullable=False)
+    student_number =db.Column(db.String(100), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
-    application_type = db.Column(db.String(50), nullable=False)
+    application_type = db.Column(db.String(150), nullable=False)
     completion_form_filename = db.Column(db.String(255), nullable=False)
     completion_form_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
     class_record_filename = db.Column(db.String(255), nullable=False)
@@ -289,7 +289,7 @@ class GradeEntry(db.Model, UserMixin):
     affidavit_filename = db.Column(db.String(255), nullable=False)
     affidavit_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50)) 
+    user_responsible = db.Column(db.String(100)) 
     status = db.Column(db.String(50)) #status 
 
      # Add a relationship to the 'students' table
@@ -320,7 +320,7 @@ class CrossEnrollment(db.Model, UserMixin):
 
     cross_enrollment_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(100), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
     school_for_cross_enrollment = db.Column(db.String(255), nullable=False)
     total_number_of_units = db.Column(db.Integer, nullable=False)
@@ -330,7 +330,7 @@ class CrossEnrollment(db.Model, UserMixin):
     permit_to_cross_enroll_filename = db.Column(db.String(255), nullable=False)
     permit_to_cross_enroll_data = db.Column(db.LargeBinary, nullable=False)  # Add
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50)) 
+    user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(50)) #status 
 
          # Add a relationship to the 'students' table
@@ -362,14 +362,14 @@ class PetitionRequest(db.Model, UserMixin):
 
     petition_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)#/Student number dpat ito/
+    student_number = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
     student_name = db.Column(db.String(255), nullable=False)
     subject_code = db.Column(db.String(50), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
     petition_type = db.Column(db.String(50), nullable=False)
     request_reason = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50)) 
+    user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(50)) #status 
 
      # Add a relationship to the 'students' table
@@ -398,7 +398,7 @@ class ShiftingApplication(db.Model, UserMixin):
 
     shifting_application_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(100), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
     current_program = db.Column(db.String(255), nullable=False)
     residency_year = db.Column(db.Integer, nullable=False)
@@ -407,7 +407,7 @@ class ShiftingApplication(db.Model, UserMixin):
     file_filename = db.Column(db.String(255))
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50)) 
+    user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(50)) #status 
 
      # Add a relationship to the 'students' table
@@ -438,16 +438,16 @@ class OverloadApplication(db.Model, UserMixin):
 
     overload_application_id = db.Column(db.Integer, primary_key=True)
     student_name = db.Column(db.String(255), nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(100), nullable=False)
     semester = db.Column(db.String(20), nullable=False)
     subjects_to_add = db.Column(db.String(255), nullable=False)
     justification = db.Column(db.Text, nullable=False)
     file_filename = db.Column(db.String(255))
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50))
+    user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(50)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
  
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='overload_applications')
@@ -476,14 +476,14 @@ class TutorialRequest(db.Model, UserMixin):
 
     tutorial_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(50), nullable=False)
+    student_number = db.Column(db.String(100), nullable=False)
     student_name = db.Column(db.String(255), nullable=False)
-    subject_code = db.Column(db.String(50), nullable=False)
+    subject_code = db.Column(db.String(100), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
     file_filename = db.Column(db.String(255), nullable=False)
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(50))
+    user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(50)) #status 
      
      # Add a relationship to the 'students' table
@@ -659,7 +659,7 @@ class Faculty(db.Model, UserMixin):
     facultyID = db.Column(db.Integer, primary_key=True)  # UserID
     facultyNumber = db.Column(db.Integer, unique=True, nullable=False) #Faculty_Number
     userType = db.Column(db.String(50))  # e.g., 'Admin', 'Professor', etc.
-    name = db.Column(db.String(50), nullable=False)  # Name
+    name = db.Column(db.String(255), nullable=False)  # Name
     email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     address = db.Column(db.String(255))  # You can use String or TEXT depending on the length
     password = db.Column(db.String(128), nullable=False)  # Password
@@ -698,7 +698,7 @@ class Admin(db.Model, UserMixin):
 
     adm_Id = db.Column(db.Integer, primary_key=True)  # UserID
     admin_Number = db.Column(db.String(30), unique=True, nullable=False) #AdminNumber
-    name = db.Column(db.String(50), nullable=False)  # Name
+    name = db.Column(db.String(255), nullable=False)  # Name
     email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     password = db.Column(db.String(128), nullable=False)  # Password
     gender = db.Column(db.Integer)  # Gender
@@ -748,7 +748,7 @@ def init_db(app):
     # Additional fields for specific service types
     # Subject-related fields
     subject_name = db.Column(db.String(50))
-    enrollment_type = db.Column(db.String(20))
+    enrollment_type = db.Column(db.String500))
     file_data = db.Column(db.LargeBinary)
     faculty_number = db.Column(db.String(50))
 

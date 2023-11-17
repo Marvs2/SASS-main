@@ -25,42 +25,60 @@
     {% endwith %}
     <br>
     <br>
-<div class="form-container">
-    <h2>Request Form</h2>
-    <form action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
-        <label for="student_number">Student Number:</label>
-        <input type="text" id="student_number" name="student_number"><br><br>
+    <div class="form-container">
+        <h2>Request Form</h2>
+        <form id="tutorialForm" action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
+            <label for="student_number">Student Number:</label>
+            <input type="text" id="student_number" name="student_number" required><br><br>
 
-        <label for="student_name">Student Name:</label>
-        <input type="text" id="student_name" name="student_name"><br><br>
-    
-        <label for="subject_code">Subject Code:</label>
-        <input type="text" id="subject_code" name="subject_code"><br><br>
-    
-        <label for="subject_name">Subject Name:</label>
-        <input type="text" id="subject_name" name="subject_name"><br><br>
-    
-        <label for="file">File:</label>
-        <input type="file" id="file" name="file"><br><br>
-    
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="-Director/ Head of Academic Program">
-                -Director/ Head of Academic Program
-            </option>
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
-        </select><br><br>
-    
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Default</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
-    
-        <input type="submit" value="Submit">
-    </form>
-</div>
+            <label for="student_name">Student Name:</label>
+            <input type="text" id="student_name" name="student_name" required><br><br>
+        
+            <label for="subject_code">Subject Code:</label>
+            <input type="text" id="subject_code" name="subject_code" required><br><br>
+        
+            <label for="subject_name">Subject Name:</label>
+            <input type="text" id="subject_name" name="subject_name" required><br><br>
+        
+            <label for="file">File:</label>
+            <input type="file" id="file" name="file" required><br><br>
+        
+            <label for="user_responsible">User Responsible:</label>
+            <select id="user_responsible" name="user_responsible" required>
+                <option value="-Director/ Head of Academic Program">
+                    -Director/ Head of Academic Program
+                </option>
+                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
+            </select><br><br>
+        
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="Sent" selected>Default</option>
+                <option value="Pending" disabled>Pending</option>
+                <option value="Approved" disabled>Approved</option>
+                <option value="Rejected" disabled>Rejected</option>
+            </select><br><br>
+        
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('tutorialForm');
+        form.addEventListener('submit', function(event) {
+            const studentNumber = document.getElementById('student_number').value.trim();
+            const studentName = document.getElementById('student_name').value.trim();
+            const subjectCode = document.getElementById('subject_code').value.trim();
+            const subjectName = document.getElementById('subject_name').value.trim();
+            const file = document.getElementById('file').files[0];
+            const userResponsible = document.getElementById('user_responsible').value.trim();
+
+            if (!studentNumber || !studentName || !subjectCode || !subjectName || !file || !userResponsible) {
+                alert('Please fill out all fields.');
+                event.preventDefault();
+            }
+            // You can add additional validation logic here if needed
+        });
+    </script>
 {% endblock %}

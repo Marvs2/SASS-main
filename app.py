@@ -191,11 +191,11 @@ def stud_overload():
     return render_template("/student/subject_overload.html")# 
 
 # Assuming your route for this page is '/submit_overload_application'
-@app.route('/submit_overload_application', methods=['POST'])
+@app.route('/student/foroverloadofsubject/submit_overload_application', methods=['POST'])
 def submit_overload_application():
     if request.method == 'POST':
         student_name = request.form['studentName']
-        student_id = request.form['studentID']
+        student_number = request.form['student_number']
         semester = request.form['semester']
         subjects_to_add = request.form['subjectsToAdd']
         justification = request.form['justification']
@@ -219,15 +219,14 @@ def submit_overload_application():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not student_name or not student_id or not semester or not subjects_to_add or not justification:
+        if not student_name or not student_number or not semester or not subjects_to_add or not justification:
             flash('Please fill out all required fields.', 'danger')
             return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
 
         try:
             new_overload_application = OverloadApplication(
                 student_name=student_name,
-                student_id=student_id,
-                student_number=student_id,  # Assuming student_id here represents student_number
+                student_number=student_number,
                 semester=semester,
                 subjects_to_add=subjects_to_add,
                 justification=justification,
@@ -255,59 +254,61 @@ def submit_overload_application():
 def stud_adding():
     return render_template("/student/adding_of_subject.html")#
 
-@app.route('/student/addingofsubject/add_subjects', methods=['POST'])
+@app.route('/student/add_subjects', methods=['POST'])
 def add_subjects():
     if request.method == 'POST':
         student_number = request.form['student_number']
         student_name = request.form['student_name']
-        subject_names = request.form['subject_Names']  # Get the subject names as a single string
+        subject_Names = request.form['subject_Names']
         enrollment_type = request.form['enrollment_type']
-        faculty_number = request.form['faculty_number']  # Assuming you have a faculty number in your form
-
+        user_responsible = request.form['user_responsible']
+        status = request.form['status']
 
         # Check if a file is provided
         if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
+            flash('No file part', 'danger')
+            return redirect(url_for('add_subjects'))  # Replace 'add_subjects' with the actual route
 
         file = request.files['file']
         # Check if the file field is empty
         if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
+            flash('No selected file', 'danger')
+            return redirect(url_for('add_subjects'))  # Replace 'add_subjects' with the actual route
 
         file_data = file.read()  # Read the file data
         file_name = secure_filename(file.filename)
 
-        try:
-            # Retrieve the student and faculty based on the provided numbers
-            student = Student.query.filter_by(student_number=student_number).first()
-            faculty = Faculty.query.filter_by(facultyNumber=faculty_number).first()
+        # Additional validation logic can be added here
 
-            # Create a new subject with the retrieved student and faculty
-            new_subject = Add_Subjects(
+        # Check if any of the required fields is empty
+        if not student_number or not student_name or not enrollment_type or not subject_Names:
+            flash('Please fill out all required fields.', 'danger')
+            return redirect(url_for('add_subjects'))  # Replace 'add_subjects' with the actual route
+
+        try:
+            new_subject_application = Add_Subjects(
                 student_number=student_number,
                 student_name=student_name,
-                subject_Names=subject_names,  # Assign the whole string to subject_Names
+                subject_Names=subject_Names,
                 enrollment_type=enrollment_type,
-                file_data=file_data,
                 file_name=file_name,
-                faculty=faculty,
-                user_responsible="Role",  # Add user role attribute
-                status="Status"
+                file_data=file_data,
+                user_responsible=user_responsible,
+                status=status
             )
 
-            db.session.add(new_subject)
+            db.session.add(new_subject_application)
             db.session.commit()
-            flash('Subject Added successfully')
+            flash('Subject application submitted successfully!', 'success')
         except Exception as e:
             db.session.rollback()
-            flash(f'Error: {str(e)}')
+            flash(f'Error: {str(e)}', 'danger')
         finally:
             db.session.close()
 
-    return redirect(url_for('stud_adding'))
+    return redirect(url_for('stud_adding')) 
 
+#========================================================
 
 @app.route('/student/service_service_form')#
 def stud_services():
@@ -338,6 +339,7 @@ def submit_services_request():
 
     # Return a response (you can customize this based on your needs)
     return jsonify({'message': 'Service request submitted successfully!'})"""
+
 @app.route('/student/submit_service_form/request', methods=['POST'])
 def submit_services_request():
     if request.method == 'POST':
@@ -365,6 +367,7 @@ def submit_services_request():
 
     return redirect(url_for('stud_services'))
 
+#========================================================================#
 @app.route('/student/changeofsubject/schedule')#
 def stud_change():
     return render_template("/student/change_of_subject.html")#
@@ -376,46 +379,43 @@ def change_of_subjects():
         student_number = request.form['student_number']
         student_name = request.form['student_name']
         enrollment_type = request.form['enrollment_type']
+        user_responsible = request.form['user_responsible']
+        status = request.form['status']
 
         # Check if ACE Form file is provided
-        if 'aceForm' not in request.files:
-            flash('No ACE Form file provided')
+        if 'ace_form_file' not in request.files:
+            flash('No ACE Form file provided', 'danger')
             return redirect(request.url)
 
-        ace_form_file = request.files['aceForm']
+        ace_form_file = request.files['ace_form_file']
         # Check if the ACE Form file field is empty
         if ace_form_file.filename == '':
-            flash('No ACE Form file selected')
+            flash('No ACE Form file selected', 'danger')
             return redirect(request.url)
 
         ace_form_data = ace_form_file.read()  # Read the ACE Form file data
         ace_form_filename = secure_filename(ace_form_file.filename)
 
         try:
-            # Retrieve the student based on the provided number
-            student = Student.query.filter_by(student_number=student_number).first()
-
             # Create a new change of subjects record with the retrieved student
             new_change_of_subjects = ChangeOfSubjects(
-                student=student,
                 student_number=student_number,
                 student_name=student_name,
                 enrollment_type=enrollment_type,
                 ace_form_filename=ace_form_filename,
                 ace_form_data=ace_form_data,
-                created_at=datetime.utcnow(),  # Assuming you want to set the creation time
-                updated_at=None,  # Assuming the record is not updated yet
-                faculty_number=request.form['faculty_number'],  # Assuming faculty number is in the form
-                user_responsible="Role",  # Add user role attribute
-                status="Status"
+                created_at=datetime.utcnow(),
+                updated_at=None,
+                user_responsible=user_responsible,
+                status=status
             )
 
             db.session.add(new_change_of_subjects)
             db.session.commit()
-            flash('Change of Subjects Added successfully')
+            flash('Change of Subjects Added successfully', 'success')
         except Exception as e:
             db.session.rollback()
-            flash(f'Error: {str(e)}')
+            flash(f'Error: {str(e)}', 'danger')
         finally:
             db.session.close()
 
@@ -427,31 +427,33 @@ def change_of_subjects():
 def stud_correction():
     return render_template("/student/grade_entry.html")#
 
-@app.route('/student/submit_grade_correction', methods=['POST'])
+@app.route('/student/gradeentry/submit_grade_correction', methods=['POST'])
 def submit_grade_correction():
-    student_id = request.form['studentID']
-    student_name = request.form['studentName']
-    application_type = request.form['applicationType']
+    # Assuming you have the student ID stored in the session during login
+    student_id = session.get('student_id')
+    student_number = request.form['student_number']    
+    student_name = request.form['student_name']
+    application_type = request.form['application_type']
 
-    #additional logic here
-    if not student_id or not student_name or not application_type:
+    # Additional logic here
+    if not student_number or not student_name or not application_type:
         flash('Please fill out all fields and provide valid values.', 'danger')
-        return render_template('student/grade_correction.html')  # Replace with the actual template name
+        return render_template('student/grade_entry.html')  # Replace with the actual template name
 
     files = {
-        'completionForm': 'Completion Form',
-        'classRecord': 'Class Record',
+        'completion_form': 'Completion Form',
+        'class_record': 'Class Record',
         'affidavit': 'Affidavit'
     }
 
     for field, display_name in files.items():
         if field not in request.files:
-            flash(f'No {display_name} file provided')
+            flash(f'No {display_name} file provided', 'danger')
             return redirect(request.url)
 
         file = request.files[field]
         if file.filename == '':
-            flash(f'No {display_name} file selected')
+            flash(f'No {display_name} file selected', 'danger')
             return redirect(request.url)
 
         data = file.read()
@@ -460,14 +462,14 @@ def submit_grade_correction():
 
     try:
         new_application = GradeEntry(
-            student_id=student_id,
-            student_number=student_id,  # Assuming student_id here represents student_number
+            student_id=student_id,  # Use the stored student 
+            student_number=student_number,
             student_name=student_name,
             application_type=application_type,
-            completion_form_filename=request.completionForm_filename,
-            completion_form_data=request.completionForm_data,
-            class_record_filename=request.classRecord_filename,
-            class_record_data=request.classRecord_data,
+            completion_form_filename=request.completion_form_filename,
+            completion_form_data=request.completion_form_data,
+            class_record_filename=request.class_record_filename,
+            class_record_data=request.class_record_data,
             affidavit_filename=request.affidavit_filename,
             affidavit_data=request.affidavit_data,
             user_responsible=request.form.get('user_responsible'),  # Added user_responsible
@@ -496,7 +498,7 @@ def stud_cross_enrollment():
 
 @app.route('/student/submit_cross_enrollment', methods=['POST'])
 def submit_cross_enrollment():
-    student_id = request.form['studentID']
+    student_number = request.form['student_number']
     student_name = request.form['studentName']
     school_for_cross_enrollment = request.form['crossEnrollmentSchool']
     total_units = int(request.form['crossEnrollmentUnits'])
@@ -505,20 +507,19 @@ def submit_cross_enrollment():
     status = request.form['status']
 
     # Additional validation logic can be added here
-
-    if not student_id or not student_name or not school_for_cross_enrollment or total_units <= 0 or not authorized_subjects:
+    if not student_number or not student_name or not school_for_cross_enrollment or total_units <= 0 or not authorized_subjects:
         flash('Please fill out all fields and provide valid values.', 'danger')
         return render_template('student/cross_enrollment.html')  # Replace with the actual template name
 
     # Check if Application Letter file is provided
     if 'applicationLetter' not in request.files:
-        flash('No Application Letter file provided')
+        flash('No Application Letter file provided', 'danger')
         return redirect(request.url)
 
     application_letter_file = request.files['applicationLetter']
     # Check if the Application Letter file field is empty
     if application_letter_file.filename == '':
-        flash('No Application Letter file selected')
+        flash('No Application Letter file selected', 'danger')
         return redirect(request.url)
 
     application_letter_data = application_letter_file.read()  # Read the Application Letter file data
@@ -526,13 +527,13 @@ def submit_cross_enrollment():
 
     # Check if Permit to Cross-Enroll file is provided
     if 'permitToCrossEnroll' not in request.files:
-        flash('No Permit to Cross-Enroll file provided')
+        flash('No Permit to Cross-Enroll file provided', 'danger')
         return redirect(request.url)
 
     permit_to_cross_enroll_file = request.files['permitToCrossEnroll']
     # Check if the Permit to Cross-Enroll file field is empty
     if permit_to_cross_enroll_file.filename == '':
-        flash('No Permit to Cross-Enroll file selected')
+        flash('No Permit to Cross-Enroll file selected', 'danger')
         return redirect(request.url)
 
     permit_to_cross_enroll_data = permit_to_cross_enroll_file.read()  # Read the Permit to Cross-Enroll file data
@@ -540,8 +541,7 @@ def submit_cross_enrollment():
 
     try:
         new_cross_enrollment = CrossEnrollment(
-            student_id=student_id,
-            student_number=student_id,  # Assuming student_id here represents student_number
+            student_number=student_number,
             student_name=student_name,
             school_for_cross_enrollment=school_for_cross_enrollment,
             total_number_of_units=total_units,
@@ -575,10 +575,10 @@ def stud_shifting():
     return render_template("/student/shifting.html")#
 
 # Assuming your route for this page is '/submit_shifting_application'
-@app.route('/submit_shifting_application', methods=['POST'])
+@app.route('/student/shifting/submit_shifting_application', methods=['POST'])
 def submit_shifting_application():
     if request.method == 'POST':
-        student_id = request.form['studentID']
+        student_number = request.form['student_number']
         student_name = request.form['studentName']
         current_program = request.form['currentProgram']
         residency_year = int(request.form['residencyYear'])
@@ -604,14 +604,13 @@ def submit_shifting_application():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not student_id or not student_name or not current_program or not residency_year or not intended_program:
+        if not student_number or not student_name or not current_program or not residency_year or not intended_program:
             flash('Please fill out all required fields.', 'danger')
             return redirect(url_for('your_shifting_page'))  # Replace 'your_shifting_page' with the actual route
 
         try:
             new_shifting_application = ShiftingApplication(
-                student_id=student_id,
-                student_number=student_id,  # Assuming student_id here represents student_number
+                student_number=student_number,
                 student_name=student_name,
                 current_program=current_program,
                 residency_year=residency_year,
@@ -642,8 +641,8 @@ def stud_enrollment():
 
 @app.route('/submit_manual_enrollment', methods=['POST'])
 def submit_manual_enrollment():
-    student_number = request.form['studentNumber']
-    student_name = request.form['studentName']
+    student_number = request.form['student_number']
+    student_name = request.form['student_name']
     enrollment_type = request.form['enrollmentType']
     reason = request.form['reason']
 
@@ -690,6 +689,47 @@ def submit_manual_enrollment():
 @app.route('/student/onlinepetitionofsubject')#
 def stud_petition():
     return render_template("/student/petition.html")#
+
+@app.route('/student/onlinepetitionofsubject', methods=['GET', 'POST'])
+def submit_petition():
+    if request.method == 'POST':
+        student_number = request.form['student_number']
+        student_name = request.form['studentName']
+        subject_code = request.form['subjectCode']
+        subject_name = request.form['subjectName']
+        petition_type = request.form['petitionType']
+        request_reason = request.form['requestReason']
+        user_responsible = request.form['userResponsible']
+        status = request.form['status']
+
+        # Check if any of the required fields is empty
+        if not student_number or not student_name or not subject_code or not subject_name or not petition_type or not request_reason or not user_responsible or not status:
+            flash('Please fill out all required fields.', 'danger')
+            return redirect(url_for('stud_petition'))  # Replace 'stud_petition' with the actual route
+
+        try:
+            new_petition_request = PetitionRequest(
+                student_number=student_number,
+                student_name=student_name,
+                subject_code=subject_code,
+                subject_name=subject_name,
+                petition_type=petition_type,
+                request_reason=request_reason,
+                user_responsible=user_responsible,
+                status=status
+            )
+
+            db.session.add(new_petition_request)
+            db.session.commit()
+            flash('Petition submitted successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error: {str(e)}', 'danger')
+        finally:
+            db.session.close()
+
+    return render_template("/student/petition.html")
+#===================================================================================================================================#
 
 @app.route('/student/requestfortutorialofsubjects')#
 def stud_tutorial():
@@ -747,8 +787,8 @@ def submit_tutorial_request():
         finally:
             db.session.close()
 
-    return redirect(url_for('stude_tutorial'))  # Redirect to the tutorial request page after submission
- # Redirect to the tutorial request page after submission
+    return redirect(url_for('stud_tutorial'))
+  # Redirect to the tutorial request page after submission
 
 #====================================================================================================================
 @app.route('/student/certification')#
@@ -759,9 +799,9 @@ def stud_certification():
 def submit_certification_request():
     if request.method == 'POST':
         # Retrieve form data
-        student_id = request.form.get('studentID')
-        student_name = request.form.get('studentName')
-        certification_type = request.form.get('certificationType')
+        student_number = request.form.get('student_number')
+        student_name = request.form.get('student_name')
+        certification_type = request.form.get('certification_type')
 
         # Check file uploads
         request_form_file = request.files['requestForm']
@@ -775,12 +815,11 @@ def submit_certification_request():
         request_form_data = request_form_file.read()
         identification_card_data = identification_card_file.read()
 
-        is_representative = request.form.get('isRepresentative') == 'on'
+        is_representative = request.form.get('is_representative') == 'on'
 
         try:
             new_request = CertificationRequest(
-                student_id=student_id,
-                student_number=student_id,  # Assuming student_id here represents student_number
+                student_number=student_number,
                 student_name=student_name,
                 certification_type=certification_type,
                 request_form_filename=secure_filename(request_form_file.filename),
@@ -990,7 +1029,7 @@ def profile():
         return "Student not found", 404"""
 
 # Modify the profile route
-@app.route('/student/home/profile')
+@app.route('/student/profile')
 @student_required
 def profile():
     session.update()
@@ -1045,6 +1084,7 @@ def profile():
 
 # Overload subjects function for students
 @app.route('/student/foroverloadofsubject')
+@student_required
 def student_portal_overload():
     session.permanent = True
     if is_user_logged_in_overload():
@@ -1055,8 +1095,9 @@ def student_portal_overload():
 
 # Function to check if the user is logged in
 def is_user_logged_in_overload():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_overload')
@@ -1069,18 +1110,37 @@ def redirect_based_on_login_overload():
 #================================================================
 # Certification function for students
 @app.route('/student/certification')
+@student_required
 def student_portal_certification():
     session.permanent = True
     if is_user_logged_in_certification():
         return render_template('student/certification.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_certification'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_certification():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_certification')
@@ -1092,18 +1152,37 @@ def redirect_based_on_login_certification():
 #========================================================================
 # Change of subject or sched function for students
 @app.route('/student/changeofsubject/schedule')
+@student_required
 def student_portal_changesubsched():
     session.permanent = True
     if is_user_logged_in_changesubsched():
         return render_template('student/change_of_subject.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_changesubsched'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_changesubsched():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_changesubsched')
@@ -1115,18 +1194,37 @@ def redirect_based_on_login_changesubsched():
 #========================================================================
 # Enrollment function for students
 @app.route('/student/manualenrollment')
+@student_required
 def student_portal_enrollment():
     session.permanent = True
     if is_user_logged_in_enrollment():
         return render_template('student/manual_enrollment.html')
+
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_enrollment'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_enrollment():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_enrollment')
@@ -1140,18 +1238,37 @@ def redirect_based_on_login_enrollment():
 
 # addingsubject subjects function for students
 @app.route('/student/addingofsubject')
+@student_required
 def student_portal_addingsubject():
     session.permanent = True
     if is_user_logged_in_addingofsubject():
         return render_template('student/adding_of_subject.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_addingofsubject'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_addingofsubject():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_addingofsubject')
@@ -1164,18 +1281,37 @@ def redirect_based_on_login_addingofsubject():
 #================================================================
 # shifting function for students
 @app.route('/student/shifting')
+@student_required
 def student_portal_shifting():
     session.permanent = True
     if is_user_logged_in_shifting():
         return render_template('student/shifting.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_shifting'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_shifting():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_shifting')
@@ -1194,14 +1330,32 @@ def student_portal_tutorial():
     session.permanent = True
     if is_user_logged_in_tutorial():
         return render_template('student/tutorial.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_tutorial'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_tutorial():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_tutorial')
@@ -1214,18 +1368,37 @@ def redirect_based_on_login_tutorial():
 #================================================================
 # online petition subjects function for students
 @app.route('/student/onlinepetitionofsubject')
+@student_required
 def student_portal_petition():
     session.permanent = True
     if is_user_logged_in_petition():
         return render_template('student/petition.html')
+    
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_petition'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_petition():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_petition')
@@ -1238,18 +1411,37 @@ def redirect_based_on_login_petition():
 #================================================================
 # gradeentry function for students
 @app.route('/student/gradeentry')
+@student_required
 def student_portal_gradeentry():
     session.permanent = True
     if is_user_logged_in_gradeentry():
         return render_template('student/grade_entry.html')
+
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_gradeentry'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_gradeentry():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_gradeentry')
@@ -1262,18 +1454,37 @@ def redirect_based_on_login_gradeentry():
 #================================================================
 # gradeentry function for students
 @app.route('/student/crossenrollment')
+@student_required
 def student_portal_crossenrollment():
     session.permanent = True
     if is_user_logged_in_crossenrollment():
         return render_template('student/cross_enrollment.html')
+    # Function to fetch student details by student ID
+def get_student_details(student_id):
+    student = Student.query.get(student_id)
+
+    if student:
+        student_details = {
+            'studentNumber': student.studentNumber,
+            'name': student.name,
+            'gender': student.gender,
+            'email': student.email,
+            'address': student.address,
+            'dateofBirth': student.dateofBirth,
+            'placeofBirth': student.placeofBirth,
+            'mobileNumber': student.mobileNumber,
+            'userImg': student.userImg,
+        }
+        return student_details
     else:
         # If not logged in, redirect to the login page
         return redirect(url_for('portal_crossenrollment'))
 
 # Function to check if the user is logged in
 def is_user_logged_in_crossenrollment():
+    session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("user_id") is not None
+    return session.get("student_id") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_crossenrollment')
@@ -1284,11 +1495,7 @@ def redirect_based_on_login_crossenrollment():
         return redirect(url_for('portal_crossenrollment'))
 
 #================================================================#
-
-
-
-
-
+# crossenrollment function for teachers
 #================================================================#
 # ALL FACULTY ROUTES HERE
 @app.route('/faculty')
