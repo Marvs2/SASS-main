@@ -671,7 +671,7 @@ class Faculty(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     # Define the 'subjects' relationship in the Faculty model
-    subjects = db.relationship('Add_Subjects', back_populates='faculty')
+   # subjects = db.relationship('Add_Subjects', back_populates='faculty')
 
     def to_dict(self):
         return {

@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import psycopg2
 from sqlalchemy import Connection
 #from models import Services
+#from models import init_db
 
 from Api.v1.student.api_routes import student_api  
 from Api.v1.faculty.api_routes import faculty_api
@@ -21,14 +22,18 @@ from decorators.auth_decorators import student_required, faculty_required, preve
 faculty_base_api_url = os.getenv('FACULTY_BASE_URL')
 
 load_dotenv()  # Load environment variables from .env file
+
 app = Flask(__name__)
 # SETUP YOUR POSTGRE DATABASE HERE
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')   
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"pool_pre_ping": True}  
+app.config['SQLALCHEMY_POOL_SIZE'] = 10
+app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
+app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hour (in seconds)
 app.secret_key = os.getenv('SECRET_KEY')  # Replace 'your-secret-key' with an actual secret key
-
 jwt = JWTManager(app)
 init_db(app)
 
@@ -685,6 +690,11 @@ def submit_manual_enrollment():
 @app.route('/student/onlinepetitionofsubject')#
 def stud_petition():
     return render_template("/student/petition.html")#
+
+@app.route('/student/requestfortutorialofsubjects')#
+def stud_tutorial():
+    return render_template("/student/tutorial.html")#
+
 
 # Assuming your route for this page is '/submit_petition'
 @app.route('/submit_tutorial_request', methods=['POST'])
@@ -1348,7 +1358,9 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0')
 
 
-
-
+"""if __name__ == "__main__":
+    init_db(app)
+    app.run(debug=True)
+"""
 # ... other route registrations ...
 # ========================================================================
