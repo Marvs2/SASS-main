@@ -26,11 +26,11 @@
 
     <h2>Application Form</h2>
     <form id="shiftingForm" action="{{ url_for('submit_shifting_application')}}" method="POST" enctype="multipart/form-data">
-        <label for="student_number">Student number:</label><br>
-        <input type="text" id="student_number" name="student_number" required><br><br>
+        <label for="studentNumber">Student number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-        <label for="studentName">Student Name:</label><br>
-        <input type="text" id="studentName" name="studentName" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
         <label for="currentProgram">Current Program:</label><br>
         <input type="text" id="currentProgram" name="currentProgram" required><br><br>
@@ -73,12 +73,12 @@
         const form = document.getElementById('shiftingForm');
         form.addEventListener('submit', function(event) {
             const studentID = document.getElementById('studentID').value.trim();
-            const studentName = document.getElementById('studentName').value.trim();
+            const name = document.getElementById('name').value.trim();
             const currentProgram = document.getElementById('currentProgram').value.trim();
             const residencyYear = document.getElementById('residencyYear').value.trim();
             const intendedProgram = document.getElementById('intendedProgram').value.trim();
 
-            if (!studentID || !studentName || !currentProgram || !residencyYear || !intendedProgram) {
+            if (!studentID || !name || !currentProgram || !residencyYear || !intendedProgram) {
                 alert('Please fill out all required fields.');
                 event.preventDefault();
             }

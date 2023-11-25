@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Overload Applications</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.css">
+</head>
+<body>
+    <h1>Overload Applications</h1>
+    <table id="overloadTable" class="display">
+        <thead>
+            <tr>
+                <th>Student Name</th>
+                <th>Student Number</th>
+                <th>Semester</th>
+                <th>Subjects to Add</th>
+                <th>Justification</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="overloadData">
+            <!-- Overload application data will be inserted here -->
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#overloadTable').DataTable({
+                // Fetch data from Flask route to populate the table
+                ajax: {
+                    url: '/student/foroverloadofsubject/submit_overload_application',
+                    type: 'POST',
+                    dataSrc: ''
+                },
+                columns: [
+                    { data: 'student_name' },
+                    { data: 'student_number' },
+                    { data: 'semester' },
+                    { data: 'subjects_to_add' },
+                    { data: 'justification' },
+                    { data: 'user_responsible' },
+                    { data: 'status' },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return '<button onclick="deleteApplication(' + row.id + ')">Delete</button>';
+                        }
+                    }
+                ]
+            });
+        });
+
+        // Function to delete an application
+        function deleteApplication(applicationId) {
+            // Perform an AJAX request to delete the application by ID
+            $.ajax({
+                url: `/delete-application/${applicationId}`, // Replace with your Flask route
+                type: 'DELETE',
+                success: function(response) {
+                    // Reload the table after deletion (optional)
+                    $('#overloadTable').DataTable().ajax.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error deleting application:', error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

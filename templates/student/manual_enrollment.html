@@ -25,11 +25,11 @@
     <br>
     <h1>Manual Enrollment Form</h1>
     <form action="{{ url_for('submit_manual_enrollment') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student Number:</label><br>
-        <input type="text" id="student_number" name="student_number" required><br><br>
+        <label for="studentNumber">Student Number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-        <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
         <label for="enrollmentType">Enrollment Type:</label><br>
         <select id="enrollmentType" name="enrollmentType" required>

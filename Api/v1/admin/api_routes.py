@@ -1,5 +1,5 @@
 # api/api_routes.py
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session
+from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  Admin
 
 from werkzeug.security import check_password_hash
@@ -21,19 +21,30 @@ def login():
             access_token = create_access_token(identity=admin.adm_Id)
             session['access_token'] = access_token
             session['user_role'] = 'admin'
-            return redirect(url_for('admin_home'))
+            
+            #Store additional admin details in the session
+            session['adm_Id'] = admin.adm_Id
+            session['admin_Number'] = admin.admin_Number
+            session['name'] = admin.name
+            session['email'] = admin.email
+            session['gender'] = admin.gender
+            session['dateofBirth'] = admin.dateofBirth
+            session['placeofBirth'] = admin.placeofBirth
+            session['mobile_number'] = admin.mobile_number
+
+            return render_template('admin/home.html', admin_details=session)
         else:
             flash('Invalid email or password', 'danger')
-    return redirect(url_for('admin_login'))
+
+    return redirect(url_for('admin_portal'))
 
 
 
 #===================================================
 # TESTING AREA
 @admin_api.route('/profile', methods=['GET'])
-@admin_required
 @jwt_required()
-def profile():
+def admin_profile():
     current_user_id = get_jwt_identity()
     # Debug print statement
     admin = Admin.query.get(current_user_id)

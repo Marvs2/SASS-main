@@ -27,11 +27,11 @@
 
     <h2>Application Form</h2>
     <form action="{{ url_for('change_of_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student No.:</label><br>
-        <input type="text" id="student_number" name="student_number" required><br><br>
+        <label for="studentNumber">Student No.:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
     
-        <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
     
         <label for="enrollment_type">Enrollment Type:</label><br>
         <select id="enrollment_type" name="enrollment_type" required>
@@ -64,8 +64,8 @@
     </form>
     <script>
         function validateForm() {
-            var studentNumber = document.getElementById('student_number').value;
-            var studentName = document.getElementById('student_name').value;
+            var studentNumber = document.getElementById('studentNumber').value;
+            var studentName = document.getElementById('name').value;
             var enrollmentType = document.getElementById('enrollment_type').value;
             var reason = document.getElementById('reason').value;
             var meFile = document.getElementById('me_file').value;

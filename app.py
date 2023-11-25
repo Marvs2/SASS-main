@@ -8,7 +8,7 @@ from sqlalchemy import Connection
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import student_api  
+from Api.v1.student.api_routes import student_api
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api
 
@@ -257,8 +257,15 @@ def stud_adding():
 @app.route('/student/add_subjects', methods=['POST'])
 def add_subjects():
     if request.method == 'POST':
-        student_number = request.form['student_number']
-        student_name = request.form['student_name']
+        studentNumber = request.form['studentNumber']
+        name = request.form['name']
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student:
+            name = student.name
+        else:
+            flash('Invalid student number.', 'danger')
+            return redirect(url_for('add_subjects'))
+        
         subject_Names = request.form['subject_Names']
         enrollment_type = request.form['enrollment_type']
         user_responsible = request.form['user_responsible']
@@ -281,14 +288,14 @@ def add_subjects():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not student_number or not student_name or not enrollment_type or not subject_Names:
+        if not studentNumber or not name or not enrollment_type or not subject_Names:
             flash('Please fill out all required fields.', 'danger')
             return redirect(url_for('add_subjects'))  # Replace 'add_subjects' with the actual route
 
         try:
             new_subject_application = Add_Subjects(
-                student_number=student_number,
-                student_name=student_name,
+                studentNumber=studentNumber,
+                name=name,
                 subject_Names=subject_Names,
                 enrollment_type=enrollment_type,
                 file_name=file_name,
@@ -686,9 +693,9 @@ def submit_manual_enrollment():
 
 #====================================================================================================================================
 
-@app.route('/student/onlinepetitionofsubject')#
-def stud_petition():
-    return render_template("/student/petition.html")#
+@app.route('/student/onlinepetitionofsubject')
+def stud_petition():  # Include the student_id parameter
+    return render_template("/student/petition.html")
 
 @app.route('/student/onlinepetitionofsubject', methods=['GET', 'POST'])
 def submit_petition():
@@ -705,7 +712,8 @@ def submit_petition():
         # Check if any of the required fields is empty
         if not student_number or not student_name or not subject_code or not subject_name or not petition_type or not request_reason or not user_responsible or not status:
             flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('stud_petition'))  # Replace 'stud_petition' with the actual route
+            return redirect(url_for('stud_petition', student_id=session['user_id']))
+  # Replace 'stud_petition' with the actual route
 
         try:
             new_petition_request = PetitionRequest(
@@ -729,6 +737,14 @@ def submit_petition():
             db.session.close()
 
     return render_template("/student/petition.html")
+
+@app.route('/student/onlinepetitionofsubject/<int:student_id>', methods=['GET'])
+def view_student_petition(student_id):
+    # Fetching the petitions based on the student_id
+    petitions = PetitionRequest.query.filter_by(student_id=student_id).all()
+
+    return render_template('view_petition_data.html', petitions=petitions)
+
 #===================================================================================================================================#
 
 @app.route('/student/requestfortutorialofsubjects')#
@@ -799,8 +815,8 @@ def stud_certification():
 def submit_certification_request():
     if request.method == 'POST':
         # Retrieve form data
-        student_number = request.form.get('student_number')
-        student_name = request.form.get('student_name')
+        studentNumber = request.form.get('studentNumber')
+        name = request.form.get('name')
         certification_type = request.form.get('certification_type')
 
         # Check file uploads
@@ -819,8 +835,8 @@ def submit_certification_request():
 
         try:
             new_request = CertificationRequest(
-                student_number=student_number,
-                student_name=student_name,
+                studentNumber=studentNumber,
+                name=name,
                 certification_type=certification_type,
                 request_form_filename=secure_filename(request_form_file.filename),
                 request_form_data=request_form_data,
@@ -1502,7 +1518,7 @@ def redirect_based_on_login_crossenrollment():
 @prevent_authenticated
 def faculty_portal():
     session.permanent=True
-    return render_template('faculty/login.html', api_base_url=faculty_base_api_url)
+    return render_template('faculty/login.html') #, api_base_url=faculty_base_api_url
 
 @app.route('/faculty/home')
 @faculty_required
@@ -1518,9 +1534,39 @@ def faculty_home():
     else:
         return render_template('faculty/home.html', user_name="Guest")  # Provide a default if the name is not in the session
 
+# Modify the  faculty profile route
+@app.route('/faculty/profile')
+@faculty_required
+def fa_profile():
+    session.update()
 
-# ========================================================================
-# ALL ADMIN ROUTES HERE
+    # Retrieve student details from the session
+    faculty_details = {
+        'faculty_Number': session.get('faculty_Number'),
+        'name': session.get('name'),
+        'email': session.get('email'),
+        'address': session.get('address'),
+        'gender': session.get('gender'),
+        'dateofBirth': session.get('dateofBirth'),
+        'placeofBirth': session.get('placeofBirth'),
+        'mobile_number': session.get('mobile_number'),
+        'userImg': session.get('userImg'),
+    }
+
+    # Map gender numerical values to strings
+    if faculty_details['gender'] == 1:
+        faculty_details['gender'] = 'Male'
+    elif faculty_details['gender'] == 2:
+        faculty_details['gender'] = 'Female'
+    else:
+        faculty_details['gender'] = 'Undefined'  # Handle any other values
+
+    return render_template('faculty/profile.html', faculty_details=faculty_details)
+
+
+# ====================================================================== #
+# ====================== ALL ADMIN ROUTES HERE========================== #
+# ====================================================================== #
 @app.route('/admin')
 @prevent_authenticated
 def admin_login():
@@ -1533,6 +1579,40 @@ def admin_home():
     session.permanent = True
     return render_template('admin/home.html')
 
+# Modify the profile route
+@app.route('/admin/profile')
+@admin_required
+def admin_profile():
+    session.update()
+
+    # Retrieve student details from the session
+    admin_details = {
+        'admin_Number': session.get('admin_Number'),
+        'name': session.get('name'),
+        'email': session.get('email'),
+        'gender': session.get('gender'),
+        'dateofBirth': session.get('dateofBirth'),
+        'placeofBirth': session.get('placeofBirth'),
+        'mobile_number': session.get('mobile_number'),
+    }
+
+    # Map gender numerical values to strings
+    if admin_details['gender'] == 1:
+        admin_details['gender'] = 'Male'
+    elif admin_details['gender'] == 2:
+        admin_details['gender'] = 'Female'
+    else:
+        admin_details['gender'] = 'Undefined'  # Handle any other values
+
+    return render_template('admin/profile.html', admin_details=admin_details)
+
+#==========================================================#
+#Admin Portal
+@app.route('/admin')
+@prevent_authenticated
+def admin_portal():
+    session.permanent = True
+    return render_template('admin/login.html')
 # ========================================================================
 # Register the API blueprint
 app.register_blueprint(admin_api, url_prefix='/api/v1/admin')

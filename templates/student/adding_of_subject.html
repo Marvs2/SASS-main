@@ -1,13 +1,13 @@
 {% extends "student/home.html" %}
 <script>
     function getStudentNumber() {
-        var studentName = document.getElementById('student_name').value;
+        var student_name = document.getElementById('student_name').value;
         var studentNumberField = document.getElementById('student_number');
 
         // AJAX request to fetch the student number
         fetch('/get_student_number', {
             method: 'POST',
-            body: new URLSearchParams({ student_name: studentName }),
+            body: new URLSearchParams({ student_number: student_number }),
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             }
@@ -15,7 +15,7 @@
         .then(response => response.text())
         .then(studentNumber => {
             if (studentNumber !== 'Student not found') {
-                studentNumberField.value = studentNumber;
+                studentNumberField.value = student_number;
             } else {
                 studentNumberField.value = '';
                 alert('Student not found');
@@ -53,11 +53,11 @@
 
     <h2>Application Form</h2>
     <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student number:</label><br>
-        <input type="text" id="student_number" name="student_number" required onblur="getStudentNumber()"><br><br>
+        <label for="studentNumber">Student number:</label><br>
+        <input type="text" id="studentumber" name="studentNumber" required onblur="getStudentNumber()"><br><br>
     
-        <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
         <label for="subject_Names">Subject Name (comma-separated):</label>
         <input type="text" id="subject_Names" name="subject_Names" required><br><br>

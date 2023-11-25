@@ -84,6 +84,7 @@ class Student(db.Model, UserMixin):
     placeofBirth = db.Column(db.String(255), nullable=True)
     mobileNumber = db.Column(db.String(11))
     userImg = db.Column(db.String, nullable=False) 
+  #  stud_status = db.Column(db.String(100), nullable=False)
 
     # Define the 'subjects' relationship in the Student model
     subjects = db.relationship('Add_Subjects', back_populates='student')
@@ -118,10 +119,10 @@ class Student(db.Model, UserMixin):
 class Add_Subjects(db.Model, UserMixin):
     __tablename__ = 'subjects'
 
-    subject_ID = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255))
+    subject_ID = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), unique=True, nullable=False)
+    name = db.Column(db.String(255), nullable=False)  
     subject_Names = db.Column(db.String(255), nullable=False)
     enrollment_type = db.Column(db.String(20))  # 'regular50or 'irregular'
     file_data = db.Column(db.LargeBinary)  # Store binary data for the file
@@ -134,10 +135,10 @@ class Add_Subjects(db.Model, UserMixin):
 
     def to_dict(self):
         return {
+            'student_id': self.student_id,
             'subject_ID': self.subject_ID,
-            'subject_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'subject_Names': self.subject_Names,
             'enrollment_type': self.enrollment_type,
             'file_data': self.file_data,
@@ -153,10 +154,10 @@ class Add_Subjects(db.Model, UserMixin):
 class ChangeOfSubjects(db.Model, UserMixin):
     __tablename__ = 'changesubjects'
 
-    Changesubject_ID = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))    
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255))
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))  
+    Changesubject_ID = db.Column(db.Integer, primary_key=True)  
+    studentNumber = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255))
     enrollment_type = db.Column(db.String(50))  # 'regular' or 'irregular'
     ace_form_filename = db.Column(db.String(255))
     ace_form_data = db.Column(db.LargeBinary)
@@ -171,10 +172,10 @@ class ChangeOfSubjects(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'Changesubject_ID': self.Changesubject_ID,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'Changesubject_ID': self.Changesubject_ID,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'enrollment_type': self.enrollment_type,
             'ace_form_filename': self.ace_form_filename,
             'ace_form_data': self.ace_form_data,
@@ -190,10 +191,10 @@ class ChangeOfSubjects(db.Model, UserMixin):
 class ManualEnrollment(db.Model, UserMixin):
     __tablename__ = 'manual_enrollments'
 
-    m_enrollment_ID = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    m_enrollment_ID = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     enrollment_type = db.Column(db.String(50), nullable=False)
     reason = db.Column(db.Text, nullable=False)
     me_file_filename = db.Column(db.String(255))
@@ -209,10 +210,10 @@ class ManualEnrollment(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'm_enrollment_ID': self.m_enrollment_ID,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'm_enrollment_ID': self.m_enrollment_ID,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'enrollment_type': self.enrollment_type,
             'reason': self.reason,
             'me_file_filename': self.me_file_filename,
@@ -229,10 +230,10 @@ class ManualEnrollment(db.Model, UserMixin):
 class CertificationRequest(db.Model, UserMixin):
     __tablename__ = 'certification_requests'
 
-    certification_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(255), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    certification_request_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     certification_type = db.Column(db.String(50), nullable=False)
     request_form_filename = db.Column(db.String(255), nullable=False)
     request_form_data = db.Column(db.LargeBinary)
@@ -252,10 +253,10 @@ class CertificationRequest(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'certification_request_id': self.certification_request_id,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'certification_request_id': self.certification_request_id,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'certification_type': self.certification_type,
             'request_form_filename': self.request_form_filename,
             'request_form_data': self.request_form_data,
@@ -277,10 +278,10 @@ class CertificationRequest(db.Model, UserMixin):
 class GradeEntry(db.Model, UserMixin):
     __tablename__ = 'grade_entries'
 
-    grade_entry_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number =db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    grade_entry_id = db.Column(db.Integer, primary_key=True)
+    studentNumber =db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     application_type = db.Column(db.String(150), nullable=False)
     completion_form_filename = db.Column(db.String(255), nullable=False)
     completion_form_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
@@ -297,10 +298,10 @@ class GradeEntry(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'grade_entry_id': self.grade_entry_id,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'grade_entry_id': self.grade_entry_id,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'application_type': self.application_type,
             'completion_form_data': self.completion_form_data,  # Add this line
             'class_record_filename': self.class_record_filename,
@@ -318,10 +319,10 @@ class GradeEntry(db.Model, UserMixin):
 class CrossEnrollment(db.Model, UserMixin):
     __tablename__ = 'cross_enrollments'
 
-    cross_enrollment_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    cross_enrollment_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     school_for_cross_enrollment = db.Column(db.String(255), nullable=False)
     total_number_of_units = db.Column(db.Integer, nullable=False)
     authorized_subjects_to_take = db.Column(db.Text, nullable=False)
@@ -338,10 +339,10 @@ class CrossEnrollment(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'cross_enrollment_id': self.cross_enrollment_id,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'cross_enrollment_id': self.cross_enrollment_id,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'school_for_cross_enrollment': self.school_for_cross_enrollment,
             'total_number_of_units': self.total_number_of_units,
             'authorized_subjects_to_take': self.authorized_subjects_to_take,
@@ -360,10 +361,10 @@ class CrossEnrollment(db.Model, UserMixin):
 class PetitionRequest(db.Model, UserMixin):
     __tablename__ = 'petition_requests'
 
-    petition_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
-    student_name = db.Column(db.String(255), nullable=False)
+    petition_request_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
+    name = db.Column(db.String(255), nullable=False)
     subject_code = db.Column(db.String(50), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
     petition_type = db.Column(db.String(50), nullable=False)
@@ -377,10 +378,10 @@ class PetitionRequest(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'petition_request_id': self.petition_request_id,
             'student_id': self.student_id,
-            'student_number':self.student_number,
-            'student_name': self.student_name,
+            'petition_request_id': self.petition_request_id,
+            'studentNumber':self.studentNumber,
+            'name': self.name,
             'subject_code': self.subject_code,
             'subject_name': self.subject_name,
             'petition_type': self.petition_type,
@@ -396,10 +397,10 @@ class PetitionRequest(db.Model, UserMixin):
 class ShiftingApplication(db.Model, UserMixin):
     __tablename__ = 'shifting_applications'
 
-    shifting_application_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    shifting_application_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     current_program = db.Column(db.String(255), nullable=False)
     residency_year = db.Column(db.Integer, nullable=False)
     intended_program = db.Column(db.String(255), nullable=False)
@@ -415,10 +416,10 @@ class ShiftingApplication(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'shifting_application_id': self.shifting_application_id,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'shifting_application_id': self.shifting_application_id,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'current_program': self.current_program,
             'residency_year': self.residency_year,
             'intended_program': self.intended_program,
@@ -436,9 +437,10 @@ class ShiftingApplication(db.Model, UserMixin):
 class OverloadApplication(db.Model, UserMixin):
     __tablename__ = 'overload_applications'
 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     overload_application_id = db.Column(db.Integer, primary_key=True)
-    student_name = db.Column(db.String(255), nullable=False)
-    student_number = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    studentNumber = db.Column(db.String(100), nullable=False)
     semester = db.Column(db.String(20), nullable=False)
     subjects_to_add = db.Column(db.String(255), nullable=False)
     justification = db.Column(db.Text, nullable=False)
@@ -447,17 +449,16 @@ class OverloadApplication(db.Model, UserMixin):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(50)) #status 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
  
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='overload_applications')
 
     def to_dict(self):
         return {
-            'overload_application_id': self.overload_application_id,
-            'student_name': self.student_name,
             'student_id': self.student_id,
-            'student_number': self.student_number,
+            'overload_application_id': self.overload_application_id,
+            'name': self.name,
+            'studentNumber': self.studentNumber,
             'semester': self.semester,
             'subjects_to_add': self.subjects_to_add,
             'justification': self.justification,
@@ -474,10 +475,10 @@ class OverloadApplication(db.Model, UserMixin):
 class TutorialRequest(db.Model, UserMixin):
     __tablename__ = 'tutorial_requests'
 
-    tutorial_request_id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
-    student_number = db.Column(db.String(100), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    tutorial_request_id = db.Column(db.Integer, primary_key=True)
+    studentNumber = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     subject_code = db.Column(db.String(100), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
     file_filename = db.Column(db.String(255), nullable=False)
@@ -491,10 +492,10 @@ class TutorialRequest(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'tutorial_request_id': self.tutorial_request_id,
             'student_id': self.student_id,
-            'student_number': self.student_number,
-            'student_name': self.student_name,
+            'tutorial_request_id': self.tutorial_request_id,
+            'studentNumber': self.studentNumber,
+            'name': self.name,
             'subject_code': self.subject_code,
             'subject_name': self.subject_name,
             'file_filename': self.file_filename,
@@ -657,8 +658,8 @@ class Faculty(db.Model, UserMixin):
     __tablename__ = 'faculties'
 
     facultyID = db.Column(db.Integer, primary_key=True)  # UserID
-    facultyNumber = db.Column(db.Integer, unique=True, nullable=False) #Faculty_Number
-    userType = db.Column(db.String(50))  # e.g., 'Admin', 'Professor', etc.
+    faculty_Number = db.Column(db.String(255), unique=True, nullable=False) #Faculty_Number
+    userType = db.Column(db.String(255))  # e.g., 'Admin', 'Professor', etc.
     name = db.Column(db.String(255), nullable=False)  # Name
     email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     address = db.Column(db.String(255))  # You can use String or TEXT depending on the length
@@ -726,10 +727,10 @@ class Admin(db.Model, UserMixin):
 def init_db(app):
     db.init_app(app)
     with app.app_context():
-        inspector = inspect(db.engine)
-        if not inspector.has_table('students'):
-            db.create_all()
-         #   create_sample_data()
+      inspector = inspect(db.engine)
+      if not inspector.has_table('students'):
+        db.create_all()
+    #    create_sample_data()
         
 #=====================================================================================================#
 """class Services(db.Model, UserMixin):
@@ -738,7 +739,7 @@ def init_db(app):
     service_id = db.Column(db.Integer, primary_key=True)
     service_type = db.Column(db.String(50), nullable=False)
     student_id = db.Column(db.String(50), nullable=False)
-    student_name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Common fields for all services
@@ -811,7 +812,7 @@ def init_db(app):
             'service_id': self.service_id,
             'service_type': self.service_type,
             'student_id': self.student_id,
-            'student_name': self.student_name,
+            'name': self.name,
             'created_at': self.created_at,
             'file_filename': self.file_filename,
             'user_role': self.user_role
@@ -893,9 +894,9 @@ def init_db(app):
 
     def get_ServiceID(self):
         return str(self.service_id)"""
-"""#=====================================================================================================#
+#=====================================================================================================#
 # INSERTING DATA
-def create_sample_data():
+"""def create_sample_data():
     # Create and insert students data
     students_data = [
         {   
@@ -937,11 +938,11 @@ def create_sample_data():
         {
             'facultyID':'1',
             'facultyNumber': '2020-00001-TC-0',
-            'userType': 'Professor',
+            'userType': 'Director',
             'name': 'Faculty 1',
             'email': 'faculty1@example.com',
             'address': '100 Galaxy st. City 2',
-            'password': generate_password_hash('password1'),
+            'password': generate_password_hash('director'),
             'gender': 1,
             'dateofBirth': '1988-07-20',
             'placeofBirth': 'City 2',
@@ -952,11 +953,11 @@ def create_sample_data():
         {
             'facultyID': '2',
             'facultyNumber': '2020-00002-TC-0',
-            'userType': 'Professor',
+            'userType': 'Head Academic Program',
             'name': 'Faculty 2',
             'email': 'faculty2@example.com',
             'address': '101 Mercury st. City 3',
-            'password': generate_password_hash('password2'),
+            'password': generate_password_hash('headacademicprogram'),
             'gender': 2,
             'dateofBirth': '1975-12-05',
             'placeofBirth': 'City 3',
@@ -1004,7 +1005,7 @@ def create_sample_data():
     for data in admin_data:
         admin = Admin(**data)
         db.session.add(admin)
-        db.session.flush()"""
+        db.session.flush()
 
-#db.session.commit()
-
+db.session.commit()
+db.session.close()"""

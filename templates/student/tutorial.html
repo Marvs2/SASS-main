@@ -28,11 +28,11 @@
     <div class="form-container">
         <h2>Request Form</h2>
         <form id="tutorialForm" action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
-            <label for="student_number">Student Number:</label>
-            <input type="text" id="student_number" name="student_number" required><br><br>
+            <label for="studentNumber">Student Number:</label>
+            <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-            <label for="student_name">Student Name:</label>
-            <input type="text" id="student_name" name="student_name" required><br><br>
+            <label for="name">Student Name:</label>
+            <input type="text" id="name" name="name" required><br><br>
         
             <label for="subject_code">Subject Code:</label>
             <input type="text" id="subject_code" name="subject_code" required><br><br>
@@ -67,8 +67,8 @@
     <script>
         const form = document.getElementById('tutorialForm');
         form.addEventListener('submit', function(event) {
-            const studentNumber = document.getElementById('student_number').value.trim();
-            const studentName = document.getElementById('student_name').value.trim();
+            const studentNumber = document.getElementById('studentNumber').value.trim();
+            const studentName = document.getElementById('name').value.trim();
             const subjectCode = document.getElementById('subject_code').value.trim();
             const subjectName = document.getElementById('subject_name').value.trim();
             const file = document.getElementById('file').files[0];

@@ -28,11 +28,11 @@
 
     <h2>Application Form</h2>
     <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student Number:</label><br>
-        <input type="text" id="student_number" name="student_number" required><br><br>
+        <label for="studentNumber">Student Number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-        <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
         <label for="application_type">Application Type:</label><br>
         <select id="application_type" name="application_type" required>

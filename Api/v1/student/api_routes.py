@@ -28,6 +28,19 @@ API_KEYS = {
 student_api = Blueprint('student_api', __name__)
 CORS(student_api)  # Apply CORS to the student_api blueprint
 
+#===============================================================
+
+# Function to authenticate the user (usually happens during login)
+def authenticate_user(username, password):
+    # Your authentication logic goes here
+    # Check if the provided username and password match a user in your database
+    # If authenticated, retrieve the user ID and set it in the session
+    user = User.query.filter_by(username=username).first()  # Replace User with your actual model
+    if user and user.check_password(password):  # Replace check_password with your validation logic
+        session['user_id'] = user.id  # Assuming user.id is the ID of the authenticated user
+        return True
+    return False
+
 # Api/v1/student/api_routes.py
 #================================================================
 # Function to check if the user is logged in
@@ -66,7 +79,7 @@ def login_Overload():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_overload', student_details=session))
+            return redirect(url_for('student_portal_overload'))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -107,7 +120,7 @@ def login_Certification():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_certification', student_details=session))
+            return redirect(url_for('student_portal_certification', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -146,7 +159,7 @@ def login_Changesubsched():
             session['placeofBirth'] = student.placeofBirth
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_changesubsched', student_details=session))
+            return redirect(url_for('student_portal_changesubsched', student_detailss=session))
 
         else:
             flash('Invalid email or password', 'danger')
@@ -189,7 +202,7 @@ def login_Enrollment():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_enrollment', student_details=session))
+            return redirect(url_for('student_portal_enrollment', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -230,7 +243,7 @@ def login_Addingofsubject():
             session['placeofBirth'] = student.placeofBirth
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_addingsubject', student_detail=session))
+            return redirect(url_for('student_portal_addingsubject', student_details=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -272,7 +285,7 @@ def login_Tutorial():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_tutorial', student_details=session))
+            return redirect(url_for('student_portal_tutorial', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -314,7 +327,7 @@ def login_Shifting():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_shifting', student_details=session))
+            return redirect(url_for('student_portal_shifting', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -356,7 +369,7 @@ def login_Petition():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return redirect(url_for('student_portal_petition', student_details=session))
+            return redirect(url_for('student_portal_petition', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -397,7 +410,7 @@ def login_Gradeentry():
             session['placeofBirth'] = student.placeofBirth
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_gradeentry', student_details=session))
+            return redirect(url_for('student_portal_gradeentry', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -439,7 +452,8 @@ def login_Crossenrollment():
             session['placeofBirth'] = student.placeofBirth
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_crossenrollment', student_details=session))
+
+            return redirect(url_for('student_portal_crossenrollment', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
     return render_template('student/login.html')
@@ -474,7 +488,7 @@ def login():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return render_template('student/home.html', student_details=session)
+            return render_template('student/home.html', student_detailss=session)
 
         else:
             flash('Invalid email or password', 'danger')
@@ -521,7 +535,55 @@ def profile():
     else:
         flash('User not found', 'danger')
         return redirect(url_for('student_api.login'))
+
+@student_api.route('/addingofsubjects', methods=['GET'])
+@jwt_required()
+def add_subjects():
+    current_user_id = get_jwt_identity()
+    print("CURRENT USER ID: ", current_user_id)
+    # Debug print statement
+    student = Student.query.get(current_user_id)
+    if student:
+        return jsonify(student.to_dict())
+    else:
+        flash('User not found', 'danger')
+        return redirect(url_for('student_api.login'))
     
+@student_api.route('/certification', methods=['GET'])
+@jwt_required()
+def certification():
+    current_user_id = get_jwt_identity()
+    print("CURRENT USER ID: ", current_user_id)
+    # Debug print statement
+    student = Student.query.get(current_user_id)
+    if student:
+        return jsonify(student.to_dict())
+    else:
+        flash('User not found', 'danger')
+        return redirect(url_for('student_api.login'))
+
+
+#adding subjects
+"""@student_api.route('/student/addingofsubject', methods=['GET', ['POST']])
+@jwt_required()
+def add_subjects():"""
+#changeofsubjectorschedule
+"""@student_api.route('/student/changeofsubject/schedule', methods=['GET', 'POST'])
+@jwt_required()
+def changeschedorsub():"""
+#overloadunits
+"""@student_api.route('/student/foroverloadofsubject', methods=['GET', 'POST'])
+@jwt_required()
+def overload():"""
+#shifting from other school or in pup
+"""@student_api.route('/student/shifting', methods=['GET', 'POST'])
+@jwt_required()
+def shiftees():"""
+#RO - For tutorial
+"""@student_api.route('/student/requestfortutorialofsubjects', methods=['GET', 'POST'])
+@jwt_required()
+def tutorial():"""
+
     
 @student_api.route('/all/student', methods=['GET'])
 def allstudent():

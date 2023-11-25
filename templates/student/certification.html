@@ -48,12 +48,11 @@
     <br>
     <h2>Request Form</h2>
     <form action="{{url_for('submit_certification_request')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="student_number">Student number:</label><br>
-        <input type="text" id="student_number" name="student
-        _number" required><br><br>
+        <label for="studentNumber">Student number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-        <label for="student_name">Student Name:</label><br>
-        <input type="text" id="student_name" name="student_name" required><br><br>
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
 
         <label for="certification_type">Certification Type:</label><br>
         <select id="certification_type" name="certification_type" required>

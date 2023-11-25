@@ -6,12 +6,12 @@
 
     form.addEventListener('submit', function(event) {
         const studentID = document.getElementById('studentID').value.trim();
-        const studentName = document.getElementById('studentName').value.trim();
+        const name = document.getElementById('name').value.trim();
         const schoolForCrossEnrollment = document.getElementById('crossEnrollmentSchool').value.trim();
         const totalUnits = document.getElementById('crossEnrollmentUnits').value.trim();
         const authorizedSubjects = document.getElementById('authorizedSubjects').value.trim();
 
-        if (!studentID || !studentName || !schoolForCrossEnrollment || totalUnits <= 0 || !authorizedSubjects) {
+        if (!studentID || !name || !schoolForCrossEnrollment || totalUnits <= 0 || !authorizedSubjects) {
             alert('Please fill out all fields and provide valid values.');
             event.preventDefault();  // Prevent form submission
         }
@@ -45,11 +45,11 @@
 
 <h2>Application Form</h2>
 <form id="crossEnrollmentForm" action="{{url_for('submit_cross_enrollment')}}" method="POST" enctype="multipart/form-data">
-    <label for="student_number">Student ID:</label><br>
-    <input type="text" id="student_number" name="student_number" required><br><br>
+    <label for="studentNumber">Student ID:</label><br>
+    <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-    <label for="studentName">Student Name:</label><br>
-    <input type="text" id="studentName" name="studentName" required><br><br>
+    <label for="name">Student Name:</label><br>
+    <input type="text" id="name" name="name" required><br><br>
 
     <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
     <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>

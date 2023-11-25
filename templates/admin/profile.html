@@ -1,4 +1,4 @@
-{% extends "main/home-admin.html" %}
+{%extends "main/home-admin.html" %}
 
 {% block admin %}
 <style>
@@ -16,10 +16,8 @@ form {
     max-width: 400px; /* Adjust as needed */
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
     text-align: left;
 }
 
@@ -117,12 +115,12 @@ input:disabled {
                     </nav>
                 </div>
                 <div class="sb-sidenav-menu-heading">Students - Details</div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts-1">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
                     Students
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                <div class="collapse" id="collapseLayouts-1" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Insert - Students</a>
                         <a class="nav-link" href="#">Status - Students</a>
@@ -132,9 +130,40 @@ input:disabled {
             </div>
         </div>
     </nav>
-    <div id="layoutSidenav_content">
-        <main>{% block main %}{% endblock %}</main>
-    </div>
 </div>
-</div>
+    <div id="layoutSidenav_content"> 
+        <main>
+            <div class="form-container">
+                <form action="{{url_for('profile')}}" method="POST">
+
+                    <label for="name">admin Number:</label>
+                    <input type="text" id="admin_Number" name="admin_Number" value="{{ admin_details['admin_Number'] }}" disabled required>
+                    <br>
+
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" value="{{ admin_details['name'] }}" disabled required>
+                    <br>
+
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" value="{{ admin_details['email'] }}" disabled required>
+                    <br>
+
+                    <label for="name">Gender:</label>
+                    <input type="text" id="gender" name="gender" value="{{ admin_details['gender'] }}" disabled required>
+                    <br>
+            
+                    <label for="dateofBirth">Date of Birth:</label>
+                    <input type="date" id="dateofBirth" name="dateofBirth" value="{{ admin_details['dateofBirth'] }}" disabled>
+                    <br>
+            
+                    <label for="placeofBirth">Place of Birth:</label>
+                    <input type="text" id="placeofBirth" name="placeofBirth" value="{{ admin_details['placeofBirth'] }}" disabled>
+                    <br>
+            
+                    <label for="mobile_number">Mobile Number:</label>
+                    <input type="tel" id="mobile_number" name="mobile_number" value="{{ admin_details['mobile_number'] }}" disabled>
+                    <br>
+                </form>
+            </div>           
+        </main>
 {% endblock %}
