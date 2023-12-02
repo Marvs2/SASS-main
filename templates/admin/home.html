@@ -1,6 +1,6 @@
 {% extends "main/home-admin.html" %}
 
-{% block admin %}
+{% block content %}
 <style>
 .form-container {
     display: flex;
@@ -16,10 +16,8 @@ form {
     max-width: 400px; /* Adjust as needed */
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
     text-align: left;
 }
 
@@ -124,17 +122,17 @@ input:disabled {
                 </a>
                 <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Insert - Students</a>
-                        <a class="nav-link" href="#">Status - Students</a>
+                        <a class="nav-link" href="{{ url_for('admin_create_stud') }}">Insert - Students</a>
+                        <a class="nav-link" href="{{ url_for('student_list')}}">Status - Students</a>
                         <a class="nav-link" href="#">Students List</a>
                     </nav>
                 </div>
             </div>
         </div>
     </nav>
+</div>
     <div id="layoutSidenav_content">
-        <main>{% block main %}{% endblock %}</main>
-    </div>
-</div>
-</div>
+        <main>
+            {% block students %} {% endblock %}
+        </main>
 {% endblock %}

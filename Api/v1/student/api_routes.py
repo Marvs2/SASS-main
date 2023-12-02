@@ -208,7 +208,7 @@ def login_Enrollment():
     return render_template('student/login.html')
 
 #=============================================================
-# Function to check if the user is logged in addingofsubject
+"""# Function to check if the user is logged in addingofsubject
 def is_user_logged_in_addingofsubject():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
@@ -456,13 +456,73 @@ def login_Crossenrollment():
             return redirect(url_for('student_portal_crossenrollment', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login.html')"""
 
+# Common function to check if the user is logged in for different services
+def is_user_logged_in(service_redirect):
+    return 'access_token' in session and session['access_token'] is not None
 
-#====================================================================#
-#================The real login in the true manners==================#
-#====================================================================#
-#for All Students
+# Common function for user login
+def login_user(studentNumber, password, service_redirect, service_portal):
+    if is_user_logged_in(service_redirect):
+        return redirect(url_for(service_portal))
+
+    student = Student.query.filter_by(studentNumber=studentNumber).first()
+
+    if student and check_password_hash(student.password, password):
+        # Successfully authenticated
+        access_token = create_access_token(identity=student.student_id)
+        session['access_token'] = access_token
+        session['user_role'] = 'student'
+
+        # Store additional student details in the session
+        session['user_id'] = student.student_id
+        session['studentNumber'] = student.studentNumber
+        session['name'] = student.name
+        session['gender'] = student.gender
+        session['email'] = student.email
+        session['address'] = student.address
+        session['dateofBirth'] = student.dateofBirth
+        session['placeofBirth'] = student.placeofBirth
+        session['mobileNumber'] = student.mobileNumber
+        session['userImg'] = student.userImg
+
+        return redirect(url_for(service_portal, student_details=session))
+    else:
+        flash('Invalid email or password', 'danger')
+        return render_template('student/login.html')
+
+# Login for Adding of Subjects
+@student_api.route('/login-AddingofSubjects', methods=['GET', 'POST'])
+def login_Addingofsubject():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_addingsubject', 'portal_addingofsubject')
+
+# Login for Tutorial
+@student_api.route('/login-Tutorial', methods=['GET', 'POST'])
+def login_Tutorial():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_tutorial', 'portal_tutorial')
+
+# Login for Shifting
+@student_api.route('/login-Shifting', methods=['GET', 'POST'])
+def login_Shifting():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_shifting', 'portal_shifting')
+
+# Login for Petition
+@student_api.route('/login-Petition', methods=['GET', 'POST'])
+def login_Petition():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_petition', 'portal_petition')
+
+# Login for Gradeentry
+@student_api.route('/login-Gradeentry', methods=['GET', 'POST'])
+def login_Gradeentry():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_gradeentry', 'portal_gradeentry')
+
+# Login for Crossenrollment
+@student_api.route('/login-Crossenrollment', methods=['GET', 'POST'])
+def login_Crossenrollment():
+    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_crossenrollment', 'portal_crossenrollment')
+
+# Main login function
 @student_api.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
@@ -494,6 +554,43 @@ def login():
             flash('Invalid email or password', 'danger')
 
     return redirect(url_for('student_portal'))
+
+
+#====================================================================#
+#================The real login in the true manners==================#
+#====================================================================#
+#for All Students
+"""@student_api.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        studentNumber = request.form['studentNumber']
+        password = request.form['password']
+        
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student and check_password_hash(student.password, password):
+            # Successfully authenticated
+            access_token = create_access_token(identity=student.student_id)
+            session['access_token'] = access_token
+            session['user_role'] = 'student'
+
+            # Store additional student details in the session
+            session['user_id'] = student.student_id
+            session['studentNumber'] = student.studentNumber
+            session['name'] = student.name
+            session['gender'] = student.gender
+            session['email'] = student.email
+            session['address'] = student.address
+            session['dateofBirth'] = student.dateofBirth
+            session['placeofBirth'] = student.placeofBirth
+            session['mobileNumber'] = student.mobileNumber
+            session['userImg'] = student.userImg
+
+            return render_template('student/home.html', student_detailss=session)
+
+        else:
+            flash('Invalid email or password', 'danger')
+
+    return redirect(url_for('student_portal'))"""
 #===================================================
 """@app.route('/api/submit_service_request', methods=['POST'])
 def api_submit_service_request():
@@ -595,6 +692,36 @@ def allstudent():
         return jsonify(message="Invalid key you cant have an access")
 
 
+"""# Route to fetch the list of students as JSON
+@student_api.route('/student_list', methods=['GET'])
+def get_student_list():
+    api_key = request.headers.get('X-Api-Key')  # Get the API key from the request header
+
+    if api_key in API_KEYS.values():
+        # Fetch all students from the database
+        students = Student.query.all()
+
+        # Convert the list of students to a JSON-friendly format
+        students_data = [
+            {
+                'student_id': student.student_id,
+                'studentNumber': student.studentNumber,
+                'name': student.name,
+                'email': student.email,
+                'address': student.address,
+                'gender': student.gender,
+                'dateofBirth': student.dateofBirth,
+                'placeofBirth': student.placeofBirth,
+                'mobileNumber': student.mobileNumber,
+                'userImg': student.userImg
+            }
+            for student in students
+        ]
+
+        # Return the list of students as JSON
+        return jsonify(message="You got API data", students=students_data)
+    else:
+        return jsonify(message="Invalid key you can't have access")"""
 # ...
 
 #@student_api.route('/update/<int:student_id>', methods=['POST','PUT', 'DELETE'])

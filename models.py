@@ -6,85 +6,22 @@ from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
 
 db = SQLAlchemy()
-
-"""class Subject(Base):
-    __tablename__ = 'subjects'
-    subjectID = Column(Integer, primary_key=True)
-    subject_Code = Column(String)
-    pre_Requisite = Column(ARRAY(String))
-    description = Column(String)
-    lecture_hours = Column(Integer)
-    laboratory_hours = Column(Integer)
-    credit_Unit = Column(Integer)
-    tuition_Hours = Column(Integer)
-    faculty_name = Column(String)
-    day = Column(String)
-    time = Column(String)
-    room = Column(String)
-
-class Course(Base):
-    __tablename__ = 'courses'
-    courseID = Column(Integer, primary_key=True)
-    courseName = Column(String)
-    students = relationship('Student', back_populates='course')
-
-class StudentSubjects(Base):
-    __tablename__ = 'student_subjects'
-    student_subject_ID = Column(Integer, primary_key=True)
-    subjectID = Column(Integer, ForeignKey('subjects.subjectID'))
-    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
-    total_Units = Column(Integer)
-    Status = Column(String)
-    student = relationship('Student', back_populates='student_subjects')
-    subject = relationship('Subject', back_populates='student_subjects')
-
-class Request(Base):
-    __tablename__ = 'requests'
-    requestID = Column(Integer, primary_key=True)
-    type = Column(String)
-    body = Column(String)
-    status = Column(String)
-    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
-    faculy_ID = Column(Integer, ForeignKey('faculties.facultyID'))
-    student = relationship('Student', back_populates='requests')
-
-class Curriculum(Base):
-    __tablename__ = 'curriculums'
-    curriculumID = Column(Integer, primary_key=True)
-    courseID = Column(Integer, ForeignKey('courses.courseID'))
-    year = Column(String)
-    semester = Column(String)
-    subject = Column(ARRAY(Integer, ForeignKey('subjects.subjectID')))
-    totalcredits = Column(Integer)
-    total_tuition_hours = Column(Integer)
-    course = relationship('Course', back_populates='curriculums')
-
-class Services(Base):
-    __tablename__ = 'services'
-    serviceID = Column(Integer, primary_key=True)
-    stud_Id = Column(Integer, ForeignKey('students.stud_Id'))
-    student_subject_ID = Column(Integer, ForeignKey('student_subjects.student_subject_ID'))
-    status = Column(String)
-    faculy_ID = Column(Integer, ForeignKey('faculties.facultyID'))
-    student = relationship('Student', back_populates='services')
-    student_subject = relationship('StudentSubjects', back_populates='services')"""
-
     
 class Student(db.Model, UserMixin):
     __tablename__ = 'students'
 
     student_id = db.Column(db.Integer, primary_key=True)
-    studentNumber = db.Column(db.String(50), unique=True, nullable=False)
+    studentNumber = db.Column(db.String(100), unique=True, nullable=False)
     name = db.Column(db.String(255), nullable=False)  
-    email = db.Column(db.String(50), unique=True, nullable=False) 
-    address = db.Column(db.String(50), nullable=True) 
+    email = db.Column(db.String(100), unique=True, nullable=False) 
+    address = db.Column(db.String(255), nullable=True) 
     password = db.Column(db.String(128), nullable=False)
     gender = db.Column(db.Integer)  
     dateofBirth = db.Column(db.Date)  
     placeofBirth = db.Column(db.String(255), nullable=True)
     mobileNumber = db.Column(db.String(11))
     userImg = db.Column(db.String, nullable=False) 
-  #  stud_status = db.Column(db.String(100), nullable=False)
+   # stud_status = db.Column(db.String(100), nullable=False)
 
     # Define the 'subjects' relationship in the Student model
     subjects = db.relationship('Add_Subjects', back_populates='student')
@@ -111,31 +48,36 @@ class Student(db.Model, UserMixin):
             'placeofBirth': self.placeofBirth,
             'mobileNo': self.mobileNumber,
             'userImg': self.userImg,
+            #'stud_status': self.stud_status,
         }
         
     def get_id(self):
         return str(self.id)  # Convert to string to ensure compatibility
+    
+    def save_image(self, image_data):
+    # Method to save image data
+        self.userImg = image_data
+        db.session.commit()
 
 class Add_Subjects(db.Model, UserMixin):
     __tablename__ = 'subjects'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     subject_ID = db.Column(db.Integer, primary_key=True)
-    studentNumber = db.Column(db.String(100), unique=True, nullable=False)
+    studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)  
     subject_Names = db.Column(db.String(255), nullable=False)
-    enrollment_type = db.Column(db.String(20))  # 'regular50or 'irregular'
+    enrollment_type = db.Column(db.String(100))  # 'regular50or 'irregular'
     file_data = db.Column(db.LargeBinary)  # Store binary data for the file
     file_name = db.Column(db.String(255))  # Store the filename
     user_responsible = db.Column(db.String(255))  # Add user role attribute
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
     # Establish a relationship with the Student class
     student = db.relationship('Student', back_populates='subjects')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'subject_ID': self.subject_ID,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -145,6 +87,7 @@ class Add_Subjects(db.Model, UserMixin):
             'file_name': self.file_name,
             'user_responsible': self.user_responsible,  # Include user role in the dictionary
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_Add_SubjectsID(self):
@@ -154,17 +97,17 @@ class Add_Subjects(db.Model, UserMixin):
 class ChangeOfSubjects(db.Model, UserMixin):
     __tablename__ = 'changesubjects'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))  
     Changesubject_ID = db.Column(db.Integer, primary_key=True)  
     studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255))
-    enrollment_type = db.Column(db.String(50))  # 'regular' or 'irregular'
+    enrollment_type = db.Column(db.String(100))  # 'regular' or 'irregular'
     ace_form_filename = db.Column(db.String(255))
     ace_form_data = db.Column(db.LargeBinary)
     created_at = db.Column(TIMESTAMP, default=datetime.utcnow)
     updated_at = db.Column(TIMESTAMP)
     user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))  
  
 
     # Add a relationship to the 'students' table
@@ -172,7 +115,6 @@ class ChangeOfSubjects(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'Changesubject_ID': self.Changesubject_ID,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -183,6 +125,7 @@ class ChangeOfSubjects(db.Model, UserMixin):
             'updated_at': self.updated_at,
             'user_responsible': self.user_responsible,  # Include user role in the dictionary
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_ChangesubjectID(self):
@@ -191,18 +134,18 @@ class ChangeOfSubjects(db.Model, UserMixin):
 class ManualEnrollment(db.Model, UserMixin):
     __tablename__ = 'manual_enrollments'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     m_enrollment_ID = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    enrollment_type = db.Column(db.String(50), nullable=False)
+    enrollment_type = db.Column(db.String(100), nullable=False)
     reason = db.Column(db.Text, nullable=False)
     me_file_filename = db.Column(db.String(255))
     me_file_data = db.Column(db.LargeBinary)
     created_at = db.Column(DateTime, default=datetime.utcnow)
     updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     user_responsible = db.Column(db.String(255))  # Add user role attribute
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
 
      # Add a relationship to the 'students' table
@@ -210,7 +153,6 @@ class ManualEnrollment(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'm_enrollment_ID': self.m_enrollment_ID,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -221,7 +163,8 @@ class ManualEnrollment(db.Model, UserMixin):
             'created_at': self.created_at,
             'updated_at': self.updated_at,
             'user_responsible': self.user_responsible,  # Include user role in the dictionary
-            'status': self.status
+            'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_ManualEnrollmentID(self):
@@ -230,11 +173,10 @@ class ManualEnrollment(db.Model, UserMixin):
 class CertificationRequest(db.Model, UserMixin):
     __tablename__ = 'certification_requests'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     certification_request_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
-    certification_type = db.Column(db.String(50), nullable=False)
+    certification_type = db.Column(db.String(100), nullable=False)
     request_form_filename = db.Column(db.String(255), nullable=False)
     request_form_data = db.Column(db.LargeBinary)
     identification_card_filename = db.Column(db.String(255), nullable=False)
@@ -246,14 +188,14 @@ class CertificationRequest(db.Model, UserMixin):
     representative_id_date = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='certification_requests')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'certification_request_id': self.certification_request_id,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -270,6 +212,7 @@ class CertificationRequest(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_CertificationRequestID(self):
@@ -278,7 +221,6 @@ class CertificationRequest(db.Model, UserMixin):
 class GradeEntry(db.Model, UserMixin):
     __tablename__ = 'grade_entries'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     grade_entry_id = db.Column(db.Integer, primary_key=True)
     studentNumber =db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -291,14 +233,14 @@ class GradeEntry(db.Model, UserMixin):
     affidavit_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(100)) 
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='grade_entries')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'grade_entry_id': self.grade_entry_id,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -311,6 +253,7 @@ class GradeEntry(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_GradeEntryID(self):
@@ -319,7 +262,6 @@ class GradeEntry(db.Model, UserMixin):
 class CrossEnrollment(db.Model, UserMixin):
     __tablename__ = 'cross_enrollments'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     cross_enrollment_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -332,14 +274,14 @@ class CrossEnrollment(db.Model, UserMixin):
     permit_to_cross_enroll_data = db.Column(db.LargeBinary, nullable=False)  # Add
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id')) 
 
          # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='cross_enrollments')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'cross_enrollment_id': self.cross_enrollment_id,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -353,6 +295,7 @@ class CrossEnrollment(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_CrossEnrollmentID(self):
@@ -361,24 +304,23 @@ class CrossEnrollment(db.Model, UserMixin):
 class PetitionRequest(db.Model, UserMixin):
     __tablename__ = 'petition_requests'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     petition_request_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
     name = db.Column(db.String(255), nullable=False)
-    subject_code = db.Column(db.String(50), nullable=False)
+    subject_code = db.Column(db.String(100), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
-    petition_type = db.Column(db.String(50), nullable=False)
+    petition_type = db.Column(db.String(100), nullable=False)
     request_reason = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='petition_requests')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'petition_request_id': self.petition_request_id,
             'studentNumber':self.studentNumber,
             'name': self.name,
@@ -388,7 +330,8 @@ class PetitionRequest(db.Model, UserMixin):
             'request_reason': self.request_reason,
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
-            'status': self.status
+            'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_PetitionRequestID(self):
@@ -397,7 +340,6 @@ class PetitionRequest(db.Model, UserMixin):
 class ShiftingApplication(db.Model, UserMixin):
     __tablename__ = 'shifting_applications'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     shifting_application_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -409,14 +351,14 @@ class ShiftingApplication(db.Model, UserMixin):
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
 
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='shifting_applications')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'shifting_application_id': self.shifting_application_id,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -429,6 +371,7 @@ class ShiftingApplication(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_ShiftingApplicationID(self):
@@ -437,7 +380,6 @@ class ShiftingApplication(db.Model, UserMixin):
 class OverloadApplication(db.Model, UserMixin):
     __tablename__ = 'overload_applications'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     overload_application_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     studentNumber = db.Column(db.String(100), nullable=False)
@@ -448,14 +390,14 @@ class OverloadApplication(db.Model, UserMixin):
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
  
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='overload_applications')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'overload_application_id': self.overload_application_id,
             'name': self.name,
             'studentNumber': self.studentNumber,
@@ -467,6 +409,7 @@ class OverloadApplication(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_OverloadApplicationID(self):
@@ -475,7 +418,6 @@ class OverloadApplication(db.Model, UserMixin):
 class TutorialRequest(db.Model, UserMixin):
     __tablename__ = 'tutorial_requests'
 
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
     tutorial_request_id = db.Column(db.Integer, primary_key=True)
     studentNumber = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
@@ -485,14 +427,14 @@ class TutorialRequest(db.Model, UserMixin):
     file_data = db.Column(db.LargeBinary, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(50)) #status 
+    status = db.Column(db.String(100)) #status 
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
      
      # Add a relationship to the 'students' table
     student = db.relationship('Student', back_populates='tutorial_requests')
 
     def to_dict(self):
         return {
-            'student_id': self.student_id,
             'tutorial_request_id': self.tutorial_request_id,
             'studentNumber': self.studentNumber,
             'name': self.name,
@@ -502,6 +444,7 @@ class TutorialRequest(db.Model, UserMixin):
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
+            'student_id': self.student_id,
         }
 
     def get_TutorialRequestID(self):
@@ -513,7 +456,7 @@ class TutorialRequest(db.Model, UserMixin):
     __tablename__ = 'payments'
 
     paymentID = db.Column(db.Integer, primary_key=True)
-    modeofPayment = db.Column(db.String(50))
+    modeofPayment = db.Column(db.String(100))
     totalPayment = db.Column(db.DECIMAL)  # You can specify precision and scale if needed
     dateofPayment = db.Column(db.Date)
     proofofPayment = db.Column(db.String(255))  # Modify the length as needed
@@ -540,8 +483,8 @@ class TutorialRequest(db.Model, UserMixin):
     __tablename__ = 'services'
 
     serviceID = db.Column(db.Integer, primary_key=True)
-    typeofServices = db.Column(db.String(50))
-    status = db.Column(db.String(50)) #Modifythelength
+    typeofServices = db.Column(db.String(100))
+    status = db.Column(db.String(100)) #Modifythelength
     dateofServices = db.Column(db.Date)
     proofofServices = db.Column(db.String(255))
     stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
@@ -565,8 +508,8 @@ class TutorialRequest(db.Model, UserMixin):
 class Feedback(db.Model, UserMixin):
     __tablename__ = 'feedbacks'
     feedbackID = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    emailAddress = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    emailAddress = db.Column(db.String(100))
     ratings = db.Column(db.Integer)  # Assuming ratings are integers
     feedBacks = db.Column(db.TEXT)  # Modify the data type as needed
     stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
@@ -590,8 +533,8 @@ class Complaint(db.Model, UserMixin):
     __tablename__ = 'complaints'
     
     complaintID = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50))
-    emailAddress = db.Column(db.String(50))
+    name = db.Column(db.String(100))
+    emailAddress = db.Column(db.String(100))
     complaintDetails = db.Column(db.TEXT)
     complaintFile = db.Column(db.String(255))  # Modify the length as needed
     dateofComplaint = db.Column(db.Date)
@@ -616,40 +559,25 @@ class Complaint(db.Model, UserMixin):
 
 class Announcement(db.Model, UserMixin):
     __tablename__ = 'announcements'
+
     announcementID = db.Column(db.Integer, primary_key=True)
-    announcementType = db.Column(db.String(50))  # e.g., 'General', 'Event', etc.
+    announcementType = db.Column(db.String(100))  # e.g., 'General', 'Event', etc.
     announcementDetails = db.Column(db.TEXT)
     date = db.Column(db.Date)
     time = db.Column(db.Time)
-    stud_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), nullable=False)
-    fac_id = db.Column(db.Integer, db.ForeignKey('faculties.facultyID'), nullable=False)
+    facultyID = db.Column(db.Integer, db.ForeignKey('faculties.facultyID'), nullable=False)
 
+    faculty = db.relationship('Faculty', back_populates='faculty')
 
     def to_dict(self):
         return {
-            'announcementID': self.announcementID,
-       #     'id': self.id,
-       #     'facultyID': self.facultyID,
-            'announcementType': self.announcementType,
-            'announcementDetails': self.announcementDetails,
-            'date': str(self.date),  # Convert Date to string for JSON serialization
-            'time': str(self.time),  # Convert Time to string for JSON serialization
-            #            'courseCode': self.courseCode,
-            #             'sectionNumber': self.sectionNumber,
-            #                'professorName': self.professorName,
-            #                    'roomNo': self.roomNo,
-            #                        'startDate': str(self.startDate),   #Convert Start Date and End Date to strings for JSON Serialization
-            #                        'startTime': str(self.startTime),   # Convert Start Time to string for JSON serialization
-            #                     'startDate': str(self.startDate),   # Convert Start Date to string for JSON Serialization
-            #                     'startTime': str(self.startTime),   #Convert StartTime and EndTime to strings so that they can be serialized in json format
-            #                        'dayOfWeek': self.dayOfWeek,
-            #                            'startTime': self.startTime,
-            #                                'endTime': self.endTime,
-            'user_id': self.user_id
+        'announcementID': self.announcementID,
+        'announcementType': self.announcementType,
+        'announcementDetails': self.announcementDetails,
+        'date': str(self.date),   # Convert Date to string for JSON serialization
+        'time': str(self.time),  # Convert Time to string for JSON serialization
+        'facultyID': self.facultyID
         }
-    # **How to call it
-    # announcement = Announcement.query.get(some_announcement_id)
-    # announcement_data = announcement.to_dict()
     def get_announcementID(self):
         return str(self.announcementID)  # Convert to string to ensure compatibility"""
 
@@ -661,12 +589,12 @@ class Faculty(db.Model, UserMixin):
     faculty_Number = db.Column(db.String(255), unique=True, nullable=False) #Faculty_Number
     userType = db.Column(db.String(255))  # e.g., 'Admin', 'Professor', etc.
     name = db.Column(db.String(255), nullable=False)  # Name
-    email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    email = db.Column(db.String(100), unique=True, nullable=False)  # Email
     address = db.Column(db.String(255))  # You can use String or TEXT depending on the length
     password = db.Column(db.String(128), nullable=False)  # Password
     gender = db.Column(db.Integer)  # Gender
     dateofBirth = db.Column(db.Date)  # dateofBirth
-    placeofBirth = db.Column(db.String(50))  # placeofBirth
+    placeofBirth = db.Column(db.String(100))  # placeofBirth
     mobile_number = db.Column(db.String(20))  # MobileNumber
     userImg = db.Column(db.String(255))  # Modify the length as needed
     is_active = db.Column(db.Boolean, default=True)
@@ -700,11 +628,11 @@ class Admin(db.Model, UserMixin):
     adm_Id = db.Column(db.Integer, primary_key=True)  # UserID
     admin_Number = db.Column(db.String(30), unique=True, nullable=False) #AdminNumber
     name = db.Column(db.String(255), nullable=False)  # Name
-    email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    email = db.Column(db.String(100), unique=True, nullable=False)  # Email
     password = db.Column(db.String(128), nullable=False)  # Password
     gender = db.Column(db.Integer)  # Gender
     dateofBirth = db.Column(db.Date)  # dateofBirth
-    placeofBirth = db.Column(db.String(50))  # placeofBirth
+    placeofBirth = db.Column(db.String(100))  # placeofBirth
     mobile_number = db.Column(db.String(11))  # MobileNumber
     is_active = db.Column(db.Boolean, default=True)
 
@@ -737,21 +665,21 @@ def init_db(app):
     __tablename__ = 'services'
 
     service_id = db.Column(db.Integer, primary_key=True)
-    service_type = db.Column(db.String(50), nullable=False)
-    student_id = db.Column(db.String(50), nullable=False)
+    service_type = db.Column(db.String(100), nullable=False)
+    student_id = db.Column(db.String(100), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Common fields for all services
     file_filename = db.Column(db.String(255))
-    user_role = db.Column(db.String(50))  # Add user role attribute
+    user_role = db.Column(db.String(100))  # Add user role attribute
 
     # Additional fields for specific service types
     # Subject-related fields
-    subject_name = db.Column(db.String(50))
+    subject_name = db.Column(db.String(100))
     enrollment_type = db.Column(db.String500))
     file_data = db.Column(db.LargeBinary)
-    faculty_number = db.Column(db.String(50))
+    faculty_number = db.Column(db.String(100))
 
     # Change of Subjects fields
     ace_form_filename = db.Column(db.String(255))
@@ -759,12 +687,12 @@ def init_db(app):
     updated_at = db.Column(db.TIMESTAMP)
 
     # Manual Enrollment fields
-    enrollment_type_manual = db.Column(db.String(50))
+    enrollment_type_manual = db.Column(db.String(100))
     reason = db.Column(db.Text)
     me_file_data = db.Column(db.LargeBinary)
 
     # Certification Request fields
-    certification_type = db.Column(db.String(50))
+    certification_type = db.Column(db.String(100))
     request_form_filename = db.Column(db.String(255))
     identification_card_filename = db.Column(db.String(255))
     is_representative = db.Column(db.Boolean, default=False)
@@ -772,7 +700,7 @@ def init_db(app):
     representative_id_filename = db.Column(db.String(255))
 
     # Grade Entry fields
-    application_type = db.Column(db.String(50))
+    application_type = db.Column(db.String(100))
     completion_form_filename = db.Column(db.String(255))
     class_record_filename = db.Column(db.String(255))
     affidavit_filename = db.Column(db.String(255))
@@ -785,7 +713,7 @@ def init_db(app):
     permit_to_cross_enroll_filename = db.Column(db.String(255))
 
     # Petition Request fields
-    subject_code_petition = db.Column(db.String(50))
+    subject_code_petition = db.Column(db.String(100))
     subject_name_petition = db.Column(db.String(255))
     request_reason = db.Column(db.Text)
 
@@ -803,7 +731,7 @@ def init_db(app):
     file_filename_overload = db.Column(db.String(255))
 
     # Tutorial Request fields
-    subject_code_tutorial = db.Column(db.String(50))
+    subject_code_tutorial = db.Column(db.String(100))
     subject_name_tutorial = db.Column(db.String(255))
     online_petition_link_tutorial = db.Column(db.String(255))
 
