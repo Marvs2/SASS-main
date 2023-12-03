@@ -1,0 +1,65 @@
+{% extends "faculty/home.html" %}
+
+{% block facultycontent %}
+<style>
+    /* Add DataTables styles */
+    table {
+        width: 90%;
+        border: 1px;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<h1>Change of Subjects changesubjects</h1>
+
+<table id="changeOfSubjectsTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Student Number</th>
+            <th>Name</th>
+            <th>Enrollment Type</th>
+            <th>ACE Form File</th>
+            <th>Created At</th>
+            <th>User Responsible</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for changesubject in changesubjects %}
+            <tr>
+                <td>{{ changesubject.Changesubject_ID }}</td>
+                <td>{{ changesubject.studentNumber }}</td>
+                <td>{{ changesubject.name }}</td>
+                <td>{{ changesubject.enrollment_type }}</td>
+                <td>{% if changesubject.ace_form_data %}
+                    <a href="{{ url_for('get_change_file', Changesubject_ID=changesubject.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubject.ace_form_filename }}</a>
+                {% else %}
+                    <span class="badge badge-warning">No File</span>
+                {% endif %}</td>
+                <td>{{ changesubject.created_at }}</td>
+                <td>{{ changesubject.user_responsible }}</td>
+                <td>{{ changesubject.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+<script>
+    // Initialize DataTable
+    $(document).ready(function() {
+        $('#changeOfSubjectsTable').DataTable();
+    });
+</script>
+{% endblock %}

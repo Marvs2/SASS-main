@@ -30,7 +30,7 @@ CORS(student_api)  # Apply CORS to the student_api blueprint
 
 #===============================================================
 
-# Function to authenticate the user (usually happens during login)
+"""# Function to authenticate the user (usually happens during login)
 def authenticate_user(username, password):
     # Your authentication logic goes here
     # Check if the provided username and password match a user in your database
@@ -39,7 +39,7 @@ def authenticate_user(username, password):
     if user and user.check_password(password):  # Replace check_password with your validation logic
         session['user_id'] = user.id  # Assuming user.id is the ID of the authenticated user
         return True
-    return False
+    return False"""
 
 # Api/v1/student/api_routes.py
 #================================================================
@@ -48,10 +48,23 @@ def is_user_logged_in_overload():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
 
+def store_user_details_in_session(student):
+    # Store user details in the session
+    session['user_id'] = student.student_id
+    session['studentNumber'] = student.studentNumber
+    session['name'] = student.name
+    session['gender'] = student.gender
+    session['email'] = student.email
+    session['address'] = student.address
+    session['dateofBirth'] = student.dateofBirth
+    session['placeofBirth'] = student.placeofBirth
+    session['mobileNumber'] = student.mobileNumber
+    session['userImg'] = student.userImg
 
-# Login function for students to goto student_overload
-@student_api.route('/login-Overload', methods=['GET', 'POST'])
+# Login function for students to go to student_overload
+@student_api.route('/login-Overload', methods=['POST'])
 def login_Overload():
+    # ... (other code)
     if is_user_logged_in_overload():
         # If the user is already logged in, redirect to the overload subjects page
         return redirect(url_for('student_portal_overload'))
@@ -59,7 +72,7 @@ def login_Overload():
     if request.method == 'POST':
         studentNumber = request.form['studentNumber']
         password = request.form['password']
-        
+
         student = Student.query.filter_by(studentNumber=studentNumber).first()
         if student and check_password_hash(student.password, password):
             # Successfully authenticated
@@ -67,21 +80,13 @@ def login_Overload():
             session['access_token'] = access_token
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.student_id
-            session['studentNumber'] = student.studentNumber
-            session['name'] = student.name
-            session['gender'] = student.gender
-            session['email'] = student.email
-            session['address'] = student.address
-            session['dateofBirth'] = student.dateofBirth
-            session['placeofBirth'] = student.placeofBirth
-            session['mobileNumber'] = student.mobileNumber
-            session['userImg'] = student.userImg
+            # Use the function to store user details in the session
+            store_user_details_in_session(student)
 
             return redirect(url_for('student_portal_overload'))
         else:
             flash('Invalid email or password', 'danger')
+
     return render_template('student/login.html')
 
 #========================================================
@@ -208,7 +213,7 @@ def login_Enrollment():
     return render_template('student/login.html')
 
 #=============================================================
-"""# Function to check if the user is logged in addingofsubject
+# Function to check if the user is logged in addingofsubject
 def is_user_logged_in_addingofsubject():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
@@ -456,73 +461,53 @@ def login_Crossenrollment():
             return redirect(url_for('student_portal_crossenrollment', student_detailss=session))
         else:
             flash('Invalid email or password', 'danger')
-    return render_template('student/login.html')"""
+    return render_template('student/login.html')
 
-# Common function to check if the user is logged in for different services
-def is_user_logged_in(service_redirect):
-    return 'access_token' in session and session['access_token'] is not None
+"""# Main login function
+@student_api.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        studentNumber = request.form['studentNumber']
+        password = request.form['password']
 
-# Common function for user login
-def login_user(studentNumber, password, service_redirect, service_portal):
-    if is_user_logged_in(service_redirect):
-        return redirect(url_for(service_portal))
+        student = Student.query.filter_by(studentNumber=studentNumber).first()
 
-    student = Student.query.filter_by(studentNumber=studentNumber).first()
+        if student:
+            # Debugging print
+            print(f"Stored Password Hash: {student.password}")
+            print(f"Provided Password: {password}")
 
-    if student and check_password_hash(student.password, password):
-        # Successfully authenticated
-        access_token = create_access_token(identity=student.student_id)
-        session['access_token'] = access_token
-        session['user_role'] = 'student'
+            if check_password_hash(student.password, password):
+                # Successfully authenticated
+                print("Authentication Successful!")
 
-        # Store additional student details in the session
-        session['user_id'] = student.student_id
-        session['studentNumber'] = student.studentNumber
-        session['name'] = student.name
-        session['gender'] = student.gender
-        session['email'] = student.email
-        session['address'] = student.address
-        session['dateofBirth'] = student.dateofBirth
-        session['placeofBirth'] = student.placeofBirth
-        session['mobileNumber'] = student.mobileNumber
-        session['userImg'] = student.userImg
+                access_token = create_access_token(identity=student.student_id)
+                session['access_token'] = access_token
+                session['user_role'] = 'student'
 
-        return redirect(url_for(service_portal, student_details=session))
-    else:
-        flash('Invalid email or password', 'danger')
-        return render_template('student/login.html')
+                # Store additional student details in the session
+                session['user_id'] = student.student_id
+                session['studentNumber'] = student.studentNumber
+                session['name'] = student.name
+                # ... (other details)
 
-# Login for Adding of Subjects
-@student_api.route('/login-AddingofSubjects', methods=['GET', 'POST'])
-def login_Addingofsubject():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_addingsubject', 'portal_addingofsubject')
+                return render_template('student/home.html', student_details=session)
 
-# Login for Tutorial
-@student_api.route('/login-Tutorial', methods=['GET', 'POST'])
-def login_Tutorial():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_tutorial', 'portal_tutorial')
+            else:
+                print("Invalid password")
+                flash('Invalid student number or password', 'danger')
 
-# Login for Shifting
-@student_api.route('/login-Shifting', methods=['GET', 'POST'])
-def login_Shifting():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_shifting', 'portal_shifting')
+        else:
+            print("Student not found")
+            flash('Invalid student number or password', 'danger')
 
-# Login for Petition
-@student_api.route('/login-Petition', methods=['GET', 'POST'])
-def login_Petition():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_petition', 'portal_petition')
+    return redirect(url_for('student_portal'))"""
 
-# Login for Gradeentry
-@student_api.route('/login-Gradeentry', methods=['GET', 'POST'])
-def login_Gradeentry():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_gradeentry', 'portal_gradeentry')
 
-# Login for Crossenrollment
-@student_api.route('/login-Crossenrollment', methods=['GET', 'POST'])
-def login_Crossenrollment():
-    return login_user(request.form['studentNumber'], request.form['password'], 'student_portal_crossenrollment', 'portal_crossenrollment')
-
-# Main login function
+#====================================================================#
+#================The real login in the true manners==================#
+#====================================================================#
+#for All Students
 @student_api.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
@@ -548,49 +533,12 @@ def login():
             session['mobileNumber'] = student.mobileNumber
             session['userImg'] = student.userImg
 
-            return render_template('student/home.html', student_detailss=session)
+            return render_template('student/home.html', student_details=session)
 
         else:
             flash('Invalid email or password', 'danger')
 
     return redirect(url_for('student_portal'))
-
-
-#====================================================================#
-#================The real login in the true manners==================#
-#====================================================================#
-#for All Students
-"""@student_api.route('/login', methods=['POST'])
-def login():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        password = request.form['password']
-        
-        student = Student.query.filter_by(studentNumber=studentNumber).first()
-        if student and check_password_hash(student.password, password):
-            # Successfully authenticated
-            access_token = create_access_token(identity=student.student_id)
-            session['access_token'] = access_token
-            session['user_role'] = 'student'
-
-            # Store additional student details in the session
-            session['user_id'] = student.student_id
-            session['studentNumber'] = student.studentNumber
-            session['name'] = student.name
-            session['gender'] = student.gender
-            session['email'] = student.email
-            session['address'] = student.address
-            session['dateofBirth'] = student.dateofBirth
-            session['placeofBirth'] = student.placeofBirth
-            session['mobileNumber'] = student.mobileNumber
-            session['userImg'] = student.userImg
-
-            return render_template('student/home.html', student_detailss=session)
-
-        else:
-            flash('Invalid email or password', 'danger')
-
-    return redirect(url_for('student_portal'))"""
 #===================================================
 """@app.route('/api/submit_service_request', methods=['POST'])
 def api_submit_service_request():
@@ -622,9 +570,8 @@ def api_submit_service_request():
 # TESTING AREA
 @student_api.route('/profile', methods=['GET'])
 @jwt_required()
-def profile():
+def student_profile():
     current_user_id = get_jwt_identity()
-    print("CURRENT USER ID: ", current_user_id)
     # Debug print statement
     student = Student.query.get(current_user_id)
     if student:

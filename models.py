@@ -20,7 +20,7 @@ class Student(db.Model, UserMixin):
     dateofBirth = db.Column(db.Date)  
     placeofBirth = db.Column(db.String(255), nullable=True)
     mobileNumber = db.Column(db.String(11))
-    userImg = db.Column(db.String, nullable=False) 
+    userImg = db.Column(db.LargeBinary, nullable=False)
    # stud_status = db.Column(db.String(100), nullable=False)
 
     # Define the 'subjects' relationship in the Student model
@@ -58,7 +58,9 @@ class Student(db.Model, UserMixin):
     # Method to save image data
         self.userImg = image_data
         db.session.commit()
-
+        
+# ==========Services========== #
+# ==========Adding_subject_form========== #
 class Add_Subjects(db.Model, UserMixin):
     __tablename__ = 'subjects'
 
@@ -93,7 +95,8 @@ class Add_Subjects(db.Model, UserMixin):
     def get_Add_SubjectsID(self):
         return str(self.subject_ID)
     
-
+# ==========Services========== #
+# ==========Change_of_subjects=========== #
 class ChangeOfSubjects(db.Model, UserMixin):
     __tablename__ = 'changesubjects'
 
@@ -130,7 +133,9 @@ class ChangeOfSubjects(db.Model, UserMixin):
 
     def get_ChangesubjectID(self):
         return str(self.Changesubject_ID)
-        
+
+# ==========Requests========== #
+# ========== Reason need pdf file ========== #
 class ManualEnrollment(db.Model, UserMixin):
     __tablename__ = 'manual_enrollments'
 
@@ -169,7 +174,10 @@ class ManualEnrollment(db.Model, UserMixin):
 
     def get_ManualEnrollmentID(self):
         return str(self.m_enrollment_ID)
-    
+
+# ==========Requests========== #
+# ========== Files needed for the Certification ========== #
+
 class CertificationRequest(db.Model, UserMixin):
     __tablename__ = 'certification_requests'
 
@@ -185,7 +193,7 @@ class CertificationRequest(db.Model, UserMixin):
     authorization_letter_filename = db.Column(db.String(255))
     authorization_letter_data = db.Column(db.LargeBinary)
     representative_id_filename = db.Column(db.String(255))
-    representative_id_date = db.Column(db.LargeBinary)
+    representative_id_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(100)) #status 
@@ -208,7 +216,7 @@ class CertificationRequest(db.Model, UserMixin):
             'authorization_letter_filename': self.authorization_letter_filename,
             'authorization_letter_data': self.authorization_letter_data,
             'representative_id_filename': self.representative_id_filename,
-            'representative_id_date': self.representative_id_date,
+            'representative_id_data': self.representative_id_data,
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
@@ -217,7 +225,8 @@ class CertificationRequest(db.Model, UserMixin):
 
     def get_CertificationRequestID(self):
         return str(self.certification_request_id)
-    
+
+# ========== Requests ========== #
 class GradeEntry(db.Model, UserMixin):
     __tablename__ = 'grade_entries'
 
@@ -259,6 +268,8 @@ class GradeEntry(db.Model, UserMixin):
     def get_GradeEntryID(self):
         return str(self.grade_entry_id)
     
+# ==========Requests========== #  
+# ========== Files needed to the request ========== #
 class CrossEnrollment(db.Model, UserMixin):
     __tablename__ = 'cross_enrollments'
 
@@ -301,6 +312,7 @@ class CrossEnrollment(db.Model, UserMixin):
     def get_CrossEnrollmentID(self):
         return str(self.cross_enrollment_id)
     
+# ==========Requests========== #
 class PetitionRequest(db.Model, UserMixin):
     __tablename__ = 'petition_requests'
 
@@ -337,6 +349,8 @@ class PetitionRequest(db.Model, UserMixin):
     def get_PetitionRequestID(self):
         return str(self.petition_request_id)
     
+# ==========Services========== #  
+# ========Accreditation-for-Shiftees-and-Regular========= #  
 class ShiftingApplication(db.Model, UserMixin):
     __tablename__ = 'shifting_applications'
 
@@ -377,6 +391,8 @@ class ShiftingApplication(db.Model, UserMixin):
     def get_ShiftingApplicationID(self):
         return str(self.shifting_application_id)
 
+# ==========Services========== #
+# ==========Overload-3-6-units========== #
 class OverloadApplication(db.Model, UserMixin):
     __tablename__ = 'overload_applications'
 
@@ -414,7 +430,9 @@ class OverloadApplication(db.Model, UserMixin):
 
     def get_OverloadApplicationID(self):
         return str(self.overload_application_id)
-
+#Done
+# ==========Services========== #
+# ==========RO FORM========== #
 class TutorialRequest(db.Model, UserMixin):
     __tablename__ = 'tutorial_requests'
 
@@ -596,7 +614,7 @@ class Faculty(db.Model, UserMixin):
     dateofBirth = db.Column(db.Date)  # dateofBirth
     placeofBirth = db.Column(db.String(100))  # placeofBirth
     mobile_number = db.Column(db.String(20))  # MobileNumber
-    userImg = db.Column(db.String(255))  # Modify the length as needed
+    userImg = db.Column(db.LargeBinary, nullable=False)  # Modify the length as needed
     is_active = db.Column(db.Boolean, default=True)
 
     # Define the 'subjects' relationship in the Faculty model
@@ -621,6 +639,10 @@ class Faculty(db.Model, UserMixin):
     def get_id(self):
         return str(self.id)  # Convert to string to ensure compatibility
     
+    def save_image(self, image_data):
+    # Method to save image data
+        self.userImg = image_data
+        db.session.commit()
 
 class Admin(db.Model, UserMixin):
     __tablename__ = 'admins'
