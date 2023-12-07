@@ -1,0 +1,85 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Application for Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h1>
+    <p>Correction of entry shall be accomplished within a period of one semester upon receipt of the grade, and the Late Reporting of Grades Form shall be accomplished within a period of one (1) year. Incomplete (Inc.) is temporarily given to a student who may pass the subject but who has not yet complied with all its requirements. Such requirement(s) shall be satisfied within one year from the end of the term; otherwise, the grade shall lapse into "No Credit (N)" or a failing grade.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Completion Form (3 original copies) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a></li>
+        <li>Copy of Class Record.</li>
+        <li>Notarized Affidavit for Change of Grade of professor (for correction of entry/late reporting of grade).</li>
+    </ul>
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+
+    <h2>Application Form</h2>
+    <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <label for="studentNumber">Student Number:</label><br>
+        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
+
+        <label for="name">Student Name:</label><br>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="application_type">Application Type:</label><br>
+        <select id="application_type" name="application_type" required>
+            <option value="Correction of Grade Entry">Correction of Grade Entry</option>
+            <option value="Late Reporting of Grades">Late Reporting of Grades</option>
+            <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
+        </select><br><br>
+
+        <label for="completion_form">Completion Form:</label><br>
+        <input type="file" id="completion_form" name="completion_form" required><br><br>
+
+        <label for="class_record">Copy of Class Record:</label><br>
+        <input type="file" id="class_record" name="class_record" required><br><br>
+
+        <label for="affidavit">Notarized Affidavit for Change of Grade:</label><br>
+        <input type="file" id="affidavit" name="affidavit" required><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="CDO Cashier/Accounting Office">
+                CDO Cashier/Accounting Office
+            </option>
+            <option value="Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room">Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room</option>
+            <option value="Director Head of Academic Program">Director Head of Academic Program</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+        </select><br><br>
+        
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+
+        <button type="submit">Submit Application</button>
+    </form>
+    <script>
+        // Automatically close the alert messages after 3 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000);
+
+        // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
+        $('#applicationForm').submit(function (event) {
+            // Add your form submission logic here
+        });
+    </script>
+{% endblock content %}

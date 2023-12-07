@@ -1,39 +1,39 @@
-{% extends "student/home.html" %}
-<script>
-    function getStudentNumber() {
-        var student_name = document.getElementById('student_name').value;
-        var studentNumberField = document.getElementById('student_number');
-
-        // AJAX request to fetch the student number
-        fetch('/get_student_number', {
-            method: 'POST',
-            body: new URLSearchParams({ student_number: student_number }),
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            }
-        })
-        .then(response => response.text())
-        .then(studentNumber => {
-            if (studentNumber !== 'Student not found') {
-                studentNumberField.value = student_number;
-            } else {
-                studentNumberField.value = '';
-                alert('Student not found');
-            }
-        });
+{% extends "student/layout.html" %}
+{% block content %}
+<style>
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
     }
 
-    function handleAlertClose() {
-        var alertDiv = document.getElementById('successAlert');
-        alertDiv.style.display = 'none';  // Hide the alert
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
     }
-</script>
 
-{% block services %}
+    input,
+    select,
+    button {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+
+    button {
+        cursor: pointer;
+    }
+</style>
+
 
     <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
-    <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.
-    </p>
+    <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
     <br>
     <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
     <br>
@@ -52,31 +52,31 @@
     {% endwith %}
 
     <h2>Application Form</h2>
-    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="studentNumber">Student number:</label><br>
-        <input type="text" id="studentumber" name="studentNumber" required onblur="getStudentNumber()"><br><br>
-    
-        <label for="name">Student Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+        <label for="studentNumber">Student number:</label>
+        <input type="text" id="student_number" name="studentNumber" required onblur="getStudentNumber()"><br>
+
+        <label for="name">Student Name:</label>
+        <input type="text" id="student_name" name="name" required><br>
 
         <label for="subject_Names">Subject Name (comma-separated):</label>
-        <input type="text" id="subject_Names" name="subject_Names" required><br><br>
-    
-        <label for="enrollment_type">Enrollment Type:</label><br>
+        <input type="text" id="subject_Names" name="subject_Names" required><br>
+
+        <label for="enrollment_type">Enrollment Type:</label>
         <select id="enrollment_type" name="enrollment_type" required>
             <option value="Regular">Regular</option>
             <option value="Irregular">Irregular</option>
-        </select><br><br>
+        </select><br>
 
         <label for="file">File:</label>
-        <input type="file" id="file" name="file"><br><br><!-- File input field -->
-        
+        <input type="file" id="file" name="file"><br>
+
         <label for="user_responsible">User Responsible:</label>
         <select name="user_responsible" id="user_responsible">
             <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
             <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
             <option value="Registrar's Office">Registrar's Office</option>
-        </select><br><br>
+        </select><br>
 
         <label for="status">Status:</label>
         <select id="status" name="status">
@@ -84,12 +84,11 @@
             <option value="Pending" disabled>Pending</option>
             <option value="Approved" disabled>Approved</option>
             <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
+        </select><br>
 
         <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
     </form>
-    
-    <!-- JavaScript function to validate the form and log any errors -->
+
     <script>
         function validateForm() {
             var studentNumber = document.getElementById('student_number').value;
@@ -97,17 +96,12 @@
             var subject_Names = document.getElementById('subject_Names').value;
             var enrollmentType = document.getElementById('enrollment_type').value;
 
-
-            // You can add your custom validation logic here
             if (!studentNumber || !studentName || !enrollmentType || !subject_Names) {
                 console.error('Error: Please fill out all required fields.');
-                // Return false to prevent form submission
                 return false;
             }
-
-            // Add additional validation checks here
 
             return true;
         }
     </script>
-{% endblock %}
+{% endblock content %}

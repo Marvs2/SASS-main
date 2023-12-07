@@ -2,7 +2,7 @@ from functools import wraps
 from flask import redirect, url_for, flash
 
 from functools import wraps
-from flask import redirect, url_for, flash, session
+from flask import redirect, url_for, session, render_template
 
 def student_required(fn):
     @wraps(fn)
@@ -11,7 +11,7 @@ def student_required(fn):
             return fn(*args, **kwargs)
         else:
             flash('', 'danger')
-            return redirect(url_for('home'))
+            return redirect(url_for('studentLogin'))
     return wrapper
 
 def faculty_required(fn):
@@ -39,9 +39,21 @@ def prevent_authenticated(fn):
     def wrapper(*args, **kwargs):
         if 'user_role' in session:
             role = session['user_role']
-            return redirect(url_for(f"{role}_home"))
+            return redirect(url_for(f"{role}_dashboard"))
         return fn(*args, **kwargs)
     return wrapper
+
+def role_required(required_role):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            user_role = session.get('user_role')
+            if user_role == required_role:
+                return func(*args, **kwargs)
+            else:
+                return render_template('404.html'), 404
+        return wrapper
+    return decorator
 
 # def faculty_required(route_function):
 #     @login_required

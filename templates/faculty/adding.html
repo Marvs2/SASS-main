@@ -1,0 +1,121 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+    /* Add DataTables styles */
+    table {
+        width: 90%;
+        border: 1px;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<!-- DataTable HTML -->
+<h1>Subject Data</h1>
+
+<table id="subjectTable" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Subject ID</th>
+      <th>Student Number</th>
+      <th>Name</th>
+      <th>Subject Names</th>
+      <th>Enrollment Type</th>
+      <th>File</th>
+      <th>User Responsible</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for subject in subjects %}
+      <tr>
+        <td>{{ subject.subject_ID }}</td>
+        <td>{{ subject.studentNumber }}</td>
+        <td>{{ subject.name }}</td>
+        <td>{{ subject.subject_Names }}</td>
+        <td>{{ subject.enrollment_type }}</td>
+        <td>        {% if subject.file_data %}
+            <a href="{{ url_for('get_subject_file', subject_ID=subject.subject_ID) }}" class="btn btn-success" download>{{ subject.file_name }}</a>
+        {% else %}
+            <span class="badge badge-warning">No File</span>
+        {% endif %}</td>
+        <td>{{ subject.user_responsible }}</td>
+        <td>{{ subject.status }}</td>
+        <td>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ subject.subject_ID }}">Change Status</button>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<!-- Modal for Change Status -->
+{% for subject in subjects %}
+  <div class="modal fade" id="statusModal{{ subject.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="statusModalLabel">Change Status</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="statusForm{{ subject.subject_ID }}">
+            <input type="hidden" name="subject_id" value="{{ subject.subject_ID }}">
+            <div class="form-group">
+              <label for="newStatus">New Status:</label>
+              <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ subject.status }}" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="updateStatus('{{ subject.subject_ID }}')">Save changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+
+<!-- DataTable Initialization Script -->
+<script>
+  $(document).ready(function () {
+    // Initialize DataTable
+    $('#subjectTable').DataTable();
+  });
+
+  // Function to update status
+  function updateStatus(subjectId) {
+    const formId = `statusForm${subjectId}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/student/update_subject', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+</script>
+
+{% endblock %}

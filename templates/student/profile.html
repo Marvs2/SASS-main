@@ -1,240 +1,108 @@
-{% extends "main/home-student.html" %}
+{% extends "student/layout.html" %}
 
 {% block content %}
 <style>
-.form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Adjusted alignment */
-    padding-top: 50px; /* Add space for the navbar */
-    height: calc(100vh - 50px); /* Adjust height to accommodate the navbar */
-    overflow-y: auto; /* Add scrollbar if content exceeds height */
-}
+    .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
 
-form {
-    max-width: 400px; /* Adjust as needed */
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    text-align: left;
-}
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-input[type="submit"] {
-    background-color: #4caf50;
-    cursor: pointer;
-}
-
-input:disabled {
-    cursor: not-allowed;
-}
-
-
-/* Adjust the layoutSidenav styles */
-#layoutSidenav {
-    display: flex;
-    min-height: 100vh;
-}
-
-#layoutSidenav_nav {
-    flex: 0 0 auto;
-}
-
-#layoutSidenav_content {
-    flex: 1 1 0;
-    overflow: auto;
-}
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+    }
 </style>
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark fixed-top">
-    <!-- Sidebar Toggle-->
-<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button"><i class="fas fa-bars"></i></button>
-<!-- Navbar Brand-->
-<a class="navbar-brand ps-5" href=""><b>SASS</b>   
-</a>   
 
-<!-- Navbar Search-->
-<form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-    <!--- <div class="input-group">
-       <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-        <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search" title="button"></i></button>
-    </div> -->
-</form>
-<!-- Navbar-->
-<ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-    <li class="nav-item dropdown">
-        <a title="profile" class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user fa-fw"></i>
-       <!---     {% if student %}
-                {{ student.name }}
-            {% else %}
-                <input title="text" type="text" id="name" name="name" value="name" readonly>
-            {% endif %} -->
-        </a>                
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{{ url_for('profile') }}">My Profile</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
-        </ul>
-    </li>
-</ul>
-</nav>
-<div id="layoutSidenav">
-<div id="layoutSidenav_nav">
-    <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-        <div class="sb-sidenav-menu">
-            <div class="nav">
-                <div class="sb-sidenav-menu-heading">Home</div>
-                <a class="nav-link" href="{{url_for('stud_dashboard')}}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                    Dashboard
-                </a>
-                <div class="sb-sidenav-menu-heading">Services</div>
-                <a class="nav-link" href="{{url_for('stud_overload') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Application for Overload of Subjects
-                </a>
-<!--                            <div class="sb-sidenav-menu-heading">Change of Enrollment</div>
-                <a class="nav-link" href="{{ url_for('stud_adding') }}"><div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Adding Subjects</a>
-                <a class="nav-link" href="{{ url_for('stud_change') }}"><div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Subjects/Schedule</a>
-            -->
-               <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                    <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                    Change of Enrollment
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ url_for('stud_adding') }}">Adding Subjects</a>
-                        <a class="nav-link" href="{{ url_for('stud_change') }}">Subjects/Schedule</a>
-                    </nav>
-                </div>
-                <a class="nav-link" href="{{url_for('stud_correction') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Correction of Grade Entry
-                </a>
-                <a class="nav-link" href="{{url_for('stud_cross_enrollment') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Cross-Enrollment
-                </a>
-                <a class="nav-link" href="{{url_for('stud_shifting') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Shifting
-                </a>
-                <a class="nav-link" href="{{url_for('stud_enrollment') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Manual Enrollment
-                </a>
-                <a class="nav-link" href="{{url_for('stud_petition') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Petition
-                </a>
-                <a class="nav-link" href="{{url_for('stud_tutorial') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Tutorial
-                </a>
-                <a class="nav-link" href="{{url_for('stud_certification') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Certification
-                </a>
-
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                    <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                    Service History
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                            Authentication
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                            <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="login.html">Login</a>
-                                <a class="nav-link" href="register.html">Register</a>
-                                <a class="nav-link" href="password.html">Forgot Password</a>
-                            </nav>
-                        </div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                            Error
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordionPages">
-                            <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="401.html">401 Page</a>
-                                <a class="nav-link" href="404.html">404 Page</a>
-                                <a class="nav-link" href="500.html">500 Page</a>
-                            </nav>
-                        </div>
-                    </nav>
-                </div>
-                <div class="sb-sidenav-menu-heading">Complaints</div>
-                <a class="nav-link" href="{{url_for('stud_services')}}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                    services
-                </a>
-                <a class="nav-link" href="tables.html">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Complaint History
-                </a>
-            </div>
-        </div>
-    </nav>
-</div>
-    <div id="layoutSidenav_content">
-        <main>
             <div class="form-container">
-                <form action="{{url_for('profile')}}" method="POST">
+                <form action="{{url_for('studentprofile')}}" method="POST">
 
                     <label for="name">Student Number:</label>
-                    <input type="text" id="studentNumber" name="studentNumber" value="{{ student_details['studentNumber'] }}" disabled required>
+                    <input type="text" id="studentNumber" name="studentNumber"  disabled required>
                     <br>
 
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" value="{{ student_details['name'] }}" disabled required>
+                    <label for="name" id="name-label">Name:</label>
+                    <input type="text" id="name" name="name"  disabled required>
                     <br>
 
                     <label for="name">Gender:</label>
-                    <input type="text" id="gender" name="gender" value="{{ student_details['gender'] }}" disabled required>
+                    <input type="text" id="gender" name="gender"  disabled required>
                     <br>
             
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ student_details['email'] }}" disabled required>
+                    <input type="email" id="email" name="email"  disabled required>
                     <br>
             
                     <label for="address">Address:</label>
-                    <input type="text" id="address" name="address" value="{{ student_details['address'] }}" disabled>
+                    <input type="text" id="address" name="address"  disabled>
                     <br>
             
                     <label for="dateofBirth">Date of Birth:</label>
-                    <input type="date" id="dateofBirth" name="dateofBirth" value="{{ student_details['dateofBirth'] }}" disabled>
+                    <input type="date" id="dateofBirth" name="dateofBirth"  disabled>
                     <br>
             
                     <label for="placeofBirth">Place of Birth:</label>
-                    <input type="text" id="placeofBirth" name="placeofBirth" value="{{ student_details['placeofBirth'] }}" disabled>
+                    <input type="text" id="placeofBirth" name="placeofBirth"  disabled>
                     <br>
             
                     <label for="mobileNumber">Mobile Number:</label>
-                    <input type="tel" id="mobileNumber" name="mobileNumber" value="{{ student_details['mobileNumber'] }}" disabled>
+                    <input type="tel" id="mobileNumber" name="mobileNumber"  disabled>
                     <br>
                 </form>
             </div>           
-        </main>
 
 {% endblock %}
+
+{% block script %} 
+<script>
+    async function fetchStudentDetails() {
+        const response = await fetch(`${api_base_url}/student-details`);
+
+        if (!response.ok) {
+        throw new Error(
+            `Failed to fetch data. Try to contact the admin to resolve the issue.`
+        );
+        }
+
+        const data_student_details = await response.json();
+        console.log('data_student_details: ', data_student_details)
+        displayDetails(data_student_details);
+  }
+
+  fetchStudentDetails()
+
+  function displayDetails(data){
+    // Select the name input and set the value to data.studentName
+    document.getElementById("name").value = data.studentName
+    // Select the studentNumber and set the value to data.studentNumber
+    document.getElementById("studentNumber").value = data.studentNumber;
+    // Select the gender and set the value to data.gender
+    document.getElementById("gender").value = data.gender;
+    // Select the email and set the value to data.email
+    document.getElementById("email").value = data.email;
+    // Select the address and set the value to data.address
+    document.getElementById("address").value = data.address;
+    // Select the dateOfBirth and set the value to data.dateOfBirth
+    document.getElementById("dateofBirth").value = data.date_of_birth_formatted;
+    // Select the placeOfBirth and set the value to data.placeOfBirth
+    document.getElementById("placeofBirth").value = data.placeofBirth;
+    // Select the mobileNumber and set the value to data.mobileNumber
+    document.getElementById("mobileNumber").value = data.mobileNumber;
+
+    document.getElementById('name-label').innerText = data.studentName; 
+  }
+</script>{% endblock script %}
+
+<!-- 1st Step Make a script that will request in the server -->
+
+<!-- 2nd Get the data  -->

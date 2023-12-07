@@ -1,6 +1,6 @@
-{% extends "student/home.html" %}
+{% extends "student/layout.html" %}
 
-{% block services %}
+{% block content %}
 <script>
     const form = document.querySelector('form');
 
@@ -47,7 +47,7 @@
     {% endwith %}
     <br>
     <h2>Request Form</h2>
-    <form action="{{url_for('submit_certification_request')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+    <form action="{{url_for('submitcertification')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
         <label for="studentNumber">Student number:</label><br>
         <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
@@ -122,4 +122,4 @@
             // Add your form submission logic here
         });
     </script>
-{% endblock %}
+{% endblock content %}

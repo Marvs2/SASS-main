@@ -1,6 +1,6 @@
-{% extends "student/home.html" %}
+{% extends "student/layout.html" %}
 
-{% block services %}
+{% block content %}
     <h1>Application for Shifting</h1>
     <p>Process requests for students who intend to shift to another program in the University. Students must have one (1) year residency from the current program to qualify for shifting to another program. Application for shifting shall be accomplished prior to the start of the next academic school year. Qualifications may vary depending on the program to which the student intends to shift.</p>
 
@@ -25,7 +25,7 @@
     <br>
 
     <h2>Application Form</h2>
-    <form id="shiftingForm" action="{{ url_for('submit_shifting_application')}}" method="POST" enctype="multipart/form-data">
+    <form id="shiftingForm" action="{{ url_for('submit_shifting')}}" method="POST" enctype="multipart/form-data">
         <label for="studentNumber">Student number:</label><br>
         <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
@@ -85,4 +85,4 @@
             // Additional validation logic can be added here if needed
         });
     </script>
-{% endblock %}
+{% endblock content %}

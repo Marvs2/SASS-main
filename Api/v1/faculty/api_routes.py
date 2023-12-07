@@ -36,7 +36,7 @@ def faculty_login():
             session['mobile_number'] = faculty.mobile_number
             session['userImg'] = faculty.userImg
 
-            return render_template('faculty/home.html', faculty_details=session)
+            return redirect(url_for('faculty_dashboard'))
 
         else:
             flash('Invalid email or password', 'danger')
@@ -61,3 +61,34 @@ def faculty_profile():
         flash('User not found', 'danger')
         return redirect(url_for('faculty_api.faculty_login'))
     
+def get_gender_string(gender_code):
+    if gender_code == 1:
+        return 'Male'
+    elif gender_code == 2:
+        return 'Female'
+    else:
+        return 'Undefined'  # Handle any other values
+
+@faculty_api.route('/faculty-details', methods=['GET'])
+# @jwt_required()
+def fetchFacultyDetails():
+    user_id = session.get('user_id')
+
+    # Debug print statement
+    faculty = Faculty.query.get(user_id)
+    if faculty:
+        gender_string = get_gender_string(faculty.gender)
+
+        return jsonify({
+            "facultyName": faculty.name,
+            "facultyNumber": faculty.faculty_Number,
+            "gender": gender_string,
+            "email": faculty.email,
+            "mobile_number": faculty.mobile_number,
+            "address": faculty.address,
+            "dateofBirth": faculty.dateofBirth,
+            "placeofBirth": faculty.placeofBirth,
+        })
+    else:
+        flash('User not found', 'danger')
+        return redirect(url_for('faculty_api.login'))

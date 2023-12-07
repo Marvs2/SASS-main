@@ -1,6 +1,6 @@
-{% extends "student/home.html" %}
+{% extends "student/layout.html" %}
 
-{% block services %}
+{% block content %}
 <h1>Service Request Form</h1>
 
 <form action="{{url_for('submit_services_request')}}" enctype="multipart/form-data">

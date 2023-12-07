@@ -1,6 +1,6 @@
-{% extends "student/home.html" %}
+{% extends "student/layout.html" %}
 
-{% block services %}
+{% block content %}
 
     <h1>Online Request for Tutorial of Subject</h1>
     <p>Process online requests for the tutorial of a subject not offered for the current semester. A retake of a subject by less than the minimum (35) number of students shall be endorsed by the Director/Head of Academic Program to the Office of the Vice President for Branches and Campuses for approval as a tutorial.</p>
@@ -27,7 +27,7 @@
     <br>
     <div class="form-container">
         <h2>Request Form</h2>
-        <form id="tutorialForm" action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
+        <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
             <label for="studentNumber">Student Number:</label>
             <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
@@ -81,4 +81,4 @@
             // You can add additional validation logic here if needed
         });
     </script>
-{% endblock %}
+{% endblock content%}

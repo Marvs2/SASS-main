@@ -1,182 +1,67 @@
-{%extends "main/home-faculty.html" %}
+{%extends "faculty/layout.html" %}
 
-{% block faculty %}
-<style>
-.form-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start; /* Adjusted alignment */
-    padding-top: 50px; /* Add space for the navbar */
-    height: calc(100vh - 50px); /* Adjust height to accommodate the navbar */
-    overflow-y: auto; /* Add scrollbar if content exceeds height */
-}
-
-form {
-    max-width: 400px; /* Adjust as needed */
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    background-color: #fff;
-    text-align: left;
-}
-
-label {
-    display: block;
-    margin-bottom: 5px;
-}
-
-input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-}
-
-input[type="submit"] {
-    background-color: #4caf50;
-    cursor: pointer;
-}
-
-input:disabled {
-    cursor: not-allowed;
-}
-
-
-/* Adjust the layoutSidenav styles */
-#layoutSidenav {
-    display: flex;
-    min-height: 100vh;
-}
-
-#layoutSidenav_nav {
-    flex: 0 0 auto;
-}
-
-#layoutSidenav_content {
-    flex: 1 1 0;
-    overflow: auto;
-}
-</style>
-<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark fixed-top">
-    <!-- Sidebar Toggle-->
-<button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button"><i class="fas fa-bars"></i></button>
-<!-- Navbar Brand-->
-<a class="navbar-brand ps-5" href=""><b>faculty SASS</b>   
-</a>   
-
-<!-- Navbar Search-->
-<form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-    <!--- <div class="input-group">
-       <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-        <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search" title="button"></i></button>
-    </div> -->
-</form>
-<!-- Navbar-->
-<ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-    <li class="nav-item dropdown">
-        <a title="profile" class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user fa-fw"></i>
-       <!---     {% if faculty %}
-                {{ faculty.name }}
-            {% else %}
-                <input title="text" type="text" id="name" name="name" value="name" readonly>
-            {% endif %} -->
-        </a>                
-        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="{{ url_for('fa_profile') }}">My Profile</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
-        </ul>
-    </li>
-</ul>
-</nav>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-            <div class="sb-sidenav-menu">
-                <div class="nav">
-                    <div class="sb-sidenav-menu-heading">Home</div>
-                    <a class="nav-link" href="#">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                        Dashboard
-                    </a>
-                    <div class="sb-sidenav-menu-heading">Services</div>
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                      <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                      Student Services
-                  <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-              </a>
-              <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                  <nav class="sb-sidenav-menu-nested nav">
-                      <a class="nav-link" href="{{ url_for('view_adding_subject')}}">Adding Subjects</a>
-                      <a class="nav-link" href="{{url_for('view_change_of_subjects_sched')}}">ChangeOfSubjects</a>
-                      <a class="nav-link" href="#">Accreditation-for-Shiftees-and-Regular</a>
-                      <a class="nav-link" href="{{url_for('view_overload')}}">OverloadApplication</a>
-                      <a class="nav-link" href="#">TutorialRequest</a>
-                      </nav>
-                  </div>
-                  <div class="sb-sidenav-menu-heading">Requests</div>
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                      <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                      Student Requests
-                  <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-              </a>
-              <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                  <nav class="sb-sidenav-menu-nested nav">
-                      <a class="nav-link" href="#">ManualEnrollment</a>
-                      <a class="nav-link" href="#">CertificationRequest</a>
-                      <a class="nav-link" href="#">GradeEntry</a>
-                      <a class="nav-link" href="#">CrossEnrollment</a>
-                      <a class="nav-link" href="#">PetitionRequest</a>
-                      <a class="nav-link" href="#">Subjects/Schedule</a>
-                      </nav>
-                  </div>
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                        Service History
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                </div>
-            </div>
-        </nav>
-    </div>
-    <div id="layoutSidenav_content">
-        <main>
+{% block content %}
             <div class="form-container">
-                <form action="{{url_for('fa_profile')}}" method="POST">
+                <form action="{{url_for('facultyprofile')}}" method="POST">
 
-                    <label for="name">faculty Number:</label>
-                    <input type="text" id="faculty_Number" name="faculty_Number" value="{{ faculty_details['faculty_Number'] }}" disabled required>
+                    <label for="faculty_Number">faculty Number:</label>
+                    <input type="text" id="facultyNumber" name="facultyNumber" disabled required>
                     <br>
 
                     <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" value="{{ faculty_details['name'] }}" disabled required>
+                    <input type="text" id="name" name="name" disabled required>
                     <br>
 
                     <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ faculty_details['email'] }}" disabled required>
+                    <input type="email" id="email" name="email" disabled required>
                     <br>
 
                     <label for="name">Gender:</label>
-                    <input type="text" id="gender" name="gender" value="{{ faculty_details['gender'] }}" disabled required>
+                    <input type="text" id="gender" name="gender" disabled required>
                     <br>
             
                     <label for="dateofBirth">Date of Birth:</label>
-                    <input type="date" id="dateofBirth" name="dateofBirth" value="{{ faculty_details['dateofBirth'] }}" disabled>
+                    <input type="date" id="dateofBirth" name="dateofBirth" disabled>
                     <br>
             
                     <label for="placeofBirth">Place of Birth:</label>
-                    <input type="text" id="placeofBirth" name="placeofBirth" value="{{ faculty_details['placeofBirth'] }}" disabled>
+                    <input type="text" id="placeofBirth" name="placeofBirth" disabled>
                     <br>
             
                     <label for="mobile_number">Mobile Number:</label>
-                    <input type="tel" id="mobile_number" name="mobile_number" value="{{ faculty_details['mobile_number'] }}" disabled>
+                    <input type="number" id="mobile_number" name="mobile_number" disabled>
                     <br>
                 </form>
             </div>           
-        </main>
 
 {% endblock %}
+
+{% block script %}
+<script>
+    async function fetchFacultyDetails() {
+        const response = await fetch(`${api_base_url}/faculty-details`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data. Try to contact the admin to resolve the issue.`
+        );
+        }
+
+        const data_faculty_details = await response.json();
+        console.log('data_faculty_details: ', data_faculty_details)
+        displayDetails(data_faculty_details);
+    }
+
+    fetchFacultyDetails()
+
+    function displayDetails(data){
+        document.getElementById("facultyNumber").value = data.facultyNumber;
+        document.getElementById("name").value = data.facultyName;
+        document.getElementById("email").value = data.email;
+        document.getElementById("gender").value = data.gender;
+        document.getElementById("dateOfBirth").value = data.dateofBirth;
+        document.getElementById("placeofBirth").value = data.placeofBirth;
+        document.getElementById("mobile_number").value = data.mobile_number;
+    }
+
+</script>
+{% endblock script %}

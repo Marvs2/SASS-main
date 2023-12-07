@@ -1,13 +1,17 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import Student
+from datetime import datetime
 #from models import Services
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import  login_user
 from flask_cors import CORS 
+from decorators.auth_decorators import student_required, faculty_required, prevent_authenticated, admin_required, role_required
 
 import os
+
+student_api_base_url = os.getenv("STUDENT_API_BASE_URL")
 
 # Access API keys from environment variables
 WEBSITE1_API_KEY = os.getenv('WEBSITE1_API_KEY')
@@ -513,32 +517,56 @@ def login():
     if request.method == 'POST':
         studentNumber = request.form['studentNumber']
         password = request.form['password']
-        
+
         student = Student.query.filter_by(studentNumber=studentNumber).first()
         if student and check_password_hash(student.password, password):
             # Successfully authenticated
             access_token = create_access_token(identity=student.student_id)
             session['access_token'] = access_token
+            session['user_id'] = student.student_id
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.student_id
-            session['studentNumber'] = student.studentNumber
-            session['name'] = student.name
-            session['gender'] = student.gender
-            session['email'] = student.email
-            session['address'] = student.address
-            session['dateofBirth'] = student.dateofBirth
-            session['placeofBirth'] = student.placeofBirth
-            session['mobileNumber'] = student.mobileNumber
-            session['userImg'] = student.userImg
-
-            return render_template('student/home.html', student_details=session)
+            return render_template('student/dashboard.html', student_details=session)
 
         else:
             flash('Invalid email or password', 'danger')
 
-    return redirect(url_for('student_portal'))
+    return redirect(url_for('studentLogin'))
+
+
+#=====================================================================#
+# @app.route('/student/profile')
+# @role_required('student')
+# def studentprofile():
+#     # Retrieve student details from the database based on the user_id stored in the session
+#     student_id = session.get('user_id')
+#     student = Student.query.get(student_id)
+
+#     # Check if the student is found in the database
+#     if student:
+#         student_details = {
+#             'studentNumber': student.studentNumber,
+#             'name': student.name,
+#             'gender': student.gender,
+#             'email': student.email,
+#             'address': student.address,
+#             'dateofBirth': student.dateofBirth,
+#             'placeofBirth': student.placeofBirth,
+#             'mobileNumber': student.mobileNumber,
+#             'userImg': student.userImg,
+#         }
+
+#         if student_details['gender'] == 1:
+#             student_details['gender'] = 'Male'
+#         elif student_details['gender'] == 2:
+#             student_details['gender'] = 'Female'
+#         else:
+#             student_details['gender'] = 'Undefined'  # Handle any other values
+
+#         return render_template('student/profile.html', student_details=student_details)
+#     else:
+#         flash('Student not found', 'danger')
+#         return redirect(url_for('studentLogin'))
 #===================================================
 """@app.route('/api/submit_service_request', methods=['POST'])
 def api_submit_service_request():
@@ -570,7 +598,7 @@ def api_submit_service_request():
 # TESTING AREA
 @student_api.route('/profile', methods=['GET'])
 @jwt_required()
-def student_profile():
+def profile():
     current_user_id = get_jwt_identity()
     # Debug print statement
     student = Student.query.get(current_user_id)
@@ -580,53 +608,39 @@ def student_profile():
         flash('User not found', 'danger')
         return redirect(url_for('student_api.login'))
 
-@student_api.route('/addingofsubjects', methods=['GET'])
-@jwt_required()
-def add_subjects():
-    current_user_id = get_jwt_identity()
-    print("CURRENT USER ID: ", current_user_id)
-    # Debug print statement
-    student = Student.query.get(current_user_id)
-    if student:
-        return jsonify(student.to_dict())
+
+def get_gender_string(gender_code):
+    if gender_code == 1:
+        return 'Male'
+    elif gender_code == 2:
+        return 'Female'
     else:
-        flash('User not found', 'danger')
-        return redirect(url_for('student_api.login'))
-    
-@student_api.route('/certification', methods=['GET'])
-@jwt_required()
-def certification():
-    current_user_id = get_jwt_identity()
-    print("CURRENT USER ID: ", current_user_id)
+        return 'Undefined'  # Handle any other values
+
+@student_api.route('/student-details', methods=['GET'])
+# @jwt_required()
+def fetchStudentDetails():
+    user_id = session.get('user_id')
+
     # Debug print statement
-    student = Student.query.get(current_user_id)
+    student = Student.query.get(user_id)
     if student:
-        return jsonify(student.to_dict())
+        gender_string = get_gender_string(student.gender)
+
+        return jsonify({
+            "studentName": student.name,
+            "studentNumber": student.studentNumber,
+            "gender": gender_string,
+            "email": student.email,
+            "mobileNumber": student.mobileNumber,
+            "address": student.address,
+            "dateofBirth": student.dateofBirth,
+            "placeofBirth": student.placeofBirth,
+        })
     else:
         flash('User not found', 'danger')
         return redirect(url_for('student_api.login'))
 
-
-#adding subjects
-"""@student_api.route('/student/addingofsubject', methods=['GET', ['POST']])
-@jwt_required()
-def add_subjects():"""
-#changeofsubjectorschedule
-"""@student_api.route('/student/changeofsubject/schedule', methods=['GET', 'POST'])
-@jwt_required()
-def changeschedorsub():"""
-#overloadunits
-"""@student_api.route('/student/foroverloadofsubject', methods=['GET', 'POST'])
-@jwt_required()
-def overload():"""
-#shifting from other school or in pup
-"""@student_api.route('/student/shifting', methods=['GET', 'POST'])
-@jwt_required()
-def shiftees():"""
-#RO - For tutorial
-"""@student_api.route('/student/requestfortutorialofsubjects', methods=['GET', 'POST'])
-@jwt_required()
-def tutorial():"""
 
     
 @student_api.route('/all/student', methods=['GET'])

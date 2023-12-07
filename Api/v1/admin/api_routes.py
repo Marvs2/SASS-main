@@ -52,7 +52,7 @@ def login():
             session['placeofBirth'] = admin.placeofBirth
             session['mobile_number'] = admin.mobile_number
 
-            return render_template('admin/home.html', admin_details=session)
+            return render_template('admin/dashboard.html', admin_details=session)
         else:
             flash('Invalid email or password', 'danger')
 

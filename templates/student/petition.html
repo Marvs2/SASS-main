@@ -1,6 +1,6 @@
-{% extends "student/home.html" %}
+{% extends "student/layout.html" %}
 
-{% block services %}
+{% block content %}
     <div style="display: flex; justify-content: space-between;">
         <div style="width: 48%;">
             <h1>Online Petition of Subject</h1>
@@ -22,7 +22,7 @@
             <br>
         
             <h2>Petition Form</h2>
-            <form id="petitionForm" action="{{url_for('submit_petition')}}" method="POST" enctype="multipart/form-data">
+            <form id="petitionForm" action="{{url_for('submitpetition')}}" method="POST" enctype="multipart/form-data">
                 <label for="studentNumber">Student Number:</label><br>
                 <input type="text" id="studentNumber" name="studentNumber" required><br><br>
         
@@ -81,64 +81,7 @@
                 });
             </script>
         </div>
-        <div style="width: 100%;">
-            <!-- DataTable to display submitted petitions -->
-            <h2>Submitted Petitions</h2>
-            <table id="petitionsTable" class="display">
-                <thead>
-                    <tr>
-                        <th>Student Number</th>
-                        <th>Student Name</th>
-                        <th>Subject Code</th>
-                        <th>Subject Name</th>
-                        <th>Petition Type</th>
-                        <th>Reason</th>
-                        <th>User Responsible</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for petition in petitions %}
-                        <tr>
-                            <td>{{ petition.studentNumber }}</td>
-                            <td>{{ petition.student_name }}</td>
-                            <td>{{ petition.subject_code }}</td>
-                            <td>{{ petition.subject_name }}</td>
-                            <td>{{ petition.petition_type }}</td>
-                            <td>{{ petition.request_reason }}</td>
-                            <td>{{ petition.user_responsible }}</td>
-                            <td>{{ petition.status }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-            <script>
-                $(document).ready(function () {
-                    // Initialize DataTable
-                    $('#petitionsTable').DataTable({
-                        ajax: {
-                            url: '{{ url_for("view_student_petition", student_id=student_id) }}',
- // ("get_petitions_data")Replace with your endpoint to fetch petition data
-                            dataSrc: '', // Data source from the AJAX response
-                        },
-                        columns: [
-                            { data: 'studentNumber' },
-                            { data: 'name' },
-                            { data: 'subjectCode' },
-                            { data: 'subjectName' },
-                            { data: 'petitionType' },
-                            { data: 'requestReason' },
-                            { data: 'userResponsible' },
-                            { data: 'status' }
-                        ]
-                    });
-                });
-            </script>
-    </div>
 
     <!-- Your petition form code -->
     <!-- ... -->
-{% endblock %}
+{% endblock content %}
