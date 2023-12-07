@@ -2,35 +2,6 @@
 
 {% block content %}
             <div class="form-container">
-                <form action="{{url_for('admin_profile')}}" method="POST">
-
-                    <label for="name">admin Number:</label>
-                    <input type="text" id="admin_Number" name="admin_Number" value="{{ admin_details['admin_Number'] }}" disabled required>
-                    <br>
-
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" value="{{ admin_details['name'] }}" disabled required>
-                    <br>
-
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" value="{{ admin_details['email'] }}" disabled required>
-                    <br>
-
-                    <label for="name">Gender:</label>
-                    <input type="text" id="gender" name="gender" value="{{ admin_details['gender'] }}" disabled required>
-                    <br>
-            
-                    <label for="dateofBirth">Date of Birth:</label>
-                    <input type="date" id="dateofBirth" name="dateofBirth" value="{{ admin_details['dateofBirth'] }}" disabled>
-                    <br>
-            
-                    <label for="placeofBirth">Place of Birth:</label>
-                    <input type="text" id="placeofBirth" name="placeofBirth" value="{{ admin_details['placeofBirth'] }}" disabled>
-                    <br>
-            
-                    <label for="mobile_number">Mobile Number:</label>
-                    <input type="tel" id="mobile_number" name="mobile_number" value="{{ admin_details['mobile_number'] }}" disabled>
-                    <br>
-                </form>
+                
             </div>           
 {% endblock %}

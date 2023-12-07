@@ -1,6 +1,7 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import Student
+from models import CertificationRequest, CrossEnrollment, ManualEnrollment, PetitionRequest, Student
+from werkzeug.utils import secure_filename
 from datetime import datetime
 #from models import Services
 from werkzeug.security import check_password_hash
@@ -651,61 +652,183 @@ def allstudent():
         return jsonify(message="You got API data")
     else:
         return jsonify(message="Invalid key you cant have an access")
+    
+
+#===============================================================================================#
+#====================================Students Functions=========================================#
+#===============================================================================================#
+
+#crossenrollment
+def create_crossenrollment_form(form_data, files, student_id):
+    studentNumber = form_data['studentNumber']
+    name = form_data['name']
+    school_for_cross_enrollment = form_data['crossEnrollmentSchool']
+    total_number_of_units = int(form_data['crossEnrollmentUnits'])
+    authorized_subjects_to_take = form_data['authorizedSubjects']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    application_letter_file = files.get('applicationLetter')
+    permit_to_cross_enroll_file = files.get('permitToCrossEnroll')
+
+    if not studentNumber or not name or not school_for_cross_enrollment or total_number_of_units <= 0 or not authorized_subjects_to_take:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    if not application_letter_file or not permit_to_cross_enroll_file:
+        flash('Please provide both application letter and permit to cross-enroll files.', 'danger')
+        return None
+
+    application_letter_filename = secure_filename(application_letter_file.filename)
+    application_letter_data = application_letter_file.read()
+
+    permit_to_cross_enroll_filename = secure_filename(permit_to_cross_enroll_file.filename)
+    permit_to_cross_enroll_data = permit_to_cross_enroll_file.read()
+
+    new_cross_enrollment = CrossEnrollment(
+        studentNumber=studentNumber,
+        name=name,
+        school_for_cross_enrollment=school_for_cross_enrollment,
+        total_number_of_units=total_number_of_units,
+        authorized_subjects_to_take=authorized_subjects_to_take,
+        application_letter_filename=application_letter_filename,
+        application_letter_data=application_letter_data,
+        permit_to_cross_enroll_filename=permit_to_cross_enroll_filename,
+        permit_to_cross_enroll_data=permit_to_cross_enroll_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),  # Set the creation time
+        student_id=student_id,  # Pass the student_id from the login
+    )
+
+    return new_cross_enrollment
+
+#===============================================================================================#
+
+#manualenrollment
+# Manual Enrollment Form function
+def create_manualenrollment_form(form_data, files, student_id):
+    studentNumber = form_data['studentNumber']
+    name = form_data['name']
+    enrollment_type = form_data['enrollment_type']
+    reason = form_data['reason']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    me_file = files.get('me_file')
+
+    if not studentNumber or not name or not enrollment_type or not reason:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    if not me_file:
+        flash('Please provide the manual enrollment file.', 'danger')
+        return None
+
+    me_file_filename = secure_filename(me_file.filename)
+    me_file_data = me_file.read()
+
+    new_manual_enrollment = ManualEnrollment(
+        studentNumber=studentNumber,
+        name=name,
+        enrollment_type=enrollment_type,
+        reason=reason,
+        me_file_filename=me_file_filename,
+        me_file_data=me_file_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),
+        student_id=student_id,
+    )
+
+    return new_manual_enrollment
+
+#====================================================================================================#
+#=====================================Petition Requests==============================================#
+#====================================================================================================#
+
+def create_petitionrequest_form(form_data, student_id):
+    studentNumber = form_data['studentNumber']
+    name = form_data['name']
+    subjectCode = form_data['subjectCode']
+    subjectName = form_data['subjectName']
+    petitionType = form_data['petitionType']
+    requestReason = form_data['requestReason']
+    userResponsible = form_data['userResponsible']
+    status = form_data['status']
+
+    if not studentNumber or not name or not subjectCode or not subjectName or not petitionType or not requestReason or not userResponsible:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    new_petition_request = PetitionRequest(
+        studentNumber=studentNumber,
+        name=name,
+        subject_code=subjectCode,
+        subject_name=subjectName,
+        petition_type=petitionType,
+        request_reason=requestReason,
+        user_responsible=userResponsible,
+        status=status,
+        created_at=datetime.utcnow(),
+        student_id=student_id,
+    )
+
+    return new_petition_request
+
+#====================================================================================================#
+#====================================Certificate Requests============================================#
+#====================================================================================================#
 
 
-"""# Route to fetch the list of students as JSON
-@student_api.route('/student_list', methods=['GET'])
-def get_student_list():
-    api_key = request.headers.get('X-Api-Key')  # Get the API key from the request header
+def create_certification_request(form_data, files, student_id):
+    studentNumber = form_data['studentNumber']
+    name = form_data['name']
+    certification_type = form_data['certification_type']
+    request_form_file = files.get('request_form_file')
+    identification_card_file = files.get('identification_card_file')
+    is_representative = 'is_representative' in form_data  # Check if the checkbox is present in the form data
+    authorization_letter_file = files.get('authorization_letter_file')
+    representative_id_file = files.get('representative_id_file')
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
 
-    if api_key in API_KEYS.values():
-        # Fetch all students from the database
-        students = Student.query.all()
+    # Validate required fields
+    if not studentNumber or not name or not certification_type or not request_form_file or not identification_card_file:
+        flash('Please fill out all required fields and provide valid values.', 'danger')
+        return None
 
-        # Convert the list of students to a JSON-friendly format
-        students_data = [
-            {
-                'student_id': student.student_id,
-                'studentNumber': student.studentNumber,
-                'name': student.name,
-                'email': student.email,
-                'address': student.address,
-                'gender': student.gender,
-                'dateofBirth': student.dateofBirth,
-                'placeofBirth': student.placeofBirth,
-                'mobileNumber': student.mobileNumber,
-                'userImg': student.userImg
-            }
-            for student in students
-        ]
+    # Read file data
+    request_form_filename = secure_filename(request_form_file.filename) if request_form_file else None
+    request_form_data = request_form_file.read() if request_form_file else None
 
-        # Return the list of students as JSON
-        return jsonify(message="You got API data", students=students_data)
-    else:
-        return jsonify(message="Invalid key you can't have access")"""
-# ...
+    identification_card_filename = secure_filename(identification_card_file.filename) if identification_card_file else None
+    identification_card_data = identification_card_file.read() if identification_card_file else None
 
-#@student_api.route('/update/<int:student_id>', methods=['POST','PUT', 'DELETE'])
-#@jwt_required()
-#def update_student(student_id):
-#    current_user_id = get_jwt_identity()
-#    student = Student.query.get(student_id)
+    authorization_letter_filename = secure_filename(authorization_letter_file.filename) if authorization_letter_file else None
+    authorization_letter_data = authorization_letter_file.read() if authorization_letter_file else None
 
-#    if not student:
-#        return jsonify(message="Student not found"), 404
+    representative_id_filename = secure_filename(representative_id_file.filename) if representative_id_file else None
+    representative_id_data = representative_id_file.read() if representative_id_file else None
 
-#    if student.id != current_user_id:
-#        return jsonify(message="Unauthorized"), 401
+    # Create CertificationRequest instance
+    new_certification_request = CertificationRequest(
+        studentNumber=studentNumber,
+        name=name,
+        certification_type=certification_type,
+        request_form_filename=request_form_filename,
+        request_form_data=request_form_data,
+        identification_card_filename=identification_card_filename,
+        identification_card_data=identification_card_data,
+        is_representative=is_representative,
+        authorization_letter_filename=authorization_letter_filename,
+        authorization_letter_data=authorization_letter_data,
+        representative_id_filename=representative_id_filename,
+        representative_id_data=representative_id_data,
+        created_at=datetime.utcnow(),
+        user_responsible=user_responsible,
+        status=status,
+        student_id=student_id,
+    )
 
-#    if request.method == 'POST':
-        # Update student information based on the form data
-#        student.name = request.form.get('name', student.name)
-#        student.email = request.form.get('email', student.email)
-#        student.address = request.form.get('address', student.address)
-#        student.dateofBirth = request.form.get('dateofBirth', student.dateofBirth)
-#        student.placeofBirth = request.form.get('placeofBirth', student.placeofBirth)
-#        student.mobileNumber = request.form.get('mobileNumber', student.mobileNumber)
-#        student.userImg = request.form.get('userImg', student.userImg)
-#        db.session.commit()
-#        return jsonify(message="Student information updated successfully")
-
+    return new_certification_request

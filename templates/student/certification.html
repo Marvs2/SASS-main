@@ -1,37 +1,9 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-<script>
-    const form = document.querySelector('form');
+    <h1>Certification Request Form</h1>
+    <p>Fill out the form below to submit a certification request.</p>
 
-    form.addEventListener('submit', function(event) {
-        const student_number = document.getElementById('student_number').value.trim();
-        const student_name = document.getElementById('student_name').value.trim();
-
-        if (studentID === '' || studentName === '') {
-            alert('Please fill out Student ID and Student Name');
-            event.preventDefault();  // Prevent form submission
-        }
-
-        // Additional validation logic can be added here
-
-        return true;  // Allow form submission
-    });
-</script>
-
-    <h1>Request for Certification (Grades, Bonafide Student, General Weighted Average)</h1>
-    <p>Process requests for certification of students and alumni. The certification is based on the records available at the respective colleges. These certifications are issued for evaluation purposes and are not a substitute for the Official Transcript of Record issued by the University Registrar.</p>
-
-    <h2>Checklist of Requirements:</h2>
-    <ul>
-        <li>Accomplished Request Form from Respective Branch/Campus Offices.</li>
-        <li>Identification Card (ID).</li>
-    </ul>
-
-    <h2>If Representative:</h2>
-    <ul>
-        <li>Authorization Letter and Identification Card (ID) if the claimant is not the owner of the document.</li>
-    </ul>
     <br>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -46,80 +18,90 @@
         {% endif %}
     {% endwith %}
     <br>
-    <h2>Request Form</h2>
-    <form action="{{url_for('submitcertification')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="studentNumber">Student number:</label><br>
-        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
 
-        <label for="name">Student Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+    <form id="certificationRequestForm" action="{{ url_for('submit_certification_request') }}" method="POST" enctype="multipart/form-data">
+        <label for="studentNumber">Student Number:</label>
+        <input type="text" id="studentNumber" name="studentNumber" required><br>
 
-        <label for="certification_type">Certification Type:</label><br>
-        <select id="certification_type" name="certification_type" required>
-            <option value="Grades">Grades</option>
-            <option value="Bonafide Student">Bonafide Student</option>
-            <option value="General Weighted Average">General Weighted Average</option>
-        </select><br><br>
+        <label for="name">Student Name:</label>
+        <input type="text" id="name" name="name" required><br>
 
-        <label for="requestForm">Request Form from Respective Branch/Campus Offices:</label><br>
-        <input type="file" id="requestForm" name="requestForm" required><br><br>
+        <label for="certification_type">Certification Type:</label>
+        <input type="text" id="certification_type" name="certification_type" required><br>
 
-        <label for="identificationCard">Identification Card (ID):</label><br>
-        <input type="file" id="identificationCard" name="identificationCard" required><br><br>
+        <label for="request_form_file">Request Form File:</label>
+        <input type="file" id="request_form_file" name="request_form_file" required><br>
+
+        <label for="identification_card_file">Identification Card File:</label>
+        <input type="file" id="identification_card_file" name="identification_card_file" required><br>
 
         <label for="is_representative">Is there a representative?</label>
-        <input type="checkbox" id="is_representative" name="is_representative"><br><br>
+        <input type="checkbox" id="is_representative" name="is_representative"><br>
 
         <div id="representativeInfo" style="display: none;">
             <label for="authorizationLetter">Authorization Letter:</label><br>
-            <input type="file" id="authorizationLetter" name="authorizationLetter" required><br><br>
+            <input type="file" id="authorizationLetter" name="authorizationLetter"><br><br>
 
             <label for="representativeID">Representative's Identification Card (ID):</label><br>
-            <input type="file" id="representativeID" name="representativeID" required><br><br>
+            <input type="file" id="representativeID" name="representativeID"><br><br>
         </div><br><br>
 
         <label for="user_responsible">User Responsible:</label>
         <select id="user_responsible" name="user_responsible" required>
-            <option value="Student Services">
-                Student Services
-            </option>
-            <option value="Receiving Staff Registrar's Office">Receiving Staff Registrar's Office</option>
-            <option value="Administrative Staff Director/ Head of Academic Program">Administrative Staff Director/ Head of Academic Program</option>
-            <option value="Administrative Staff Registrar's Office">Administrative Staff Registrar's Office</option>
-        </select><br><br>
-        
+            <option value="Faculty">Faculty Member/s</option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+        </select><br>
+
         <label for="status">Status:</label>
         <select id="status" name="status">
             <option value="Sent" selected>Sending</option>
             <option value="Pending" disabled>Pending</option>
             <option value="Approved" disabled>Approved</option>
             <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
+        </select><br>
 
-
-        <button type="submit">Submit Request</button>
+        <button type="submit">Submit</button>
     </form>
 
     <script>
-        const is_representativeCheckbox = document.getElementById('is_representative');
+        const isRepresentativeCheckbox = document.getElementById('is_representative');
         const representativeInfoDiv = document.getElementById('representativeInfo');
 
-        is_RepresentativeCheckbox.addEventListener('change', function() {
-            if (is_RepresentativeCheckbox.checked) {
+        isRepresentativeCheckbox.addEventListener('change', function () {
+            if (isRepresentativeCheckbox.checked) {
                 representativeInfoDiv.style.display = 'block';
             } else {
                 representativeInfoDiv.style.display = 'none';
             }
         });
 
-                // Automatically close the alert messages after 3 seconds
-                setTimeout(function () {
+        // Automatically close the alert messages after 3 seconds
+        setTimeout(function () {
             $('.alert').alert('close');
         }, 3000);
 
-        // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
-        $('#applicationForm').submit(function (event) {
-            // Add your form submission logic here
-        });
+        // JavaScript validation logic can be added here
+        document.getElementById('certificationRequestForm').addEventListener('submit', function (event) {
+        // Add your validation logic here
+        var studentNumber = document.getElementById('studentNumber').value.trim();
+        var name = document.getElementById('name').value.trim();
+        var certificationType = document.getElementById('certification_type').value.trim();
+        var requestFormFile = document.getElementById('request_form_file').value.trim();
+        var identificationCardFile = document.getElementById('identification_card_file').value.trim();
+        var isRepresentativeCheckbox = document.getElementById('is_representative');
+        var authorizationLetterFile = document.getElementById('authorizationLetter').value.trim();
+        var representativeIDFile = document.getElementById('representativeID').value.trim();
+
+        if (!studentNumber || !name || !certificationType || !requestFormFile || !identificationCardFile) {
+            alert('Please fill out all required fields.');
+            event.preventDefault();  // Prevent form submission
+        }
+
+        if (isRepresentativeCheckbox.checked && (!authorizationLetterFile || !representativeIDFile)) {
+            alert('Please provide files for the representative.');
+            event.preventDefault();  // Prevent form submission
+        }
+    });
     </script>
-{% endblock content %}
+{% endblock %}

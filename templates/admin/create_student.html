@@ -48,9 +48,20 @@
 {% block content %}
 
 <!-- Success message container -->
-<div id="successMessage" style="display: none; color: green; margin-top: 10px;">
-    Student created successfully
-</div>
+<br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
         <h1>Create Student</h1>
         <form action="{{ url_for('admin_create_student') }}" method="POST" enctype="multipart/form-data">
             <!-- Existing form fields -->
@@ -104,7 +115,7 @@
                     successMessage.fadeIn(1000, function () {
                         setTimeout(function () {
                             successMessage.fadeOut(1000);
-                        }, 9000); // 9 seconds
+                        }, 2000); // 9 seconds
                     });
                 }
         

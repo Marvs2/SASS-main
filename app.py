@@ -12,7 +12,7 @@ from sqlalchemy import Connection
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import API_KEYS, student_api
+from Api.v1.student.api_routes import API_KEYS, create_certification_request, create_crossenrollment_form, create_manualenrollment_form, create_petitionrequest_form, student_api
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api
 # Assuming your Flask app is created as 'app'
@@ -579,73 +579,25 @@ def studentenrollment():
 @app.route('/student/crossenrollment/submitted', methods=['POST'])
 @student_required  # Add any required authentication decorator
 def submit_cross_enrollment():
-    if request.method == 'POST':
-        # Handle form submission
-        try:
-            # Process and save the form data
-            new_cross_enrollment = create_cross_enrollment_from_form(request.form_data, request.files)
+    # Handle form submission
+    try:
+        # Process and save the form data
+        current_student_id = session.get('user_id')
+        new_cross_enrollment = create_crossenrollment_form(request.form, request.files, current_student_id)
+        
+        if new_cross_enrollment:
             db.session.add(new_cross_enrollment)
             db.session.commit()
             flash('Cross-Enrollment created successfully!', 'success')
             return redirect(url_for('studentenrollment'))  # Redirect to the appropriate route
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
     return render_template('student/crossenrollment.html')
 
-def create_cross_enrollment_from_form(form_data, files):
-    # Process form data and create a new CrossEnrollment instance
-    studentNumber = form_data['studentNumber']
-    name = form_data['name']
-    school_for_cross_enrollment = form_data['school_for_cross_enrollment']
-    total_number_of_units = int(form_data['total_number_of_units'])
-    authorized_subjects_to_take = form_data['authorized_subjects_to_take']
-    user_responsible = form_data.get('user_responsible')
-    status = form_data.get('status')
-    student_id = int(form_data.get('student_id'))  # Assuming you have a student_id in your form
-
-    # Validate the form data as needed
-
-    application_letter_file = files.get('application_letter_file')
-    permit_to_cross_enroll_file = files.get('permit_to_cross_enroll_file')
-
-    if not studentNumber or not name or not total_number_of_units <= 0 or not authorized_subjects_to_take:
-        flash('Please fill out all fields and provide valid values.', 'danger')
-        # Redirect or render the form again with an error message
-        return redirect(url_for('studentenrollment'))
-
-    if not application_letter_file or not permit_to_cross_enroll_file:
-        flash('Please provide both application letter and permit to cross-enroll files.', 'danger')
-        # Redirect or render the form again with an error message
-        return redirect(url_for('studentenrollment'))
-
-    # Process and save the file data
-    application_letter_filename = secure_filename(application_letter_file.filename)
-    application_letter_data = application_letter_file.read()
-
-    permit_to_cross_enroll_filename = secure_filename(permit_to_cross_enroll_file.filename)
-    permit_to_cross_enroll_data = permit_to_cross_enroll_file.read()
-
-    # Create a new CrossEnrollment instance
-    new_cross_enrollment = CrossEnrollment(
-        studentNumber=studentNumber,
-        name=name,
-        school_for_cross_enrollment=school_for_cross_enrollment,
-        total_number_of_units=total_number_of_units,
-        authorized_subjects_to_take=authorized_subjects_to_take,
-        application_letter_filename=application_letter_filename,
-        application_letter_data=application_letter_data,
-        permit_to_cross_enroll_filename=permit_to_cross_enroll_filename,
-        permit_to_cross_enroll_data=permit_to_cross_enroll_data,
-        user_responsible=user_responsible,
-        status=status,
-        student_id=student_id,
-    )
-
-    return new_cross_enrollment
 
 #==================================================================================================================================
 #==================================================================================================================================
@@ -719,49 +671,26 @@ def submit_shifting():
 def studentmanualenrollment():
     return render_template("/student/manualenrollment.html")#
 
-@app.route('/student/manualenrollment/submit', methods=['POST'])
+# Manual Enrollment Route
+@app.route('/student/manualenrollment/submitmanual', methods=['POST'])
+@student_required
 def submitmanualenrollment():
-    studentNumber = request.form['studentNumber']
-    name = request.form['name']
-    enrollment_type = request.form['enrollment_type']
-    reason = request.form['reason']
-
-    # Check if the file is provided
-    if 'me_file_data' not in request.files:
-        flash('No file part', 'danger')
-        return redirect(request.url)
-
-    file = request.files['me_file_data']
-    # Check if the file field is empty
-    if file.me_file_filename == '':
-        flash('No selected file', 'danger')
-        return redirect(request.url)
-
-    file_data = file.read()  # Read the file data
-    file_name = secure_filename(file.me_file_filename)
-
     try:
-        new_manual_enrollment = ManualEnrollment(
-            studentNumber=studentNumber,
-            name=name,
-            enrollment_type=enrollment_type,
-            reason=reason,
-            me_file_filename=file_name,
-            me_file_data=file_data,
-            user_responsible=request.form['user_responsible'],  # Adjust based on your form
-            status=request.form['status']  # Adjust based on your form
-        )
+        current_student_id = session.get('user_id')
+        new_manual_enrollment = create_manualenrollment_form(request.form, request.files, current_student_id)
 
-        db.session.add(new_manual_enrollment)
-        db.session.commit()
-        flash('Manual Enrollment submitted successfully!', 'success')
+        if new_manual_enrollment:
+            db.session.add(new_manual_enrollment)
+            db.session.commit()
+            flash('Manual Enrollment created successfully!', 'success')
+            return redirect(url_for('studentmanualenrollment'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
-    return redirect(url_for('studentmanualenrollment'))
+    return render_template('student/manualenrollment.html')
 
 
 #====================================================================================================================================
@@ -770,46 +699,24 @@ def submitmanualenrollment():
 def studentpetition():  # Include the student_id parameter
     return render_template("/student/petition.html")
 
-@app.route('/student/onlinepetitionofsubject/submit', methods=['GET', 'POST'])
+@app.route('/submit_petition_request', methods=['POST'])
 def submitpetition():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
-        subject_code = request.form['subject_code']
-        subject_name = request.form['subject_name']
-        petition_type = request.form['petition_type']
-        request_reason = request.form['request_reason']
-        user_responsible = request.form['user_responsible']
-        status = request.form['status']
+    try:
+        current_student_id = session.get('user_id')
+        new_petition_request = create_petitionrequest_form(request.form, current_student_id)
 
-        # Check if any of the required fields is empty
-        if not studentNumber or not name or not subject_code or not subject_name or not petition_type or not request_reason or not user_responsible or not status:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('stud_petition', student_id=session['user_id']))
-  # Replace 'stud_petition' with the actual route
-
-        try:
-            new_petition_request = PetitionRequest(
-                studentNumber=studentNumber,
-                name=name,
-                subject_code=subject_code,
-                subject_name=subject_name,
-                petition_type=petition_type,
-                request_reason=request_reason,
-                user_responsible=user_responsible,
-                status=status
-            )
-
+        if new_petition_request:
             db.session.add(new_petition_request)
             db.session.commit()
-            flash('Petition submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+            flash('Petition Request submitted successfully!', 'success')
+            return redirect(url_for('studentpetition'))  # Redirect to the appropriate route
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return render_template("/student/petition.html")
+    return render_template('student/petition.html')
 
 #===============================================
 
@@ -890,71 +797,25 @@ def studentcertification():
 def studentprofile():
     return render_template("/student/profile.html", student_api_base_url=student_api_base_url)
 
-@app.route('/student/submitcertificationrequest', methods=['POST'])
-def submitcertification():
-    if request.method == 'POST':
-        # Retrieve form data
-        studentNumber = request.form.get('studentNumber')
-        name = request.form.get('name')
-        certification_type = request.form.get('certification_type')
+@app.route('/submit_certification_request', methods=['POST'])
+@student_required
+def submit_certification_request():
+    try:
+        current_student_id = session.get('user_id')  # Adjust this based on your authentication logic
+        new_certification_request = create_certification_request(request.form, request.files, current_student_id)
 
-        # Check file uploads
-        request_form_file = request.files['requestForm']
-        identification_card_file = request.files['identificationCard']
-
-        if request_form_file.filename == '' or identification_card_file.filename == '':
-            flash('Please select files for Request Form and Identification Card')
-            return redirect(request.url)
-
-        # Read file data
-        request_form_data = request_form_file.read()
-        identification_card_data = identification_card_file.read()
-
-        is_representative = request.form.get('is_representative') == 'on'
-
-        try:
-            new_request = CertificationRequest(
-                studentNumber=studentNumber,
-                name=name,
-                certification_type=certification_type,
-                request_form_filename=secure_filename(request_form_file.filename),
-                request_form_data=request_form_data,
-                identification_card_filename=secure_filename(identification_card_file.filename),
-                identification_card_data=identification_card_data,
-                is_representative=is_representative,
-                created_at=datetime.utcnow()
-            )
-
-            if is_representative:
-                # Handle representative files
-                authorization_letter_file = request.files['authorizationLetter']
-                representative_id_file = request.files['representativeID']
-
-                if authorization_letter_file.filename == '' or representative_id_file.filename == '':
-                    flash('Please select files for Authorization Letter and Representative ID')
-                    return redirect(request.url)
-
-                authorization_letter_data = authorization_letter_file.read()
-                representative_id_data = representative_id_file.read()
-
-                new_request.authorization_letter_filename = secure_filename(authorization_letter_file.filename)
-                new_request.authorization_letter_data = authorization_letter_data
-                new_request.representative_id_filename = secure_filename(representative_id_file.filename)
-                new_request.representative_id_data = representative_id_data
-
-            new_request.user_responsible = request.form.get('user_responsible')
-            new_request.status = request.form.get('status')
-
-            db.session.add(new_request)
+        if new_certification_request:
+            db.session.add(new_certification_request)
             db.session.commit()
-            flash('Certification request submitted successfully')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}')
-        finally:
-            db.session.close()
+            flash('Certification Request submitted successfully!', 'success')
+            return redirect(url_for('studentcertification'))  # Redirect to the appropriate route
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return redirect(url_for('studentcertification'))
+    return render_template('student/certification.html')
 
 #============================================================================================================================
 """@app.route('/student/submit_service_request', methods=['GET'])
@@ -1802,7 +1663,7 @@ def admin_create_stud():
 
 
 # Route to handle student creation with image upload
-@app.route('/admin/create_student', methods=['GET', 'POST'])
+@app.route('/admin/createstudent/created', methods=['GET', 'POST'])
 def admin_create_student():
     if request.method == 'POST':
         studentNumber = request.form['studentNumber']
@@ -1849,7 +1710,7 @@ def admin_create_student():
 
         return 'Student created successfully'
 
-    return render_template("/admin/create_student.html")
+    return render_template("admin/create_student.html")
 
 @app.route('/admin/student_list', methods=['GET'])
 def student_list():
