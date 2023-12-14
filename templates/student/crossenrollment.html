@@ -27,11 +27,11 @@
 
 <h2>Application Form</h2>
 <form id="crossEnrollmentForm" action="{{ url_for('submit_cross_enrollment') }}" method="POST" enctype="multipart/form-data">
-    <label for="studentNumber">Student ID:</label><br>
-    <input type="text" id="studentNumber" name="studentNumber" required><br><br>
+    <label for="StudentNumber">Student ID:</label><br>
+    <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
 
-    <label for="name">Student Name:</label><br>
-    <input type="text" id="name" name="name" required><br><br>
+    <label for="Name">Student Name:</label><br>
+    <input type="text" id="Name" name="Name" required><br><br>
 
     <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
     <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
@@ -76,8 +76,8 @@
 
         // Form submission logic
         $('#crossEnrollmentForm').submit(function(event) {
-            const studentID = $('#studentNumber').val().trim();
-            const name = $('#name').val().trim();
+            const studentID = $('#StudentNumber').val().trim();
+            const Name = $('#Name').val().trim();
             const schoolForCrossEnrollment = $('#crossEnrollmentSchool').val().trim();
             const totalUnits = $('#crossEnrollmentUnits').val().trim();
             const authorizedSubjects = $('#authorizedSubjects').val().trim();
@@ -93,3 +93,33 @@
 </script>
 
 {% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}

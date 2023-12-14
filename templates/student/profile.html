@@ -27,36 +27,36 @@
             <div class="form-container">
                 <form action="{{url_for('studentprofile')}}" method="POST">
 
-                    <label for="name">Student Number:</label>
-                    <input type="text" id="studentNumber" name="studentNumber"  disabled required>
+                    <label for="StudentNumber">Student Number:</label>
+                    <input type="text" id="StudentNumber" name="StudentNumber"  disabled required>
                     <br>
 
-                    <label for="name" id="name-label">Name:</label>
-                    <input type="text" id="name" name="name"  disabled required>
+                    <label for="Name" id="name-label">Name:</label>
+                    <input type="text" id="Name" name="Name"  disabled required>
                     <br>
 
                     <label for="name">Gender:</label>
-                    <input type="text" id="gender" name="gender"  disabled required>
+                    <input type="text" id="Gender" name="Gender"  disabled required>
                     <br>
             
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email"  disabled required>
+                    <label for="Email">Email:</label>
+                    <input type="email" id="Email" name="Email"  disabled required>
                     <br>
             
                     <label for="address">Address:</label>
                     <input type="text" id="address" name="address"  disabled>
                     <br>
             
-                    <label for="dateofBirth">Date of Birth:</label>
-                    <input type="date" id="dateofBirth" name="dateofBirth"  disabled>
+                    <label for="DateofBirth">Date of Birth:</label>
+                    <input type="date" id="DateofBirth" name="DateofBirth"  disabled>
                     <br>
             
-                    <label for="placeofBirth">Place of Birth:</label>
-                    <input type="text" id="placeofBirth" name="placeofBirth"  disabled>
+                    <label for="PlaceofBirth">Place of Birth:</label>
+                    <input type="text" id="PlaceofBirth" name="PlaceofBirth"  disabled>
                     <br>
             
-                    <label for="mobileNumber">Mobile Number:</label>
-                    <input type="tel" id="mobileNumber" name="mobileNumber"  disabled>
+                    <label for="MobileNumber">Mobile Number:</label>
+                    <input type="tel" id="MobileNumber" name="MobileNumber"  disabled>
                     <br>
                 </form>
             </div>           
@@ -83,21 +83,23 @@
 
   function displayDetails(data){
     // Select the name input and set the value to data.studentName
-    document.getElementById("name").value = data.studentName
-    // Select the studentNumber and set the value to data.studentNumber
-    document.getElementById("studentNumber").value = data.studentNumber;
-    // Select the gender and set the value to data.gender
-    document.getElementById("gender").value = data.gender;
-    // Select the email and set the value to data.email
-    document.getElementById("email").value = data.email;
+    document.getElementById("Name").value = data.Name
+    // Select the StudentNumber and set the value to data.StudentNumber
+    document.getElementById("StudentNumber").value = data.StudentNumber;
+    // Select the Gender and set the value to data.Gender
+    document.getElementById("Gender").value = data.Gender;
+    // Select the Email and set the value to data.Email
+    document.getElementById("Email").value = data.Email;
     // Select the address and set the value to data.address
     document.getElementById("address").value = data.address;
     // Select the dateOfBirth and set the value to data.dateOfBirth
-    document.getElementById("dateofBirth").value = data.date_of_birth_formatted;
+    document.getElementById("DateofBirth").value = data.date_of_birth_formatted;
     // Select the placeOfBirth and set the value to data.placeOfBirth
-    document.getElementById("placeofBirth").value = data.placeofBirth;
-    // Select the mobileNumber and set the value to data.mobileNumber
-    document.getElementById("mobileNumber").value = data.mobileNumber;
+    document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
+    // Select the ResidentialAddress and set the value to data.ResidentialAddress
+    //document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+    // Select the MobileNumber and set the value to data.MobileNumber
+    document.getElementById("MobileNumber").value = data.MobileNumber;
 
     document.getElementById('name-label').innerText = data.studentName; 
   }

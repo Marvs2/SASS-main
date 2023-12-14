@@ -1,10 +1,10 @@
 from datetime import datetime
 import io
 from multiprocessing import connection
-from flask import Flask, abort, render_template, app, jsonify, redirect, request, flash, send_file, url_for, session
+from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
 import requests
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, Add_Subjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash
 import psycopg2
@@ -12,7 +12,7 @@ from sqlalchemy import Connection
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import API_KEYS, create_certification_request, create_crossenrollment_form, create_manualenrollment_form, create_petitionrequest_form, student_api
+from Api.v1.student.api_routes import API_KEYS, create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, student_api
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api
 # Assuming your Flask app is created as 'app'
@@ -119,8 +119,8 @@ def download_RO_form():
 #=======================================================================#
 
 def upload_image():
-    studentNumber = request.form['studentNumber']
-    student = Student.query.filter_by(studentNumber=studentNumber).first()
+    StudentNumber = request.form['StudentNumber']
+    student = Student.query.filter_by(StudentNumber=StudentNumber).first()
 
     if student:
         image_file = request.files['image']
@@ -183,98 +183,72 @@ def allowed_file(filename):
 @role_required('student')
 def student_dashboard():
     session.permanent=True
-    return render_template('student/dashboard.html')
+    return render_template('/student/dashboard.html')
 
 @app.route('/student/practice')
 def student_practice():
     return render_template('/student/practice.html')
 
+"""# Endpoint to Fetch Programs
+@app.route('/programs', methods=['GET'])
+def get_programs():
+    programs = Program.query.all()
+    return jsonify([program.to_dict() for program in programs])
+
+
+# Endpoint to Fetch Year Levels based on ProgramID
+@app.route('/year-levels/<int:program_id>', methods=['GET'])
+def get_year_levels(program_id):
+    year_levels = YearLevel.query.filter_by(programId=program_id).all()
+    return jsonify([year_level.to_dict() for year_level in year_levels])
+
+
+# Endpoint to Fetch Semesters based on YearLevelID
+@app.route('/semesters/<int:year_level_id>', methods=['GET'])
+def get_semesters(year_level_id):
+    semesters = Semester.query.filter_by(yearId=year_level_id).all()
+    return jsonify([semester.to_dict() for semester in semesters])
+
+
+# Endpoint to Fetch Subjects based on YearLevelID and SemesterID
+@app.route('/subjects/<int:year_level_id>/<int:semester_id>', methods=['GET'])
+def get_subjects(year_level_id, semester_id):
+    subjects = CourseSub.query.filter_by(yearId=year_level_id, semesterId=semester_id).all()
+    return jsonify([subject.to_dict() for subject in subjects])"""
 #==============================================================================================#
-@app.route('/student/overload') #
+@app.route('/student/overload') 
 def studentoverload():
-    return render_template("/student/overload.html")# 
+    return render_template("/student/overload.html", student_api_base_url=student_api_base_url)
 
-
-# Assuming your route for this page is '/submit_overload_application'
-@app.route('/student/overload/submit_overload_application', methods=['POST'])
+@app.route('/student/overload/submitted-application', methods=['POST'])
+@role_required('student')
 def submit_overload_application():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        # Fetch additional data for the given studentNumber
-        student = Student.query.filter_by(studentNumber=studentNumber).first()
+    try:
+        current_StudentId = session.get('user_id')
+            # Ensure create_overload_application function returns a valid object
+        new_overload_application = create_overload_application(request.form, request.files, current_StudentId)
 
-        if not student:
-            flash('Student not found', 'danger')
-            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
+        if new_overload_application:
+                db.session.add(new_overload_application)
+                db.session.commit()
+                # Ensure student_api_base_url is defined and accessible
+        flash('Overload application submitted successfully!', 'success')
+        return redirect(url_for('studentoverload'))
+    except Exception as e:
+        db.session.rollback()
+        # Make sure student_api_base_url is defined or accessible here
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-        name = student.name  # Retrieve the name from the fetched student
-
-        semester = request.form['semester']
-        subjects_to_add = request.form['subjectsToAdd']
-        justification = request.form['justification']
-        user_responsible = request.form['user_responsible']
-        status = request.form['status']
-
-        # Check if a file is provided
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
-
-        file = request.files['file']
-        # Check if the file field is empty
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
-
-        file_data = file.read()  # Read the file data
-        file_filename = secure_filename(file.filename)
-
-        # Additional validation logic can be added here
-
-        # Check if any of the required fields is empty
-        if not studentNumber or not semester or not subjects_to_add or not justification:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('stud_overload'))  # Replace 'stud_overload' with the actual route
-
-        try:
-            new_overload_application = OverloadApplication(
-                name=name,
-                studentNumber=studentNumber,
-                semester=semester,
-                subjects_to_add=subjects_to_add,
-                justification=justification,
-                file_filename=file_filename,
-                file_data=file_data,
-                user_responsible=user_responsible,
-                status=status
-            )
-
-            db.session.add(new_overload_application)
-            db.session.commit()
-            flash('Overload application submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
-
-    return redirect(url_for('studentoverload'))
+    return render_template("student/overload.html")
+  # Adjust the template as needed
 
 
 
 #=============================================================================================================
 
 # View function to retrieve and display the overload application details
-"""@app.route('/student/foroverloadofsubject/view_overload/<int:overload_application_id>', methods=['GET'])
-def view_overload(overload_application_id):
-    overload_application = OverloadApplication.query.get(overload_application_id)
-    if not overload_application:
-        flash('Overload application not found.', 'danger')
-        return redirect(url_for('stud_overload'))
-
-    return render_template('view_overload.html', overload_application=overload_application)"""
-
-
 @app.route('/student/foroverloadofsubject/edit_overload/<int:overload_application_id>', methods=['GET', 'POST'])
 def edit_overload(overload_application_id):
     overload_application = OverloadApplication.query.get(overload_application_id)
@@ -287,8 +261,8 @@ def edit_overload(overload_application_id):
 
     if request.method == 'POST':
         if 'submit' in request.form:  # Check if the "Submit" button was clicked
-            name = request.form['name']
-            studentNumber = request.form['studentNumber']
+            Name = request.form['Name']
+            StudentNumber = request.form['StudentNumber']
             semester = request.form['semester']
             subjects_to_add = request.form['subjectsToAdd']
             justification = request.form['justification']
@@ -304,8 +278,8 @@ def edit_overload(overload_application_id):
                 file_data = overload_application.file_data
                 file_filename = overload_application.file_filename
 
-            overload_application.name = name
-            overload_application.studentNumber = studentNumber
+            overload_application.Name = Name
+            overload_application.StudentNumber = StudentNumber
             overload_application.semester = semester
             overload_application.subjects_to_add = subjects_to_add
             overload_application.justification = justification
@@ -326,68 +300,28 @@ def edit_overload(overload_application_id):
 
 @app.route('/student/subject')#
 def studentaddingsubject():
-    return render_template("/student/adding_of_subject.html")#
+    return render_template("/student/adding_of_subject.html", student_api_base_url=student_api_base_url)#
 
 @app.route('/student/subject/added', methods=['POST'])
+@role_required('student')
 def add_subjects():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
-        student = Student.query.filter_by(studentNumber=studentNumber).first()
-        if student:
-            name = student.name
-        else:
-            flash('Invalid student number.', 'danger')
-            return redirect(url_for('add_subjects'))
+    try: 
+        current_StudentId = session.get('user_id')
+
+        new_addsubjects_application = create_addsubjects_application(request.form, request.files, current_StudentId)
         
-        subject_Names = request.form['subject_Names']
-        enrollment_type = request.form['enrollment_type']
-        user_responsible = request.form['user_responsible']
-        status = request.form['status']
-
-        # Check if a file is provided
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(url_for('studentaddingsubject'))  # Replace 'add_subjects' with the actual route
-
-        file = request.files['file']
-        # Check if the file field is empty
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(url_for('studentaddingsubject'))  # Replace 'add_subjects' with the actual route
-
-        file_data = file.read()  # Read the file data
-        file_name = secure_filename(file.filename)
-
-        # Additional validation logic can be added here
-
-        # Check if any of the required fields is empty
-        if not studentNumber or not name or not enrollment_type or not subject_Names:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('studentaddingsubject'))  # Replace 'add_subjects' with the actual route
-
-        try:
-            new_subject_application = Add_Subjects(
-                studentNumber=studentNumber,
-                name=name,
-                subject_Names=subject_Names,
-                enrollment_type=enrollment_type,
-                file_name=file_name,
-                file_data=file_data,
-                user_responsible=user_responsible,
-                status=status
-            )
-
-            db.session.add(new_subject_application)
+        if new_addsubjects_application:
+            db.session.add(new_addsubjects_application)
             db.session.commit()
-            flash('Subject application submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+            flash('Add subjects created Successfully!', 'success')
+            return redirect(url_for('studentaddingsubject'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return redirect(url_for('studentaddingsubject')) 
+    return render_template('student/adding_of_subject.html') 
 
 #========================================================
 
@@ -395,36 +329,11 @@ def add_subjects():
 def stud_services():
     return render_template("/student/service_request_form.html")#
 
-"""@app.route('/student/submit_service_form/request', methods=['POST'])
-def submit_services_request():
-    # Retrieve form data and create a new Services object
-    service_type = request.form.get('serviceType')
-    student_id = request.form.get('studentID')
-    name = request.form.get('name')
-
-    # Add other fields based on your requirements
-
-    # Create a new Services object
-    new_service = Services(
-        service_type=service_type,
-        student_id=student_id,
-        name=name,
-        created_at=datetime.utcnow(),
-        # Add other fields based on your requirements
-    )
-
-    # Save the new service request to the database
-    db.session.add(new_service)
-    db.session.commit()
-
-    # Return a response (you can customize this based on your needs)
-    return jsonify({'message': 'Service request submitted successfully!'})"""
-
 @app.route('/student/submit_service_form/request', methods=['POST'])
 def submit_services_request():
     if request.method == 'POST':
         service_type = request.form.get('serviceType')
-        student_id = request.form.get('studentID')
+        StudentId = request.form.get('StudentId')
         name = request.form.get('name')
 
         # Add other fields based on your requirements
@@ -432,7 +341,7 @@ def submit_services_request():
         # Create a new Services object
         new_service = Services(
             service_type=service_type,
-            student_id=student_id,
+            StudentId=StudentId,
             name=name,
             created_at=datetime.utcnow(),
             # Add other fields based on your requirements
@@ -450,117 +359,48 @@ def submit_services_request():
 #========================================================================#
 @app.route('/student/changeofsubject')#
 def studentchange():
-    return render_template("/student/changeofsubject.html")#
+    return render_template("/student/changeofsubject.html", student_api_base_url=student_api_base_url)#
 
-
-@app.route('/student/changeofsubject/subject', methods=['POST'])
+@app.route('/student/changeofsubject/added', methods=['POST'])
+@role_required('student')
 def change_of_subjects():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
-        enrollment_type = request.form['enrollment_type']
-        user_responsible = request.form['user_responsible']
-        status = request.form['status']
+    try: 
+        current_StudentId = session.get('user_id')
 
-        # Check if ACE Form file is provided
-        if 'ace_form_file' not in request.files:
-            flash('No ACE Form file provided', 'danger')
-            return redirect(request.url)
-
-        ace_form_file = request.files['ace_form_file']
-        # Check if the ACE Form file field is empty
-        if ace_form_file.filename == '':
-            flash('No ACE Form file selected', 'danger')
-            return redirect(request.url)
-
-        ace_form_data = ace_form_file.read()  # Read the ACE Form file data
-        ace_form_filename = secure_filename(ace_form_file.filename)
-
-        try:
-            # Create a new change of subjects record with the retrieved student
-            new_change_of_subjects = ChangeOfSubjects(
-                studentNumber=studentNumber,
-                name=name,
-                enrollment_type=enrollment_type,
-                ace_form_filename=ace_form_filename,
-                ace_form_data=ace_form_data,
-                created_at=datetime.utcnow(),
-                updated_at=None,
-                user_responsible=user_responsible,
-                status=status
-            )
-
-            db.session.add(new_change_of_subjects)
+        new_changesubjects_application = create_changesubjects_application(request.form, request.files, current_StudentId)
+        
+        if new_changesubjects_application:
+            db.session.add(new_changesubjects_application)
             db.session.commit()
-            flash('Change of Subjects Added successfully', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+            flash('Change of subjects created Successfully!', 'success')
+            return redirect(url_for('studentchange'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return redirect(url_for('studentchange'))
+    return render_template('student/changeofsubject.html')
 
 #==========================================================================================================================#
 
 @app.route('/student/gradeentry')#
 def studentcorrection():
-    return render_template("/student/gradeentry.html")#
+    return render_template("/student/gradeentry.html", student_api_base_url=student_api_base_url)#
 
 @app.route('/student/gradeentry/submit', methods=['POST'])
+@role_required('student')
 def submit_grade_correction():
-    # Assuming you have the student ID stored in the session during login
-    student_id = session.get('student_id')
-    studentNumber = request.form['studentNumber']    
-    name = request.form['name']
-    application_type = request.form['application_type']
+    try: 
+        current_StudentId = session.get('user_id')
 
-    # Additional logic here
-    if not studentNumber or not name or not application_type:
-        flash('Please fill out all fields and provide valid values.', 'danger')
-        return render_template('student/grade_entry.html')  # Replace with the actual template name
-
-    files = {
-        'completion_form': 'Completion Form',
-        'class_record': 'Class Record',
-        'affidavit': 'Affidavit'
-    }
-
-    for field, display_name in files.items():
-        if field not in request.files:
-            flash(f'No {display_name} file provided', 'danger')
-            return redirect(request.url)
-
-        file = request.files[field]
-        if file.filename == '':
-            flash(f'No {display_name} file selected', 'danger')
-            return redirect(request.url)
-
-        data = file.read()
-        setattr(request, f'{field}_filename', secure_filename(file.filename))
-        setattr(request, f'{field}_data', data)
-
-    try:
-        new_application = GradeEntry(
-            student_id=student_id,  # Use the stored student 
-            studentNumber=studentNumber,
-            name=name,
-            application_type=application_type,
-            completion_form_filename=request.completion_form_filename,
-            completion_form_data=request.completion_form_data,
-            class_record_filename=request.class_record_filename,
-            class_record_data=request.class_record_data,
-            affidavit_filename=request.affidavit_filename,
-            affidavit_data=request.affidavit_data,
-            user_responsible=request.form.get('user_responsible'),  # Added user_responsible
-            status=request.form.get('status'),  # Added status
-            created_at=datetime.utcnow()
-        )
-
-        db.session.add(new_application)
-        db.session.commit()
-        flash('Grade correction application submitted successfully!', 'success')
-        return redirect(url_for('studentcorrection'))  # Replace with the actual route name for grade correction
+        new_gradeentry_application = create_gradeentry_application(request.form, request.files, current_StudentId)
+        
+        if new_gradeentry_application:
+            db.session.add(new_gradeentry_application)
+            db.session.commit()
+            flash('Grade entry Submitted Successfully!', 'success')
+            return redirect(url_for('studentcorrection'))
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
@@ -569,21 +409,20 @@ def submit_grade_correction():
 
     return render_template('student/gradeentry.html')
 
-
 #==============================================================================================================
 
 @app.route('/student/crossenrollment')#
 def studentenrollment():
-    return render_template("/student/crossenrollment.html")#
+    return render_template("/student/crossenrollment.html", student_api_base_url=student_api_base_url)#
 
 @app.route('/student/crossenrollment/submitted', methods=['POST'])
-@student_required  # Add any required authentication decorator
+@role_required('student')  # Add any required authentication decorator
 def submit_cross_enrollment():
     # Handle form submission
     try:
         # Process and save the form data
-        current_student_id = session.get('user_id')
-        new_cross_enrollment = create_crossenrollment_form(request.form, request.files, current_student_id)
+        current_StudentId = session.get('user_id')
+        new_cross_enrollment = create_crossenrollment_form(request.form, request.files, current_StudentId)
         
         if new_cross_enrollment:
             db.session.add(new_cross_enrollment)
@@ -604,80 +443,43 @@ def submit_cross_enrollment():
 #===================Shifting===================#
 @app.route('/student/shifting')#
 def studentshifting():
-    return render_template("/student/shifting.html")#
+    return render_template("/student/shifting.html", student_api_base_url=student_api_base_url)#
 
 # Assuming your route for this page is '/submit_shifting_application'
 @app.route('/student/shifting/submit', methods=['POST'])
+@role_required('student')
 def submit_shifting():
-    if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
-        current_program = request.form['currentProgram']
-        residency_year = int(request.form['residencyYear'])
-        intended_program = request.form['intendedProgram']
-        qualifications = request.form['qualifications']
-        user_responsible = request.form['user_responsible']
-        status = request.form['status']
+    try: 
+        current_StudentId = session.get('user_id')
 
-        # Check if a file is provided
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(url_for('studentshifting'))  # Replace 'your_shifting_page' with the actual route
-
-        file = request.files['file']
-        # Check if the file field is empty
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(url_for('studentshifting'))  # Replace 'your_shifting_page' with the actual route
-
-        file_data = file.read()  # Read the file data
-        file_filename = secure_filename(file.filename)
-
-        # Additional validation logic can be added here
-
-        # Check if any of the required fields is empty
-        if not studentNumber or not name or not current_program or not residency_year or not intended_program:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('studentshifting'))  # Replace 'your_shifting_page' with the actual route
-
-        try:
-            new_shifting_application = ShiftingApplication(
-                studentNumber=studentNumber,
-                name=name,
-                current_program=current_program,
-                residency_year=residency_year,
-                intended_program=intended_program,
-                qualifications=qualifications,
-                file_filename=file_filename,
-                file_data=file_data,
-                user_responsible=user_responsible,
-                status=status,
-            )
-
+        new_shifting_application = create_shifting_application(request.form, request.files, current_StudentId)
+        
+        if new_shifting_application:
             db.session.add(new_shifting_application)
             db.session.commit()
-            flash('Shifting application submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+            flash('Shifting has been created Successfully!', 'success')
+            return redirect(url_for('studentshifting'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return redirect(url_for('studentshifting'))
+    return render_template('student/shifting.html') 
 
 #========================================================================================================================================
 #================ManualEnrollment=================#
 @app.route('/student/manualenrollment')#
 def studentmanualenrollment():
-    return render_template("/student/manualenrollment.html")#
+    return render_template("/student/manualenrollment.html", student_api_base_url=student_api_base_url)#
 
 # Manual Enrollment Route
 @app.route('/student/manualenrollment/submitmanual', methods=['POST'])
-@student_required
+@role_required('student')
 def submitmanualenrollment():
     try:
-        current_student_id = session.get('user_id')
-        new_manual_enrollment = create_manualenrollment_form(request.form, request.files, current_student_id)
+        current_StudentId = session.get('user_id')
+        new_manual_enrollment = create_manualenrollment_form(request.form, request.files, current_StudentId)
 
         if new_manual_enrollment:
             db.session.add(new_manual_enrollment)
@@ -696,14 +498,15 @@ def submitmanualenrollment():
 #====================================================================================================================================
 
 @app.route('/student/onlinepetitionofsubject')
-def studentpetition():  # Include the student_id parameter
-    return render_template("/student/petition.html")
+def studentpetition():  # Include the StudentId parameter
+    return render_template("/student/petition.html", student_api_base_url=student_api_base_url)
 
 @app.route('/submit_petition_request', methods=['POST'])
+@role_required('student')
 def submitpetition():
     try:
-        current_student_id = session.get('user_id')
-        new_petition_request = create_petitionrequest_form(request.form, current_student_id)
+        current_StudentId = session.get('user_id')
+        new_petition_request = create_petitionrequest_form(request.form, current_StudentId)
 
         if new_petition_request:
             db.session.add(new_petition_request)
@@ -720,10 +523,10 @@ def submitpetition():
 
 #===============================================
 
-@app.route('/student/onlinepetitionofsubject/<int:student_id>', methods=['GET'])
-def view_student_petition(student_id):
-    # Fetching the petitions based on the student_id
-    petitions = PetitionRequest.query.filter_by(student_id=student_id).all()
+@app.route('/student/onlinepetitionofsubject/<int:StudentId>', methods=['GET'])
+def view_student_petition(StudentId):
+    # Fetching the petitions based on the StudentId
+    petitions = PetitionRequest.query.filter_by(StudentId=StudentId).all()
 
     return render_template('view_petition_data.html', petitions=petitions)
 
@@ -731,15 +534,15 @@ def view_student_petition(student_id):
 
 @app.route('/student/tutorial')#
 def studenttutorial():
-    return render_template("/student/tutorial.html")#
+    return render_template("/student/tutorial.html", student_api_base_url=student_api_base_url)#
 
 #done
 # Assuming your route for this page is '/submit_tutorial'
 @app.route('/student/tutorial/submit', methods=['POST'])
 def submittutorialrequest():
     if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
+        StudentNumber = request.form['StudentNumber']
+        Name = request.form['Name']
         subject_code = request.form['subject_code']
         subject_name = request.form['subject_name']
         
@@ -760,14 +563,14 @@ def submittutorialrequest():
         # Additional validation logic can be added here
 
         # Check if any of the required fields is empty
-        if not studentNumber or not name or not subject_code or not subject_name:
+        if not StudentNumber or not Name or not subject_code or not subject_name:
             flash('Please fill out all required fields.', 'danger')
             return redirect(url_for('studenttutorial'))  # Replace 'stude_tutorial' with the actual route
 
         try:
             new_tutorial_request = TutorialRequest(
-                studentNumber=studentNumber,
-                name=name,
+                StudentNumber=StudentNumber,
+                Name=Name,
                 subject_code=subject_code,
                 subject_name=subject_name,
                 file_filename=file_filename,
@@ -791,18 +594,18 @@ def submittutorialrequest():
 #====================================================================================================================
 @app.route('/student/certification')#
 def studentcertification():
-    return render_template("/student/certification.html")#
+    return render_template("/student/certification.html", student_api_base_url=student_api_base_url)#
 
 @app.route('/student/profile')
 def studentprofile():
     return render_template("/student/profile.html", student_api_base_url=student_api_base_url)
 
 @app.route('/submit_certification_request', methods=['POST'])
-@student_required
+@role_required('student')
 def submit_certification_request():
     try:
-        current_student_id = session.get('user_id')  # Adjust this based on your authentication logic
-        new_certification_request = create_certification_request(request.form, request.files, current_student_id)
+        current_StudentId = session.get('user_id')  # Adjust this based on your authentication logic
+        new_certification_request = create_certification_request(request.form, request.files, current_StudentId)
 
         if new_certification_request:
             db.session.add(new_certification_request)
@@ -827,7 +630,7 @@ def submit_service_request():
 def submit_services_request():
     if request.method == 'POST':
         service_type = request.form.get('serviceType')
-        student_id = request.form.get('studentID')
+        StudentId = request.form.get('studentID')
         name = request.form.get('name')
 
         # Add other fields based on your requirements
@@ -835,7 +638,7 @@ def submit_services_request():
         # Create a new Services object
         new_service = Services(
             service_type=service_type,
-            student_id=student_id,
+            StudentId=StudentId,
             name=name,
             created_at=datetime.utcnow(),
             # Add other fields based on your requirements
@@ -911,7 +714,7 @@ def facultytutorial():
 @prevent_authenticated
 def studentLogin():
     session.permanent = True
-    return render_template('student/login.html')
+    return render_template("student/login.html")
 
 #foroverload
 @app.route('/student/login_for_overload')
@@ -949,11 +752,11 @@ def portal_addingofsubject():
 
     # If the request method is POST, attempt to log in
     if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
+        StudentNumber = request.form['StudentNumber']
         password = request.form['password']
         
         # Use the common login function
-        return login_user(studentNumber, password, 'student_portal_addingsubject', 'portal_addingofsubject')
+        return login_user(StudentNumber, password, 'student_portal_addingsubject', 'portal_addingofsubject')
 
     return render_template('student/login_addsubjects.html')
 
@@ -996,68 +799,29 @@ def portal_crossenrollment():
 
 
 # Function to fetch student details by student ID
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
     else:
         return None
 
-"""# Modify the profile route
-@app.route('/student/home/profile')
-def profile():
-    session.update()
-
-    # Replace the static student_id with the actual student ID you want to retrieve
-    student_id = session.get("user_id")
-    student = Student.query.get(student_id)
-
-    if student:
-        # Fetch additional student details
-        student_details = get_student_details(student_id)
-
-        if student_details:
-            return render_template('student/profile.html', student_details=student_details)
-        else:
-            # Handle the case where student details are not found
-            return "Student details not found", 404
-
-    else:
-        # Handle the case where the student is not found
-        return "Student not found", 404"""
-#def store_user_details_in_session(student):
-    # Store user details in the session
-#    session['user_id'] = student.student_id
-#    session['studentNumber'] = student.studentNumber
-#    session['name'] = student.name
-#    session['gender'] = student.gender
-#    session['email'] = student.email
-#    session['address'] = student.address
-#    session['dateofBirth'] = student.dateofBirth
-#    session['placeofBirth'] = student.placeofBirth
-#    session['mobileNumber'] = student.mobileNumber
-#    session['userImg'] = student.userImg
-
-
-
-
-
-# ========================================================================
+#===========================================================#
 #Student directly Services
 
-# Overload subjects function for students
+# Overload subjects function for student
 @app.route('/student/foroverloadofsubject')
 def student_portal_overload():
     session.permanent = True
@@ -1071,7 +835,7 @@ def student_portal_overload():
 def is_user_logged_in_overload():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_overload')
@@ -1082,26 +846,26 @@ def redirect_based_on_login_overload():
         return redirect(url_for('portal_overload'))
 
 #================================================================
-# Certification function for students
+# Certification function for student
 @app.route('/student/certification')
 def student_portal_certification():
     session.permanent = True
     if is_user_logged_in_certification():
         return render_template('student/certification.html')
     
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1113,7 +877,7 @@ def get_student_details(student_id):
 def is_user_logged_in_certification():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_certification')
@@ -1123,26 +887,26 @@ def redirect_based_on_login_certification():
     else:
         return redirect(url_for('portal_certification'))
 #========================================================================
-# Change of subject or sched function for students
+# Change of subject or sched function for student
 @app.route('/student/changeofsubject/schedule')
 def student_portal_changesubsched():
     session.permanent = True
     if is_user_logged_in_changesubsched():
         return render_template('student/change_of_subject.html')
     
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1154,7 +918,7 @@ def get_student_details(student_id):
 def is_user_logged_in_changesubsched():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_changesubsched')
@@ -1164,26 +928,26 @@ def redirect_based_on_login_changesubsched():
     else:
         return redirect(url_for('portal_changesubsched'))
 #========================================================================
-# Enrollment function for students
+# Enrollment function for student
 @app.route('/student/manualenrollment')
 def student_portal_enrollment():
     session.permanent = True
     if is_user_logged_in_enrollment():
         return render_template('student/manual_enrollment.html')
 
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1195,7 +959,7 @@ def get_student_details(student_id):
 def is_user_logged_in_enrollment():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_enrollment')
@@ -1207,7 +971,7 @@ def redirect_based_on_login_enrollment():
 
 #========================================================================
 
-# addingsubject subjects function for students
+# addingsubject subjects function for student
 @app.route('/student/addingofsubject')
 def student_portal_addingsubject():
     session.permanent = True
@@ -1226,7 +990,7 @@ def student_portal_addingsubject():
 def is_user_logged_in_addingofsubject(service_redirect):
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 
 # Main function to handle redirection based on user login status
@@ -1243,26 +1007,26 @@ def redirect_based_on_login_addingofsubject():
 
 
 #================================================================
-# shifting function for students
+# shifting function for student
 @app.route('/student/shifting')
 def student_portal_shifting():
     session.permanent = True
     if is_user_logged_in_shifting():
         return render_template('student/shifting.html')
     
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1274,7 +1038,7 @@ def get_student_details(student_id):
 def is_user_logged_in_shifting():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_shifting')
@@ -1287,26 +1051,26 @@ def redirect_based_on_login_shifting():
 
 #========================================================================
 
-# tutorial subjects function for students
+# tutorial subjects function for student
 @app.route('/student/requestfortutorialofsubjects')
 def student_portal_tutorial():
     session.permanent = True
     if is_user_logged_in_tutorial():
         return render_template('student/tutorial.html')
     
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1318,7 +1082,7 @@ def get_student_details(student_id):
 def is_user_logged_in_tutorial():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_tutorial')
@@ -1329,26 +1093,26 @@ def redirect_based_on_login_tutorial():
         return redirect(url_for('portal_tutorial'))
 
 #================================================================
-# online petition subjects function for students
+# online petition subjects function for student
 @app.route('/student/onlinepetitionofsubject')
 def student_portal_petition():
     session.permanent = True
     if is_user_logged_in_petition():
         return render_template('student/petition.html')
     
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1360,7 +1124,7 @@ def get_student_details(student_id):
 def is_user_logged_in_petition():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_petition')
@@ -1371,26 +1135,26 @@ def redirect_based_on_login_petition():
         return redirect(url_for('portal_petition'))
     
 #================================================================
-# gradeentry function for students
+# gradeentry function for student
 @app.route('/student/gradeentry')
 def student_portal_gradeentry():
     session.permanent = True
     if is_user_logged_in_gradeentry():
         return render_template('student/grade_entry.html')
 
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1402,7 +1166,7 @@ def get_student_details(student_id):
 def is_user_logged_in_gradeentry():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_gradeentry')
@@ -1413,26 +1177,26 @@ def redirect_based_on_login_gradeentry():
         return redirect(url_for('portal_gradeentry'))
 
 #================================================================
-# gradeentry function for students
+# gradeentry function for student
 @app.route('/student/crossenrollment')
 def student_portal_crossenrollment():
     session.permanent = True
     if is_user_logged_in_crossenrollment():
         return render_template('student/cross_enrollment.html')
     # Function to fetch student details by student ID
-def get_student_details(student_id):
-    student = Student.query.get(student_id)
+def get_student_details(StudentId):
+    student = Student.query.get(StudentId)
 
     if student:
         student_details = {
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'gender': student.gender,
-            'email': student.email,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
             'userImg': student.userImg,
         }
         return student_details
@@ -1444,7 +1208,7 @@ def get_student_details(student_id):
 def is_user_logged_in_crossenrollment():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
-    return session.get("student_id") is not None
+    return session.get("StudentId") is not None
 
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_crossenrollment')
@@ -1488,8 +1252,8 @@ def facultyprofile():
 # Updated view function
 @app.route('/faculty/view_adding_subject')
 def view_adding_subject():
-    subjects = Add_Subjects.query.all()
-    return render_template("/faculty/view_adding.html", subjects=subjects)
+    addsubjects = AddSubjects.query.all()
+    return render_template("/faculty/view_adding.html", addsubjects=addsubjects)
 
 @app.route('/faculty/view_adding_subject/get_subject_file/<int:subject_ID>')
 def get_subject_file(subject_ID):
@@ -1498,14 +1262,14 @@ def get_subject_file(subject_ID):
 #download the file in the view page
 @app.route('/student/download_subject_file/<int:subject_ID>')
 def download_subject_file(subject_ID):
-    subject = Add_Subjects.query.get(subject_ID)
+    addsubject = AddSubjects.query.get(subject_ID)
 
-    if subject and subject.file_data:
-        file_extension = get_file_extension(subject.file_name)
+    if addsubject and addsubject.file_data:
+        file_extension = get_file_extension(addsubject.file_name)
         download_name = f'subject_{subject_ID}.{file_extension}'
 
         return send_file(
-            io.BytesIO(subject.file_data),
+            io.BytesIO(addsubject.file_data),
             as_attachment=True,
             download_name=download_name,
             mimetype=get_mimetype(file_extension),
@@ -1663,134 +1427,81 @@ def admin_create_stud():
 
 
 # Route to handle student creation with image upload
-@app.route('/admin/createstudent/created', methods=['GET', 'POST'])
+@app.route('/admin/createstudent/create_student', methods=['GET', 'POST'])
 def admin_create_student():
     if request.method == 'POST':
-        studentNumber = request.form['studentNumber']
-        name = request.form['name']
-        email = request.form['email']
-        password = request.form['password']
+        StudentNumber = request.form['StudentNumber']
+        Name = request.form['Name']
+        Email = request.form['Email']
+        Password = request.form['Password']
         address = request.form['address']
-        gender = request.form['gender']
-        date_of_birth = request.form['dateOfBirth']
-        place_of_birth = request.form['placeOfBirth']
-        mobile_number = request.form['mobileNumber']
-
-        # Hash the password
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        Gender = request.form['Gender']
+        DateofBirth = request.form['DateofBirth']
+        PlaceofBirth = request.form['PlaceofBirth']
+        ResidentialAddress = request.form['ResidentialAddress']
+        MobileNumber = request.form['MobileNumber']
 
         # Check if the student already exists
-        existing_student = Student.query.filter_by(studentNumber=studentNumber).first()
+        existing_student = Student.query.filter_by(StudentNumber=StudentNumber).first()
         if existing_student:
             return 'Student with this student number already exists'
+        # Hash the password
+        hashed_password = generate_password_hash(Password, method='pbkdf2:sha256')
 
         # Handle image upload
-        image_file = request.files['image']
-        image_data = image_file.read() if image_file else None
-
-        # Create a new student
+        userImg = request.files['image']
+        userImg = userImg.read() if userImg else None
+        # Create a new student instance
         new_student = Student(
-            studentNumber=studentNumber,
-            name=name,
-            email=email,
-            password=hashed_password,
+            StudentNumber=StudentNumber,
+            Name=Name,
+            Email=Email,
+            Password=hashed_password,
             address=address,
-            gender=gender,
-            dateofBirth=date_of_birth,
-            placeofBirth=place_of_birth,
-            mobileNumber=mobile_number,
+            Gender=Gender,
+            DateofBirth=DateofBirth,
+            PlaceofBirth=PlaceofBirth,
+            ResidentialAddress=ResidentialAddress,
+            MobileNumber=MobileNumber
         )
 
         # Save the image data
-        if image_data:
-            new_student.save_image(image_data)
-
+        if userImg:
+            new_student.save_image(userImg)
+        # Save the new student to the database
         db.session.add(new_student)
         db.session.commit()
+        # Flash a success message
+        flash('Student created successfully', 'success')
 
-        return 'Student created successfully'
+        # Redirect back to the create student page
+        return redirect(url_for('admin_create_stud'))
 
-    return render_template("admin/create_student.html")
+    return render_template("/admin/create_student.html")
 
 @app.route('/admin/student_list', methods=['GET'])
 def student_list():
-    # Fetch all students from the database
-    students = Student.query.all()
+    # Fetch all student from the database
+    student = Student.query.all()
 
-    # Convert the list of students to a list of dictionaries for rendering
-    students_data = [
+    # Convert the list of student to a list of dictionaries for rendering
+    student_data = [
         {
-            'student_id': student.student_id,
-            'studentNumber': student.studentNumber,
-            'name': student.name,
-            'email': student.email,
+            'StudentId': student.StudentId,
+            'StudentNumber': student.StudentNumber,
+            'Name': student.Name,
+            'Gender': student.Gender,
+            'Email': student.Email,
             'address': student.address,
-            'gender': student.gender,
-            'dateofBirth': student.dateofBirth,
-            'placeofBirth': student.placeofBirth,
-            'mobileNumber': student.mobileNumber,
-            'userImg': student.userImg
+            'DateofBirth': student.DateofBirth,
+            'PlaceofBirth': student.PlaceofBirth,
+            'MobileNumber': student.MobileNumber,
+            'userImg': student.userImg,
         }
-        for student in students
+        for student in student
     ]
 
-    return render_template("/admin/student_list.html", students=students_data)
-
-"""@app.route('/admin/student_list')
-def student_list():
-    api_key = request.headers.get('X-Api-Key')  # Get the API key from the request header
-
-    if not api_key or api_key not in API_KEYS.values():
-        return render_template("/admin/student_list.html", students=[], message="Invalid API key")
-
-    try:
-        # Fetch all students from the database
-        students = Student.query.all()
-
-        # Render the template with the student data from the database
-        return render_template("/admin/student_list.html", students=students, message="You got data from the database")
-
-    except Exception as e:
-        print("Exception during database query:", e)
-        return render_template("/admin/student_list.html", students=[], message="Error fetching data from the database")"""
-
-"""# Route to display the list of students in HTML
-@app.route('/admin/student_list')
-def student_list():
-    api_key = request.headers.get('X-Api-Key')  # Get the API key from the request header
-
-    if not api_key or api_key not in API_KEYS.values():
-        return render_template("/admin/student_list.html", students=[], message="Invalid API key")
-
-    try:
-        # Fetch data from the API endpoint
-        response = requests.get('http://your-api-url/student_list', headers={'X-Api-Key': api_key})
-        response.raise_for_status()  # Raise an exception for HTTP errors (4xx and 5xx)
-        api_data = response.json()
-
-        if response.status_code == 200 and api_data.get('message') == 'You got API data':
-            # Render the template with the student data from the API
-            return render_template("/admin/student_list.html", students=api_data.get('students'))
-        else:
-            return render_template("/admin/student_list.html", students=[], message="Error: {}".format(api_data.get('message')))
-
-    except requests.exceptions.RequestException as e:
-        print("Exception during API request:", e)
-        return render_template("/admin/student_list.html", students=[], message="Error fetching data from API")"""
-
-
-
-"""@app.route('/admin/view_student/<int:student_id>')
-def view_student(student_id):
-    # Assuming you have a function to get student details from the database
-    student = get_student_details(student_id)
-
-    # Replace 'path_to_your_image.jpg' with the actual path to the student's profile image
-    image_path = 'path_to_your_image.jpg'
-
-    return render_template("path_to_your_template.html", student=student, image_path=image_path)"""#for single profile needed 
-                                                                                                   #html is in the view_student naka comment
-
+    return render_template("/admin/student_list.html", student=student_data)
 
 #==========================================================#
 #Admin Portal
@@ -1809,15 +1520,15 @@ app.register_blueprint(student_api, url_prefix=student_api_base_url)
 # TESTING
 @app.route('/student/json', methods=['GET'])
 def get_student_json():
-    students = Student.query.all()
+    student = Student.query.all()
 
     student_list = []
-    for student in students:
+    for student in student:
         student_data = {
-            'id': student.id,
-            'name': student.name,
-            'email': student.email,
-            'password': student.password
+            'StudentId': student.StudentId,
+            'Name': student.Name,
+            'Email': student.Email,
+            'Password': student.Password
             # Add other fields as needed
         }
         student_list.append(student_data)

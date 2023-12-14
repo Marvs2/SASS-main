@@ -49,59 +49,57 @@
 
 <!-- Success message container -->
 <br>
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
     <br>
-        <h1>Create Student</h1>
-        <form action="{{ url_for('admin_create_student') }}" method="POST" enctype="multipart/form-data">
-            <!-- Existing form fields -->
-            <label for="studentNumber">Student Number:</label>
-            <input type="text" id="studentNumber" name="studentNumber" required><br>
-        
-            <label for="name">Name:</label>
-            <input type="text" id="name" name="name" required><br>
-        
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required><br>
-        
-            <!-- Additional form fields -->
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
-        
-            <label for="address">Address:</label>
-            <input type="text" id="address" name="address"><br>
-        
-            <label for="gender">Gender:</label>
-            <select id="gender" name="gender">
-                <option value="1">Male</option>
-                <option value="2">Female</option>
-            </select><br>
-        
-            <label for="dateOfBirth">Date of Birth:</label>
-            <input type="date" id="dateOfBirth" name="dateOfBirth" required><br>
-        
-            <label for="placeOfBirth">Place of Birth:</label>
-            <input type="text" id="placeOfBirth" name="placeOfBirth"><br>
-        
-            <label for="mobileNumber">Mobile Number:</label>
-            <input type="text" id="mobileNumber" name="mobileNumber"><br>
-        
-         <!-- New input for uploading image -->
-         <label for="image">Upload Image:</label>
-         <input type="file" id="image" name="image" accept="image/*"><br>
-        
-            <button type="submit">Create Student</button>
-        </form>
+    <h1>Create Student</h1>
+    <form action="{{ url_for('admin_create_student') }}" method="POST" enctype="multipart/form-data">
+        <label for="StudentNumber">Student Number:</label>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br>
+
+        <label for="Name">Name:</label>
+        <input type="text" id="Name" name="Name" required><br>
+
+        <label for="Email">Email:</label>
+        <input type="email" id="Email" name="Email" required><br>
+
+        <label for="Password">Password:</label>
+        <input type="password" id="Password" name="Password" required><br>
+
+        <label for="address">Address:</label>
+        <input type="text" id="address" name="address"><br>
+
+        <label for="Gender">Gender:</label>
+        <select id="Gender" name="Gender">
+            <option value="1">Male</option>
+            <option value="2">Female</option>
+        </select><br>
+
+        <label for="DateofBirth">Date of Birth:</label>
+        <input type="date" id="DateofBirth" name="DateofBirth" required><br>
+
+        <label for="PlaceofBirth">Place of Birth:</label>
+        <input type="text" id="PlaceofBirth" name="PlaceofBirth"><br>
+
+        <label for="ResidentialAddress">Residential Address:</label>
+        <input type="text" id="ResidentialAddress" name="ResidentialAddress"><br>
+
+        <label for="MobileNumber">Mobile Number:</label>
+        <input type="text" id="MobileNumber" name="MobileNumber"><br>
+
+        <label for="image">Upload Image:</label>
+        <input type="file" id="image" name="image" accept="image/*"><br><br>
+
+        <button type="submit">Create Student</button>
+    </form>
         <script>
             $(document).ready(function () {
                 // Initialize DataTable
@@ -118,20 +116,6 @@
                         }, 2000); // 9 seconds
                     });
                 }
-        
-                // Optionally, fetch and load initial data into the DataTable using AJAX
-                // Example AJAX request:
-                // $.ajax({
-                //     url: '/api/get_students', // Replace with your API endpoint to fetch data
-                //     method: 'GET',
-                //     success: function (data) {
-                //         // Load data into DataTable
-                //         $('#studentTable').DataTable().clear().rows.add(data).draw();
-                //     },
-                //     error: function (error) {
-                //         console.error('Error fetching data:', error);
-                //     }
-                // });
             });
         </script>
 {% endblock %}

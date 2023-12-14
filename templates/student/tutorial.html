@@ -28,11 +28,11 @@
     <div class="form-container">
         <h2>Request Form</h2>
         <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
-            <label for="studentNumber">Student Number:</label>
-            <input type="text" id="studentNumber" name="studentNumber" required><br><br>
+            <label for="StudentNumber">Student Number:</label>
+            <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
 
-            <label for="name">Student Name:</label>
-            <input type="text" id="name" name="name" required><br><br>
+            <label for="Name">Student Name:</label>
+            <input type="text" id="Name" name="Name" required><br><br>
         
             <label for="subject_code">Subject Code:</label>
             <input type="text" id="subject_code" name="subject_code" required><br><br>
@@ -67,14 +67,14 @@
     <script>
         const form = document.getElementById('tutorialForm');
         form.addEventListener('submit', function(event) {
-            const studentNumber = document.getElementById('studentNumber').value.trim();
-            const studentName = document.getElementById('name').value.trim();
+            const StudentNumber = document.getElementById('StudentNumber').value.trim();
+            const studentName = document.getElementById('Name').value.trim();
             const subjectCode = document.getElementById('subject_code').value.trim();
             const subjectName = document.getElementById('subject_name').value.trim();
             const file = document.getElementById('file').files[0];
             const userResponsible = document.getElementById('user_responsible').value.trim();
 
-            if (!studentNumber || !studentName || !subjectCode || !subjectName || !file || !userResponsible) {
+            if (!StudentNumber || !studentName || !subjectCode || !subjectName || !file || !userResponsible) {
                 alert('Please fill out all fields.');
                 event.preventDefault();
             }
@@ -82,3 +82,33 @@
         });
     </script>
 {% endblock content%}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.studentName;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}

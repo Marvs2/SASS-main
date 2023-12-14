@@ -20,30 +20,30 @@
     <br>
 
     <form id="certificationRequestForm" action="{{ url_for('submit_certification_request') }}" method="POST" enctype="multipart/form-data">
-        <label for="studentNumber">Student Number:</label>
-        <input type="text" id="studentNumber" name="studentNumber" required><br>
+        <label for="StudentNumber">Student Number:</label>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br>
 
-        <label for="name">Student Name:</label>
-        <input type="text" id="name" name="name" required><br>
+        <label for="Name">Student Name:</label>
+        <input type="text" id="Name" name="Name" required><br>
 
         <label for="certification_type">Certification Type:</label>
         <input type="text" id="certification_type" name="certification_type" required><br>
 
-        <label for="request_form_file">Request Form File:</label>
-        <input type="file" id="request_form_file" name="request_form_file" required><br>
+        <label for="request_form">Request Form File:</label>
+        <input type="file" id="request_form" name="request_form" required><br>
 
-        <label for="identification_card_file">Identification Card File:</label>
-        <input type="file" id="identification_card_file" name="identification_card_file" required><br>
+        <label for="identification_card">Identification Card File:</label>
+        <input type="file" id="identification_card" name="identification_card" required><br>
 
         <label for="is_representative">Is there a representative?</label>
         <input type="checkbox" id="is_representative" name="is_representative"><br>
 
         <div id="representativeInfo" style="display: none;">
-            <label for="authorizationLetter">Authorization Letter:</label><br>
-            <input type="file" id="authorizationLetter" name="authorizationLetter"><br><br>
+            <label for="authorization_letter">Authorization Letter:</label><br>
+            <input type="file" id="authorization_letter" name="authorization_letter"><br><br>
 
-            <label for="representativeID">Representative's Identification Card (ID):</label><br>
-            <input type="file" id="representativeID" name="representativeID"><br><br>
+            <label for="representative_id">Representative's Identification Card (ID):</label><br>
+            <input type="file" id="representative_id" name="representative_id"><br><br>
         </div><br><br>
 
         <label for="user_responsible">User Responsible:</label>
@@ -84,16 +84,16 @@
         // JavaScript validation logic can be added here
         document.getElementById('certificationRequestForm').addEventListener('submit', function (event) {
         // Add your validation logic here
-        var studentNumber = document.getElementById('studentNumber').value.trim();
-        var name = document.getElementById('name').value.trim();
+        var StudentNumber = document.getElementById('StudentNumber').value.trim();
+        var Name = document.getElementById('Name').value.trim();
         var certificationType = document.getElementById('certification_type').value.trim();
-        var requestFormFile = document.getElementById('request_form_file').value.trim();
-        var identificationCardFile = document.getElementById('identification_card_file').value.trim();
+        var request_form = document.getElementById('request_form').value.trim();
+        var identification_card = document.getElementById('identification_card').value.trim();
         var isRepresentativeCheckbox = document.getElementById('is_representative');
-        var authorizationLetterFile = document.getElementById('authorizationLetter').value.trim();
-        var representativeIDFile = document.getElementById('representativeID').value.trim();
+        var authorization_letter = document.getElementById('authorization_letter').value.trim();
+        var representative_id = document.getElementById('representative_id').value.trim();
 
-        if (!studentNumber || !name || !certificationType || !requestFormFile || !identificationCardFile) {
+        if (!StudentNumber || !Name || !certificationType || !requestFormFile || !identificationCardFile) {
             alert('Please fill out all required fields.');
             event.preventDefault();  // Prevent form submission
         }
@@ -105,3 +105,34 @@
     });
     </script>
 {% endblock %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the Name input and set the value to data.Name
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+

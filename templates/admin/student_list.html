@@ -48,17 +48,17 @@
         </tr>
     </thead>
     <tbody>
-        {% for student in students %}
+        {% for student in student %}
             <tr>
-                <td>{{ student.student_id }}</td>
-                <td>{{ student.studentNumber }}</td>
-                <td>{{ student.name }}</td>
-                <td>{{ student.email }}</td>
+                <td>{{ student.StudentId }}</td>
+                <td>{{ student.StudentNumber }}</td>
+                <td>{{ student.Name }}</td>
+                <td>{{ student.Email }}</td>
                 <td>{{ student.address }}</td>
-                <td>{{ student.gender }}</td>
-                <td>{{ student.dateofBirth }}</td>
-                <td>{{ student.placeofBirth }}</td>
-                <td>{{ student.mobileNumber }}</td>
+                <td>{{ student.Gender }}</td>
+                <td>{{ student.DateofBirth }}</td>
+                <td>{{ student.PlaceofBirth }}</td>
+                <td>{{ student.MobileNumber }}</td>
                 <td>
                     {% if student.userImg %}
                         <img src="{{ student.userImg }}" alt="Student Image" style="width: 30px; height: 30px; border-radius: 50%;">

@@ -28,11 +28,11 @@
 
     <h2>Application Form</h2>
     <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="studentNumber">Student Number:</label><br>
-        <input type="text" id="studentNumber" name="studentNumber" required><br><br>
+        <label for="StudentNumber">Student Number:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
 
-        <label for="name">Student Name:</label><br>
-        <input type="text" id="name" name="name" required><br><br>
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
 
         <label for="application_type">Application Type:</label><br>
         <select id="application_type" name="application_type" required>
@@ -83,3 +83,33 @@
         });
     </script>
 {% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}

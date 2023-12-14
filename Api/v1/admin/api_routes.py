@@ -52,7 +52,7 @@ def login():
             session['placeofBirth'] = admin.placeofBirth
             session['mobile_number'] = admin.mobile_number
 
-            return render_template('admin/dashboard.html', admin_details=session)
+            return render_template('admin/dashboard.html', admin_details=session) # needed to be a redirect to be able to not seen the api/v1/etc....
         else:
             flash('Invalid email or password', 'danger')
 

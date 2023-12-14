@@ -1,7 +1,7 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import  Faculty
-
+from models import Faculty
+import requests
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import  login_user
@@ -10,6 +10,39 @@ from decorators.auth_decorators import faculty_required
 faculty_api = Blueprint('faculty_api', __name__)
 
 # Api/v1/faculty/api_routes.py
+
+
+"""faculty_api_url = 'https://pupqcfis-com.onrender.com/api/all/Faculty_Profile'
+api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJrZXkiOiIzM2Y0ZWI4NWNjNDQ0MTQzOWFkMzMwYWUzMzJiNmYwYyJ9.5pjwXdaIIZf6Jm9zb26YueCPQhj6Tc18bbZ0vnX4S9M'  # Replace with your actual API key
+
+@faculty_api.route('/login', methods=['POST'])
+def faculty_login():
+    # Existing code...
+    email = request.form['email']
+    password = request.form['password']
+
+    # Prepare the data to send to the authentication endpoint
+    payload = {
+        'email': email,
+        'password': password
+    }
+
+    response = requests.post(faculty_api_url, json=payload)
+
+    if response.status_code == 200:
+        # Assuming the API returns a token upon successful login
+        token = response.json().get('token')
+
+        # Store the token in session or use it for further API requests
+        session['token'] = token
+
+        # Redirect to faculty dashboard or other route
+        return redirect(url_for('faculty_dashboard'))
+    else:
+        flash('Failed to authenticate', 'danger')
+
+    return redirect(url_for('faculty_portal'))"""
+
 
 @faculty_api.route('/login', methods=['POST'])
 def faculty_login():
