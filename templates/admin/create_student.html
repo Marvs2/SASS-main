@@ -49,16 +49,15 @@
 
 <!-- Success message container -->
 <br>
-    {% if messages %}
-        {% for message in messages %}
-            <div id="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-        {% endfor %}
-    {% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
     <br>
     <h1>Create Student</h1>
     <form action="{{ url_for('admin_create_student') }}" method="POST" enctype="multipart/form-data">
@@ -71,11 +70,11 @@
         <label for="Email">Email:</label>
         <input type="email" id="Email" name="Email" required><br>
 
-        <label for="Password">Password:</label>
-        <input type="password" id="Password" name="Password" required><br>
-
         <label for="address">Address:</label>
         <input type="text" id="address" name="address"><br>
+
+        <label for="Password">Password:</label>
+        <input type="password" id="Password" name="Password" required><br>
 
         <label for="Gender">Gender:</label>
         <select id="Gender" name="Gender">
