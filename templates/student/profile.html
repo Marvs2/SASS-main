@@ -102,7 +102,18 @@
     // Select the address and set the value to data.address
     document.getElementById("address").value = data.address;
     // Select the dateOfBirth and set the value to data.dateOfBirth
-    document.getElementById("DateofBirth").value = data.DateofBirth;
+    const dateOfBirthInput = document.getElementById("DateofBirth");
+
+// Format the date to display only the birthday
+const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric'
+});
+
+// Set the formatted date to the DateofBirth input
+dateOfBirthInput.value = formattedDateOfBirth;
+
     // Select the placeOfBirth and set the value to data.placeOfBirth
     document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
     // Select the ResidentialAddress and set the value to data.ResidentialAddress
@@ -117,6 +128,7 @@
 <!-- 1st Step Make a script that will request in the server -->
 
 <!-- 2nd Get the data  -->
+
 
 
 
