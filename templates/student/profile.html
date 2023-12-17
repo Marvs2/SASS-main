@@ -47,8 +47,8 @@
                     <input type="text" id="address" name="address"  disabled>
                     <br>
             
-                    <label for="DateofBirth">Date of Birth:</label>
-                    <input type="date" id="DateofBirth" name="DateofBirth"  disabled>
+                    <label for="date">Date of Birth:</label>
+                    <input type="DateofBirth" id="DateofBirth" name="DateofBirth"  disabled>
                     <br>
             
                     <label for="PlaceofBirth">Place of Birth:</label>
@@ -93,7 +93,7 @@
     // Select the address and set the value to data.address
     document.getElementById("address").value = data.address;
     // Select the dateOfBirth and set the value to data.dateOfBirth
-    document.getElementById("DateofBirth").value = data.date_of_birth_formatted;
+    document.getElementById("DateofBirth").value = data.DateofBirth;
     // Select the placeOfBirth and set the value to data.placeOfBirth
     document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
     // Select the ResidentialAddress and set the value to data.ResidentialAddress

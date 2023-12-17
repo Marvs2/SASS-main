@@ -3,7 +3,7 @@ import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student
 from werkzeug.utils import secure_filename
-from datetime import datetime
+from datetime import datetime #, timedelta, timezone
 #from models import Services
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -360,7 +360,7 @@ def login_Crossenrollment():
 #==============The real login in the true manners===========#
 #===========================================================#
 #for All Students
-@student_api.route('/login', methods=['POST'])
+"""@student_api.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
         StudentNumber = request.form['StudentNumber']
@@ -379,8 +379,51 @@ def login():
         else:
             flash('Invalid Email or Password', 'danger')
 
+    return redirect(url_for('studentLogin'))"""
+
+@student_api.route('/login', methods=['POST'])
+def login():
+    if request.method == 'POST':
+        StudentNumber = request.form['StudentNumber']
+        Password = request.form['Password']
+
+        student = Student.query.filter_by(StudentNumber=StudentNumber).first()
+        if student and check_password_hash(student.Password, Password):
+            # Successfully authenticated
+            access_token = create_access_token(identity=student.StudentId)
+            session['access_token'] = access_token
+            session['user_id'] = student.StudentId
+            session['user_role'] = 'student'
+            
+            # Set the last activity timestamp
+           # session['last_activity'] = datetime.now()
+
+            return redirect(url_for('student_dashboard'))
+
+        else:
+            flash('Invalid Email or Password', 'danger')
+
     return redirect(url_for('studentLogin'))
 
+    # Middleware to check for inactivity and redirect to login if needed
+"""@student_api.before_request
+def check_user_activity():
+    if 'user_id' in session and 'last_activity' in session:
+        last_activity = session['last_activity']
+        now_utc = datetime.now(timezone.utc)
+        
+        # Convert last_activity to an aware datetime object
+        if not last_activity.tzinfo:
+            last_activity = last_activity.replace(tzinfo=timezone.utc)
+
+        inactive_time = now_utc - last_activity
+
+        # Redirect to login if inactive for 5 minutes
+        if inactive_time > timedelta(minutes=5):
+            return redirect(url_for('studentLogin'))
+    
+    # Update the last activity timestamp
+    session['last_activity'] = datetime.now(timezone.utc)"""
 
 #=====================================================================#
 

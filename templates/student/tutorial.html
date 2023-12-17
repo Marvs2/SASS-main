@@ -68,7 +68,7 @@
         const form = document.getElementById('tutorialForm');
         form.addEventListener('submit', function(event) {
             const StudentNumber = document.getElementById('StudentNumber').value.trim();
-            const studentName = document.getElementById('Name').value.trim();
+            const Name = document.getElementById('Name').value.trim();
             const subjectCode = document.getElementById('subject_code').value.trim();
             const subjectName = document.getElementById('subject_name').value.trim();
             const file = document.getElementById('file').files[0];
@@ -106,7 +106,7 @@
 
     function displayDetails(data) {
         // Select the name input and set the value to data.studentName
-        document.getElementById('Name').value = data.studentName;
+        document.getElementById('Name').value = data.Name;
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
