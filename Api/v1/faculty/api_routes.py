@@ -59,7 +59,7 @@ def faculty_login():
 
             # Store additional faculty details in the session
             session['user_id'] = faculty.facultyID
-            session['faculty_Number'] = faculty.faculty_Number
+            session['facultyNumber'] = faculty.facultyNumber
             session['name'] = faculty.name
             session['email'] = faculty.email
             session['address'] = faculty.address
@@ -113,8 +113,8 @@ def fetchFacultyDetails():
         gender_string = get_gender_string(faculty.gender)
 
         return jsonify({
-            "facultyName": faculty.name,
-            "facultyNumber": faculty.faculty_Number,
+            "name": faculty.name,
+            "facultyNumber": faculty.facultyNumber,
             "gender": gender_string,
             "email": faculty.email,
             "mobile_number": faculty.mobile_number,
@@ -124,4 +124,4 @@ def fetchFacultyDetails():
         })
     else:
         flash('User not found', 'danger')
-        return redirect(url_for('faculty_api.login'))
+        return redirect(url_for('faculty_api.faculty_login'))

@@ -87,10 +87,33 @@
                     <button type="submit" class="btn btn-success">Submit Application</button>
                 </div>
 
+<<<<<<< HEAD
             </form>
            
         </div>
     </div>
+=======
+        <label for="me_file">File:</label><br>
+        <input type="file" id="me_file" name="me_file" required><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Faculty">Faculty Member/s</option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+        </select><br><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+>>>>>>> 0875974cff52974d0c81bdbc55dd18776ddf9cff
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>

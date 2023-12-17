@@ -575,7 +575,7 @@ class Faculty(db.Model, UserMixin):
     __tablename__ = 'faculties'
 
     facultyID = db.Column(db.Integer, primary_key=True)  # UserID
-    faculty_Number = db.Column(db.String(255), unique=True, nullable=False) #Faculty_Number
+    facultyNumber = db.Column(db.String(255), unique=True, nullable=False) #Faculty_Number
     userType = db.Column(db.String(255))  # e.g., 'Admin', 'Professor', etc.
     name = db.Column(db.String(255), nullable=False)  # Name
     email = db.Column(db.String(100), unique=True, nullable=False)  # Email

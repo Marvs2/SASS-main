@@ -34,31 +34,31 @@
         </tr>
     </thead>
     <tbody>
-        {% for application in overload_applications %}
+        {% for overload_applications in overload_applications %}
             <tr>
-                <td>{{ application.overload_application_id }}</td>
-                <td>{{ application.name }}</td>
-                <td>{{ application.studentNumber }}</td>
-                <td>{{ application.semester }}</td>
-                <td>{{ application.subjects_to_add }}</td>
-                <td>{{ application.justification }}</td>
-                <td>        {% if application.file_data %}
-                    <a href="{{ url_for('get_overload_file', overload_application_id=application.overload_application_id) }}" class="btn btn-success" download>{{ application.file_filename }}</a>
+                <td>{{ overload_applications.overload_application_id }}</td>
+                <td>{{ overload_applications.Name }}</td>
+                <td>{{ overload_applications.StudentNumber }}</td>
+                <td>{{ overload_applications.semester }}</td>
+                <td>{{ overload_applications.subjects_to_add }}</td>
+                <td>{{ overload_applications.justification }}</td>
+                <td>        {% if overload_applications.file_data %}
+                    <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download>{{ overload_applications.file_filename }}</a>
                 {% else %}
                     <span class="badge badge-warning">No File</span>
                 {% endif %}</td>
-                <td>{{ application.user_responsible }}</td>
-                <td>{{ application.status }}</td>
+                <td>{{ overload_applications.user_responsible }}</td>
+                <td>{{ overload_applications.status }}</td>
                 <td>
                     <!-- Button to trigger the modal form -->
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ application.overload_application_id }}">
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_applications.overload_application_id }}">
                         Edit Status
                     </button>
                 </td>
             </tr>
 
             <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ application.overload_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+            <div class="modal fade" id="statusModal{{ overload_applications.overload_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -72,7 +72,7 @@
                             <form>
                                 <!-- Add form fields for editing status -->
                                 <label for="newStatus">New Status:</label>
-                                <input type="text" id="newStatus" name="new_status" value="{{ application.status }}" required>
+                                <input type="text" id="newStatus" name="new_status" value="{{ overload_applications.status }}" required>
                             </form>
                         </div>
                         <div class="modal-footer">
@@ -96,5 +96,24 @@
     $(document).ready(function() {
         $('#overloadTable').DataTable();
     });
+         // Function to update status
+  function updateStatus(Changesubject_ID) {
+    const formId = `statusForm${Changesubject_ID}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/overload', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
 </script>
 {% endblock %}

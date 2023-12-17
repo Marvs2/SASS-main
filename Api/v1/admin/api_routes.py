@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from Api.v1.student.api_routes import API_KEYS
 from models import Admin, Student
-
+from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from decorators.auth_decorators import admin_required
@@ -74,6 +74,48 @@ def admin_profile():
         flash('User not found', 'danger')
         return redirect(url_for('admin_api.login'))
     
+
+#========================================#
+# Creation of Student account
+def create_student(form_data, files):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    Email = form_data['Email']
+    address = form_data['address']
+    Password = form_data['Password']
+    Gender = form_data['Gender']
+    DateofBirth = form_data['DateofBirth']
+    PlaceofBirth = form_data['PlaceofBirth']
+    ResidentialAddress = form_data['ResidentialAddress']
+    MobileNumber = form_data['MobileNumber']
+
+    # Check if the student already exists
+    existing_student = Student.query.filter_by(StudentNumber=StudentNumber).first()
+    if existing_student:
+        return 'Student with this student number already exists'
+    
+    # Hash the password
+    hashed_password = generate_password_hash(Password, method='pbkdf2:sha256')
+
+    # Handle image upload
+    userImg = files['image']
+    userImg = userImg.read() if userImg else None
+    
+    # Create a new student instance
+    new_student = Student(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        Email=Email,
+        address=address,
+        Password=hashed_password,
+        Gender=Gender,
+        DateofBirth=DateofBirth,
+        PlaceofBirth=PlaceofBirth,
+        ResidentialAddress=ResidentialAddress,
+        MobileNumber=MobileNumber
+    )
+    
+    return new_student
 """# Route to fetch the list of students as JSON
 @admin_api.route('/student_list', methods=['GET'])
 def get_student_list():

@@ -16,7 +16,7 @@
     }
 </style>
 
-<h1>Change of Subjects changesubjects</h1>
+<h1>Change of Subjects changesubjectss</h1>
 
 <table id="changeOfSubjectsTable" class="table table-bordered">
     <thead>
@@ -32,20 +32,21 @@
         </tr>
     </thead>
     <tbody>
-        {% for changesubject in changesubjects %}
+        {% for changesubjects in changesubjects %}
             <tr>
-                <td>{{ changesubject.Changesubject_ID }}</td>
-                <td>{{ changesubject.studentNumber }}</td>
-                <td>{{ changesubject.name }}</td>
-                <td>{{ changesubject.enrollment_type }}</td>
-                <td>{% if changesubject.ace_form_data %}
-                    <a href="{{ url_for('get_change_file', Changesubject_ID=changesubject.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubject.ace_form_filename }}</a>
+                <td>{{ changesubjects.Changesubject_ID }}</td>
+                <td>{{ changesubjects.StudentNumber }}</td>
+                <td>{{ changesubjects.Name }}</td>
+                <td>{{ changesubjects.enrollment_type }}</td>
+                <td>{% if changesubjects.ace_form_data %}
+                    <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubjects.ace_form_filename }}</a>
                 {% else %}
                     <span class="badge badge-warning">No File</span>
                 {% endif %}</td>
-                <td>{{ changesubject.created_at }}</td>
-                <td>{{ changesubject.user_responsible }}</td>
-                <td>{{ changesubject.status }}</td>
+                <td>{{ changesubjects.created_at }}</td>
+                <td>{{ changesubjects.user_responsible }}</td>
+                <td>{{ changesubjects.status }}</td>
+                <td> <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ changesubjects.Changesubject_ID }}">Change Status</button></td>
             </tr>
         {% endfor %}
     </tbody>
@@ -61,5 +62,24 @@
     $(document).ready(function() {
         $('#changeOfSubjectsTable').DataTable();
     });
+     // Function to update status
+  function updateStatus(Changesubject_ID) {
+    const formId = `statusForm${Changesubject_ID}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/change', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
 </script>
 {% endblock %}

@@ -34,22 +34,22 @@
     </tr>
   </thead>
   <tbody>
-    {% for subject in subjects %}
+    {% for addsubjects in addsubjects %}
       <tr>
-        <td>{{ subject.subject_ID }}</td>
-        <td>{{ subject.studentNumber }}</td>
-        <td>{{ subject.name }}</td>
-        <td>{{ subject.subject_Names }}</td>
-        <td>{{ subject.enrollment_type }}</td>
-        <td>        {% if subject.file_data %}
-            <a href="{{ url_for('get_subject_file', subject_ID=subject.subject_ID) }}" class="btn btn-success" download>{{ subject.file_name }}</a>
+        <td>{{ addsubjects.subject_ID }}</td>
+        <td>{{ addsubjects.StudentNumber }}</td>
+        <td>{{ addsubjects.Name }}</td>
+        <td>{{ addsubjects.subject_Names }}</td>
+        <td>{{ addsubjects.enrollment_type }}</td>
+        <td>        {% if addsubjects.file_data %}
+            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
         {% else %}
             <span class="badge badge-warning">No File</span>
         {% endif %}</td>
-        <td>{{ subject.user_responsible }}</td>
-        <td>{{ subject.status }}</td>
+        <td>{{ addsubjects.user_responsible }}</td>
+        <td>{{ addsubjects.status }}</td>
         <td>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ subject.subject_ID }}">Change Status</button>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
         </td>
       </tr>
     {% endfor %}
@@ -57,8 +57,8 @@
 </table>
 
 <!-- Modal for Change Status -->
-{% for subject in subjects %}
-  <div class="modal fade" id="statusModal{{ subject.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+{% for addsubjects in addsubjects %}
+  <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -68,17 +68,17 @@
           </button>
         </div>
         <div class="modal-body">
-          <form id="statusForm{{ subject.subject_ID }}">
-            <input type="hidden" name="subject_id" value="{{ subject.subject_ID }}">
+          <form id="statusForm{{ addsubjects.subject_ID }}">
+            <input type="hidden" name="subject_id" value="{{ addsubjects.subject_ID }}">
             <div class="form-group">
               <label for="newStatus">New Status:</label>
-              <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ subject.status }}" required>
+              <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ addsubjects.status }}" required>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="updateStatus('{{ subject.subject_ID }}')">Save changes</button>
+          <button type="button" class="btn btn-primary" onclick="updateStatus('{{ addsubjects.subject_ID }}')">Save changes</button>
         </div>
       </div>
     </div>
@@ -103,7 +103,7 @@
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 
-    fetch('/student/update_subject', {
+    fetch('/faculty/adding', {
       method: 'POST',
       body: formData,
     })

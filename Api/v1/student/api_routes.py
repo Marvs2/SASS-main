@@ -1,7 +1,7 @@
 # api/api_routes.py
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, Student
+from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student
 from werkzeug.utils import secure_filename
 from datetime import datetime
 #from models import Services
@@ -52,20 +52,6 @@ def is_user_logged_in_overload():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
 
-def store_user_details_in_session(student):
-    # Store user details in the session
-    session['user_id'] = student.StudentId
-    session['StudentNumber'] = student.StudentNumber
-    session['Name'] = student.Name
-    session['Gender'] = student.Gender
-    session['Email'] = student.Email
-    session['address'] = student.address
-    session['DateofBirth'] = student.DateofBirth
-    session['PlaceofBirth'] = student.PlaceofBirth
-    session['ResidentialAddress'] = student.ResidentialAddress
-    session['MobileNumber'] = student.MobileNumber
-    session['userImg'] = student.userImg
-
 # Login function for student to go to student_overload
 @student_api.route('/login-Overload', methods=['POST'])
 def login_Overload():
@@ -83,16 +69,14 @@ def login_Overload():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
-
-            # Use the function to store user details in the session
-            store_user_details_in_session(student)
 
             return redirect(url_for('student_portal_overload'))
         else:
             flash('Invalid Email or Password', 'danger')
 
-    return render_template('student/login.html')
+    return render_template('student/login_for_overload.html')
 
 #========================================================
 
@@ -116,25 +100,13 @@ def login_Certification():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['Name'] = student.Name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_certification', student_detailss=session))
+            return redirect(url_for('student_portal_certification'))
         else:
             flash('Invalid Email or Password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login_certification.html')
 
 #=============================================================
 def is_user_logged_in_changesubsched():
@@ -157,21 +129,10 @@ def login_Changesubsched():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['Name'] = student.Name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_changesubsched', student_detailss=session))
+            return redirect(url_for('student_portal_changesubsched'))
 
         else:
             flash('Invalid Email or Password', 'danger')
@@ -200,39 +161,27 @@ def login_Enrollment():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['Name'] = student.Name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_enrollment', student_detailss=session))
+            return redirect(url_for('student_portal_enrollment'))
         else:
             flash('Invalid Email or Password', 'danger')
     return render_template('student/login.html')
 
 #=============================================================
 # Function to check if the user is logged in addingofsubject
-def is_user_logged_in_addingofsubject():
+def is_user_logged_in_addingsubjects():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
 
 
 # Login function for student to goto student_enrollment
-@student_api.route('/login-AddingofSubjects', methods=['GET', 'POST'])
+@student_api.route('/login-AddingofSubjects', methods=['POST'])
 def login_Addingofsubject():
-    if is_user_logged_in_addingofsubject():
+    if is_user_logged_in_addingsubjects():
         # If the user is already logged in, redirect to the overload subjects page
-        return redirect(url_for('student_portal_addingsubject'))
+        return redirect(url_for('student_portal_addingsubjects'))
 
     if request.method == 'POST':
         StudentNumber = request.form['StudentNumber']
@@ -243,24 +192,13 @@ def login_Addingofsubject():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_addingsubject', student_details=session))
+            return redirect(url_for('student_portal_addingsubjects'))
         else:
             flash('Invalid Email or Password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login_addsubjects.html')
 
 #=============================================================
 # Function to check if the user is logged in tutorial of subjects
@@ -285,25 +223,13 @@ def login_Tutorial():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_tutorial', student_detailss=session))
+            return redirect(url_for('student_portal_tutorial'))
         else:
             flash('Invalid Email or Password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login_tutorial.html')
 
 #=============================================================
 # Function to check if the user is logged in shifting
@@ -328,22 +254,10 @@ def login_Shifting():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_shifting', student_detailss=session))
+            return redirect(url_for('student_portal_shifting'))
         else:
             flash('Invalid Email or Password', 'danger')
     return render_template('student/login.html')
@@ -371,22 +285,10 @@ def login_Petition():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_petition', student_detailss=session))
+            return redirect(url_for('student_portal_petition'))
         else:
             flash('Invalid Email or Password', 'danger')
     return render_template('student/login.html')
@@ -414,24 +316,13 @@ def login_Gradeentry():
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
+            session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            # Store additional student details in the session
-            session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-            return redirect(url_for('student_portal_gradeentry', student_detailss=session))
+            return redirect(url_for('student_portal_gradeentry'))
         else:
             flash('Invalid Email or Password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login_gradeentry.html')
 
 #=============================================================
 
@@ -449,33 +340,21 @@ def login_Crossenrollment():
         return redirect(url_for('student_portal_crossenrollment'))
 
     if request.method == 'POST':
-        StudentNumber = request.data['StudentNumber']
-        Password = request.data['Password']
+        StudentNumber = request.form['StudentNumber']
+        Password = request.form['Password']
         
         student = Student.query.filter_by(StudentNumber=StudentNumber).first()
         if student and check_password_hash(student.Password, Password):
             # Successfully authenticated
             access_token = create_access_token(identity=student.StudentId)
             session['access_token'] = access_token
-            session['user_role'] = 'student'
-
-            # Store additional student details in the session
             session['user_id'] = student.StudentId
-            session['StudentNumber'] = student.StudentNumber
-            session['name'] = student.name
-            session['Gender'] = student.Gender
-            session['Email'] = student.Email
-            session['address'] = student.address
-            session['DateofBirth'] = student.DateofBirth
-            session['PlaceofBirth'] = student.PlaceofBirth
-            session['ResidentialAddress'] = student.ResidentialAddress
-            session['MobileNumber'] = student.MobileNumber
-            session['userImg'] = student.userImg
-
-            return redirect(url_for('student_portal_crossenrollment', student_detailss=session))
+            session['user_role'] = 'student'
+            
+            return redirect(url_for('student_portal_crossenrollment'))
         else:
             flash('Invalid Email or Password', 'danger')
-    return render_template('student/login.html')
+    return render_template('student/login_crossenrollment.html')
 
 #===========================================================#
 #==============The real login in the true manners===========#
@@ -738,6 +617,8 @@ def create_addsubjects_application(form_data, files, StudentId):
         flash('Please fill out all fields and provide valid values.', 'danger')
         return None  # Replace 'add_subjects' with the actual route
 
+    # Log the form submission
+    #log_form_submission_to_file(form_data)
     # Additional validation logic can be added here
 
     new_addsubjects_application = AddSubjects(
@@ -753,6 +634,18 @@ def create_addsubjects_application(form_data, files, StudentId):
     )
     
     return new_addsubjects_application
+
+"""def log_form_submission_to_file(form_data):
+    with open('form_submissions.log', 'a') as log_file:
+        log_file.write(f"Timestamp: {datetime.datetime.now()}\n")
+        log_file.write(f"Student Number: {form_data.get('StudentNumber')}\n")
+        log_file.write(f"Student Name: {form_data.get('Name')}\n")
+        log_file.write(f"Subject Names: {form_data.get('subject_Names')}\n")
+        log_file.write(f"Enrollment Type: {form_data.get('enrollment_type')}\n")
+        log_file.write(f"User Responsible: {form_data.get('user_responsible')}\n")
+        log_file.write(f"Status: {form_data.get('status')}\n")
+        log_file.write("\n")
+"""
 
     
 #=========================================================#
@@ -1011,8 +904,8 @@ def create_shifting_application(form_data, files, StudentId):
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
-    if 'filesubject' not in files:
-        flash('Please provide the Subjects file.', 'danger')
+    if 'fileshifting' not in files:
+        flash('Please provide the shifitng file.', 'danger')
         return None
 
     fileshifting = files['fileshifting']
@@ -1031,7 +924,7 @@ def create_shifting_application(form_data, files, StudentId):
 
     # Additional validation logic can be added here
 
-    new_shifting_application = AddSubjects(
+    new_shifting_application = ShiftingApplication(
         StudentNumber=StudentNumber,
         Name=Name,
         current_program=current_program,
