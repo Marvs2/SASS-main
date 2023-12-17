@@ -132,7 +132,7 @@ def upload_image():
 def overload():
     return render_template("/services/subject_overload.html")
 
-@app.route('/services/addingofsubject')
+@app.route('/services/addingofsubjects')
 def adding():
     return render_template("/services/adding_of_subject.html")
 
@@ -785,7 +785,7 @@ def portal_enrollment():
 #addsubjects
 @app.route('/student/login_addsubjects')
 @prevent_authenticated
-def portal_addingsubjects():
+def portal_addingofsubjects():
     session.permanent = True
     return render_template('student/login_addsubjects.html')
 
@@ -981,12 +981,12 @@ def redirect_based_on_login_certification():
         return redirect(url_for('portal_certification'))
 #========================================================================
 # Change of subject or sched function for student
-@app.route('/student/changeofsubject/schedule')
+@app.route('/student/changeofsubject')
 def student_portal_changesubsched():
     session.permanent = True
+
     if is_user_logged_in_changesubsched():
-        return render_template('student/change_of_subject.html')
-    
+        return render_template('student/changesofsubject.html')
        # Redirect to the login page if not logged in
     return redirect(url_for('portal_changesubsched'))
 
@@ -1020,10 +1020,11 @@ def is_user_logged_in_changesubsched():
 # Main function to handle redirection based on user login status
 @app.route('/student/redirect_based_on_login_changesubsched')
 def redirect_based_on_login_changesubsched():
-    if is_user_logged_in_certification():
+    if is_user_logged_in_changesubsched():
         return redirect(url_for('student_portal_changesubsched'))
     else:
         return redirect(url_for('portal_changesubsched'))
+    
 #========================================================================
 # Enrollment function for student
 @app.route('/student/manualenrollment')
@@ -1069,15 +1070,14 @@ def redirect_based_on_login_enrollment():
 #========================================================================
 
 # addingsubject subjects function for student
-@app.route('/student/addingsubjects')
-def student_portal_addingsubjects():
+@app.route('/student/addingsubject')
+def student_portal_addingofsubjects():
     session.permanent = True
     # Use the common login check
-    if is_user_logged_in_addingsubjects():
-        return render_template('student/addingsubject.html')
+    if is_user_logged_in_addingofsubjects():
+        return render_template("student/addingsubject.html")
     
-   # Redirect to the login page if not logged in
-    return redirect(url_for('portal_addingsubjects'))
+    return redirect(url_for('portal_addingofsubjects'))
 
 def get_student_details(StudentId):
     student = Student.query.get(StudentId)
@@ -1097,23 +1097,23 @@ def get_student_details(StudentId):
         return student_details
     else:
         # If not logged in, redirect to the login page
-        return redirect(url_for('portal_addingsubjects'))
+        return redirect(url_for('portal_addingofsubjects'))
 
 
 # Function to check if the user is logged in
-def is_user_logged_in_addingsubjects():
+def is_user_logged_in_addingofsubjects():
     session.permanent = True
     # Replace this condition with your actual logic for checking if the user is logged in
     return session.get("StudentId") is not None
 
 
 # Main function to handle redirection based on user login status
-@app.route('/student/redirect_based_on_login_addingsubjects')
-def redirect_based_on_login_addingsubjects():
-    if is_user_logged_in_addingsubjects():
-        return redirect(url_for('student_portal_addingsubjects'))
+@app.route('/student/redirect_based_on_login_addingofsubjects')
+def redirect_based_on_login_addingofsubjects():
+    if is_user_logged_in_addingofsubjects():
+        return redirect(url_for('student_portal_addingofsubjects'))
     else:
-        return redirect(url_for('portal_addingsubjects'))
+        return redirect(url_for('portal_addingofsubjects'))
 
 
 #================================================================

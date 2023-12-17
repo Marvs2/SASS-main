@@ -171,17 +171,17 @@ def login_Enrollment():
 
 #=============================================================
 # Function to check if the user is logged in addingofsubject
-def is_user_logged_in_addingsubjects():
+def is_user_logged_in_addingofsubjects():
     # Replace this condition with your actual logic for checking if the user is logged in
     return 'access_token' in session and session['access_token'] is not None
 
 
 # Login function for student to goto student_enrollment
 @student_api.route('/login-AddingofSubjects', methods=['POST'])
-def login_Addingofsubject():
-    if is_user_logged_in_addingsubjects():
+def login_AddingofSubjects():
+    if is_user_logged_in_addingofsubjects():
         # If the user is already logged in, redirect to the overload subjects page
-        return redirect(url_for('student_portal_addingsubjects'))
+        return redirect(url_for('student_portal_addingofsubjects'))
 
     if request.method == 'POST':
         StudentNumber = request.form['StudentNumber']
@@ -195,7 +195,7 @@ def login_Addingofsubject():
             session['user_id'] = student.StudentId
             session['user_role'] = 'student'
 
-            return redirect(url_for('student_portal_addingsubjects'))
+            return redirect(url_for('student_portal_addingofsubjects'))
         else:
             flash('Invalid Email or Password', 'danger')
     return render_template('student/login_addsubjects.html')

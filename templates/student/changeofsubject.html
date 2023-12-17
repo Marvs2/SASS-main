@@ -1,16 +1,7 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-    <h1>Application for Change of Enrollment (Change of Schedule/Subjects)</h1>
-    <p>Process requests for application for change of enrollment specifically for changing schedules or subjects. This is applicable to both regular and irregular students of the University and is done during the adjustment period.</p>
-
-    <h2>Checklist of Requirements:</h2>
-    <ul>
-        <li>Accomplished and printed copy of ACE form (Change of Schedule/Subject) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a>.</li>
-    </ul>
-    <br>
-        <p><a href="{{url_for('download_Change_Sched_Subs')}}">Download Application file for Change of Subject/Sched</a></p>
-    <br>   
+    
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -23,49 +14,80 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
+          
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Change of Schedule/Subjects</h3>           
+        </div>
 
-    <h2>Application Form</h2>
     <form action="{{ url_for('change_of_subjects') }}" method="POST" enctype="multipart/form-data">
-        <br>
-        <label for="StudentNumber">Student No.:</label><br>
-        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
-    
-        <label for="Name">Student Name:</label><br>
-        <input type="text" id="Name" name="Name" required><br><br>
-    
-        <label for="enrollment_type">Enrollment Type:</label><br>
-        <select id="enrollment_type" name="enrollment_type" required>
-            <option value="Regular">Regular</option>
-            <option value="Irregular">Irregular</option>
-        </select><br><br>
-    
-        <label for="ace_form">ACE Form File:</label>
-        <input type="file" id="ace_form" name="ace_form"><br><br><!-- File input field -->
 
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="Faculty Member/s">
-                Faculty Member/s
-            </option>
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="CDO Cashier/Accounting">CDO Cashier/Accounting</option>
-            <option value="Registrar's Office">Registrar's Office</option>
-        </select><br><br>
-    
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
-                <!-- Hidden input for the current date and time -->
-        <input type="hidden" id="created_at" name="created_at">
-        <br><br>
-        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
+        
+        <div class="row mb-3">
+            <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="Name" class="col-sm-3 col-form-label">Name</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="Name" name="Name" readonly>
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="enrollment_type" class="col-sm-3 col-form-label">Enrollment Type</label>
+                <div class="col-sm-8">
+                    <select class="custom-select" id="enrollment_type" name="enrollment_type" required>
+                        <option value="">Select Enrollment Type...</option>
+                        <option value="Regular">Regular</option>
+                        <option value="Irregular">Irregular</option>
+                    </select>
+                </div>
+        </div>
+        
+        <div class="row mb-3">
+            <label for="ace_form" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+            <div class="col-sm-8">
+                <input class="form-control" type="file" name="ace_form" id="ace_form" accept=".pdf">
+              </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                <div class="col-sm-8">
+                    <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                        <option value="Faculty Member/s">Faculty Member/s</option>
+                        <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                        <option value="CDO Cashier/Accounting">CDO Cashier/Accounting</option>
+                        <option value="Registrar's Office">Registrar's Office</option>
+                    </select>
+                </div>
+        </div>
+
+        <div class="row mb-3">
+            <label for="status" class="col-sm-3 col-form-label">Status </label>
+                <div class="col-sm-8">
+                    <select class="custom-select" id="status" name="status" required>
+                        <option value="Sent" selected>Sending</option>
+                        <option value="Pending" disabled>Pending</option>
+                        <option value="Approved" disabled>Approved</option>
+                        <option value="Rejected" disabled>Rejected</option>
+                    </select>
+                </div>
+        </div>
+
+         <div class="d-flex justify-content-center">
+            <button type="submit" class="btn btn-success">Submit Application</button>
+        </div>
+
     </form>
 
+    </div>
+</div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <script>

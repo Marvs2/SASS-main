@@ -1,30 +1,6 @@
 {% extends "student/layout.html" %}
 {% block content %}
-<style>
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        margin: auto;
-        max-width: 600px; /* Adjust the width as needed */
-        padding: 20px;
-    }
-
-    /* Add other styles as needed */
-</style>
-
-<h1>Application for Overload of Subjects</h1>
-<p>Process a request for the overload of subjects for students who intend to add additional subjects, more than the prescribed number of units specified in the curriculum for the current semester, prior to the opening of classes or within the adjustment period specified in the University calendar, and approved by the Director/Head of Academic Program.</p>
-
-<p>Request for overload may be allowed for graduating students during the last school term. For undergraduate students, overload may be allowed under the following considerations:</p>
-
-<ul>
-    <li>Academically outstanding student as certified by the Director/Head of Academic Program.</li>
-    <li>Transferee/Shiftiee who is in good standing (no failing grade in the previous semester).</li>
-</ul>
-<br>
+  
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         {% for message in messages %}
@@ -38,103 +14,131 @@
     {% endif %}
 {% endwith %}
 
-    <h2>Application Form</h2>
-    <form action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
-        <label for="StudentNumber">Student Number:</label><br>
-        <input type="text" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()"><br><br>
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Overload of Subjects</h3>           
+        </div>
+        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+          
+            <div class="row mb-3">
+                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()" readonly>
+                </div>
+            </div>
+           
+            <div class="row mb-3">
+                <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="Name" name="Name" readonly>
+                </div>
+            </div>
 
-        <!-- Display student name dynamically -->
-        <label for="Name">Student Name:</label><br>
-        <input type="text" id="Name" name="Name" required><br><br>
-        <label for="programcourse">Select Program:</label><br>
-<select id="programcourse" name="programcourse" required>
-    <option value="">Select Program</option>
-    <option value="BSIT">BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY</option>
-    <option value="BBTLE_HE">BACHELOR OF BUSINESS TECHNOLOGY AND LIVELIHOOD EDUCATION - MAJOR IN HOME ECONOMICS</option>
-    <option value="BBTLE_ICT">BACHELOR OF BUSINESS TECHNOLOGY AND LIVELIHOOD EDUCATION - MAJOR IN INFORMATION AND COMMUNICATION TECHNOLOGY</option>
-    <option value="BSBA_MM">BACHELOR OF SCIENCE IN BUSINESS ADMINISTRATION - MAJOR IN MARKETING MANAGEMENT</option>
-    <option value="BSBA_HRM">BACHELOR OF SCIENCE IN BUSINESS ADMINISTRATION - MAJOR IN HUMAN RESOURCE MANAGEMENT</option>
-    <option value="BSE">BACHELOR OF SCIENCE IN ENTREPRENEURSHIP</option>
-    <option value="DOMT_MOM">DIPLOMA IN OFFICE MANAGEMENT TECHNOLOGY WITH SPECIALIZATION IN MEDICAL OFFICE MANAGEMENT</option>
-    <option value="BPA_PFM">BACHELOR OF PUBLIC ADMINISTRATION - MAJOR IN PUBLIC FINANCIAL MANAGEMENT</option>
-</select><br><br>
+            <div class="row mb-3">
+                <label for="date" class="col-sm-3 col-form-label">Application Date</label>
+                <div class="col-sm-8">
+                    <div class="input-group date" id="datepicker">
+                        <input type="text" class="form-control" id="date" name="date" required>
+                        <span class="input-group-append">
+                            <span class="input-group-text bg-light d-block">
+                                <i class='bx bxs-calendar icon'></i>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
 
+            <div class="row mb-3">
+                <label for="programcourse" class="col-sm-3 col-form-label">Program</label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="programcourse" name="programcourse" required>
+                            <option value ="">Select Program...</option>
+                            <option value="BSIT">Bachelor of Science in Information Technology</option>
+                            <option value="BBTLE_HE">Bachelor of Business Technology and Livelihood Education - Home Economics</option>
+                            <option value="BBTLE_ICT">Bachelor of Business Technology and Livelihood Education - Information and Communication Technology</option>
+                            <option value="BSBA_MM">Bachelor of Science in Business Administration - Marketing Management</option>
+                            <option value="BSBA_HRM">Bachelor of Science in Business Administration - Human Resource Management</option>
+                            <option value="BSE">Bachelor of Science in Entrepreneurship</option>
+                            <option value="DOMT_MOM">Diploma in Office Management Technology - Medical Office Management</option>
+                            <option value="BPA_PFM">Bachelor of Public Administration - Public Financial Management</option>
+                        </select>
+                    </div>
+            </div>
 
-        <label for="semester">Semester:</label><br>
-        <select id="semester" name="semester" required>
-            <option value="First">1st</option>
-            <option value="Second">2nd</option>
-            <option value="Summer">Summer</option>
-        </select><br><br>
+            <div class="row mb-3">
+                <label for="semester" class="col-sm-3 col-form-label">Semester</label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="semester" name="semester" required>
+                            <option value="">Select Semester...</option>
+                            <option value="First">First Semester</option>
+                            <option value="Second">Second Semester</option>
+                            <option value="Summer">Summer</option>
+                        </select>
+                    </div>
+            </div>
 
-        <label for="subjectsToAdd">Subjects to Add (comma-separated):</label><br>
-        <input type="text" id="subjectsToAdd" name="subjectsToAdd" required><br><br>
+            <div class="row mb-3">
+                <label for="subjectsToAdd" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="subjectsToAdd" name="subjectsToAdd" required>
+                </div>
+            </div>
 
-        <label for="justification">Justification for Overload:</label><br>
-        <textarea id="justification" name="justification" rows="4" required></textarea><br><br>
+            <div class="row mb-4">
+                <label for="justification" class="col-sm-3 col-form-label">Justification for Overload <br> (State your Reason/s)</label>
+                <div class="col-sm-8">
+                  <textarea class="form-control" id="justification" name="justification" required></textarea>
+                </div>
+            </div>
 
-        <input type="file" name="file"> <!-- File input field -->
-        <br>
-        <br>
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="Director">Director</option>
-            <option value="Head of Academic Program">Head of Academic Program</option>
-        </select><br><br>
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
+            <div class="row mb-3">
+                <label for="file" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" name="file" id="file" accept=".pdf">
+                  </div>
+            </div>
+    
 
-        <button type="submit">Send Application</button>
-    </form>
-
-<script>
-    setTimeout(function() {
-        $('.alert').alert('close');
-    }, 3000);
-    // Form submission logic
-    $('#overloadApplicationForm').submit(function(event) {
-        const StudentNumber = $('#StudentNumber').val().trim();
-        const Name = $('#Name').val().trim();
-        const programcourse = $('#programcourse').val();
-        const semester = $('#semester').val().trim();
-        const subjectsToAdd = $('#subjectsToAdd').val().trim();
-        const justification = $('#justification').val().trim();
-        const userResponsible = $('#user_responsible').val().trim();
-        const status = $('#status').val().trim();
-
-        // Additional validation logic
-        if (!StudentNumber || !Name || !programcourse || !semester || !subjectsToAdd || !justification) {
-            alert('Please fill out all fields and provide valid values.');
-            event.preventDefault(); // Prevent form submission
-        }
-// Prevent default form submission
-    });
-    function validateForm() {
-            var StudentNumber = document.getElementById('StudentNumber').value;
-            var studentName = document.getElementById('Name').value;
-            var programcourse = document.getElementById('programcourse').value;
-            var semester = document.getElementById('semester')
-            var subjectsToAdd = document.getElementById('subjectsToAdd').value;
-            
-
-            if (!StudentNumber || !Name || !programcourse || !semester) {
-                console.error('Error: Please fill out all required fields.');
-                return false;
-            }
-
-            return true;
-        }
-</script>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock content %}
 
 {% block script %}
- <script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script> -->
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
+<script>
+ //   $(document).ready(function () {
+   //     $('#datepicker').datepicker({
+     //       format: 'mm-dd-yyyy', // Adjust the format as needed
+       //     autoclose: true,
+        //});
+    // });
+
+    document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById('date').value = flatpickr.formatDate(new Date(), 'm-d-y');
+
+            flatpickr("#datepicker", {
+                dateFormat: 'm-d-y',
+                minDate: 'today', // Disable previous dates
+                defaultDate: 'today',
+                onClose: function (selectedDates, dateStr, instance) {
+                    // Update the input value when the user selects a date
+                    document.getElementById('date').value = dateStr;
+                }
+            });
+        });
+
     // Fetch student details
     async function fetchStudentDetails() {
         try {
@@ -160,5 +164,49 @@
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
- </script>
+
+    // Form submission logic
+    $('#overloadApplicationForm').submit(function(event) {
+        const StudentNumber = $('#StudentNumber').val().trim();
+        const Name = $('#Name').val().trim();
+        const programcourse = $('#programcourse').val();
+        const semester = $('#semester').val().trim();
+        const subjectsToAdd = $('#subjectsToAdd').val().trim();
+        const justification = $('#justification').val().trim();
+
+        // Additional validation logic
+        if (!StudentNumber || !Name || !programcourse || !semester || !subjectsToAdd || !justification) {
+            alert('Please fill out all fields and provide valid values.');
+            event.preventDefault(); // Prevent form submission
+        }
+    });
+
+    function validateForm() {
+        var StudentNumber = document.getElementById('StudentNumber').value;
+        var Name = document.getElementById('Name').value;
+        var programcourse = document.getElementById('programcourse').value;
+        var semester = document.getElementById('semester').value;
+        var subjectsToAdd = document.getElementById('subjectsToAdd').value;
+
+        if (!StudentNumber || !Name || !programcourse || !semester) {
+            console.error('Error: Please fill out all required fields.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
 {% endblock script %}
+
+
+
+
+
+
+
+
+
+
+
+
+

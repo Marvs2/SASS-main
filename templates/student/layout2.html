@@ -1,0 +1,1623 @@
+<!--------------------------------------------------------- DEFAULT TEMPLATE -------------------------------------------------------->
+
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Overload of Subjects</h3>           
+        </div>
+       
+    </div>
+</div>
+
+<!--------------------------------------------------------- DEFAULT TEMPLATE -------------------------------------------------------->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
+    <link href="{{url_for('static', filename='css/admin.css')}}" rel="stylesheet"/>
+    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
+</head>
+
+<!------------------------------------------------------------------ SIDE NAVBAR ----------------------------------------------------------->
+<body class="sb-nav-fixed">
+    <nav class="sb-topnav navbar navbar-expand navbar-light bg-light">
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button">
+            <i class="fas fa-bars"></i>
+        </button>
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-5" href=""><b>SASS</b></a>
+        <!-- Navbar Search-->
+        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+            <div class="input-group">
+                <!--- <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search" title="button"></i></button>
+            </div> -->
+        </form>
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a title="profile" class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user fa-fw"></i>
+                    <!--- {% if student %}
+                        {{ student.name }}
+                    {% else %}
+                        <input title="text" type="text" id="name" name="name" value="name" readonly>
+                    {% endif %} -->
+                </a>             
+                
+                <!-------------------------------------- MY PROFILE AREA ------------------------------------------------------>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{url_for('studentprofile')}}">My Profile</a></li>
+                    <li><a class="dropdown-item" href="#!">Manage Password</a></li>
+                    <li><hr class="dropdown-divider" /></li>
+                    <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+    <div id="layoutSidenav">
+        <div id="layoutSidenav_nav">
+            <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+                <div class="sb-sidenav-menu">
+                    <div class="nav">
+
+                <!------------------------------------ DASHBOARD AREA ------------------------------------------------------------>
+                        <div class="sb-sidenav-menu-heading">Home</div>
+                        <a class="nav-link" href="{{url_for('student_dashboard')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                            Dashboard
+                        </a>
+
+                <!------------------------------------ SERVICES AREA ------------------------------------------------------------>
+                        <div class="sb-sidenav-menu-heading">Services</div>
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseServices" aria-expanded="false" aria-controls="collapseServices">
+                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                            Request Services
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseServices" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="{{url_for('studentoverload') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Overload of Subjects
+                                </a>
+                                <a class="nav-link" href="{{ url_for('studentaddingsubject') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Adding of Subjects
+                                </a>
+                                <a class="nav-link" href="{{ url_for('studentchange') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Change of Schedule/Subjects
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentcorrection') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Correction of Grade Entry
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentenrollment') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Cross-Enrollment
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentshifting') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Application for Shifting
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentmanualenrollment') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Manual Enrollment
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentpetition') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Online Petition of Subjects
+                                </a>
+                                <a class="nav-link" href="{{url_for('studenttutorial') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Online Request for Tutorial
+                                </a>
+                                <a class="nav-link" href="{{url_for('studentcertification') }}">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                                    Request for Certification
+                                </a>
+                                
+                            </nav>
+                        </div>
+                        
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
+                                History
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
+                                    Authentication
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="login.html">Login</a>
+                                        <a class="nav-link" href="register.html">Register</a>
+                                        <a class="nav-link" href="password.html">Forgot Password</a>
+                                    </nav>
+                                </div>
+                                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
+                                    Error
+                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                                </a>
+                                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingFour" data-bs-parent="#sidenavAccordionPages">
+                                    <nav class="sb-sidenav-menu-nested nav">
+                                        <a class="nav-link" href="401.html">401 Page</a>
+                                        <a class="nav-link" href="404.html">404 Page</a>
+                                        <a class="nav-link" href="500.html">500 Page</a>
+                                    </nav>
+                                </div>
+                            </nav>
+                        </div>
+                        <div class="sb-sidenav-menu-heading">Complaints</div>
+                        <a class="nav-link" href="{{url_for('stud_services')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
+                            Services
+                        </a>
+                        <a class="nav-link" href="tables.html">
+                            <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
+                            Complaint History
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+        <div id="layoutSidenav_content">
+            <main>
+                {% block content %} {% endblock %}
+            </main>
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-right">
+                        <div class="text-muted">
+                            &copy; <script>document.write(new Date().getFullYear());</script>
+                            <a href="https://www.pup.edu.ph/" target="_blank" rel="noopener noreferrer">Polytechnic University of the Philippines |</a>
+                        </div> &nbsp;
+                        <div>
+                            <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use |</a>
+                        </div>&nbsp;
+                        <div>
+                            <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+
+            <script>
+                const api_base_url = '{{ student_api_base_url | default("") }}';
+                console.log('api_base_url: ', api_base_url)
+            </script>
+
+            {% block script %} {% endblock script %}
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+            <script src="{{ url_for('static', filename='js/asset/scripts.js')}}"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
+            <script src="assets/demo/chart-area-demo.js"></script>
+            <script src="assets/demo/chart-bar-demo.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
+            <script src="{{ url_for('static', filename='js/asset/datatables-simple-demo.js')}}"></script>
+        </div>
+    </div>
+</body>
+</html> 
+
+
+
+<!----------------------------------------------------------- OVERLOAD OF SUBJECTS -------------------------------------------->
+
+{% extends "student/layout.html" %}
+{% block content %}
+<style>
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: auto;
+        max-width: 600px; /* Adjust the width as needed */
+        padding: 20px;
+    }
+
+    /* Add other styles as needed */
+</style>
+
+<h1>Application for Overload of Subjects</h1>
+<p>Process a request for the overload of subjects for students who intend to add additional subjects, more than the prescribed number of units specified in the curriculum for the current semester, prior to the opening of classes or within the adjustment period specified in the University calendar, and approved by the Director/Head of Academic Program.</p>
+
+<p>Request for overload may be allowed for graduating students during the last school term. For undergraduate students, overload may be allowed under the following considerations:</p>
+
+<ul>
+    <li>Academically outstanding student as certified by the Director/Head of Academic Program.</li>
+    <li>Transferee/Shiftiee who is in good standing (no failing grade in the previous semester).</li>
+</ul>
+<br>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+
+
+
+    <h2>Application Form</h2>
+    <form action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+        <label for="StudentNumber">Student Number:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()"><br><br>
+
+        <!-- Display student name dynamically -->
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
+        <label for="programcourse">Select Program:</label><br>
+<select id="programcourse" name="programcourse" required>
+    <option value="">Select Program</option>
+    <option value="BSIT">BACHELOR OF SCIENCE IN INFORMATION TECHNOLOGY</option>
+    <option value="BBTLE_HE">BACHELOR OF BUSINESS TECHNOLOGY AND LIVELIHOOD EDUCATION - MAJOR IN HOME ECONOMICS</option>
+    <option value="BBTLE_ICT">BACHELOR OF BUSINESS TECHNOLOGY AND LIVELIHOOD EDUCATION - MAJOR IN INFORMATION AND COMMUNICATION TECHNOLOGY</option>
+    <option value="BSBA_MM">BACHELOR OF SCIENCE IN BUSINESS ADMINISTRATION - MAJOR IN MARKETING MANAGEMENT</option>
+    <option value="BSBA_HRM">BACHELOR OF SCIENCE IN BUSINESS ADMINISTRATION - MAJOR IN HUMAN RESOURCE MANAGEMENT</option>
+    <option value="BSE">BACHELOR OF SCIENCE IN ENTREPRENEURSHIP</option>
+    <option value="DOMT_MOM">DIPLOMA IN OFFICE MANAGEMENT TECHNOLOGY WITH SPECIALIZATION IN MEDICAL OFFICE MANAGEMENT</option>
+    <option value="BPA_PFM">BACHELOR OF PUBLIC ADMINISTRATION - MAJOR IN PUBLIC FINANCIAL MANAGEMENT</option>
+</select><br><br>
+
+
+        <label for="semester">Semester:</label><br>
+        <select id="semester" name="semester" required>
+            <option value="First">1st</option>
+            <option value="Second">2nd</option>
+            <option value="Summer">Summer</option>
+        </select><br><br>
+
+        <label for="subjectsToAdd">Subjects to Add (comma-separated):</label><br>
+        <input type="text" id="subjectsToAdd" name="subjectsToAdd" required><br><br>
+
+        <label for="justification">Justification for Overload:</label><br>
+        <textarea id="justification" name="justification" rows="4" required></textarea><br><br>
+
+        <input type="file" name="file"> <!-- File input field -->
+        <br>
+        <br>
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Director">Director</option>
+            <option value="Head of Academic Program">Head of Academic Program</option>
+        </select><br><br>
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+        <button type="submit">Send Application</button>
+    </form>
+
+<script>
+    setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
+    // Form submission logic
+    $('#overloadApplicationForm').submit(function(event) {
+        const StudentNumber = $('#StudentNumber').val().trim();
+        const Name = $('#Name').val().trim();
+        const programcourse = $('#programcourse').val();
+        const semester = $('#semester').val().trim();
+        const subjectsToAdd = $('#subjectsToAdd').val().trim();
+        const justification = $('#justification').val().trim();
+        const userResponsible = $('#user_responsible').val().trim();
+        const status = $('#status').val().trim();
+
+        // Additional validation logic
+        if (!StudentNumber || !Name || !programcourse || !semester || !subjectsToAdd || !justification) {
+            alert('Please fill out all fields and provide valid values.');
+            event.preventDefault(); // Prevent form submission
+        }
+// Prevent default form submission
+    });
+    function validateForm() {
+            var StudentNumber = document.getElementById('StudentNumber').value;
+            var studentName = document.getElementById('Name').value;
+            var programcourse = document.getElementById('programcourse').value;
+            var semester = document.getElementById('semester')
+            var subjectsToAdd = document.getElementById('subjectsToAdd').value;
+            
+
+            if (!StudentNumber || !Name || !programcourse || !semester) {
+                console.error('Error: Please fill out all required fields.');
+                return false;
+            }
+
+            return true;
+        }
+</script>
+
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+
+
+<!------------------------------------------------ MY PROFILE ----------------------------------------------->
+
+{% extends "student/layout.html" %}
+
+{% block content %}
+<style>
+    .form-container {
+        max-width: 400px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #f9f9f9;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+    }
+</style>
+
+            <div class="form-container">
+                <form action="{{url_for('studentprofile')}}" method="POST">
+
+                    <label for="StudentNumber">Student Number:</label>
+                    <input type="text" id="StudentNumber" name="StudentNumber"  disabled required>
+                    <br>
+
+                    <label for="Name" id="name-label">Name:</label>
+                    <input type="text" id="Name" name="Name"  disabled required>
+                    <br>
+
+                    <label for="name">Gender:</label>
+                    <input type="text" id="Gender" name="Gender"  disabled required>
+                    <br>
+            
+                    <label for="Email">Email:</label>
+                    <input type="email" id="Email" name="Email"  disabled required>
+                    <br>
+            
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address"  disabled>
+                    <br>
+            
+                    <label for="DateofBirth">Date of Birth:</label>
+                    <input type="date" id="DateofBirth" name="DateofBirth"  disabled>
+                    <br>
+            
+                    <label for="PlaceofBirth">Place of Birth:</label>
+                    <input type="text" id="PlaceofBirth" name="PlaceofBirth"  disabled>
+                    <br>
+            
+                    <label for="MobileNumber">Mobile Number:</label>
+                    <input type="tel" id="MobileNumber" name="MobileNumber"  disabled>
+                    <br>
+                </form>
+            </div>           
+
+{% endblock %}
+
+{% block script %} 
+<script>
+    async function fetchStudentDetails() {
+        const response = await fetch(`${api_base_url}/student-details`);
+
+        if (!response.ok) {
+        throw new Error(
+            `Failed to fetch data. Try to contact the admin to resolve the issue.`
+        );
+        }
+
+        const data_student_details = await response.json();
+        console.log('data_student_details: ', data_student_details)
+        displayDetails(data_student_details);
+  }
+
+  fetchStudentDetails()
+
+  function displayDetails(data){
+    // Select the name input and set the value to data.studentName
+    document.getElementById("Name").value = data.Name
+    // Select the StudentNumber and set the value to data.StudentNumber
+    document.getElementById("StudentNumber").value = data.StudentNumber;
+    // Select the Gender and set the value to data.Gender
+    document.getElementById("Gender").value = data.Gender;
+    // Select the Email and set the value to data.Email
+    document.getElementById("Email").value = data.Email;
+    // Select the address and set the value to data.address
+    document.getElementById("address").value = data.address;
+    // Select the dateOfBirth and set the value to data.dateOfBirth
+    document.getElementById("DateofBirth").value = data.date_of_birth_formatted;
+    // Select the placeOfBirth and set the value to data.placeOfBirth
+    document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
+    // Select the ResidentialAddress and set the value to data.ResidentialAddress
+    //document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+    // Select the MobileNumber and set the value to data.MobileNumber
+    document.getElementById("MobileNumber").value = data.MobileNumber;
+
+    document.getElementById('name-label').innerText = data.studentName; 
+  }
+</script>{% endblock script %}
+
+<!-- 1st Step Make a script that will request in the server -->
+
+<!-- 2nd Get the data  -->
+
+
+
+<!----------------------------------------------- ADDING OF SUBJECTS --------------------------------------------------------------------->
+{% extends "student/layout.html" %}
+{% block content %}
+<style>
+    .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin: auto;
+        max-width: 600px; /* Adjust the width as needed */
+        padding: 20px;
+    }
+</style>
+
+
+    <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
+    <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
+    <br>
+    <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
+    <br>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %} 
+    {% endwith %}
+
+    <h2>Application Form</h2>
+    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+        <label for="StudentNumber">Student number:</label>
+        <input type="text" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()"><br>
+
+        <label for="Name">Student Name:</label>
+        <input type="text" id="Name" name="Name" required><br>
+
+        <label for="subject_Names">Subject Name (comma-separated):</label>
+        <input type="text" id="subject_Names" name="subject_Names" required><br>
+
+        <label for="enrollment_type">Enrollment Type:</label>
+        <select id="enrollment_type" name="enrollment_type" required>
+            <option value="Regular">Regular</option>
+            <option value="Irregular">Irregular</option>
+        </select><br>
+
+        <label for="filesubject">File:</label>
+        <input type="file" id="filesubject" name="filesubject"><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select name="user_responsible" id="user_responsible">
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+        </select><br><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
+    </form>
+
+    <script>
+        // Automatically close the alert messages after 3 seconds
+    setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
+
+    // Form submission logic
+    $('#addsubjectsApplicationForm').submit(function(event) {
+        const StudentNumber = $('#StudentNumber').val().trim();
+        const Name = $('#Name').val().trim();
+        const semester = $('#subject_Names').val().trim();
+        const enrollment_type = $('#enrollment_type').val().trim();
+        const userResponsible = $('#user_responsible').val().trim();
+        const status = $('#status').val().trim();
+
+        // Additional validation logic
+        if (!StudentNumber || !Name || !semester || !enrollment_type) {
+            alert('Please fill out all fields and provide valid values.');
+            event.preventDefault(); // Prevent form submission
+        }
+
+        // You can add more validation logic here as needed
+    });
+        function validateForm() {
+            var StudentNumber = document.getElementById('StudentNumber').value;
+            var studentName = document.getElementById('Name').value;
+            var subject_Names = document.getElementById('subject_Names').value;
+            var enrollmentType = document.getElementById('enrollment_type').value;
+
+            if (!StudentNumber || !studentName || !enrollmentType || !subject_Names) {
+                console.error('Error: Please fill out all required fields.');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+        // Select the name input and set the value to data.Name
+        document.getElementById('Name').value = data.Name;
+    }
+ </script>
+{% endblock script %}
+
+<!------------------------------------------------- CHANGE OF SCHEDULE/SUBJECTS ----------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Application for Change of Enrollment (Change of Schedule/Subjects)</h1>
+    <p>Process requests for application for change of enrollment specifically for changing schedules or subjects. This is applicable to both regular and irregular students of the University and is done during the adjustment period.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Accomplished and printed copy of ACE form (Change of Schedule/Subject) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a>.</li>
+    </ul>
+    <br>
+        <p><a href="{{url_for('download_Change_Sched_Subs')}}">Download Application file for Change of Subject/Sched</a></p>
+    <br>   
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+
+    <h2>Application Form</h2>
+    <form action="{{ url_for('change_of_subjects') }}" method="POST" enctype="multipart/form-data">
+        <br>
+        <label for="StudentNumber">Student No.:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+    
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
+    
+        <label for="enrollment_type">Enrollment Type:</label><br>
+        <select id="enrollment_type" name="enrollment_type" required>
+            <option value="Regular">Regular</option>
+            <option value="Irregular">Irregular</option>
+        </select><br><br>
+    
+        <label for="ace_form">ACE Form File:</label>
+        <input type="file" id="ace_form" name="ace_form"><br><br><!-- File input field -->
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Faculty Member/s">
+                Faculty Member/s
+            </option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting">CDO Cashier/Accounting</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+        </select><br><br>
+    
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
+    </form>
+    <script>
+        function validateForm() {
+            var StudentNumber = document.getElementById('StudentNumber').value;
+            var studentName = document.getElementById('Name').value;
+            if (!StudentNumber || !studentName) {
+                alert('Error: Please fill out all required fields.');
+                return false;
+            }
+    
+            // Add additional validation checks here if needed
+    
+            return true;
+        }
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+        // Select the name input and set the value to data.Name
+        document.getElementById('Name').value = data.Name;
+
+    }
+ </script>
+{% endblock script %}
+
+<!-------------------------------------------------------- CORRECTION OF GRADE ENTRY ------------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Application for Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h1>
+    <p>Correction of entry shall be accomplished within a period of one semester upon receipt of the grade, and the Late Reporting of Grades Form shall be accomplished within a period of one (1) year. Incomplete (Inc.) is temporarily given to a student who may pass the subject but who has not yet complied with all its requirements. Such requirement(s) shall be satisfied within one year from the end of the term; otherwise, the grade shall lapse into "No Credit (N)" or a failing grade.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Completion Form (3 original copies) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a></li>
+        <li>Copy of Class Record.</li>
+        <li>Notarized Affidavit for Change of Grade of professor (for correction of entry/late reporting of grade).</li>
+    </ul>
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+
+    <h2>Application Form</h2>
+    <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+        <label for="StudentNumber">Student Number:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
+
+        <label for="application_type">Application Type:</label><br>
+        <select id="application_type" name="application_type" required>
+            <option value="Correction of Grade Entry">Correction of Grade Entry</option>
+            <option value="Late Reporting of Grades">Late Reporting of Grades</option>
+            <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
+        </select><br><br>
+
+        <label for="completion_form">Completion Form:</label><br>
+        <input type="file" id="completion_form" name="completion_form" required><br><br>
+
+        <label for="class_record">Copy of Class Record:</label><br>
+        <input type="file" id="class_record" name="class_record" required><br><br>
+
+        <label for="affidavit">Notarized Affidavit for Change of Grade:</label><br>
+        <input type="file" id="affidavit" name="affidavit" required><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="CDO Cashier/Accounting Office">
+                CDO Cashier/Accounting Office
+            </option>
+            <option value="Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room">Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room</option>
+            <option value="Director Head of Academic Program">Director Head of Academic Program</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+        </select><br><br>
+        
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+
+        <button type="submit">Submit Application</button>
+    </form>
+    <script>
+        // Automatically close the alert messages after 3 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000);
+
+        // Optional: Add additional logic for form submission, e.g., validation, AJAX submission, etc.
+        $('#applicationForm').submit(function (event) {
+            // Add your form submission logic here
+        });
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+
+<!---------------------------------------------------- APPLICATION FOR CROSS ENROLLMENT ------------------------------------------------>
+{% extends "student/layout.html" %}
+
+{% block content %}
+<h1>Application for Cross Enrollment</h1>
+<p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
+
+<h2>Checklist of Requirements:</h2>
+<ul>
+    <li>Application Letter for Cross-Enrollment.</li>
+    <li>Permit to Cross-Enroll from the Office of the University Registrar.</li>
+</ul>
+<br>
+
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<br>
+
+<h2>Application Form</h2>
+<form id="crossEnrollmentForm" action="{{ url_for('submit_cross_enrollment') }}" method="POST" enctype="multipart/form-data">
+    <label for="StudentNumber">Student ID:</label><br>
+    <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+
+    <label for="Name">Student Name:</label><br>
+    <input type="text" id="Name" name="Name" required><br><br>
+
+    <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
+    <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
+
+    <label for="crossEnrollmentUnits">Total Number of Units:</label><br>
+    <input type="number" id="crossEnrollmentUnits" name="crossEnrollmentUnits" required><br><br>
+
+    <label for="authorizedSubjects">Authorized Subjects to Take:</label><br>
+    <textarea id="authorizedSubjects" name="authorizedSubjects" rows="4" cols="50" required></textarea><br><br>
+
+    <label for="applicationLetter">Application Letter for Cross-Enrollment:</label><br>
+    <input type="file" id="applicationLetter" name="applicationLetter" required><br><br>
+
+    <label for="permitToCrossEnroll">Permit to Cross-Enroll from the Office of the University Registrar:</label><br>
+    <input type="file" id="permitToCrossEnroll" name="permitToCrossEnroll" required><br><br>
+
+    <label for="user_responsible">User Responsible:</label>
+    <select id="user_responsible" name="user_responsible" required>
+        <option value="Student Services">Student Services</option>
+        <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+        <option value="Branch">Branch Registrar</option>
+    </select><br><br>
+    
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+        <option value="Sent" selected>Sending</option>
+        <option value="Pending" disabled>Pending</option>
+        <option value="Approved" disabled>Approved</option>
+        <option value="Rejected" disabled>Rejected</option>
+    </select><br><br>
+
+    <button type="submit">Submit Application</button>
+</form>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Automatically close the alert messages after 3 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 3000);
+
+        // Form submission logic
+        $('#crossEnrollmentForm').submit(function(event) {
+            const studentID = $('#StudentNumber').val().trim();
+            const Name = $('#Name').val().trim();
+            const schoolForCrossEnrollment = $('#crossEnrollmentSchool').val().trim();
+            const totalUnits = $('#crossEnrollmentUnits').val().trim();
+            const authorizedSubjects = $('#authorizedSubjects').val().trim();
+
+            if (!studentID || !name || !schoolForCrossEnrollment || totalUnits <= 0 || !authorizedSubjects) {
+                alert('Please fill out all fields and provide valid values.');
+                event.preventDefault();  // Prevent form submission
+            }
+
+            // Additional validation logic can be added here
+        });
+    });
+</script>
+
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+<!----------------------------------------------- APPLICATION FOR SHIFTIN ------------------------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Application for Shifting</h1>
+    <p>Process requests for students who intend to shift to another program in the University. Students must have one (1) year residency from the current program to qualify for shifting to another program. Application for shifting shall be accomplished prior to the start of the next academic school year. Qualifications may vary depending on the program to which the student intends to shift.</p>
+
+    <br>
+    <p><a href="{{url_for('download_Accreditation')}}">Download Application file for Accreditation of Shiftees & Regular</a></p>
+    <br>
+
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+
+    <h2>Application Form</h2>
+    <form id="shiftingForm" action="{{ url_for('submit_shifting')}}" method="POST" enctype="multipart/form-data">
+        <label for="StudentNumber">Student number:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
+
+        <label for="currentProgram">Current Program:</label><br>
+        <input type="text" id="currentProgram" name="currentProgram" required><br><br>
+
+        <label for="residencyYear">Years of Residency in Current Program:</label><br>
+        <input type="number" id="residencyYear" name="residencyYear" required><br><br>
+
+        <label for="intendedProgram">Intended Program:</label><br>
+        <input type="text" id="intendedProgram" name="intendedProgram" required><br><br>
+
+        <label for="qualifications">Qualifications for Shifting (if any):</label><br>
+        <textarea id="qualifications" name="qualifications" rows="4" cols="50"></textarea><br><br>
+
+        <label for="fileshifting">Attach Supporting Document:</label><br>
+        <input type="file" id="fileshifting" name="fileshifting"><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="CDO Cashier/Accounting Office.">
+                CDO Cashier/Accounting Office.
+            </option>
+            <option value="Administrative, Staff Head of Admission and Registration Office.">Administrative, Staff Head of Admission and Registration Office.</option>
+            <option value="Director/ Head of Academic Program.">Director/ Head of Academic Program.</option>
+        </select><br><br>
+
+    
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+
+        <button type="submit">Submit Application</button>
+    </form>
+
+    <script>
+        const form = document.getElementById('shiftingForm');
+        form.addEventListener('submit', function(event) {
+            const StudentID = document.getElementById('StudentID').value.trim();
+            const Name = document.getElementById('Name').value.trim();
+            const currentProgram = document.getElementById('currentProgram').value.trim();
+            const residencyYear = document.getElementById('residencyYear').value.trim();
+            const intendedProgram = document.getElementById('intendedProgram').value.trim();
+
+            if (!StudentID || !Name || !currentProgram || !residencyYear || !intendedProgram) {
+                alert('Please fill out all required fields.');
+                event.preventDefault();
+            }
+            // Additional validation logic can be added here if needed
+        });
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+<!------------------------------------------------ MANUAL ENROLLMENT REQUEST ------------------------------------------------------>
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Manual Enrollment Request</h1>
+    <p>This service is for both regular and irregular students of the University and is done during the adjustment period. It is used when the student fails to enroll during the online registration period set by the University.</p>
+
+    <p><a href="{{url_for('download_RO_form')}}">Download Application file for Request Form</a></p>
+    <br>  
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+    <br>
+    <h1>Manual Enrollment Form</h1>
+    <form id="manualEnrollmentForm" action="{{ url_for('submitmanualenrollment') }}" method="POST" enctype="multipart/form-data">
+        <label for="StudentNumber">Student Number:</label><br>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+
+        <label for="Name">Student Name:</label><br>
+        <input type="text" id="Name" name="Name" required><br><br>
+
+        <label for="enrollmentType">Enrollment Type:</label><br>
+        <select id="enrollmentType" name="enrollment_type" required>
+            <option value="Regular">Regular</option>
+            <option value="Irregular">Irregular</option>
+            <option value="Special">Special</option>
+            <!-- Add more options as needed -->
+        </select><br><br>
+    
+        <label for="reason">Reason:</label><br>
+        <textarea id="reason" name="reason" rows="4" cols="50" required></textarea><br><br>
+
+        <label for="meFile">File:</label><br>
+        <input type="file" id="meFile" name="me_file" required><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Faculty">Faculty Member/s</option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+        </select><br><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Automatically close the alert messages after 3 seconds
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 3000);
+    
+            // Form submission logic
+            $('#manualEnrollmentForm').submit(function(event) {
+                const StudentNumber = $('#StudentNumber').val().trim();
+                const Name = $('#Name').val().trim();
+                const enrollmentType = $('#enrollmentType').val().trim();
+                const reason = $('#reason').val().trim();
+    
+                if (!StudentNumber || !name || !enrollmentType || !reason) {
+                    alert('Please fill out all fields and provide valid values.');
+                    event.preventDefault();  // Prevent form submission
+                }
+    
+                // Additional validation logic can be added here
+            });
+        });
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+<!---------------------------------------------------------- ONLINE PETITION OF SUBJECTS -------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <div style="display: flex; justify-content: space-between;">
+        <div style="width: 48%;">
+            <h1>Online Petition of Subject</h1>
+            <p>Process online requests for the petition of back subjects or retakes of subjects not offered for the current semester. A minimum of 35 students must request the petition to be recommended by the Administrative Building Administrative Staff ICT Office and approved by the Office of the Vice President for Branches and Campuses.</p>
+            <br>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            <br>
+            <br>
+        
+            <h2>Petition Form</h2>
+            <form id="petitionForm" action="{{url_for('submitpetition')}}" method="POST" enctype="multipart/form-data">
+                <label for="StudentNumber">Student Number:</label><br>
+                <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+        
+                <label for="Name">Student Name:</label><br>
+                <input type="text" id="Name" name="Name" required><br><br>
+        
+                <label for="subjectCode">Subject Code:</label><br>
+                <input type="text" id="subjectCode" name="subjectCode" required><br><br>
+        
+                <label for="subjectName">Subject Name:</label><br>
+                <input type="text" id="subjectName" name="subjectName" required><br><br>
+        
+                <label for="petitionType">Petition Type:</label><br>
+                <select id="petitionType" name="petitionType" required>
+                    <option value="Back Subject">Back Subject</option>
+                    <option value="Retake">Retake</option>
+                    <!-- Add more options as needed -->
+                </select><br><br>
+        
+                <label for="requestReason">Reason for Petition:</label><br>
+                <textarea id="requestReason" name="requestReason" rows="4" cols="50" required></textarea><br><br>
+        
+                <label for="userResponsible">User Responsible:</label>
+                <select id="userResponsible" name="userResponsible" required>
+                    <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
+                    <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
+                </select><br><br>
+        
+                <label for="status">Status:</label>
+                <select id="status" name="status">
+                    <option value="Sent" selected>Sending</option>
+                    <option value="Pending" disabled>Pending</option>
+                    <option value="Approved" disabled>Approved</option>
+                    <option value="Rejected" disabled>Rejected</option>
+                </select><br><br>
+        
+                <button type="submit">Submit Petition</button>
+            </form>
+        
+            <script>
+                $(document).ready(function () {
+                    // Automatically close the alert messages after 3 seconds
+                    setTimeout(function () {
+                        $('.alert').alert('close');
+                    }, 3000);
+
+                const form = document.getElementById('petitionForm');
+                form.addEventListener('submit', function(event) {
+                    const StudentNumber = document.getElementById('StudentNumber').value.trim();
+                    const Name = document.getElementById('Name').value.trim();
+                    const subjectCode = document.getElementById('subjectCode').value.trim();
+                    const subjectName = document.getElementById('subjectName').value.trim();
+                    const petitionType = document.getElementById('petitionType').value.trim();
+                    const requestReason = document.getElementById('requestReason').value.trim();
+                    const userResponsible = document.getElementById('userResponsible').value.trim();
+        
+                    if (!StudentNumber || !Name || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
+                        alert('Please fill out all fields.');
+                        event.preventDefault();
+                    }
+                    // You can add additional validation logic here if needed
+                });
+            });
+            </script>
+        </div>
+
+    <!-- Your petition form code -->
+    <!-- ... -->
+{% endblock content %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+<!------------------------------------------ Online Request for Tutorial ----------------------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+
+    <h1>Online Request for Tutorial of Subject</h1>
+    <p>Process online requests for the tutorial of a subject not offered for the current semester. A retake of a subject by less than the minimum (35) number of students shall be endorsed by the Director/Head of Academic Program to the Office of the Vice President for Branches and Campuses for approval as a tutorial.</p>
+
+    <h2>Checklist of Requirements:</h2>
+    <ul>
+        <li>Online Petition of Subject from <a href="https://sis1.pup.edu.ph/">https://sis1.pup.edu.ph/</a></li>
+    </ul>
+
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+    <br>
+    <div class="form-container">
+        <h2>Request Form</h2>
+        <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
+            <label for="StudentNumber">Student Number:</label>
+            <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+
+            <label for="Name">Student Name:</label>
+            <input type="text" id="Name" name="Name" required><br><br>
+        
+            <label for="subject_code">Subject Code:</label>
+            <input type="text" id="subject_code" name="subject_code" required><br><br>
+        
+            <label for="subject_name">Subject Name:</label>
+            <input type="text" id="subject_name" name="subject_name" required><br><br>
+        
+            <label for="file">File:</label>
+            <input type="file" id="file" name="file" required><br><br>
+        
+            <label for="user_responsible">User Responsible:</label>
+            <select id="user_responsible" name="user_responsible" required>
+                <option value="-Director/ Head of Academic Program">
+                    -Director/ Head of Academic Program
+                </option>
+                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
+            </select><br><br>
+        
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="Sent" selected>Sending</option>
+                <option value="Pending" disabled>Pending</option>
+                <option value="Approved" disabled>Approved</option>
+                <option value="Rejected" disabled>Rejected</option>
+            </select><br><br>
+        
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('tutorialForm');
+        form.addEventListener('submit', function(event) {
+            const StudentNumber = document.getElementById('StudentNumber').value.trim();
+            const studentName = document.getElementById('Name').value.trim();
+            const subjectCode = document.getElementById('subject_code').value.trim();
+            const subjectName = document.getElementById('subject_name').value.trim();
+            const file = document.getElementById('file').files[0];
+            const userResponsible = document.getElementById('user_responsible').value.trim();
+
+            if (!StudentNumber || !studentName || !subjectCode || !subjectName || !file || !userResponsible) {
+                alert('Please fill out all fields.');
+                event.preventDefault();
+            }
+            // You can add additional validation logic here if needed
+        });
+    </script>
+{% endblock content%}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the name input and set the value to data.studentName
+        document.getElementById('Name').value = data.studentName;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+
+
+<!----------------------------------------------------- REQUEST FOR CERTIFICATION ----------------------------------------------------->
+{% extends "student/layout.html" %}
+
+{% block content %}
+    <h1>Certification Request Form</h1>
+    <p>Fill out the form below to submit a certification request.</p>
+
+    <br>
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <br>
+
+    <form id="certificationRequestForm" action="{{ url_for('submit_certification_request') }}" method="POST" enctype="multipart/form-data">
+        <label for="StudentNumber">Student Number:</label>
+        <input type="text" id="StudentNumber" name="StudentNumber" required><br>
+
+        <label for="Name">Student Name:</label>
+        <input type="text" id="Name" name="Name" required><br>
+
+        <label for="certification_type">Certification Type:</label>
+        <input type="text" id="certification_type" name="certification_type" required><br>
+
+        <label for="request_form">Request Form File:</label>
+        <input type="file" id="request_form" name="request_form" required><br>
+
+        <label for="identification_card">Identification Card File:</label>
+        <input type="file" id="identification_card" name="identification_card" required><br>
+
+        <label for="is_representative">Is there a representative?</label>
+        <input type="checkbox" id="is_representative" name="is_representative"><br>
+
+        <div id="representativeInfo" style="display: none;">
+            <label for="authorization_letter">Authorization Letter:</label><br>
+            <input type="file" id="authorization_letter" name="authorization_letter"><br><br>
+
+            <label for="representative_id">Representative's Identification Card (ID):</label><br>
+            <input type="file" id="representative_id" name="representative_id"><br><br>
+        </div><br><br>
+
+        <label for="user_responsible">User Responsible:</label>
+        <select id="user_responsible" name="user_responsible" required>
+            <option value="Faculty">Faculty Member/s</option>
+            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+        </select><br>
+
+        <label for="status">Status:</label>
+        <select id="status" name="status">
+            <option value="Sent" selected>Sending</option>
+            <option value="Pending" disabled>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+        </select><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const isRepresentativeCheckbox = document.getElementById('is_representative');
+        const representativeInfoDiv = document.getElementById('representativeInfo');
+
+        isRepresentativeCheckbox.addEventListener('change', function () {
+            if (isRepresentativeCheckbox.checked) {
+                representativeInfoDiv.style.display = 'block';
+            } else {
+                representativeInfoDiv.style.display = 'none';
+            }
+        });
+
+        // Automatically close the alert messages after 3 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 3000);
+
+        // JavaScript validation logic can be added here
+        document.getElementById('certificationRequestForm').addEventListener('submit', function (event) {
+        // Add your validation logic here
+        var StudentNumber = document.getElementById('StudentNumber').value.trim();
+        var Name = document.getElementById('Name').value.trim();
+        var certificationType = document.getElementById('certification_type').value.trim();
+        var request_form = document.getElementById('request_form').value.trim();
+        var identification_card = document.getElementById('identification_card').value.trim();
+        var isRepresentativeCheckbox = document.getElementById('is_representative');
+        var authorization_letter = document.getElementById('authorization_letter').value.trim();
+        var representative_id = document.getElementById('representative_id').value.trim();
+
+        if (!StudentNumber || !Name || !certificationType || !requestFormFile || !identificationCardFile) {
+            alert('Please fill out all required fields.');
+            event.preventDefault();  // Prevent form submission
+        }
+
+        if (isRepresentativeCheckbox.checked && (!authorizationLetterFile || !representativeIDFile)) {
+            alert('Please provide files for the representative.');
+            event.preventDefault();  // Prevent form submission
+        }
+    });
+    </script>
+{% endblock %}
+
+{% block script %}
+ <script>
+    // Fetch student details
+    async function fetchStudentDetails() {
+        try {
+            const response = await fetch(`${api_base_url}/student-details`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data_student_details = await response.json();
+            console.log('data_student_details:', data_student_details);
+            displayDetails(data_student_details);
+        } catch (error) {
+            console.error('Error fetching student details:', error.message);
+        }
+    }
+
+    fetchStudentDetails();
+
+    function displayDetails(data) {
+        // Select the Name input and set the value to data.Name
+        document.getElementById('Name').value = data.Name;
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById('StudentNumber').value = data.StudentNumber;
+    }
+ </script>
+{% endblock script %}
+

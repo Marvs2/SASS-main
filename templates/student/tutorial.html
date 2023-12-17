@@ -1,16 +1,7 @@
 {% extends "student/layout.html" %}
-
 {% block content %}
 
-    <h1>Online Request for Tutorial of Subject</h1>
-    <p>Process online requests for the tutorial of a subject not offered for the current semester. A retake of a subject by less than the minimum (35) number of students shall be endorsed by the Director/Head of Academic Program to the Office of the Vice President for Branches and Campuses for approval as a tutorial.</p>
-
-    <h2>Checklist of Requirements:</h2>
-    <ul>
-        <li>Online Petition of Subject from <a href="https://sis1.pup.edu.ph/">https://sis1.pup.edu.ph/</a></li>
-    </ul>
-
-    <br>
+    
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -23,45 +14,81 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
-    <br>
-    <div class="form-container">
-        <h2>Request Form</h2>
-        <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
-            <label for="StudentNumber">Student Number:</label>
-            <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+   
+    <div class="data data1">
+        <div class="content-data">
+            <div class="head">
+                <h3>Online Request for Tutorial</h3>           
+            </div>
 
-            <label for="Name">Student Name:</label>
-            <input type="text" id="Name" name="Name" required><br><br>
-        
-            <label for="subject_code">Subject Code:</label>
-            <input type="text" id="subject_code" name="subject_code" required><br><br>
-        
-            <label for="subject_name">Subject Name:</label>
-            <input type="text" id="subject_name" name="subject_name" required><br><br>
-        
-            <label for="file">File:</label>
-            <input type="file" id="file" name="file" required><br><br>
-        
-            <label for="user_responsible">User Responsible:</label>
-            <select id="user_responsible" name="user_responsible" required>
-                <option value="-Director/ Head of Academic Program">
-                    -Director/ Head of Academic Program
-                </option>
-                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-                <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
-            </select><br><br>
-        
-            <label for="status">Status:</label>
-            <select id="status" name="status">
-                <option value="Sent" selected>Sending</option>
-                <option value="Pending" disabled>Pending</option>
-                <option value="Approved" disabled>Approved</option>
-                <option value="Rejected" disabled>Rejected</option>
-            </select><br><br>
-        
-            <input type="submit" value="Submit">
-        </form>
+            <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
+
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="subject_code" class="col-sm-3 col-form-label">Subject Code</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="subject_code" name="subject_code">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="subject_name" class="col-sm-3 col-form-label">Subject Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="subject_name" name="subject_name">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="File" class="col-sm-3 col-form-label">Attach Files</label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" type="File" name="File" id="File" accept=".pdf">
+                      </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                <option value="-Director/ Head of Academic Program">Director/ Head of Academic Program</option>
+                                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                                <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
+                            </select>
+                        </div>
+                </div>
+    
+                <div class="row mb-3">
+                    <label for="status" class="col-sm-3 col-form-label">Status </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="status" name="status" required>
+                                <option value="Sent" selected>Sending</option>
+                                <option value="Pending" disabled>Pending</option>
+                                <option value="Approved" disabled>Approved</option>
+                                <option value="Rejected" disabled>Rejected</option>
+                            </select>
+                        </div>
+                </div>
+    
+                 <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
+
+
+            </form>
+           
+        </div>
     </div>
 
     <script>

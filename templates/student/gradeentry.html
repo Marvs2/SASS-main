@@ -1,16 +1,6 @@
 {% extends "student/layout.html" %}
-
 {% block content %}
-    <h1>Application for Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h1>
-    <p>Correction of entry shall be accomplished within a period of one semester upon receipt of the grade, and the Late Reporting of Grades Form shall be accomplished within a period of one (1) year. Incomplete (Inc.) is temporarily given to a student who may pass the subject but who has not yet complied with all its requirements. Such requirement(s) shall be satisfied within one year from the end of the term; otherwise, the grade shall lapse into "No Credit (N)" or a failing grade.</p>
-
-    <h2>Checklist of Requirements:</h2>
-    <ul>
-        <li>Completion Form (3 original copies) downloadable from <a href="http://www.pup.edu.ph/downloads/students/">www.pup.edu.ph/downloads/students/</a></li>
-        <li>Copy of Class Record.</li>
-        <li>Notarized Affidavit for Change of Grade of professor (for correction of entry/late reporting of grade).</li>
-    </ul>
-    <br>
+   
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -23,54 +13,97 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
-    <br>
+   
 
-    <h2>Application Form</h2>
-    <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
-        <label for="StudentNumber">Student Number:</label><br>
-        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+    <div class="data data1">
+        <div class="content-data">
+            <div class="head">
+                <h3>Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h3>           
+            </div>
+          
+            <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
 
-        <label for="Name">Student Name:</label><br>
-        <input type="text" id="Name" name="Name" required><br><br>
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
 
-        <label for="application_type">Application Type:</label><br>
-        <select id="application_type" name="application_type" required>
-            <option value="Correction of Grade Entry">Correction of Grade Entry</option>
-            <option value="Late Reporting of Grades">Late Reporting of Grades</option>
-            <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
-        </select><br><br>
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>
 
-        <label for="completion_form">Completion Form:</label><br>
-        <input type="file" id="completion_form" name="completion_form" required><br><br>
+                <div class="row mb-3">
+                    <label for="application_type" class="col-sm-3 col-form-label">Application Type</label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="application_type" name="application_type" required>
+                                <option value="">Select Application Type</option>
+                                <option value="Correction of Grade Entry">Correction of Grade Entry</option>
+                                <option value="Late Reporting of Grades">Late Reporting of Grades</option>
+                                <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
+                            </select>
+                        </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <label for="completion_form" class="col-sm-3 col-form-label">Completion Form </label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="file" name="completion_form" id="completion_form" accept=".pdf">
+                      </div>
+                </div>
 
-        <label for="class_record">Copy of Class Record:</label><br>
-        <input type="file" id="class_record" name="class_record" required><br><br>
+                <div class="row mb-3">
+                    <label for="class_record" class="col-sm-3 col-form-label">Coply of Class Record</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="file" name="class_record" id="class_record" accept=".pdf">
+                      </div>
+                </div>
 
-        <label for="affidavit">Notarized Affidavit for Change of Grade:</label><br>
-        <input type="file" id="affidavit" name="affidavit" required><br><br>
+                <div class="row mb-3">
+                    <label for="affidavit" class="col-sm-3 col-form-label">Notarized Affidavit for Change of Grade</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="file" name="affidavit" id="affidavit" accept=".pdf">
+                      </div>
+                </div>
 
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="CDO Cashier/Accounting Office">
-                CDO Cashier/Accounting Office
-            </option>
-            <option value="Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room">Faculty Member/s Assigned Room/s based on Teaching Assignment or Faculty Room</option>
-            <option value="Director Head of Academic Program">Director Head of Academic Program</option>
-            <option value="Registrar's Office">Registrar's Office</option>
-        </select><br><br>
-        
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
+                 <div class="row mb-3">
+                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+                            <option value="Registrar's Office">Registrar's Office</option>
+                            <option value="Administrative, Staff Head of Admission and Registration Office.">Administrative, Staff Head of Admission and Registration Office.</option>
+                            <option value="Director/ Head of Academic Program.">Director/ Head of Academic Program.</option>
+                        </select>
+                    </div>
+            </div>
 
+            <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="status" name="status" required>
+                            <option value="Sent" selected>Sending</option>
+                            <option value="Pending" disabled>Pending</option>
+                            <option value="Approved" disabled>Approved</option>
+                            <option value="Rejected" disabled>Rejected</option>
+                        </select>
+                    </div>
+            </div>
 
-        <button type="submit">Submit Application</button>
-    </form>
+             <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+            </form>   
+
+        </div>
+    </div>
+    
+
     <script>
         // Automatically close the alert messages after 3 seconds
         setTimeout(function () {

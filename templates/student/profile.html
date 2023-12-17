@@ -1,40 +1,50 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-<style>
-    .form-container {
-        max-width: 400px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        background-color: #f9f9f9;
-    }
 
-    label {
-        display: block;
-        margin-bottom: 8px;
-    }
 
-    input {
-        width: 100%;
-        padding: 8px;
-        margin-bottom: 16px;
-        box-sizing: border-box;
-    }
-</style>
 
-            <div class="form-container">
-                <form action="{{url_for('studentprofile')}}" method="POST">
+<div class="data data1">
+   
+    <div class="content-data">
+        <div class="head">
+            <h3>Student's Profile</h3>           
+        </div>
+        <form action="{{url_for('studentprofile')}}" method="POST">
+            <div class="form-group">
+              <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
+              <div class="col-sm-4">
+                <input type="text" id="StudentNumber" name="studentNumber" required="required" class="form-control" disabled>
+              </div>
+              <label for="DateofBirth" class="col-sm-2 control-label">Date of Birth</label>
+              <div class="col-sm-4">
+                <input type="text" name="DateofBirth" id="DateofBirth" required="required" class="form-control" disabled>
+              </div>
+            </div>
 
-                    <label for="StudentNumber">Student Number:</label>
-                    <input type="text" id="StudentNumber" name="StudentNumber"  disabled required>
-                    <br>
+            <div class="form-group">
+              <label for="Name" class="col-sm-2 control-label">Name</strong></label>
+              <div class="col-sm-4">
+                <input type="text" name="Name" id="Name" required="required" class="form-control" disabled>
+              </div>   
+              <label for="PlaceofBirth" class="col-sm-2 col-sm-2 control-label">Place of Birth</strong></label>
+              <div class="col-sm-4">
+                <input type="text" name="PlaceofBirth" id="PlaceofBirth" required="required" class="form-control" disabled>
+              </div>
+            </div>
 
-                    <label for="Name" id="name-label">Name:</label>
-                    <input type="text" id="Name" name="Name"  disabled required>
-                    <br>
+            <div class="form-group">
+            <label for="Gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
+              <div class="col-sm-4">
+               <input type="text" name="Gender" id="Gender" required="required" class="form-control" disabled> 
+              </div>
+              <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
+              <div class="col-sm-4">
+                <input type="email" name="Email" id="Email" required="required" class="form-control">
+              </div>
+            </div>
 
+<<<<<<< HEAD
                     <label for="name">Gender:</label>
                     <input type="text" id="Gender" name="Gender"  disabled required>
                     <br>
@@ -60,6 +70,33 @@
                     <br>
                 </form>
             </div>           
+=======
+            <div class="form-group">
+            <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
+            <div class="col-sm-4">
+              <input type="text"  name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}" class="form-control">
+            </div>
+              <label for="address" class="col-sm-2 col-sm-2 control-label">Address</strong></label>
+              <div class="col-sm-4">
+              <textarea  name="address" id="address" required="required" class="form-control"></textarea>
+             </div>              
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-11 text-center">
+                <div class="pt-3 pl-4">
+              <!---    <span><i>I hereby Certify that all the information provided are true and correct to the best of my knowledge.</i></span> -->
+                </div>
+              
+                <div class="col-sm-13 d-flex justify-content-center">
+                  <button type="submit" name="submit" class="btn btn-success ">Save Profile</button>
+                </div>
+              </div>
+            </div>       
+          </form>
+    </div>
+</div>
+>>>>>>> origin/SASS-clone
 
 {% endblock %}
 
@@ -108,3 +145,7 @@
 <!-- 1st Step Make a script that will request in the server -->
 
 <!-- 2nd Get the data  -->
+
+
+
+

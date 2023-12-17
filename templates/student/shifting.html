@@ -1,14 +1,6 @@
 {% extends "student/layout.html" %}
-
 {% block content %}
-    <h1>Application for Shifting</h1>
-    <p>Process requests for students who intend to shift to another program in the University. Students must have one (1) year residency from the current program to qualify for shifting to another program. Application for shifting shall be accomplished prior to the start of the next academic school year. Qualifications may vary depending on the program to which the student intends to shift.</p>
 
-    <br>
-    <p><a href="{{url_for('download_Accreditation')}}">Download Application file for Accreditation of Shiftees & Regular</a></p>
-    <br>
-
-    <br>
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -21,53 +13,93 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
-    <br>
 
-    <h2>Application Form</h2>
-    <form id="shiftingForm" action="{{ url_for('submit_shifting')}}" method="POST" enctype="multipart/form-data">
-        <label for="StudentNumber">Student number:</label><br>
-        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+    <div class="data data1">
+        <div class="content-data">
+            <div class="head">
+                <h3>Application for Shifting</h3>           
+            </div>
 
-        <label for="Name">Student Name:</label><br>
-        <input type="text" id="Name" name="Name" required><br><br>
+            <form id="shiftingForm" action="{{ url_for('submit_shifting')}}" method="POST" enctype="multipart/form-data">
 
-        <label for="currentProgram">Current Program:</label><br>
-        <input type="text" id="currentProgram" name="currentProgram" required><br><br>
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
 
-        <label for="residencyYear">Years of Residency in Current Program:</label><br>
-        <input type="number" id="residencyYear" name="residencyYear" required><br><br>
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>
 
-        <label for="intendedProgram">Intended Program:</label><br>
-        <input type="text" id="intendedProgram" name="intendedProgram" required><br><br>
+                <div class="row mb-3">
+                    <label for="currentProgram" class="col-sm-3 col-form-label">Current Program</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="currentProgram" id="currentProgram">
+                    </div>
+                </div>
 
-        <label for="qualifications">Qualifications for Shifting (if any):</label><br>
-        <textarea id="qualifications" name="qualifications" rows="4" cols="50"></textarea><br><br>
+                <div class="row mb-3">
+                    <label for="residencyYear" class="col-sm-3 col-form-label">Years of Residency in Current Program</label>
+                    <div class="col-sm-8">
+                        <input type="number" class="form-control" name="residencyYear" id="residencyYear">
+                    </div>
+                </div>
 
-        <label for="fileshifting">Attach Supporting Document:</label><br>
-        <input type="file" id="fileshifting" name="fileshifting"><br><br>
+                <div class="row mb-3">
+                    <label for="intendedProgram" class="col-sm-3 col-form-label">Intended Program</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="intendedProgram" id="intendedProgram">
+                    </div>
+                </div>
 
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="CDO Cashier/Accounting Office.">
-                CDO Cashier/Accounting Office.
-            </option>
-            <option value="Administrative, Staff Head of Admission and Registration Office.">Administrative, Staff Head of Admission and Registration Office.</option>
-            <option value="Director/ Head of Academic Program.">Director/ Head of Academic Program.</option>
-        </select><br><br>
+                <div class="row mb-3">
+                    <label for="qualifications" class="col-sm-3 col-form-label">Qualifications for Shifting</label>
+                    <div class="col-sm-8">
+                        <textarea type="text" class="form-control" name="qualifications" id="qualifications"></textarea>    
+                    </div>
+                </div>
 
+                <div class="row mb-3">
+                    <label for="fileshifting" class="col-sm-3 col-form-label">Attached Supporting Documents</label>
+                    <div class="col-sm-8">
+                        <input class="form-control" type="file" name="fileshifting" id="fileshifting" accept=".pdf">
+                      </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                <option value="CDO Cashier/Accounting Office.">CDO Cashier/Accounting Office.</option>
+                            </select>
+                        </div>
+                </div>
     
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
-
-
-        <button type="submit">Submit Application</button>
-    </form>
+                <div class="row mb-3">
+                    <label for="status" class="col-sm-3 col-form-label">Status </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="status" name="status" required>
+                                <option value="Sent" selected>Sending</option>
+                                <option value="Pending" disabled>Pending</option>
+                                <option value="Approved" disabled>Approved</option>
+                                <option value="Rejected" disabled>Rejected</option>
+                            </select>
+                        </div>
+                </div>
+    
+                 <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
+            </form>
+            
+           
+        </div>
+    </div>
 
     <script>
         const form = document.getElementById('shiftingForm');

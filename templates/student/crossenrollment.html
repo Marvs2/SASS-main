@@ -1,15 +1,6 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-<h1>Application for Cross Enrollment</h1>
-<p>Process requests for cross-enrollment of subjects not offered for the current semester in the branch/campus. Permission must be obtained from the University Registrar, indicating the total number of units and the subject/s that the student is authorized to take from another school.</p>
-
-<h2>Checklist of Requirements:</h2>
-<ul>
-    <li>Application Letter for Cross-Enrollment.</li>
-    <li>Permit to Cross-Enroll from the Office of the University Registrar.</li>
-</ul>
-<br>
 
 {% with messages = get_flashed_messages() %}
     {% if messages %}
@@ -23,48 +14,93 @@
         {% endfor %}
     {% endif %}
 {% endwith %}
-<br>
 
-<h2>Application Form</h2>
-<form id="crossEnrollmentForm" action="{{ url_for('submit_cross_enrollment') }}" method="POST" enctype="multipart/form-data">
-    <label for="StudentNumber">Student ID:</label><br>
-    <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
 
-    <label for="Name">Student Name:</label><br>
-    <input type="text" id="Name" name="Name" required><br><br>
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Cross Enrollment</h3>           
+        </div>
+        <form id="crossEnrollmentForm" action="{{ url_for('submit_cross_enrollment') }}" method="POST" enctype="multipart/form-data">
 
-    <label for="crossEnrollmentSchool">School for Cross-Enrollment:</label><br>
-    <input type="text" id="crossEnrollmentSchool" name="crossEnrollmentSchool" required><br><br>
+            <div class="row mb-3">
+                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                </div>
+            </div>
 
-    <label for="crossEnrollmentUnits">Total Number of Units:</label><br>
-    <input type="number" id="crossEnrollmentUnits" name="crossEnrollmentUnits" required><br><br>
+            <div class="row mb-3">
+                <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="Name" name="Name" readonly>
+                </div>
+            </div>
 
-    <label for="authorizedSubjects">Authorized Subjects to Take:</label><br>
-    <textarea id="authorizedSubjects" name="authorizedSubjects" rows="4" cols="50" required></textarea><br><br>
+            <div class="row mb-3">
+                <label for="crossEnrollmentSchool" class="col-sm-3 col-form-label">School to Cross-Enroll</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="crossEnrollmentSchool" name="crossEnrollmentSchool">
+                </div>
+            </div>
 
-    <label for="applicationLetter">Application Letter for Cross-Enrollment:</label><br>
-    <input type="file" id="applicationLetter" name="applicationLetter" required><br><br>
+            <div class="row mb-3">
+                <label for="crossEnrollmentUnits" class="col-sm-3 col-form-label">Total Number of Units</label>
+                <div class="col-sm-8">
+                    <input type="number" class="form-control" id="crossEnrollmentUnits" name="crossEnrollmentUnits">
+                </div>
+            </div>
 
-    <label for="permitToCrossEnroll">Permit to Cross-Enroll from the Office of the University Registrar:</label><br>
-    <input type="file" id="permitToCrossEnroll" name="permitToCrossEnroll" required><br><br>
+            <div class="row mb-3">
+                <label for="authorizedSubjects" class="col-sm-3 col-form-label">Authorized Subject to Take</label>
+                <div class="col-sm-8">
+                    <textarea type="text" class="form-control" id="authorizedSubjects" name="authorizedSubjects"></textarea>
+                </div>
+            </div>
 
-    <label for="user_responsible">User Responsible:</label>
-    <select id="user_responsible" name="user_responsible" required>
-        <option value="Student Services">Student Services</option>
-        <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-        <option value="Branch">Branch Registrar</option>
-    </select><br><br>
-    
-    <label for="status">Status:</label>
-    <select id="status" name="status">
-        <option value="Sent" selected>Sending</option>
-        <option value="Pending" disabled>Pending</option>
-        <option value="Approved" disabled>Approved</option>
-        <option value="Rejected" disabled>Rejected</option>
-    </select><br><br>
+            <div class="row mb-3">
+                <label for="applicationLetter" class="col-sm-3 col-form-label">Application Letter for Cross Enrollment</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" name="applicationLetter" id="applicationLetter" accept=".pdf">
+                  </div>
+            </div>
 
-    <button type="submit">Submit Application</button>
-</form>
+            <div class="row mb-3">
+                <label for="permitToCrossEnroll" class="col-sm-3 col-form-label">Permit to Cross-Enroll from the Office of the University Registrar</label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" name="permitToCrossEnroll" id="permitToCrossEnroll" accept=".pdf">
+                  </div>
+            </div>
+            
+            <div class="row mb-3">
+                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                            <option value="Student Services">Student Services</option>
+                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                            <option value="Branch">Branch Registrar</option>
+                        </select>
+                    </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="status" name="status" required>
+                            <option value="Sent" selected>Sending</option>
+                            <option value="Pending" disabled>Pending</option>
+                            <option value="Approved" disabled>Approved</option>
+                            <option value="Rejected" disabled>Rejected</option>
+                        </select>
+                    </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+        </form>
+
+    </div>
+</div>
 
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script>

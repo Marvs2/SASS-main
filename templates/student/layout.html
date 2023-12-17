@@ -1,228 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
-    <link href="{{url_for('static', filename='css/asset/admin.css')}}" rel="stylesheet"/>
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        
-        input[type="submit"] {
-            background-color: #4caf50;
-            cursor: pointer;
-        }
-        
-        input:disabled {
-            cursor: not-allowed;
-        }
-        
-        
-        /* Adjust the layoutSidenav styles */
-        #layoutSidenav {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        #layoutSidenav_nav {
-            flex: 0 0 auto;
-        }
-        
-        #layoutSidenav_content {
-            flex: 1 1 0;
-            overflow: auto;
-        }
-        </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
+	<title>Student Academic Support System</title>
 </head>
-<body class="sb-nav-fixed">
-    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-        <!-- Sidebar Toggle-->
-    <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button"><i class="fas fa-bars"></i></button>
-    <!-- Navbar Brand-->
-    <a class="navbar-brand ps-5" href=""><b>SASS</b>   
-    </a>   
+<body>
+	
+	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="{{url_for('student_dashboard')}}" class="brand"><i class='bx bxs-smile icon'></i>SASS</a>
+		<ul class="side-menu">
+			<li class="divider" data-text="Home">Home</li>
+			<li><a href="{{url_for('student_dashboard')}}" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="Services">Services</li>
+			<li>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
+				<ul class="side-dropdown">
+					<li><a href="{{url_for('studentoverload')}}">Overload of Subjects</a></li>
+					<li><a href="{{ url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
+					<li><a href="{{url_for('studentchange')}}">Change of Schedule/Subjects</a></li>
+					<li><a href="{{url_for('studentcorrection')}}">Correction of Grade Entry</a></li>
+					<li><a href="{{url_for('studentenrollment')}}">Cross-Enrollment</a></li>
+					<li><a href="{{url_for('studentshifting')}}">Application for Shifting</a></li>
+					<li><a href="{{url_for('studentmanualenrollment')}}">Manual Enrollment</a></li>
+					<li><a href="{{url_for('studentpetition')}}"> Online Petition of Subjects</a></li>
+					<li><a href="{{url_for('studenttutorial')}}">Online Request for Tutorial</a></li>
+					<li><a href="{{url_for('studentcertification')}}">Request for Certification</a></li>
 
-    <!-- Navbar Search-->
-    <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-        <div class="input-group">
-         <!---   <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-            <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search" title="button"></i></button>
-        </div> -->
-    </form>
-    <!-- Navbar-->
-    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-        <li class="nav-item dropdown">
-            <a title="profile" class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-user fa-fw"></i>
-           <!---     {% if student %}
-                    {{ student.name }}
-                {% else %}
-                    <input title="text" type="text" id="name" name="name" value="name" readonly>
-                {% endif %} -->
-            </a>                
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="{{url_for('studentprofile')}}">My Profile Another</a></li>
-                <li><a class="dropdown-item" href="#!">Manage Password</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
-            </ul>
-        </li>
-    </ul>
-</nav>
-<div id="layoutSidenav">
-    <div id="layoutSidenav_nav">
-        <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-            <div class="sb-sidenav-menu">
-                <div class="nav">
-                    <div class="sb-sidenav-menu-heading">Home</div>
-                    <a class="nav-link" href="{{url_for('student_dashboard')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                        Dashboard
-                    </a>
-                    <div class="sb-sidenav-menu-heading">Services</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseServices" aria-expanded="false" aria-controls="collapseServices">
-                          <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                          Student Services
-                          <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                      </a>
-                      <div class="collapse show" id="collapseServices" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                          <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="{{url_for('studentoverload') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Application for Overload of Subjects</a>
-                            <a class="nav-link" href="{{ url_for('studentaddingsubject') }}"><div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Adding Subjects</a>
-                                    <a class="nav-link" href="{{ url_for('studentchange') }}"><div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>Subjects/Schedule</a>
-                            <a class="nav-link" href="{{url_for('studentshifting') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Shifting
-                            </a>
-                            <a class="nav-link" href="{{url_for('studenttutorial') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Tutorial
-                            </a>
-                          </nav>
-                        </div>
-                    <div class="sb-sidenav-menu-heading">Requests</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseRequest" aria-expanded="false" aria-controls="collapseRequest">
-                          <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                          Student Requests
-                          <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                      </a>
-                      <div class="collapse show" id="collapseRequest" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                          <nav class="sb-sidenav-menu-nested nav">
-                            <a class="nav-link" href="{{url_for('studentmanualenrollment') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Manual Enrollment
-                            </a>
-                              <a class="nav-link" href="{{url_for('studentcertification') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Certification
-                            </a>
-                              <a class="nav-link" href="{{url_for('studentenrollment') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Cross-Enrollment
-                            </a>
-                              <a class="nav-link" href="{{url_for('studentpetition') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Petition
-                            </a>
-                            <a class="nav-link" href="{{url_for('studentcorrection') }}">
-                                <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                                Correction of Grade Entry
-                            </a>
-                          </nav>
-                      </div>
+				</ul>
+			</li>
+			<li><a href=""><i class='bx bx-history icon' ></i>Transaction History</a></li>
 
-                    <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                        <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                        Service History
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
-                    <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-bs-parent="#sidenavAccordion">
-                        <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                                Authentication
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordionPages">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="login.html">Login</a>
-                                    <a class="nav-link" href="register.html">Register</a>
-                                    <a class="nav-link" href="password.html">Forgot Password</a>
-                                </nav>
-                            </div>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                                Error
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="pagesCollapseError" aria-labelledby="headingFour" data-bs-parent="#sidenavAccordionPages">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="401.html">401 Page</a>
-                                    <a class="nav-link" href="404.html">404 Page</a>
-                                    <a class="nav-link" href="500.html">500 Page</a>
-                                </nav>
-                            </div>
-                        </nav>
+			<li class="divider" data-text="Complaints">Complaints</li>
+			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
+			<li><a href="#"><i class='bx bxs-widget icon' ></i> Manage Complaint</a></li>
+		</ul>
+	</section>
+	
+
+	<!-- NAVBAR -->
+	<section id="content">
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+			<form action="#">
+			<!----	<div class="form-group">
+					<input type="text" placeholder="Search...">
+					<i class='bx bx-search icon' ></i>
+				</div> -->
+			</form>
+			<a href="#" class="nav-link">
+				<i class='bx bxs-bell icon' ></i>
+				<span class="badge">5</span>
+			</a>
+
+			<div class="nav-item dropdown d-none d-md-flex me-3">
+                <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications">
+                  <!-- Download SVG icon from http://tabler-icons.io/i/bell -->
+                  <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" /><path d="M9 17v1a3 3 0 0 0 6 0v-1" /></svg>
+                  <span class="badge bg-red"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Last updates</h3>
                     </div>
-                    <div class="sb-sidenav-menu-heading">Complaints</div>
-                    <a class="nav-link" href="{{url_for('stud_services')}}">
-                        <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                        services
-                    </a>
-                    <a class="nav-link" href="tables.html">
-                        <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                        Complaint History
-                    </a>
+                    <div class="list-group list-group-flush list-group-hoverable">
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col-auto"><span class="status-dot status-dot-animated bg-red d-block"></span></div>
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 1</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Change deprecated html tags to text decoration classes (#29604)
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <a href="#" class="list-group-item-actions">
+                              <!-- Download SVG icon from http://tabler-icons.io/i/star -->
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col-auto"><span class="status-dot d-block"></span></div>
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 2</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              justify-content:between ⇒ justify-content:space-between (#29734)
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <a href="#" class="list-group-item-actions show">
+                              <!-- Download SVG icon from http://tabler-icons.io/i/star -->
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-yellow" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col-auto"><span class="status-dot d-block"></span></div>
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 3</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Update change-version.js (#29736)
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <a href="#" class="list-group-item-actions">
+                              <!-- Download SVG icon from http://tabler-icons.io/i/star -->
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col-auto"><span class="status-dot status-dot-animated bg-green d-block"></span></div>
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 4</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Regenerate package-lock.json (#29730)
+                            </div>
+                          </div>
+                          <div class="col-auto">
+                            <a href="#" class="list-group-item-actions">
+                              <!-- Download SVG icon from http://tabler-icons.io/i/star -->
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon text-muted" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-            </div>
-        </nav>
-    </div>
-    <div id="layoutSidenav_content">
-    <main>
-        {% block content %} {% endblock %} 
-    </main>
-<footer class="py-4 bg-light mt-auto">
-    <div class="container-fluid px-4">
-        <div class="d-flex align-items-right">
-            <div class="text-muted"> &copy; <script>document.write(new Date().getFullYear());</script> 
-                <a href="https://www.pup.edu.ph/" target="_blank" rel="noopener noreferrer">Polytechnic University of the Philippines |</a>      
-            </div> &nbsp;
-            <div>
-                <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use |</a> 
-            </div>&nbsp;
-            <div>
-                <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a> 
-            </div>
-        </div>
-</footer>
+              </div>
+			
+		<!----	<a href="#" class="nav-link">
+				<i class='bx bxs-message-square-dots icon'></i>
+				<span class="badge">8</span> 
+			</a> -->
+			<span class="divider"></span>
 
-<script>
-    const api_base_url = '{{ student_api_base_url | default("") }}';
-    console.log('api_base_url: ', api_base_url)
-  </script>
+			<div class="profile">
+				<img src="/static/images/user.png" alt="">
+				<ul class="profile-link">
+					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
+					<li><a href="{{url_for('logout')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+		<!-- NAVBAR -->
 
-{% block script %} {% endblock script %}
+		<main>
+			{% block content %} {% endblock %}
+		</main>
+	</section>
 
-  
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/asset/scripts.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-<script src="assets/demo/chart-area-demo.js"></script>
-<script src="assets/demo/chart-bar-demo.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/asset/datatables-simple-demo.js')}}"></script>
+	<script>
+		const api_base_url = '{{ student_api_base_url | default("") }}';
+		console.log('api_base_url: ', api_base_url)
+	</script>
+
+	{% block script %} {% endblock script %}
+
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>
+
+
+
+
