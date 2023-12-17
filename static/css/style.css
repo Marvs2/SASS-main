@@ -254,15 +254,17 @@ nav .form-group .icon {
 }
 nav .nav-link {
 	position: relative;
+	left: 40px;
+	top: 3px;
 }
 nav .nav-link .icon {
-	font-size: 18px;
+	font-size: 25px;
 	color: var(--dark);
 }
 nav .nav-link .badge {
 	position: absolute;
-	top: -12px;
-	right: -12px;
+	top: -7px;
+	right: 2px;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
