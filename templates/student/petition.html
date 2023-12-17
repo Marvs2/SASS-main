@@ -1,11 +1,7 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-    <div style="display: flex; justify-content: space-between;">
-        <div style="width: 48%;">
-            <h1>Online Petition of Subject</h1>
-            <p>Process online requests for the petition of back subjects or retakes of subjects not offered for the current semester. A minimum of 35 students must request the petition to be recommended by the Administrative Building Administrative Staff ICT Office and approved by the Office of the Vice President for Branches and Campuses.</p>
-            <br>
+   
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
@@ -18,49 +14,93 @@
                     {% endfor %}
                 {% endif %}
             {% endwith %}
-            <br>
-            <br>
+          
+            <div class="data data1">
+                <div class="content-data">
+                    <div class="head">
+                        <h3>Online Petition of Subjects</h3>           
+                    </div>
+
+                <form id="petitionForm" action="{{url_for('submitpetition')}}" method="POST" enctype="multipart/form-data">
+
+                    <div class="row mb-3">
+                        <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                        </div>
+                    </div>
+    
+                    <div class="row mb-3">
+                        <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="Name" name="Name" readonly>
+                        </div>
+                    </div>   
+
+                    <div class="row mb-3">
+                        <label for="subjectCode" class="col-sm-3 col-form-label">Subject Code</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="subjectCode" name="subjectCode" >
+                        </div>
+                    </div>   
+
+                    <div class="row mb-3">
+                        <label for="subjectName" class="col-sm-3 col-form-label">Subject Code</label>
+                        <div class="col-sm-8">
+                            <input type="text" class="form-control" id="subjectName" name="subjectName" >
+                        </div>
+                    </div>   
+
+                    <div class="row mb-3">
+                        <label for="petitionType" class="col-sm-3 col-form-label">Petition Type</label>
+                            <div class="col-sm-8">
+                                <select class="custom-select" id="petitionType" name="petitionType" required>
+                                    <option value="Back Subject">Back Subject</option>
+                                    <option value="Retake">Retake</option>
+                                </select>
+                            </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <label for="requestReason" class="col-sm-3 col-form-label">Reason for Petition</label>
+                        <div class="col-sm-8">
+                          <textarea class="form-control" id="requestReason" name="requestReason" required></textarea>
+                        </div>
+                    </div> 
+
+                    <div class="row mb-3">
+                        <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                            <div class="col-sm-8">
+                                <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                    <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
+                                    <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
+                                </select>
+                            </div>
+                    </div>
         
-            <h2>Petition Form</h2>
-            <form id="petitionForm" action="{{url_for('submitpetition')}}" method="POST" enctype="multipart/form-data">
-                <label for="StudentNumber">Student Number:</label><br>
-                <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+                    <div class="row mb-3">
+                        <label for="status" class="col-sm-3 col-form-label">Status </label>
+                            <div class="col-sm-8">
+                                <select class="custom-select" id="status" name="status" required>
+                                    <option value="Sent" selected>Sending</option>
+                                    <option value="Pending" disabled>Pending</option>
+                                    <option value="Approved" disabled>Approved</option>
+                                    <option value="Rejected" disabled>Rejected</option>
+                                </select>
+                            </div>
+                    </div>
         
-                <label for="Name">Student Name:</label><br>
-                <input type="text" id="Name" name="Name" required><br><br>
-        
-                <label for="subjectCode">Subject Code:</label><br>
-                <input type="text" id="subjectCode" name="subjectCode" required><br><br>
-        
-                <label for="subjectName">Subject Name:</label><br>
-                <input type="text" id="subjectName" name="subjectName" required><br><br>
-        
-                <label for="petitionType">Petition Type:</label><br>
-                <select id="petitionType" name="petitionType" required>
-                    <option value="Back Subject">Back Subject</option>
-                    <option value="Retake">Retake</option>
-                    <!-- Add more options as needed -->
-                </select><br><br>
-        
-                <label for="requestReason">Reason for Petition:</label><br>
-                <textarea id="requestReason" name="requestReason" rows="4" cols="50" required></textarea><br><br>
-        
-                <label for="userResponsible">User Responsible:</label>
-                <select id="userResponsible" name="userResponsible" required>
-                    <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
-                    <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
-                </select><br><br>
-        
-                <label for="status">Status:</label>
-                <select id="status" name="status">
-                    <option value="Sent" selected>Sending</option>
-                    <option value="Pending" disabled>Pending</option>
-                    <option value="Approved" disabled>Approved</option>
-                    <option value="Rejected" disabled>Rejected</option>
-                </select><br><br>
-        
-                <button type="submit">Submit Petition</button>
-            </form>
+                     <div class="d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success">Submit Application</button>
+                    </div>
+    
+    
+                </form>
+  
+
+                </div>
+            </div>
+            
         
             <script>
                 $(document).ready(function () {

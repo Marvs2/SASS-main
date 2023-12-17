@@ -1,10 +1,6 @@
 {% extends "student/layout.html" %}
-
 {% block content %}
-    <h1>Certification Request Form</h1>
-    <p>Fill out the form below to submit a certification request.</p>
-
-    <br>
+    
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -17,52 +13,96 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
+    
 
-    <form id="certificationRequestForm" action="{{ url_for('submit_certification_request') }}" method="POST" enctype="multipart/form-data">
-        <label for="StudentNumber">Student Number:</label>
-        <input type="text" id="StudentNumber" name="StudentNumber" required><br>
+    <div class="data data1">
+        <div class="content-data">
+            <div class="head">
+                <h3>Request for Certification</h3>           
+            </div>
 
-        <label for="Name">Student Name:</label>
-        <input type="text" id="Name" name="Name" required><br>
+            <form id="certificationRequestForm" action="{{ url_for('submit_certification_request') }}" method="POST" enctype="multipart/form-data">
+              
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
 
-        <label for="certification_type">Certification Type:</label>
-        <input type="text" id="certification_type" name="certification_type" required><br>
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>
 
-        <label for="request_form">Request Form File:</label>
-        <input type="file" id="request_form" name="request_form" required><br>
+                <div class="row mb-3">
+                    <label for="certification_type" class="col-sm-3 col-form-label">Certification Type</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="certification_type" name="certification_type">
+                    </div>
+                </div>
 
-        <label for="identification_card">Identification Card File:</label>
-        <input type="file" id="identification_card" name="identification_card" required><br>
+                <div class="row mb-3">
+                    <label for="request_form" class="col-sm-3 col-form-label">Attach Request Form </label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" name="request_form" id="request_form" accept=".pdf">
+                      </div>
+                </div>
 
-        <label for="is_representative">Is there a representative?</label>
-        <input type="checkbox" id="is_representative" name="is_representative"><br>
+                <div class="row mb-3">
+                    <label for="identification_card" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" name="identification_card" id="identification_card" accept=".pdf">
+                      </div>
+                </div>
 
-        <div id="representativeInfo" style="display: none;">
-            <label for="authorization_letter">Authorization Letter:</label><br>
-            <input type="file" id="authorization_letter" name="authorization_letter"><br><br>
+                <label for="is_representative">Is there a representative?</label>
+                <input type="checkbox" id="is_representative" name="is_representative"><br>
 
-            <label for="representative_id">Representative's Identification Card (ID):</label><br>
-            <input type="file" id="representative_id" name="representative_id"><br><br>
-        </div><br><br>
+                <div class="row mb-3" id="representativeInfo">
+                    <label for="authorization_letter" class="col-sm-3 col-form-label">Authorization Letter</label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" name="authorization_letter" id="authorization_letter">
+                      </div>
 
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="Faculty">Faculty Member/s</option>
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
-        </select><br>
+                      <label for="representative_id" class="col-sm-3 col-form-label">Representative's Identification Card (ID)</label>
+                      <div class="col-sm-8">
+                          <input type="file" class="form-control" name="representative_id" id="representative_id">
+                        </div>                   
+                </div>
 
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br>
-
-        <button type="submit">Submit</button>
-    </form>
+                <div class="row mb-3">
+                    <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                <option value="Faculty">Faculty Member/s</option>
+                                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                                <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+                            </select>
+                        </div>
+                </div>
+    
+                <div class="row mb-3">
+                    <label for="status" class="col-sm-3 col-form-label">Status </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="status" name="status" required>
+                                <option value="Sent" selected>Sending</option>
+                                <option value="Pending" disabled>Pending</option>
+                                <option value="Approved" disabled>Approved</option>
+                                <option value="Rejected" disabled>Rejected</option>
+                            </select>
+                        </div>
+                </div>
+    
+                 <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
+            </form>
+           
+        </div>
+    </div>
 
     <script>
         const isRepresentativeCheckbox = document.getElementById('is_representative');

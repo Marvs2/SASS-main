@@ -1,75 +1,97 @@
 {% extends "student/layout.html" %}
 {% block content %}
-<style>
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        margin: auto;
-        max-width: 600px; /* Adjust the width as needed */
-        padding: 20px;
-    }
-</style>
 
 
-    <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
-    <p>Process request for application for change of enrollment specifically for adding of subjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
-    <br>
-    <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
-    <br>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
-                        <span aria-hidden="true">×</span>
-                    </button>
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Adding of Subjects</h3>           
+        </div>
+        <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+           
+            <div class="row mb-3">
+                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()" readonly>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+            </div>
 
-    <h2>Application Form</h2>
-    <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
-        <label for="StudentNumber">Student number:</label>
-        <input type="text" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()"><br>
+            <div class="row mb-3">
+                <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="Name" name="Name" readonly>
+                </div>
+            </div>
 
-        <label for="Name">Student Name:</label>
-        <input type="text" id="Name" name="Name" required><br>
+            <div class="row mb-3">
+                <label for="subject_Names" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="subject_Names" name="subject_Names" required>
+                </div>
+            </div>
 
-        <label for="subject_Names">Subject Name (comma-separated):</label>
-        <input type="text" id="subject_Names" name="subject_Names" required><br>
+            <div class="row mb-3">
+                <label for="enrollment_type" class="col-sm-3 col-form-label">Enrollment Type</label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="enrollment_type" name="enrollment_type" required>
+                            <option value="">Select Enrollment Type...</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Irregular">Irregular</option>
+                        </select>
+                    </div>
+            </div>
 
-        <label for="enrollment_type">Enrollment Type:</label>
-        <select id="enrollment_type" name="enrollment_type" required>
-            <option value="Regular">Regular</option>
-            <option value="Irregular">Irregular</option>
-        </select><br>
+            <div class="row mb-3">
+                <label for="filesubject" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" name="filesubject" id="filesubject" accept=".pdf">
+                  </div>
+            </div>
 
-        <label for="filesubject">File:</label>
-        <input type="file" id="filesubject" name="filesubject"><br><br>
-
-        <label for="user_responsible">User Responsible:</label>
-        <select name="user_responsible" id="user_responsible">
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <div class="row mb-3">
+                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
             <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
             <option value="Registrar's Office">Registrar's Office</option>
-        </select><br><br>
+                        </select>
+                    </div>
+            </div>
 
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
+            <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="status" name="status" required>
+                            <option value="Sent" selected>Sending</option>
+                            <option value="Pending" disabled>Pending</option>
+                            <option value="Approved" disabled>Approved</option>
+                            <option value="Rejected" disabled>Rejected</option>
+                        </select>
+                    </div>
+            </div>
 
-        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
-    </form>
+             <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+
+        </form>
+       
+    </div>
+</div>
 
     <script>
         // Automatically close the alert messages after 3 seconds

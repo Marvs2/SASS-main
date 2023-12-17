@@ -1,12 +1,6 @@
 {% extends "student/layout.html" %}
-
 {% block content %}
-    <h1>Manual Enrollment Request</h1>
-    <p>This service is for both regular and irregular students of the University and is done during the adjustment period. It is used when the student fails to enroll during the online registration period set by the University.</p>
-
-    <p><a href="{{url_for('download_RO_form')}}">Download Application file for Request Form</a></p>
-    <br>  
-    <br>
+    
     {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -19,48 +13,84 @@
             {% endfor %}
         {% endif %}
     {% endwith %}
-    <br>
-    <br>
-    <br>
-    <h1>Manual Enrollment Form</h1>
-    <form id="manualEnrollmentForm" action="{{ url_for('submitmanualenrollment') }}" method="POST" enctype="multipart/form-data">
-        <label for="StudentNumber">Student Number:</label><br>
-        <input type="text" id="StudentNumber" name="StudentNumber" required><br><br>
+   
+    <div class="data data1">
+        <div class="content-data">
+            <div class="head">
+                <h3>Request for Manual Enrollment</h3>           
+            </div>
+            <form id="manualEnrollmentForm" action="{{ url_for('submitmanualenrollment') }}" method="POST" enctype="multipart/form-data">
 
-        <label for="Name">Student Name:</label><br>
-        <input type="text" id="Name" name="Name" required><br><br>
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
 
-        <label for="enrollmentType">Enrollment Type:</label><br>
-        <select id="enrollmentType" name="enrollment_type" required>
-            <option value="Regular">Regular</option>
-            <option value="Irregular">Irregular</option>
-            <option value="Special">Special</option>
-            <!-- Add more options as needed -->
-        </select><br><br>
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="enrollmentType" class="col-sm-3 col-form-label">Enrollment Type</label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="enrollmentType" name="enrollmentType" required>
+                                <option value="Regular">Regular</option>
+                                <option value="Irregular">Irregular</option>
+                                <option value="Special">Special</option>
+                            </select>
+                        </div>
+                </div>
+
+                <div class="row mb-4">
+                    <label for="reason" class="col-sm-3 col-form-label">Reason</label>
+                    <div class="col-sm-8">
+                      <textarea class="form-control" id="reason" name="reason" required></textarea>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="meFile" class="col-sm-3 col-form-label">Attach Files </label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" name="meFile" id="meFile" accept=".pdf">
+                      </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                <option value="Faculty">Faculty Member/s</option>
+                                <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                                <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+                            </select>
+                        </div>
+                </div>
     
-        <label for="reason">Reason:</label><br>
-        <textarea id="reason" name="reason" rows="4" cols="50" required></textarea><br><br>
+                <div class="row mb-3">
+                    <label for="status" class="col-sm-3 col-form-label">Status </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="status" name="status" required>
+                                <option value="Sent" selected>Sending</option>
+                                <option value="Pending" disabled>Pending</option>
+                                <option value="Approved" disabled>Approved</option>
+                                <option value="Rejected" disabled>Rejected</option>
+                            </select>
+                        </div>
+                </div>
+    
+                 <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
 
-        <label for="meFile">File:</label><br>
-        <input type="file" id="meFile" name="me_file" required><br><br>
-
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="Faculty">Faculty Member/s</option>
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
-        </select><br><br>
-
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
-
-        <button type="submit">Submit</button>
-    </form>
+            </form>
+           
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
