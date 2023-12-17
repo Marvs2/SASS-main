@@ -1,147 +1,139 @@
 {% extends "student/layout.html" %}
 {% block content %}
-<style>
-    .form-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        margin: auto;
-        max-width: 900px; /* Adjust the width as needed */
-        padding: 20px;
-    }
-
-    .container {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .column {
-        flex: 0 0 48%; /* Adjust column width as needed */
-    }
-
-    /* Adjust other styles as necessary */
-</style>
 
 
-    <h1>Application for Change of Enrollment (Adding of Subjects)</h1>
-    <p>Process request for application for change of enrollment specifically for adding of addsubjects. This is both for regular and irregular students of the University and is done during the adjustment period.</p>
-    <br>
-    <p><a href="{{url_for('download_AddingSubs')}}">Download Application file for Adding Subject</a></p>
-    <br>
-
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <div class="form-container">
-        <div class="container">
-            <div class="column">
-                <!-- Form -->
-                <h2>Application Form</h2>
-                <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
-                    <label for="StudentNumber">Student number:</label>
-                    <input type="text" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()"><br>
-            
-                    <label for="Name">Student Name:</label>
-                    <input type="text" id="Name" name="Name" required><br>
-            
-                    <label for="subject_Names">Subject Name (comma-separated):</label>
-                    <input type="text" id="subject_Names" name="subject_Names" required><br>
-            
-                    <label for="enrollment_type">Enrollment Type:</label>
-                    <select id="enrollment_type" name="enrollment_type" required>
-                        <option value="Regular">Regular</option>
-                        <option value="Irregular">Irregular</option>
-                    </select><br>
-            
-                    <label for="filesubject">File:</label>
-                    <input type="file" id="filesubject" name="filesubject"><br><br>
-            
-                    <label for="user_responsible">User Responsible:</label>
-                    <select name="user_responsible" id="user_responsible">
-                        <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-                        <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
-                        <option value="Registrar's Office">Registrar's Office</option>
-                    </select><br><br>
-            
-                    <label for="status">Status:</label>
-                    <select id="status" name="status">
-                        <option value="Sent" selected>Sending</option>
-                        <option value="Pending" disabled>Pending</option>
-                        <option value="Approved" disabled>Approved</option>
-                        <option value="Rejected" disabled>Rejected</option>
-                    </select><br><br>
-            
-                    <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
-                </form>
-            </div>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    {% for message in messages %}
+        <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                <span aria-hidden="true">×</span>
+            </button>
         </div>
+    {% endfor %}
+{% endif %}
+{% endwith %}
+
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Adding of Subjects</h3>           
+        </div>
+        <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+           
+            <div class="row mb-3">
+                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="Name" name="Name" readonly>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="subject_Names" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <div class="col-sm-8">
+                  <input type="text" class="form-control" id="subject_Names" name="subject_Names" required>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="enrollment_type" class="col-sm-3 col-form-label">Enrollment Type</label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="enrollment_type" name="enrollment_type" required>
+                            <option value="">Select Enrollment Type...</option>
+                            <option value="Regular">Regular</option>
+                            <option value="Irregular">Irregular</option>
+                        </select>
+                    </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="filesubject" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+                <div class="col-sm-8">
+                    <input class="form-control" type="file" name="filesubject" id="filesubject" accept=".pdf">
+                  </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
+            <option value="Registrar's Office">Registrar's Office</option>
+                        </select>
+                    </div>
+            </div>
+
+            <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="status" name="status" required>
+                            <option value="Sent" selected>Sending</option>
+                            <option value="Pending" disabled>Pending</option>
+                            <option value="Approved" disabled>Approved</option>
+                            <option value="Rejected" disabled>Rejected</option>
+                        </select>
+                    </div>
+            </div>
+
+             <div class="d-flex justify-content-center">
+                <button type="submit" class="btn btn-success">Submit Application</button>
+            </div>
+
+        </form>
+       
     </div>
-        <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Include DataTables JS -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.js"></script>
-    <!-- Include Bootstrap JS -->
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</div>
 
-{% endblock content %}
-
-{% block script %}
-<script>
-    // Automatically close the alert messages after 3 seconds
+    <script>
+        // Automatically close the alert messages after 3 seconds
     setTimeout(function() {
         $('.alert').alert('close');
     }, 3000);
 
     // Form submission logic
-    $('#addaddsubjectsApplicationForm').submit(function(event) {
-        const form_data = {
-            StudentNumber: $('#StudentNumber').val().trim(),
-            Name: $('#Name').val().trim(),
-            subject_Names: $('#subject_Names').val().trim(),
-            enrollment_type: $('#enrollment_type').val().trim(),
-            user_responsible: $('#user_responsible').val().trim(),
-            status: $('#status').val().trim()
-        };
+    $('#addsubjectsApplicationForm').submit(function(event) {
+        const StudentNumber = $('#StudentNumber').val().trim();
+        const Name = $('#Name').val().trim();
+        const semester = $('#subject_Names').val().trim();
+        const enrollment_type = $('#enrollment_type').val().trim();
+        const userResponsible = $('#user_responsible').val().trim();
+        const status = $('#status').val().trim();
 
         // Additional validation logic
-        if (!form_data.StudentNumber || !form_data.Name || !form_data.subject_Names || !form_data.enrollment_type) {
+        if (!StudentNumber || !Name || !semester || !enrollment_type) {
             alert('Please fill out all fields and provide valid values.');
             event.preventDefault(); // Prevent form submission
-        } else {
-            // Log the form submission
-            logFormSubmission(form_data);
         }
 
         // You can add more validation logic here as needed
     });
+        function validateForm() {
+            var StudentNumber = document.getElementById('StudentNumber').value;
+            var studentName = document.getElementById('Name').value;
+            var subject_Names = document.getElementById('subject_Names').value;
+            var enrollmentType = document.getElementById('enrollment_type').value;
 
-    function logFormSubmission(form_data) {
-        $.ajax({
-            type: 'POST',
-            url: '/log_form_submission',  // Replace with your Flask route
-            data: form_data,
-            success: function(response) {
-                console.log(response.message);
-                // You can add any additional actions upon successful form submission
-            },
-            error: function(error) {
-                console.error('Error logging form submission:', error);
+            if (!StudentNumber || !studentName || !enrollmentType || !subject_Names) {
+                console.error('Error: Please fill out all required fields.');
+                return false;
             }
-        });
-    }
 
+            return true;
+        }
+    </script>
+{% endblock content %}
+
+{% block script %}
+ <script>
     // Fetch student details
     async function fetchStudentDetails() {
         try {
@@ -167,7 +159,6 @@
         // Select the name input and set the value to data.Name
         document.getElementById('Name').value = data.Name;
     }
-</script>
+ </script>
 {% endblock script %}
-
 

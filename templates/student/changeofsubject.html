@@ -24,8 +24,7 @@
         </div>
 
     <form action="{{ url_for('change_of_subjects') }}" method="POST" enctype="multipart/form-data">
-
-<<<<<<< HEAD
+        
         <div class="row mb-3">
             <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
             <div class="col-sm-8">
@@ -90,32 +89,7 @@
 
     </div>
 </div>
-=======
-        <label for="user_responsible">User Responsible:</label>
-        <select id="user_responsible" name="user_responsible" required>
-            <option value="Faculty Member/s">
-                Faculty Member/s
-            </option>
-            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="CDO Cashier/Accounting">CDO Cashier/Accounting</option>
-            <option value="Registrar's Office">Registrar's Office</option>
-        </select><br><br>
-    
-        <label for="status">Status:</label>
-        <select id="status" name="status">
-            <option value="Sent" selected>Sending</option>
-            <option value="Pending" disabled>Pending</option>
-            <option value="Approved" disabled>Approved</option>
-            <option value="Rejected" disabled>Rejected</option>
-        </select><br><br>
-                <!-- Hidden input for the current date and time -->
-        <input type="hidden" id="created_at" name="created_at">
-        <br><br>
-        <button type="submit" class="btn btn-primary btn-block">Submit Application</button>
-    </form>
-
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
->>>>>>> 0875974cff52974d0c81bdbc55dd18776ddf9cff
 
     <script>
         function validateForm() {
