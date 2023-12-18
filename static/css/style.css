@@ -646,6 +646,14 @@ main .btn-send:hover {
     box-shadow: none;
 }
 
+.text-body {
+	color: #800000;
+}
+
+.text-right {
+	color: #800000;
+}
+
 @media screen and (max-width: 768px) {
 	#content {
 		position: relative;
@@ -661,6 +669,8 @@ main .btn-send:hover {
 		font-size: 18px;
 		cursor: pointer;
 	}
+
+	
 }
 
 
