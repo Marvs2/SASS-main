@@ -46,6 +46,7 @@ def authenticate_user(username, Password):
         return True
     return False"""
 
+#have problem
 #condition needed it can put in utils.py
 def getCurrentUser():
     current_user_id = session.get('user_id')
@@ -383,7 +384,7 @@ def login():
             return redirect(url_for('student_dashboard'))
 
         else:
-            flash('Invalid Email or Password', 'danger')
+            flash('Invalid Student Number or Password', 'danger')
 
     return redirect(url_for('studentLogin'))
 
@@ -414,7 +415,7 @@ def get_Gender_string(Gender_code):
         return 'Female'
     else:
         return 'Undefined'  # Handle any other values
-
+#take 1 - it only presenting message in terminal 
 """def update_student_profile(form_data, StudentId):
     Email = form_data['Email']
     address = form_data['address']
@@ -431,8 +432,40 @@ def get_Gender_string(Gender_code):
         return True  # Indicates successful update
     else:
         return False  # Indicates failure to find the student or update"""
+#take 2
+@student_api.route('/update-student-details', methods=['POST'])
+def updateStudentDetails():
+    user_id = getCurrentUser()
+    student = Student.query.get(user_id)
+
+    if not student:
+        flash('User not found', 'danger')
+        return jsonify({'message': 'User not found'}), 404
+
+    # Check if the request is JSON or form data
+   # Check if the request is JSON or form data
+    if request.is_json:
+        # Update from JSON data
+        student.Email = request.json.get('Email', student.Email)
+        student.MobileNumber = request.json.get('MobileNumber', student.MobileNumber)
+        student.address = request.json.get('address', student.address)
+    else:
+        # Update from form data
+        student.Email = request.form.get('Email', student.Email)
+        student.MobileNumber = request.form.get('MobileNumber', student.MobileNumber)
+        student.address = request.form.get('address', student.address)
+
+    # Check if Email and MobileNumber are not None or empty
+    if student.Email is not None and student.MobileNumber is not None:
+        db.session.commit()
+        return jsonify({'message': 'Student details updated successfully'})
+    else:
+        flash('Email and MobileNumber cannot be empty', 'danger')
+        return jsonify({'message': 'Email and MobileNumber cannot be empty'}), 400
 
 
+
+#================================================================================#
 #applicable to all the applications if you want student
 @student_api.route('/student-details', methods=['GET'])
 def fetchStudentDetails():
