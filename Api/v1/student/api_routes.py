@@ -388,18 +388,22 @@ def login():
 
 #===================================================
 # TESTING AREA
+
 @student_api.route('/profile', methods=['GET'])
 @jwt_required()
 def profile():
     current_user_id = get_jwt_identity()
-    # Debug print statement
     student = Student.query.get(current_user_id)
+    
     if student:
         return jsonify(student.to_dict())
     else:
-        flash('User not found', 'danger')
-        return redirect(url_for('student_api.login'))
-
+        # If it's an API request, return a JSON response
+        if request.headers.get('Content-Type') == 'application/json':
+            return jsonify({'error': 'User not found'}), 404
+        else:
+            flash('User not found', 'danger')
+            return redirect(url_for('student_api.login'))
 
 def get_Gender_string(Gender_code):
     if Gender_code == 1:
@@ -407,7 +411,9 @@ def get_Gender_string(Gender_code):
     elif Gender_code == 2:
         return 'Female'
     else:
-        return 'Undefined'  # Handle any other values
+        # Handle any other values gracefully, for example, returning 'Unknown'
+        return 'Unknown'
+
 
 #applicable to all the applications if you want student
 @student_api.route('/student-details', methods=['GET'])
