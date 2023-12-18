@@ -2,16 +2,18 @@
 
 {% block content %}
 
-
-
 <div class="data data1">
    
     <div class="content-data">
         <div class="head">
             <h3>Student's Profile</h3>           
         </div>
+<<<<<<< HEAD
         <form action="{{url_for('studentprofile')}}" method="POST">
           
+=======
+        <form id="profileForm" method="POST" onsubmit="updateStudentProfile(event)">
+>>>>>>> 20fbdfc854569d903acd6c8ec22eecf3db95338d
             <div class="form-group">
               <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
               <div class="col-sm-4">
@@ -70,11 +72,39 @@
           </form>
     </div>
 </div>
-
+<!--<script>
+  async function updateStudentProfile(event) {
+      event.preventDefault();
+  
+      const formData = new FormData(document.getElementById('profileForm'));
+  
+      try {
+          const response = await fetch(`/student/update/{{ student_id }}`, {
+              method: 'PUT',
+              body: formData,
+          });
+  
+          if (!response.ok) {
+              throw new Error('Failed to update profile');
+          }
+  
+          const result = await response.json();
+          console.log('Profile updated successfully:', result);
+  
+          // Optionally, update the UI or show a success message
+  
+      } catch (error) {
+          console.error('Error updating profile:', error.message);
+          // Handle error scenarios - display an error message, etc.
+      }
+  }
+  </script>-->
 {% endblock %}
 
 {% block script %} 
 <script>
+
+// Fetch and display current user's profile details when page loads
     async function fetchStudentDetails() {
         const response = await fetch(`${api_base_url}/student-details`);
 
@@ -123,4 +153,12 @@ dateOfBirthInput.value = formattedDateOfBirth;
 
     document.getElementById('name-label').innerText = data.studentName; 
   }
+<<<<<<< HEAD
 </script>{% endblock script %}
+=======
+</script>{% endblock script %}
+
+<!-- 1st Step Make a script that will request in the server -->
+
+<!-- 2nd Get the data  -->
+>>>>>>> 20fbdfc854569d903acd6c8ec22eecf3db95338d

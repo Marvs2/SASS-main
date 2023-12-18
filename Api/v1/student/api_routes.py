@@ -1,5 +1,6 @@
 # api/api_routes.py
 import base64
+from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student
 from werkzeug.utils import secure_filename
@@ -44,6 +45,11 @@ def authenticate_user(username, Password):
         session['user_id'] = user.id  # Assuming user.id is the ID of the authenticated user
         return True
     return False"""
+
+#condition needed it can put in utils.py
+def getCurrentUser():
+    current_user_id = session.get('user_id')
+    return Student.query.get(current_user_id)    
 
 # Api/v1/student/api_routes.py
 #================================================================
@@ -415,6 +421,24 @@ def get_Gender_string(Gender_code):
         return 'Unknown'
 
 
+"""def update_student_profile(form_data, StudentId):
+    Email = form_data['Email']
+    address = form_data['address']
+    MobileNumber = form_data['MobileNumber']
+
+    # You can perform additional validation or checks here if needed
+
+    student = Student.query.get(StudentId)
+    if student:
+        student.Email = Email
+        student.address = address
+        student.MobileNumber = MobileNumber
+        db.session.commit()
+        return True  # Indicates successful update
+    else:
+        return False  # Indicates failure to find the student or update"""
+
+
 #applicable to all the applications if you want student
 @student_api.route('/student-details', methods=['GET'])
 def fetchStudentDetails():
@@ -444,6 +468,31 @@ def fetchStudentDetails():
         flash('User not found', 'danger')
         return redirect(url_for('student_api.login'))
 
+"""@student_api.route('/student/update-details', methods=['PUT'])
+def update_student_details():
+    user_id = session.get('user_id')
+    
+    # Retrieve the student from the database using the provided user_id
+    student = Student.query.get(user_id)
+
+    if student:
+        # Update the student's details based on the form data
+        student.Email = request.form.get('Email', student.Email)
+        student.MobileNumber = request.form.get('MobileNumber', student.MobileNumber)
+        student.address = request.form.get('address', student.address)
+        
+        # Commit changes to the database
+        db.session.commit()
+
+        # Return a success message with the updated details
+        return jsonify({
+            'message': 'Student details updated successfully',
+            'Email': student.Email,
+            'MobileNumber': student.MobileNumber,
+            'address': student.address
+        }), 200
+    else:
+        return jsonify({'message': 'Student not found'}), 404"""
 
     
 @student_api.route('/all/student', methods=['GET'])
@@ -454,7 +503,6 @@ def allstudent():
         return jsonify(message="You got API data")
     else:
         return jsonify(message="Invalid key you cant have an access")
-    
 
 #===============================================================================================#
 #====================================Students Functions=========================================#

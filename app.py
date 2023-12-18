@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, student_api #log_form_submission_to_file
+from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, fetchStudentDetails, student_api#, update_student_profile #log_form_submission_to_file
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
@@ -183,6 +183,32 @@ def student_dashboard():
 @app.route('/student/practice')
 def student_practice():
     return render_template('/student/practice.html')
+
+@app.route('/student/profile')
+def studentprofile():
+    student = fetchStudentDetails()
+    return render_template("/student/profile.html", student=student, student_api_base_url=student_api_base_url)
+
+@app.route('/student/setting')
+def studentsetting():
+    return render_template('/student/setting.html')
+
+@app.route('/student/history')
+def studenthistory():
+    return render_template('/student/history.html')
+
+"""# Usage in your Flask route:
+@app.route('/update_profile/<int:student_id>', methods=['POST'])
+def update_profile(student_id):
+    if request.method == 'POST':
+        form_data = request.form.to_dict()
+        success = update_student_profile(form_data, student_id)
+        if success:
+            return 'Profile updated successfully'
+        else:
+            return 'Failed to update profile'
+    else:
+        return 'Invalid request method'"""
 
 """# Endpoint to Fetch Programs
 @app.route('/programs', methods=['GET'])
@@ -597,10 +623,6 @@ def submittutorialrequest():
 @app.route('/student/certification')#
 def studentcertification():
     return render_template("/student/certification.html", student_api_base_url=student_api_base_url)#
-
-@app.route('/student/profile')
-def studentprofile():
-    return render_template("/student/profile.html", student_api_base_url=student_api_base_url)
 
 @app.route('/submit_certification_request', methods=['POST'])
 @role_required('student')
