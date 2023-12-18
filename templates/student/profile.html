@@ -11,6 +11,7 @@
             <h3>Student's Profile</h3>           
         </div>
         <form action="{{url_for('studentprofile')}}" method="POST">
+          
             <div class="form-group">
               <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
               <div class="col-sm-4">
@@ -103,10 +104,9 @@
     document.getElementById("address").value = data.address;
     // Select the dateOfBirth and set the value to data.dateOfBirth
     const dateOfBirthInput = document.getElementById("DateofBirth");
-
-// Format the date to display only the birthday
-const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
-    month: 'numeric',
+    // Format the date to display only the birthday
+    const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
+    month: 'long',
     day: 'numeric',
     year: 'numeric'
 });
@@ -124,10 +124,6 @@ dateOfBirthInput.value = formattedDateOfBirth;
     document.getElementById('name-label').innerText = data.studentName; 
   }
 </script>{% endblock script %}
-
-<!-- 1st Step Make a script that will request in the server -->
-
-<!-- 2nd Get the data  -->
 
 
 
