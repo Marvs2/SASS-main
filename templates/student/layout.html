@@ -58,7 +58,7 @@
 					<i class='bx bx-search icon' ></i>
 				</div> -->
 			</form>
-			<a href="#" class="nav-link" data-bs-toggle="dropdown" tabindex="-1" aria-label="Show notifications" id="notification-icon">
+			<a href="#" class="nav-link" data-bs-toggle="dropdown" tabindex="-1" title="Notifications" aria-label="Show notifications" id="notification-icon">
 				<i class='bx bxs-bell icon'></i>
 				<span class="badge">4</span>
 			</a>
@@ -128,9 +128,9 @@
 			<span class="divider"></span>
 
 			<div class="profile">
-				<img src="/static/images/user.png" alt="">
+				<img src="/static/images/user.png" alt="" title="My Profile">
 				<ul class="profile-link">
-					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon'></i> Profile</a></li>
 					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
 					<li><a href="{{url_for('logout')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
 				</ul>
