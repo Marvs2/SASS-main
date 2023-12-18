@@ -593,13 +593,65 @@ main .btn-send:hover {
 	background: var(--dark-blue);
 }
 /* MAIN */
+
 /* CONTENT */
-
-/*Bootstrap Calendar*/
-
 
 #representativeInfo {
 	display: none;
+}
+
+.dropdown-menu-arrow:before {
+    content: "";
+    position: absolute;
+    top: -.30rem;
+    left: .75rem;
+    display: block;
+    background: inherit;
+    width: 14px;
+    height: 14px;
+    transform: rotate(45deg);
+    transform-origin: center;
+    border: 2px solid;
+    border-color: inherit;
+    z-index: -1;
+    clip: rect(0,9px,9px,0)
+}
+
+.dropdown-menu-arrow.dropdown-menu-end:before {
+    right: .75rem;
+    left: auto
+}
+
+.dropend>.dropdown-menu {
+    margin-top: calc(-.25rem - 1px);
+    margin-left: -.25rem;
+}
+
+.dropend .dropdown-toggle:after {
+    margin-left: auto
+}
+
+.dropdown-menu-card {
+    padding: 0;
+	top: 55px;
+	right: 98px;
+	margin-left: 500px;	
+	font-size: 14px;
+
+}
+
+.dropdown-menu-card>.card {
+    margin: 0;
+    border: 0;
+    box-shadow: none;
+}
+
+.text-body {
+	color: #800000;
+}
+
+.text-right {
+	color: #800000;
 }
 
 @media screen and (max-width: 768px) {
@@ -617,6 +669,8 @@ main .btn-send:hover {
 		font-size: 18px;
 		cursor: pointer;
 	}
+
+	
 }
 
 
