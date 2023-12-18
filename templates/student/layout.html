@@ -108,10 +108,13 @@
                             <div class="d-block text-secondary text-truncate mt-n1">
                               Regenerate package-lock.json (#29730)
                             </div>
-                          </div>
-                          <div class="col-auto">                            
-                          </div>
+                          </div>                         
                         </div>
+                      </div>
+                      <div class="col-auto">  
+                        <div class="text-right mt-2 mb-1">
+                          <a href="#" id="see-all-notifications">See All Notifications</a>
+                      </div>                          
                       </div>
                     </div>
                   </div>
@@ -166,6 +169,16 @@ document.getElementById('notification-card').addEventListener('click', function 
     event.stopPropagation();
 });
 
+  // JavaScript to show all notifications when "See All Notifications" is clicked
+  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+      // Prevent the link from navigating (you may adjust this behavior as needed)
+      event.preventDefault();
+
+      // Show all notifications by removing the 'd-none' class
+      var notificationList = document.getElementById('notification-list');
+      notificationList.classList.remove('d-none');
+  });
+
         //STUDENT API
 		const api_base_url = '{{ student_api_base_url | default("") }}';
 		console.log('api_base_url: ', api_base_url)
@@ -177,6 +190,5 @@ document.getElementById('notification-card').addEventListener('click', function 
 	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>
-
 
 
