@@ -61,6 +61,8 @@ def custom_context_processor():
 
 #===========================================================================
 
+#========================= LANDING PAGE ===================================
+
 @app.route('/')
 def index():
     session.permanent = True
@@ -73,6 +75,8 @@ def index():
 def home():
     session.permanent = True
     return render_template('main/home.html')
+
+#========================= LOGOUT FUNCTION ====================================
 
 @app.route('/logout')
 def logout():
@@ -125,9 +129,9 @@ def upload_image():
             return 'Image uploaded successfully'
     
     return 'Error uploading image'
-#=======================================================================#
-# ========================================================================
-#SERVICES
+
+#=========================== LANDING PAGE SERVICES ROUTE ==============================================
+
 @app.route('/services/foroverloadofsubject')
 def overload():
     return render_template("/services/subject_overload.html")
@@ -168,41 +172,41 @@ def tutorial():
 def certification():
     return render_template("/services/certification.html")
 
-#========================================================================
+#===============================================================================================================
 # Define your allowed file function (you can customize it)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png', 'gif'}
-#========================================================================
-# STUDENT
-@app.route('/student/dashboard')
+
+
+#========================================= STUDENT SERVICES ====================================================
+
+#======================================== STUDENT DASHBOARD ====================================================
+@app.route('/student/dashboard') 
 @role_required('student')
 def student_dashboard():
     session.permanent=True
     return render_template('/student/dashboard.html')
 
-@app.route('/student/practice')
-def student_practice():
-    return render_template('/student/practice.html')
+#======================================== STUDENT PROFILE ======================================================
 
-@app.route('/student/profile', methods=['GET', 'POST'])
+@app.route('/student/profile') 
 def studentprofile():
-    if request.method == 'POST':
-        # Get the student ID from the form
-        student_id = request.form.get('student_id')
+    return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
-        # Update the student details using the student ID
+@app.route('/student/profile/updated', methods=['GET', 'POST']) 
+def student_update_profile():
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        
         email = request.form.get('Email')
         mobile_number = request.form.get('MobileNumber')
         address = request.form.get('address')
 
-        # Assuming you have a function to get the current user ID
         user_id = getCurrentUser()
 
-        # Extract StudentId from the user object if necessary
         if isinstance(user_id, Student):
             user_id = user_id.StudentId
 
-        # Correct way to query the Student model using user_id
         student = Student.query.get(user_id)
 
         if student:
@@ -212,25 +216,24 @@ def studentprofile():
 
             db.session.commit()
             flash('Student details updated successfully', 'success')
+            return redirect(url_for('studentprofile'))
 
-    # Redirect to the student profile route
-    return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
+    return render_template('/student/profile.html')
 
-
-
-
-@app.route('/student/setting')
-def studentsetting():
-    return render_template('/student/setting.html')
+#==================================== STUDENT TRANSACTION HISTORY ======================================================
 
 @app.route('/student/history')
 def studenthistory():
     return render_template('/student/history.html')
 
+
+#==================================== STUDENT CHANGE PASSWORD ===========================================================
+
 @app.route('/student/changepassword')
-def changepassword():
+def studentpassword():
     return render_template('/student/changepassword.html')
 
+#====================================  ===========================================================
 
 """# Usage in your Flask route:
 @app.route('/update_profile/<int:student_id>', methods=['POST'])

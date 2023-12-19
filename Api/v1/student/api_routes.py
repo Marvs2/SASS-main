@@ -457,7 +457,7 @@ def updateStudentDetails():
 
     # Check if Email and MobileNumber are not None or empty
     if student.Email is not None and student.MobileNumber is not None:
-        db.session.commit()
+        # db.session.commit()
         return jsonify({'message': 'Student details updated successfully'})
     else:
         flash('Email and MobileNumber cannot be empty', 'danger')
