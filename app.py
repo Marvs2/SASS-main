@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, fetchStudentDetails, student_api#, update_student_profile #log_form_submission_to_file
+from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, fetchStudentDetails, getCurrentUser, student_api#, update_student_profile #log_form_submission_to_file
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
@@ -184,10 +184,40 @@ def student_dashboard():
 def student_practice():
     return render_template('/student/practice.html')
 
-@app.route('/student/profile')
+@app.route('/student/profile', methods=['GET', 'POST'])
 def studentprofile():
-    student = fetchStudentDetails()
-    return render_template("/student/profile.html", student=student, student_api_base_url=student_api_base_url)
+    if request.method == 'POST':
+        # Get the student ID from the form
+        student_id = request.form.get('student_id')
+
+        # Update the student details using the student ID
+        email = request.form.get('Email')
+        mobile_number = request.form.get('MobileNumber')
+        address = request.form.get('address')
+
+        # Assuming you have a function to get the current user ID
+        user_id = getCurrentUser()
+
+        # Extract StudentId from the user object if necessary
+        if isinstance(user_id, Student):
+            user_id = user_id.StudentId
+
+        # Correct way to query the Student model using user_id
+        student = Student.query.get(user_id)
+
+        if student:
+            student.Email = email
+            student.MobileNumber = mobile_number
+            student.address = address
+
+            db.session.commit()
+            flash('Student details updated successfully', 'success')
+
+    # Redirect to the student profile route
+    return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
+
+
+
 
 @app.route('/student/setting')
 def studentsetting():

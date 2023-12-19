@@ -8,12 +8,7 @@
         <div class="head">
             <h3>Student's Profile</h3>           
         </div>
-<<<<<<< HEAD
-        <form action="{{url_for('studentprofile')}}" method="POST">
-          
-=======
-        <form id="profileForm" method="POST" onsubmit="updateStudentProfile(event)">
->>>>>>> 20fbdfc854569d903acd6c8ec22eecf3db95338d
+        <form id="profileForm" method="POST" onsubmit="updateStudentProfile(event)" action="{{ url_for('studentprofile') }}">
             <div class="form-group">
               <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
               <div class="col-sm-4">
@@ -54,7 +49,7 @@
             </div>
               <label for="address" class="col-sm-2 col-sm-2 control-label">Address</strong></label>
               <div class="col-sm-4">
-              <textarea  name="address" id="address" required="required" class="form-control"></textarea>
+              <input  name="address" id="address" required="required" class="form-control">
              </div>              
             </div>
 
@@ -72,33 +67,34 @@
           </form>
     </div>
 </div>
-<!--<script>
-  async function updateStudentProfile(event) {
-      event.preventDefault();
-  
-      const formData = new FormData(document.getElementById('profileForm'));
-  
-      try {
-          const response = await fetch(`/student/update/{{ student_id }}`, {
-              method: 'PUT',
-              body: formData,
-          });
-  
-          if (!response.ok) {
-              throw new Error('Failed to update profile');
-          }
-  
-          const result = await response.json();
-          console.log('Profile updated successfully:', result);
-  
-          // Optionally, update the UI or show a success message
-  
-      } catch (error) {
-          console.error('Error updating profile:', error.message);
-          // Handle error scenarios - display an error message, etc.
-      }
-  }
-  </script>-->
+<script>
+    async function updateStudentProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData(document.getElementById('profileForm'));
+
+        try {
+            const response = await fetch('/student/profile', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            const result = await response.json();
+            console.log('Profile updated successfully:', result);
+
+            // Optionally, update the UI or show a success message
+
+        } catch (error) {
+            console.error('Error updating profile:', error.message);
+            // Handle error scenarios - display an error message, etc.
+        }
+    }
+</script>
+
 {% endblock %}
 
 {% block script %} 
@@ -134,9 +130,10 @@
     document.getElementById("address").value = data.address;
     // Select the dateOfBirth and set the value to data.dateOfBirth
     const dateOfBirthInput = document.getElementById("DateofBirth");
-    // Format the date to display only the birthday
-    const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
-    month: 'long',
+
+// Format the date to display only the birthday
+const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
+    month: 'numeric',
     day: 'numeric',
     year: 'numeric'
 });
@@ -153,12 +150,8 @@ dateOfBirthInput.value = formattedDateOfBirth;
 
     document.getElementById('name-label').innerText = data.studentName; 
   }
-<<<<<<< HEAD
-</script>{% endblock script %}
-=======
 </script>{% endblock script %}
 
 <!-- 1st Step Make a script that will request in the server -->
 
 <!-- 2nd Get the data  -->
->>>>>>> 20fbdfc854569d903acd6c8ec22eecf3db95338d
