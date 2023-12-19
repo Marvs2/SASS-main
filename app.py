@@ -197,6 +197,11 @@ def studentsetting():
 def studenthistory():
     return render_template('/student/history.html')
 
+@app.route('/student/changepassword')
+def changepassword():
+    return render_template('/student/changepassword.html')
+
+
 """# Usage in your Flask route:
 @app.route('/update_profile/<int:student_id>', methods=['POST'])
 def update_profile(student_id):
