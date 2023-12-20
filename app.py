@@ -1,7 +1,6 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import ChangeOfSubjects, GradeEntry, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from datetime import datetime, timezone #, timedelta, 
@@ -190,17 +189,15 @@ def student_dashboard():
 
 #======================================== STUDENT PROFILE ======================================================
 
-@app.route('/student/profile', methods=['GET', 'POST'])
+@app.route('/student/profile') 
 def studentprofile():
     return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
 @app.route('/student/profile/updated', methods=['GET', 'POST']) 
 def student_update_profile():
     if request.method == 'POST':
-        # Get the student ID from the form
         student_id = request.form.get('student_id')
-
-        # Update the student details using the student ID
+        
         email = request.form.get('Email')
         mobile_number = request.form.get('MobileNumber')
         address = request.form.get('address')
@@ -219,20 +216,67 @@ def student_update_profile():
 
             db.session.commit()
             flash('Student details updated successfully', 'success')
+            return redirect(url_for('studentprofile'))
 
-    # Redirect to the student profile route
-    return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
-
-
+    return render_template('/student/profile.html')
 
 
 @app.route('/student/setting')
 def studentsetting():
     return render_template('/student/setting.html')
+# Assuming you have the role_required decorator implemented
+@app.route('/student/history', methods=['GET'])
+@role_required('student')
+def student_history():
+    user_id = session.get('user_id')
 
-@app.route('/student/history')
-def studenthistory():
-    return render_template('/student/history.html')"""
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    services_data = {}
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
+
+        # Fetch ChangeOfSubjects based on the StudentId foreign key
+        changesubjects = ChangeOfSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
+
+        # Fetch ManualEnrollment based on the StudentId foreign key
+        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
+
+        # Fetch CertificationRequest based on the StudentId foreign key
+        certification_requests = CertificationRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['certification_requests_list'] = [subject.to_dict() for subject in certification_requests]
+
+        # Fetch GradeEntry based on the StudentId foreign key
+        grade_entries = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
+        services_data['grade_entries_list'] = [subject.to_dict() for subject in grade_entries]
+
+        # Fetch CrossEnrollment based on the StudentId foreign key
+        cross_enrollments = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['cross_enrollments_list'] = [subject.to_dict() for subject in cross_enrollments]
+
+        # Fetch PetitionRequest based on the StudentId foreign key
+        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
+
+        # Fetch ShiftingApplication based on the StudentId foreign key
+        shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
+
+        # Fetch OverloadApplication based on the StudentId foreign key
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['overload_applications_list'] = [subject.to_dict() for subject in overload_applications]
+
+        # Fetch TutorialRequest based on the StudentId foreign key
+        tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
+
+    return render_template("/student/history.html", services_data=services_data)
 
 
 #==================================== STUDENT CHANGE PASSWORD ===========================================================
@@ -770,60 +814,6 @@ def submit_certification_request():
     return render_template('student/certification.html')
 
 #===========================================================================================================================#
-
-# Assuming you have the role_required decorator implemented
-@app.route('/student/history', methods=['GET'])
-@role_required('student')
-def student_history():
-    user_id = session.get('user_id')
-
-    # Fetch the student based on the user_id
-    student = Student.query.get(user_id)
-
-    services_data = {}
-
-    if student:
-        # Fetch AddSubjects based on the StudentId foreign key
-        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
-        services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
-
-        # Fetch ChangeOfSubjects based on the StudentId foreign key
-        changesubjects = ChangeOfSubjects.query.filter_by(StudentId=student.StudentId).all()
-        services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
-
-        # Fetch ManualEnrollment based on the StudentId foreign key
-        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
-        services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
-
-        # Fetch CertificationRequest based on the StudentId foreign key
-        certification_requests = CertificationRequest.query.filter_by(StudentId=student.StudentId).all()
-        services_data['certification_requests_list'] = [subject.to_dict() for subject in certification_requests]
-
-        # Fetch GradeEntry based on the StudentId foreign key
-        grade_entries = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
-        services_data['grade_entries_list'] = [subject.to_dict() for subject in grade_entries]
-
-        # Fetch CrossEnrollment based on the StudentId foreign key
-        cross_enrollments = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
-        services_data['cross_enrollments_list'] = [subject.to_dict() for subject in cross_enrollments]
-
-        # Fetch PetitionRequest based on the StudentId foreign key
-        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
-        services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
-
-        # Fetch ShiftingApplication based on the StudentId foreign key
-        shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
-        services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
-
-        # Fetch OverloadApplication based on the StudentId foreign key
-        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
-        services_data['overload_applications_list'] = [subject.to_dict() for subject in overload_applications]
-
-        # Fetch TutorialRequest based on the StudentId foreign key
-        tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
-        services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
-
-    return render_template("/student/history.html", services_data=services_data)
 
 """# View function to handle operations based on StudentId
 @app.route('/students/<int:student_id>/subjects', methods=['GET'])
