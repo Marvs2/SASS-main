@@ -4,11 +4,6 @@ from flask_login import login_user
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
-<<<<<<< HEAD
-=======
-
- 
->>>>>>> b9682b3c4a4c28573c2e295236a14441d306f7ae
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
