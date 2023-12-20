@@ -3,7 +3,13 @@ from flask import Flask, abort, render_template, jsonify, redirect, request, fla
 from flask_login import login_user
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
+<<<<<<< HEAD
+from werkzeug.security import generate_password_hash, check_password_hash 
+
+ 
+=======
 from datetime import datetime, timezone #, timedelta, 
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 #from models import Services
 #from models import init_db
 
@@ -54,12 +60,6 @@ def custom_context_processor():
         authenticated = True
     return {'authenticated': authenticated}
 
-
-#=========================================================================
-# TESTING AREA
-
-#===========================================================================
-
 #========================= LANDING PAGE ===================================
 
 @app.route('/')
@@ -68,22 +68,21 @@ def index():
     return render_template('main/home.html')
 
 #===========================================================================
-# ROUTING FOR YOUR APPLICATION (http:localhost:3000)
 @app.route('/')
 @prevent_authenticated
 def home():
     session.permanent = True
     return render_template('main/home.html')
 
-#========================= LOGOUT FUNCTION ====================================
+#=============================== LOGOUT FUNCTION ====================================
 
 @app.route('/logout')
 def logout():
-    # Clear session data including JWT token and user role
+    
     session.clear()
-    return redirect(url_for('studentLogin'))  # Redirect to home or appropriate route
+    return redirect(url_for('studentLogin'))  
 
-# =======================================================================
+# ===================================================================================
 #Downloadable files for Adding Subjects
 @app.route('/download/pdf_file/Adding_subject_form')
 def download_AddingSubs():
@@ -114,7 +113,7 @@ def download_RO_form():
     pdf_path = "static/pdf_files/RO-Form.pdf"  # Replace with the actual path to your PDF file
     return send_file(pdf_path, as_attachment=True, download_name="RO-Form.pdf")
 
-#=======================================================================#
+#=====================================================================================================
 
 def upload_image():
     StudentNumber = request.form['StudentNumber']
@@ -171,8 +170,6 @@ def tutorial():
 def certification():
     return render_template("/services/certification.html")
 
-#===============================================================================================================
-# Define your allowed file function (you can customize it)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png', 'gif'}
 
@@ -214,7 +211,7 @@ def student_update_profile():
             student.address = address
 
             db.session.commit()
-            flash('Student details updated successfully', 'success')
+            flash('Profile Updated Successfully!', 'success')
             return redirect(url_for('studentprofile'))
 
     return render_template('/student/profile.html')
@@ -284,7 +281,43 @@ def student_history():
 def studentpassword():
     return render_template('/student/changepassword.html')
 
-#====================================  ===========================================================
+
+@app.route('/student/changepassword', methods=['GET', 'POST'])
+def student_change_password():
+    if request.method == 'POST':
+        student_id = request.form.get('student_id')
+        current_password = request.form.get('currentPassword')
+        new_password = request.form.get('newPassword')
+        confirm_password = request.form.get('confirmPassword')
+
+
+        user_id = getCurrentUser()
+
+        if isinstance(user_id, Student):
+            user_id = user_id.StudentId
+
+        student = Student.query.get(user_id)
+
+        # Check if the current password matches the one stored in the database
+        if not check_password_hash(student.Password, current_password):
+            flash('Incorrect current password. Please try again.', 'error')
+            return redirect(url_for('student_change_password'))
+
+        # Check if the new and confirm passwords match
+        if new_password != confirm_password:
+            flash('New password and confirm password do not match. Please try again.', 'error')
+            return redirect(url_for('student_change_password'))
+
+        # Update the user's password in the database
+        hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
+        student.Password = hashed_password
+        db.session.commit()
+
+        flash('Password changed successfully!', 'success')
+        return redirect(url_for('student_change_password'))
+
+    return render_template('student/change_password.html')
+#====================================  ==================================================================================
 
 """# Usage in your Flask route:
 @app.route('/update_profile/<int:student_id>', methods=['POST'])
@@ -325,7 +358,8 @@ def get_semesters(year_level_id):
 def get_subjects(year_level_id, semester_id):
     subjects = CourseSub.query.filter_by(yearId=year_level_id, semesterId=semester_id).all()
     return jsonify([subject.to_dict() for subject in subjects])"""
-#==============================================================================================#
+    
+#================================= OVERLOAD OF SUBJECT =============================================================
 @app.route('/student/overload') 
 def studentoverload():
     return render_template("/student/overload.html", student_api_base_url=student_api_base_url)
@@ -335,26 +369,37 @@ def studentoverload():
 def submit_overload_application():
     try:
         current_StudentId = session.get('user_id')
+<<<<<<< HEAD
+=======
 
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
         new_overload_application = create_overload_application(request.form, request.files, current_StudentId)
 
         if new_overload_application:
                 db.session.add(new_overload_application)
                 db.session.commit()
+<<<<<<< HEAD
+        flash('Overload application submitted successfully!', 'success')
+        return redirect(url_for('studentoverload'))
+=======
                 # Ensure student_api_base_url is defined and accessible
                 flash('Overload application submitted successfully!', 'success')
                 return redirect(url_for('studentoverload'))
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
     except Exception as e:
         db.session.rollback()
-        # Make sure student_api_base_url is defined or accessible here
         flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
+<<<<<<< HEAD
+    return render_template("student/overload.html")
+=======
     return render_template('student/overload.html')
   # Adjust the template as needed
 
 
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 
 #=============================================================================================================
 
@@ -370,7 +415,7 @@ def edit_overload(overload_application_id):
         return render_template('edit_overload.html', overload_application=overload_application)
 
     if request.method == 'POST':
-        if 'submit' in request.form:  # Check if the "Submit" button was clicked
+        if 'submit' in request.form: 
             Name = request.form['Name']
             StudentNumber = request.form['StudentNumber']
             semester = request.form['semester']
@@ -401,12 +446,12 @@ def edit_overload(overload_application_id):
             db.session.commit()
             flash('Overload application updated successfully!', 'success')
             return redirect(url_for('stud_overload'))
-        else:  # Check if the "Cancel" button was clicked
+        else:  
             return redirect(url_for('stud_overload'))
 
 
 
-#=============================================================================================================
+#==================================== ADDING OF SUBJECT =========================================================
 
 @app.route('/student/addingsubject')
 def studentaddingsubject():
@@ -586,10 +631,10 @@ def submit_services_request():
 
     return redirect(url_for('stud_services'))"""
 
-#========================================================================#
-@app.route('/student/changeofsubject')#
+#============================== CHANGE OF SCHEDULE/SUBJECT ===============================================#
+@app.route('/student/changeofsubject')
 def studentchange():
-    return render_template("/student/changeofsubject.html", student_api_base_url=student_api_base_url)#
+    return render_template("/student/changeofsubject.html", student_api_base_url=student_api_base_url)
 
 @app.route('/student/changeofsubject/added', methods=['POST'])
 @role_required('student')
@@ -612,11 +657,11 @@ def change_of_subjects():
 
     return render_template('student/changeofsubject.html')
 
-#==========================================================================================================================#
+#========================== CORRECTION OF GRADE ENTRY ================================================#
 
-@app.route('/student/gradeentry')#
+@app.route('/student/gradeentry')
 def studentcorrection():
-    return render_template("/student/gradeentry.html", student_api_base_url=student_api_base_url)#
+    return render_template("/student/gradeentry.html", student_api_base_url=student_api_base_url)
 
 @app.route('/student/gradeentry/submit', methods=['POST'])
 @role_required('student')
@@ -639,18 +684,17 @@ def submit_grade_correction():
 
     return render_template('student/gradeentry.html')
 
-#==============================================================================================================
+#====================================== CROSS ENROLLMENT =========================================================
 
-@app.route('/student/crossenrollment')#
+@app.route('/student/crossenrollment')
 def studentenrollment():
-    return render_template("/student/crossenrollment.html", student_api_base_url=student_api_base_url)#
+    return render_template("/student/crossenrollment.html", student_api_base_url=student_api_base_url)
 
 @app.route('/student/crossenrollment/submitted', methods=['POST'])
-@role_required('student')  # Add any required authentication decorator
+@role_required('student') 
 def submit_cross_enrollment():
-    # Handle form submission
+
     try:
-        # Process and save the form data
         current_StudentId = session.get('user_id')
         new_cross_enrollment = create_crossenrollment_form(request.form, request.files, current_StudentId)
         
@@ -658,7 +702,7 @@ def submit_cross_enrollment():
             db.session.add(new_cross_enrollment)
             db.session.commit()
             flash('Cross-Enrollment created successfully!', 'success')
-            return redirect(url_for('studentenrollment'))  # Redirect to the appropriate route
+            return redirect(url_for('studentenrollment'))  
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
@@ -668,14 +712,11 @@ def submit_cross_enrollment():
     return render_template('student/crossenrollment.html')
 
 
-#==================================================================================================================================
-#==================================================================================================================================
-#===================Shifting===================#
-@app.route('/student/shifting')#
+#================================== APPLICATION FOR SHIFTING ================================================
+@app.route('/student/shifting')
 def studentshifting():
-    return render_template("/student/shifting.html", student_api_base_url=student_api_base_url)#
+    return render_template("/student/shifting.html", student_api_base_url=student_api_base_url)
 
-# Assuming your route for this page is '/submit_shifting_application'
 @app.route('/student/shifting/submit', methods=['POST'])
 @role_required('student')
 def submit_shifting():
@@ -697,8 +738,7 @@ def submit_shifting():
 
     return render_template('student/shifting.html') 
 
-#========================================================================================================================================
-#================ManualEnrollment=================#
+#=========================================== MANUAL ENROLLMENT ========================================================
 @app.route('/student/manualenrollment')#
 def studentmanualenrollment():
     return render_template("/student/manualenrollment.html", student_api_base_url=student_api_base_url)#
@@ -725,10 +765,10 @@ def submitmanualenrollment():
     return render_template('student/manualenrollment.html')
 
 
-#====================================================================================================================================
+#===================================== ONLINE PETITION OF SUBJECTS =====================================================
 
 @app.route('/student/onlinepetitionofsubject')
-def studentpetition():  # Include the StudentId parameter
+def studentpetition():
     return render_template("/student/petition.html", student_api_base_url=student_api_base_url)
 
 @app.route('/submit_petition_request', methods=['POST'])
@@ -751,7 +791,6 @@ def submit_petition():
 
     return render_template('student/petition.html')
 
-#===============================================
 
 @app.route('/student/onlinepetitionofsubject/<int:StudentId>', methods=['GET'])
 def view_student_petition(StudentId):
@@ -760,7 +799,7 @@ def view_student_petition(StudentId):
 
     return render_template('view_petition_data.html', petitions=petitions)
 
-#===================================================================================================================================#
+#================================= ONLINE REQUEST FOR TUTORIAL ===================================================
 
 @app.route('/student/tutorial')#
 def studenttutorial():
@@ -774,7 +813,38 @@ def submit_tutorial_request():
 
         new_tutorial_request = create_tutorial_request(request.form, request.files, current_StudentId)
         
+<<<<<<< HEAD
+        if 'file' not in request.files:
+            flash('No file part', 'danger')
+            return redirect(url_for('stude_tutorial'))
+
+        file = request.files['file']
+        if file.filename == '':
+            flash('No selected file', 'danger')
+            return redirect(url_for('studenttutorial')) 
+
+        file_data = file.read()  # Read the file data
+        file_filename = secure_filename(file.filename)
+
+        if not StudentNumber or not Name or not subject_code or not subject_name:
+            flash('Please fill out all required fields.', 'danger')
+            return redirect(url_for('studenttutorial')) 
+
+        try:
+            new_tutorial_request = TutorialRequest(
+                StudentNumber=StudentNumber,
+                Name=Name,
+                subject_code=subject_code,
+                subject_name=subject_name,
+                file_filename=file_filename,
+                file_data=file_data,
+                user_responsible=request.form.get('user_responsible'),
+                status=request.form.get('status')
+            )
+
+=======
         if new_tutorial_request:
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
             db.session.add(new_tutorial_request)
             db.session.commit()
             flash('Tutorial request has been created successfully!', 'success')
@@ -785,25 +855,29 @@ def submit_tutorial_request():
     finally:
         db.session.close()
 
+<<<<<<< HEAD
+    return redirect(url_for('studenttutorial'))
+=======
     return render_template('student/tutorial.html')
+>>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 
-#====================================================================================================================
-@app.route('/student/certification')#
+#======================================== REQUEST FOR CERTIFICATION ===========================================================
+@app.route('/student/certification')
 def studentcertification():
-    return render_template("/student/certification.html", student_api_base_url=student_api_base_url)#
+    return render_template("/student/certification.html", student_api_base_url=student_api_base_url)
 
 @app.route('/submit_certification_request', methods=['POST'])
 @role_required('student')
 def submit_certification_request():
     try:
-        current_StudentId = session.get('user_id')  # Adjust this based on your authentication logic
+        current_StudentId = session.get('user_id') 
         new_certification_request = create_certification_request(request.form, request.files, current_StudentId)
 
         if new_certification_request:
             db.session.add(new_certification_request)
             db.session.commit()
             flash('Certification Request submitted successfully!', 'success')
-            return redirect(url_for('studentcertification'))  # Redirect to the appropriate route
+            return redirect(url_for('studentcertification')) 
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
