@@ -3,17 +3,23 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
+  
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
+  
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+  
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+
 	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
+
+  <!-- Add this in the <head> section of your HTML -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 	<title>Student Academic Support System</title>
 </head>
 <body>
+  
 	
 	<!-- SIDEBAR -->
 	<section id="sidebar">
@@ -49,10 +55,11 @@
 
 	<!-- NAVBAR -->
 	<section id="content">
+    
 		<!-- NAVBAR -->
 		<nav>
 			<i class='bx bx-menu toggle-sidebar' ></i>
-			<form action="#">
+      			<form action="#">
 			<!----	<div class="form-group">
 					<input type="text" placeholder="Search...">
 					<i class='bx bx-search icon' ></i>

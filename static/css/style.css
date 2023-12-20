@@ -13,7 +13,7 @@
 	--dark-grey: #8D8D8D;
 	--light: #fff;
 	--dark: #000;
-	--green: #81D43A;
+	--green: #1fa41f;
 	--light-green: #E3FFCB;
 	--blue: #1775F1;
 	--light-blue: #D0E4FF;
@@ -658,6 +658,44 @@ main .btn-send:hover {
 	color: red;
 	font-size: 12px;
 }
+
+@keyframes progress-indeterminate {
+    0% {
+        right: 100%;
+        left: -35%
+    }
+
+    100%,60% {
+        right: -90%;
+        left: 100%
+    }
+}
+
+.progress {
+    position: relative;
+    width: 100%;
+    line-height: .5rem;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+	background-color: white;
+	display: none;
+}
+
+.progress-bar-indeterminate:after,.progress-bar-indeterminate:before {
+    position: absolute;
+    top: 0;
+    bottom: 9;
+    left: 0;
+    content: "";
+    background-color: var(--green);
+    will-change: left,right
+}
+
+.progress-bar-indeterminate:before {
+    animation: progress-indeterminate 1.5s cubic-bezier(.65,.815,.735,.395) infinite
+}
+
 
 @media screen and (max-width: 768px) {
 	#content {
