@@ -1,9 +1,10 @@
-from datetime import datetime
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
+from models import ChangeOfSubjects, GradeEntry, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
+from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
 
@@ -61,6 +62,8 @@ def custom_context_processor():
 
 #===========================================================================
 
+#========================= LANDING PAGE ===================================
+
 @app.route('/')
 def index():
     session.permanent = True
@@ -73,6 +76,8 @@ def index():
 def home():
     session.permanent = True
     return render_template('main/home.html')
+
+#========================= LOGOUT FUNCTION ====================================
 
 @app.route('/logout')
 def logout():
@@ -125,9 +130,9 @@ def upload_image():
             return 'Image uploaded successfully'
     
     return 'Error uploading image'
-#=======================================================================#
-# ========================================================================
-#SERVICES
+
+#=========================== LANDING PAGE SERVICES ROUTE ==============================================
+
 @app.route('/services/foroverloadofsubject')
 def overload():
     return render_template("/services/subject_overload.html")
@@ -168,42 +173,43 @@ def tutorial():
 def certification():
     return render_template("/services/certification.html")
 
-#========================================================================
+#===============================================================================================================
 # Define your allowed file function (you can customize it)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png', 'gif'}
-#========================================================================
-# STUDENT
-@app.route('/student/dashboard')
+
+
+#========================================= STUDENT SERVICES ====================================================
+
+#======================================== STUDENT DASHBOARD ====================================================
+@app.route('/student/dashboard') 
 @role_required('student')
 def student_dashboard():
     session.permanent=True
     return render_template('/student/dashboard.html')
 
-@app.route('/student/practice')
-def student_practice():
-    return render_template('/student/practice.html')
+#======================================== STUDENT PROFILE ======================================================
 
 @app.route('/student/profile', methods=['GET', 'POST'])
-@role_required('student')
 def studentprofile():
+    return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
+
+@app.route('/student/profile/updated', methods=['GET', 'POST']) 
+def student_update_profile():
     if request.method == 'POST':
         # Get the student ID from the form
-        student_id = request.form.get('user_id')
+        student_id = request.form.get('student_id')
 
         # Update the student details using the student ID
         email = request.form.get('Email')
         mobile_number = request.form.get('MobileNumber')
         address = request.form.get('address')
 
-        # Assuming you have a function to get the current user ID
         user_id = getCurrentUser()
 
-        # Extract StudentId from the user object if necessary
         if isinstance(user_id, Student):
             user_id = user_id.StudentId
 
-        # Correct way to query the Student model using user_id
         student = Student.query.get(user_id)
 
         if student:
@@ -223,10 +229,19 @@ def studentprofile():
 @app.route('/student/setting')
 def studentsetting():
     return render_template('/student/setting.html')
-"""
+
 @app.route('/student/history')
 def studenthistory():
     return render_template('/student/history.html')"""
+
+
+#==================================== STUDENT CHANGE PASSWORD ===========================================================
+
+@app.route('/student/changepassword')
+def studentpassword():
+    return render_template('/student/changepassword.html')
+
+#====================================  ===========================================================
 
 """# Usage in your Flask route:
 @app.route('/update_profile/<int:student_id>', methods=['POST'])
@@ -858,6 +873,12 @@ def submit_services_request():
     return redirect(url_for('stud_services'))"""
 
 #===========================================================#
+@app.route('/refresh_session', methods=['POST'])
+def refresh_session():
+    # Update the last activity timestamp
+    session['last_activity'] = datetime.now(timezone.utc)
+    return jsonify(success=True)
+
 #======================View_Compilation=====================#
 #===========================================================#
 
@@ -866,21 +887,24 @@ def submit_services_request():
 @app.route('/faculty/overload')
 def facultyoverload():
     overload_applications = OverloadApplication.query.all()
-    return render_template("/faculty/overload.html", overload_applications=overload_applications)
+    return render_template("/faculty/overload.html", overload_applications=overload_applications)  #overload_applications in overload_applications
 
 @app.route('/faculty/adding')
 def facultyadding():
+    session['last_activity'] = datetime.now(timezone.utc)
     addsubjects = AddSubjects.query.all()
-    return render_template("/faculty/adding.html", addsubjects=addsubjects)
+    return render_template("/faculty/adding.html", addsubjects=addsubjects) # addsubjects in addsubjects
 
 @app.route('/faculty/change')
 def facultychange():
+    session['last_activity'] = datetime.now(timezone.utc)
     changesubjects = ChangeOfSubjects.query.all()
-    return render_template("/faculty/change.html", changesubjects=changesubjects)
+    return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
 
 @app.route('/faculty/correction')
 def facultycorrection():
-    return render_template("/faculty/correction.html")
+    grade_entries = GradeEntry.query.all()
+    return render_template("/faculty/correction.html", grade_entry=grade_entries) # for grade_entry in grade_entries
 
 @app.route('/faculty/crossenrollment')
 def facultycrossenrollment():
@@ -888,7 +912,8 @@ def facultycrossenrollment():
 
 @app.route('/faculty/shifting')
 def facultyshifting():
-    return render_template("/faculty/shifting.html")
+    shifting_applications = ShiftingApplication.query.all()
+    return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
 
 @app.route('/faculty/manualenrollment')
 def facultyenrollment():
@@ -915,6 +940,29 @@ def facultytutorial():
 #routes for the redirection to the portal of the login in different routes
 # ====================================================================================================================#
 #===================================================== PORTALS =======================================================#
+#=====================================================================================================================#
+
+#===================================================TIMER=============================================================#
+# Middleware to check for inactivity and redirect to login if needed
+"""@app.before_request
+def check_user_activity():
+    if 'user_id' in session and 'last_activity' in session:
+        last_activity = session['last_activity']
+        now_utc = datetime.now(timezone.utc)
+
+        # Convert last_activity to an aware datetime object
+        if not last_activity.tzinfo:
+            last_activity = last_activity.replace(tzinfo=timezone.utc)
+
+        inactive_time = now_utc - last_activity
+
+        # Redirect to login if inactive for 5 minutes
+        if inactive_time > timedelta(minutes=5):
+            return redirect(url_for('studentLogin'))
+
+    # Update the last activity timestamp
+    session['last_activity'] = datetime.now(timezone.utc)"""
+
 #=====================================================================================================================#
 # ALL STUDENT ROUTES HERE
 @app.route('/student')
@@ -1498,7 +1546,7 @@ def redirect_based_on_login_crossenrollment():
         return redirect(url_for('portal_crossenrollment'))
 
 #================================================================#
-# crossenrollment function for teachers
+# function that is sent for teachers
 #================================================================#
 # ALL FACULTY ROUTES HERE
 @app.route('/faculty')
@@ -1533,7 +1581,7 @@ def facultyprofile():
 def view_adding_subject():
     addsubjects = AddSubjects.query.all()
     return render_template("/faculty/view_adding.html", addsubject=addsubjects)"""
-
+# adding.html page
 @app.route('/faculty/view_adding_subject/get_subject_file/<int:subject_ID>')
 def get_subject_file(subject_ID):
     return redirect(url_for('download_subject_file', subject_ID=subject_ID))
@@ -1576,7 +1624,7 @@ def view_overload():
     overload_applications = OverloadApplication.query.all()
     return render_template('/faculty/view_overload.html', overload_applications=overload_applications)
 """
-# Redirect to download overload file
+# Redirect to download overload.html page
 @app.route('/faculty/view_overload/get_overload_file/<int:overload_application_id>')
 def get_overload_file(overload_application_id):
     return redirect(url_for('download_overload_file', overload_application_id=overload_application_id))
@@ -1615,12 +1663,12 @@ def get_mimetype(file_extension):
 #=========================================================#
 
 # for change of subjects and sched
-@app.route('/faculty/view_change_of_subjects_sched')
+"""@app.route('/faculty/view_change_of_subjects_sched')
 def view_change_of_subjects_sched():
     changesubjects = ChangeOfSubjects.query.all()
-    return render_template('/faculty/view_change.html', changesubjects=changesubjects)
+    return render_template('/faculty/view_change.html', changesubjects=changesubjects)"""
 
-# Redirect to download change of subjects file
+# Redirect to download change of change.html
 @app.route('/faculty/view_change_of_subjects_sched/get_change_file/<int:Changesubject_ID>')
 def get_change_file(Changesubject_ID):
     return redirect(url_for('download_change_file', Changesubject_ID=Changesubject_ID))
@@ -1656,10 +1704,61 @@ def get_mimetype(file_extension):
 
     return mimetypes.get(file_extension, 'application/octet-stream')
 
+#===========================================================#
+#shifting
+"""@app.route('/faculty/shifting_applications')
+def view_shifting_applications():
+    shifting_applications = GradeEntry.query.all()
+    return render_template('/faculty/shifting.html', shifting_applications=shifting_applications)"""
 
+# Redirect to download change of change.html
+@app.route('/faculty/shifting_applications/get_shifting_file/<int:shifting_application_id>')
+def get_shifting_file(shifting_application_id):
+    return redirect(url_for('download_shifting_file', shifting_application_id=shifting_application_id))
+
+# Download change of subjects file
+@app.route('/faculty/download_shifting_file/<int:shifting_application_id>')
+def download_shifting_file(shifting_application_id):
+    shifting_applications = ShiftingApplication.query.get(shifting_application_id)
+
+    if shifting_applications and shifting_applications.file_data:
+        file_extension = get_file_extension(shifting_applications.file_filename)
+        download_name = f'shifting_applications_{shifting_application_id}.{file_extension}'
+
+        return send_file(
+            io.BytesIO(shifting_applications.file_data),
+            as_attachment=True,
+            download_name=download_name,
+            mimetype=get_mimetype(file_extension),
+        )
+    else:
+        abort(404)  # Change of subjects application or file not found
+
+def get_file_extension(file_filename):
+    return file_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(file_extension, 'application/octet-stream')
+#===========================================================#
+#certification
+#===========================================================#
+#correction
+#===========================================================#
+#crossenrollment
+#===========================================================#
+#enrollment
+# ====================================================================== #petition
+#===========================================================#
+#tutorial
 #===========================================================#
 
-# ====================================================================== #
 # ====================== ALL ADMIN ROUTES HERE========================== #
 # ====================================================================== #
 @app.route('/admin')

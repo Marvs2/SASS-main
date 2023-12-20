@@ -301,7 +301,7 @@ nav .profile .profile-link {
 	padding: 10px 0;
 	box-shadow: 4px 4px 16px rgba(0, 0, 0, .1);
 	border-radius: 10px;
-	width: 160px;
+	width: 200px;
 	opacity: 0;
 	pointer-events: none;
 	transition: all .3s ease;
@@ -652,6 +652,11 @@ main .btn-send:hover {
 
 .text-right {
 	color: #800000;
+}
+
+.password {
+	color: red;
+	font-size: 12px;
 }
 
 @media screen and (max-width: 768px) {

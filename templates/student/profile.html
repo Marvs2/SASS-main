@@ -2,13 +2,26 @@
 
 {% block content %}
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+      <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
 <div class="data data1">
    
     <div class="content-data">
         <div class="head">
             <h3>Student's Profile</h3>           
         </div>
-        <form id="profileForm" method="POST" onsubmit="updateStudentProfile(event)" action="{{ url_for('studentprofile') }}">
+        <form action="{{ url_for('student_update_profile') }}" id="profileForm" method="POST" onsubmit="updateStudentProfile(event)">
             <div class="form-group">
               <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
               <div class="col-sm-4">
@@ -42,6 +55,33 @@
               </div>
             </div>
 
+<<<<<<< HEAD
+                    <label for="name">Gender:</label>
+                    <input type="text" id="Gender" name="Gender"  disabled required>
+                    <br>
+            
+                    <label for="Email">Email:</label>
+                    <input type="email" id="Email" name="Email"  disabled required>
+                    <br>
+            
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address"  disabled>
+                    <br>
+            
+                    <label for="date">Date of Birth:</label>
+                    <input type="DateofBirth" id="DateofBirth" name="DateofBirth"  disabled>
+                    <br>
+            
+                    <label for="PlaceofBirth">Place of Birth:</label>
+                    <input type="text" id="PlaceofBirth" name="PlaceofBirth"  disabled>
+                    <br>
+            
+                    <label for="MobileNumber">Mobile Number:</label>
+                    <input type="tel" id="MobileNumber" name="MobileNumber"  disabled>
+                    <br>
+                </form>
+            </div>           
+=======
             <div class="form-group">
             <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
             <div class="col-sm-4">
@@ -60,7 +100,7 @@
                 </div>
               
                 <div class="col-sm-13 d-flex justify-content-center">
-                  <button type="submit" name="submit" class="btn btn-success ">Save Profile</button>
+                  <button type="submit" name="submit" class="btn btn-success">Save Profile</button>
                 </div>
               </div>
             </div>       
@@ -69,44 +109,30 @@
 </div>
 <script>
     async function updateStudentProfile(event) {
-    event.preventDefault();
+        event.preventDefault();
 
-    const formData = new FormData(document.getElementById('profileForm'));
+        const formData = new FormData(document.getElementById('profileForm'));
 
-    try {
-        const response = await fetch('/student/profile', {
-            method: 'POST',
-            body: formData,
-        });
+        try {
+            const response = await fetch('/student/profile', {
+                method: 'POST',
+                body: formData,
+            });
 
-        if (!response.ok) {
-            throw new Error('Failed to update profile');
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            const result = await response.json();
+            console.log('Profile updated successfully:', result);
+
+            // Optionally, update the UI or show a success message
+
+        } catch (error) {
+            console.error('Error updating profile:', error.message);
+            // Handle error scenarios - display an error message, etc.
         }
-
-        const result = await response.json();
-        console.log('Profile updated successfully:', result);
-
-        // Optionally, update the UI or show a success message
-
-        // Add the code to display the success alert here
-        document.getElementById('successAlert').style.display = 'block';
-
-        // Call the function to close the alert after 4 seconds
-        handleAlertClose();
-
-    } catch (error) {
-        console.error('Error updating profile:', error.message);
-        // Handle error scenarios - display an error message, etc.
     }
-}
-
-// Function to close the alert after 4 seconds
-function handleAlertClose() {
-    setTimeout(function () {
-        document.getElementById('successAlert').style.display = 'none';
-    }, 4000); // 4 seconds
-}
-
 </script>
 
 {% endblock %}
@@ -147,7 +173,7 @@ function handleAlertClose() {
 
 // Format the date to display only the birthday
 const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
-    month: 'numeric',
+    month: 'long',
     day: 'numeric',
     year: 'numeric'
 });
@@ -169,3 +195,6 @@ dateOfBirthInput.value = formattedDateOfBirth;
 <!-- 1st Step Make a script that will request in the server -->
 
 <!-- 2nd Get the data  -->
+
+
+

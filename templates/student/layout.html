@@ -131,7 +131,7 @@
 				<img src="/static/images/user.png" alt="" title="My Profile">
 				<ul class="profile-link">
 					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
-					<li><a href="#"><i class='bx bxs-cog' ></i> Settings</a></li>
+					<li><a href="{{url_for('studentpassword')}}"><i class='bx bxs-cog' ></i> Change Password</a></li>
 					<li><a href="{{url_for('logout')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
 				</ul>
 			</div>
@@ -186,9 +186,13 @@ document.getElementById('notification-card').addEventListener('click', function 
 
 	{% block script %} {% endblock script %}
 
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>
+
 
 

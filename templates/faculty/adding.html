@@ -7,6 +7,9 @@
         width: 90%;
         border: 1px;
         margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
     }
 
     th, td {
@@ -15,7 +18,7 @@
         border-bottom: 1px solid #ddd;
     }
 </style>
-
+<!--Done-->
 <!-- DataTable HTML -->
 <h1>Subject Data</h1>
 
@@ -41,11 +44,14 @@
         <td>{{ addsubjects.Name }}</td>
         <td>{{ addsubjects.subject_Names }}</td>
         <td>{{ addsubjects.enrollment_type }}</td>
-        <td>        {% if addsubjects.file_data %}
-            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
-        {% else %}
-            <span class="badge badge-warning">No File</span>
-        {% endif %}</td>
+        <td>
+          {% if addsubjects.file_data %}
+              {% set truncated_file_name = addsubjects.file_name[:15] + '...' if addsubjects.file_name|length > 15 else addsubjects.file_name %}
+              <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download title="{{ addsubjects.file_name }}">{{ truncated_file_name }}</a>
+          {% else %}
+              <span class="badge badge-warning">No File</span>
+          {% endif %}
+        </td>
         <td>{{ addsubjects.user_responsible }}</td>
         <td>{{ addsubjects.status }}</td>
         <td>
@@ -58,44 +64,46 @@
 
 <!-- Modal for Change Status -->
 {% for addsubjects in addsubjects %}
-  <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="statusModalLabel">Change Status</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="statusForm{{ addsubjects.subject_ID }}">
-            <input type="hidden" name="subject_id" value="{{ addsubjects.subject_ID }}">
-            <div class="form-group">
-              <label for="newStatus">New Status:</label>
-              <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ addsubjects.status }}" required>
-            </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="updateStatus('{{ addsubjects.subject_ID }}')">Save changes</button>
-        </div>
+<div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="statusModalLabel">Change Status</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="statusForm{{ addsubjects.subject_ID }}">
+          <input type="hidden" name="subject_id" value="{{ addsubjects.subject_ID }}">
+          <div class="form-group">
+            <label for="newStatus">New Status:</label>
+            <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ addsubjects.status }}" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="updateStatus('{{ addsubjects.subject_ID }}')">Save changes</button>
       </div>
     </div>
   </div>
+</div>
 {% endfor %}
 
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 
 <!-- DataTable Initialization Script -->
 <script>
-  $(document).ready(function () {
     // Initialize DataTable
-    $('#subjectTable').DataTable();
-  });
+    $(document).ready(function() {
+    $('#subjectTable').DataTable({
+        "pageLength": 5
+    });
+});
 
   // Function to update status
   function updateStatus(subjectId) {
@@ -116,6 +124,53 @@
         console.error('Error updating status:', error);
       });
   }
+  var lastActivity = new Date().getTime();
+
+  // Function to update the activity timestamp
+  function updateActivity() {
+      lastActivity = new Date().getTime();
+  }
+
+  // Function to handle user activity events
+  function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', error);
+        });
+    }
+
+
+  // Set up an interval to check for inactivity
+  setInterval(function () {
+      var now = new Date().getTime();
+      var inactiveTime = now - lastActivity;
+
+      // If inactive for more than 5 minutes (adjust as needed)
+      if (inactiveTime > 300000) {
+          // Redirect to the logout or login page
+          window.location.href = "/logout";  // Adjust the URL as needed
+      }
+  }, 60000);  // Check every minute (adjust as needed)
+
+  // Event listeners for user activity
+  document.addEventListener("mousemove", handleUserActivity);
+  document.addEventListener("mousedown", handleUserActivity);
+  document.addEventListener("keydown", handleUserActivity);
 </script>
 
 {% endblock %}
