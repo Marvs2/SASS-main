@@ -75,7 +75,6 @@ def admin_profile():
         return redirect(url_for('admin_api.login'))
     
 
-#========================================#
 # Creation of Student account
 def create_student(form_data, files):
     StudentNumber = form_data['StudentNumber']
@@ -83,23 +82,31 @@ def create_student(form_data, files):
     Email = form_data['Email']
     address = form_data['address']
     Password = form_data['Password']
-    Gender = form_data['Gender']
+    Gender = int(form_data['Gender'])
     DateofBirth = form_data['DateofBirth']
     PlaceofBirth = form_data['PlaceofBirth']
     ResidentialAddress = form_data['ResidentialAddress']
     MobileNumber = form_data['MobileNumber']
 
-    # Check if the student already exists
-    existing_student = Student.query.filter_by(StudentNumber=StudentNumber).first()
-    if existing_student:
-        return 'Student with this student number already exists'
-    
     # Hash the password
     hashed_password = generate_password_hash(Password, method='pbkdf2:sha256')
 
     # Handle image upload
+    if 'image' not in files:
+        flash('Please provide the user image.', 'danger')
+        return None
+
     userImg = files['image']
-    userImg = userImg.read() if userImg else None
+    if userImg.filename == '':
+        flash('No selected file.', 'danger')
+        return None
+    
+    userImg_data = userImg.read()  # Read the file data
+
+    # Check if the student already exists
+    existing_student = Student.query.filter_by(StudentNumber=StudentNumber).first()
+    if existing_student:
+        return 'Student with this student number already exists'
     
     # Create a new student instance
     new_student = Student(
@@ -112,10 +119,12 @@ def create_student(form_data, files):
         DateofBirth=DateofBirth,
         PlaceofBirth=PlaceofBirth,
         ResidentialAddress=ResidentialAddress,
-        MobileNumber=MobileNumber
+        MobileNumber=MobileNumber,
+        userImg=userImg_data
     )
     
     return new_student
+
 """# Route to fetch the list of students as JSON
 @admin_api.route('/student_list', methods=['GET'])
 def get_student_list():

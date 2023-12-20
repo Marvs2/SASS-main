@@ -20,7 +20,6 @@ from flask_jwt_extended import JWTManager
 from decorators.auth_decorators import prevent_authenticated, role_required, student_required
 
 
-
 load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
@@ -1795,7 +1794,7 @@ def admin_create_stud():
 
 
 # Route for creating a student account
-@app.route('/admin/createstudent/create_student', methods=['GET', 'POST'])
+@app.route('/admin/createstudent/submit', methods=['GET', 'POST'])
 def admin_create_student():
     if request.method == 'POST':
         try:
@@ -1810,7 +1809,7 @@ def admin_create_student():
                 db.session.add(new_student)
                 db.session.commit()
                 flash('Student created successfully', 'success')
-                return redirect(url_for('admin_create_stud'))
+                return redirect(url_for('admin_create_student'))
 
         except Exception as e:
             db.session.rollback()

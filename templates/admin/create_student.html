@@ -100,12 +100,6 @@
         <button type="submit">Create Student</button>
     </form>
         <script>
-            $(document).ready(function () {
-                // Initialize DataTable
-                $('#studentTable').DataTable({
-                    // Customize DataTable options as needed
-                });
-        
                 // Display success message for 10 seconds
                 var successMessage = $('#successMessage');
                 if (successMessage.length) {
@@ -115,7 +109,6 @@
                         }, 2000); // 9 seconds
                     });
                 }
-            });
         </script>
 {% endblock %}
 
