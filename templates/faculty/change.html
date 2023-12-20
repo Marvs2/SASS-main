@@ -15,7 +15,7 @@
         border-bottom: 1px solid #ddd;
     }
 </style>
-
+<!--Done-->
 <h1>Change of Subjects changesubjectss</h1>
 
 <table id="changeOfSubjectsTable" class="table table-bordered">
@@ -29,6 +29,7 @@
             <th>Created At</th>
             <th>User Responsible</th>
             <th>Status</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -39,7 +40,8 @@
                 <td>{{ changesubjects.Name }}</td>
                 <td>{{ changesubjects.enrollment_type }}</td>
                 <td>{% if changesubjects.ace_form_data %}
-                    <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubjects.ace_form_filename }}</a>
+                    {% set form_data = changesubjects.ace_form_filename[:15] + '...' if changesubjects.ace_form_filename|length > 15 else changesubjects.ace_form_filename %} <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download title="{{changesubjects.ace_form_filename}}">{{ form_data }}</a>
+                </td>
                 {% else %}
                     <span class="badge badge-warning">No File</span>
                 {% endif %}</td>
@@ -54,14 +56,17 @@
 
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
 
 <script>
     // Initialize DataTable
+    // Initialize DataTable
     $(document).ready(function() {
-        $('#changeOfSubjectsTable').DataTable();
+    $('#overloadTable').DataTable({
+        "pageLength": 5
     });
+});
      // Function to update status
   function updateStatus(Changesubject_ID) {
     const formId = `statusForm${Changesubject_ID}`;
@@ -81,5 +86,52 @@
         console.error('Error updating status:', error);
       });
   }
+  var lastActivity = new Date().getTime();
+
+// Function to update the activity timestamp
+function updateActivity() {
+    lastActivity = new Date().getTime();
+}
+
+// Function to handle user activity events
+function handleUserActivity() {
+      updateActivity();
+
+      // Make an AJAX request to the server to notify about user activity
+      // Adjust the URL as needed
+      fetch('/notify_activity', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Handle the server's response if needed
+          console.log('Server notified about user activity');
+      })
+      .catch(error => {
+          console.error('Error notifying server:', error);
+      });
+  }
+
+
+// Set up an interval to check for inactivity
+setInterval(function () {
+    var now = new Date().getTime();
+    var inactiveTime = now - lastActivity;
+
+    // If inactive for more than 5 minutes (adjust as needed)
+    if (inactiveTime > 300000) {
+        // Redirect to the logout or login page
+        window.location.href = "/logout";  // Adjust the URL as needed
+    }
+}, 60000);  // Check every minute (adjust as needed)
+
+// Event listeners for user activity
+document.addEventListener("mousemove", handleUserActivity);
+document.addEventListener("mousedown", handleUserActivity);
+document.addEventListener("keydown", handleUserActivity);
 </script>
 {% endblock %}

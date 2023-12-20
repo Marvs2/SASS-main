@@ -2,11 +2,19 @@
 
 {% block content %}
 <style>
+    /* Adjust styling for DataTable container*/ 
+    #overloadTableContainer {
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
+        max-width: 80%; /* Adjust the maximum width as needed */
+    }
+
     /* Add DataTables styles */
     table {
-        width: 90%;
-        border: 1px;
-        margin-top: 20px;
+        width: 70%;
+        border: 1px solid #ddd;
     }
 
     th, td {
@@ -17,7 +25,7 @@
 </style>
 
 <h1>Overload Applications</h1>
-
+<div id="overloadTableContainer">
 <table id="overloadTable" class="table table-bordered">
     <thead>
         <tr>
@@ -42,11 +50,14 @@
                 <td>{{ overload_applications.semester }}</td>
                 <td>{{ overload_applications.subjects_to_add }}</td>
                 <td>{{ overload_applications.justification }}</td>
-                <td>        {% if overload_applications.file_data %}
-                    <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download>{{ overload_applications.file_filename }}</a>
-                {% else %}
-                    <span class="badge badge-warning">No File</span>
-                {% endif %}</td>
+                <td>
+                    {% if overload_applications.file_data %}
+                        {% set filename = overload_applications.file_filename[:15] + '...' if overload_applications.file_filename|length > 15 else overload_applications.file_filename %}
+                        <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download title="{{overload_applications.file_filename}}">{{ filename }}</a>
+                    {% else %}
+                        <span class="badge badge-warning">No File</span>
+                    {% endif %}
+                </td>                
                 <td>{{ overload_applications.user_responsible }}</td>
                 <td>{{ overload_applications.status }}</td>
                 <td>
@@ -85,7 +96,7 @@
         {% endfor %}
     </tbody>
 </table>
-
+</div>
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
@@ -94,11 +105,13 @@
 <script>
     // Initialize DataTable
     $(document).ready(function() {
-        $('#overloadTable').DataTable();
+    $('#overloadTable').DataTable({
+        "pageLength": 5
     });
+});
          // Function to update status
-  function updateStatus(Changesubject_ID) {
-    const formId = `statusForm${Changesubject_ID}`;
+  function updateStatus(overload_application_id) {
+    const formId = `statusForm${overload_application_id}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 
@@ -115,5 +128,52 @@
         console.error('Error updating status:', error);
       });
   }
+  var lastActivity = new Date().getTime();
+
+    // Function to update the activity timestamp
+    function updateActivity() {
+        lastActivity = new Date().getTime();
+    }
+
+    // Function to handle user activity events
+    function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity_overload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', error);
+        });
+    }
+
+
+    // Set up an interval to check for inactivity
+    setInterval(function () {
+        var now = new Date().getTime();
+        var inactiveTime = now - lastActivity;
+
+        // If inactive for more than 5 minutes (adjust as needed)
+        if (inactiveTime > 300000) {
+            // Redirect to the logout or login page
+            window.location.href = "/logout";  // Adjust the URL as needed
+        }
+    }, 60000);  // Check every minute (adjust as needed)
+
+    // Event listeners for user activity
+    document.addEventListener("mousemove", handleUserActivity);
+    document.addEventListener("mousedown", handleUserActivity);
+    document.addEventListener("keydown", handleUserActivity);
 </script>
 {% endblock %}

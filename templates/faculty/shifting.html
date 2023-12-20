@@ -1,0 +1,182 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+ /* Adjusted DataTables styles */
+ #shiftingTableContainer {
+        margin-top: 20px;
+        margin-left: 70px;
+        margin-right: 70px;
+        margin-bottom: 70px;
+        max-width: 60%; /* Adjust the maximum width as needed */
+    }
+
+    table {
+        width: 70%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 10px; /* Reduced padding for smaller cells */
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+<!--Done-->
+<!-- DataTable HTML -->
+<h1>Accreditation for Shifting and Regular</h1>
+<div id="shiftingTableContainer">
+<table id="shiftingTable" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Student Number</th>
+      <th>Name</th>
+      <th>Current Program</th>
+      <th>Residency Year</th>
+      <th>Intended Program</th>
+      <th>Qualifications</th>
+      <th>File</th>
+      <th>User Responsible</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for shifting_applications in shifting_applications %}
+      <tr>
+        <td>{{ shifting_applications.StudentNumber }}</td>
+        <td>{{ shifting_applications.Name }}</td>
+        <td>{{ shifting_applications.current_program }}</td>
+        <td>{{ shifting_applications.residency_year }}</td>
+        <td>{{ shifting_applications.intended_program }}</td>
+        <td>{{ shifting_applications.qualifications }}</td>
+        <td>
+            {% if shifting_applications.file_data %}
+                {% set shiftingfile = shifting_applications.file_filename[:15] + '...' if shifting_applications.file_filename|length > 15 else shifting_applications.file_filename %}
+                <a href="{{ url_for('get_shifting_file', shifting_application_id=shifting_applications.shifting_application_id) }}" class="btn btn-success" download title="{{ shifting_applications.file_filename }}">{{ shiftingfile }}</a>
+            {% else %}
+                <span class="badge badge-warning">No File</span>
+            {% endif %}
+        </td>
+        <td>{{ shifting_applications.user_responsible }}</td>
+        <td>{{ shifting_applications.status }}</td>
+        <td>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ shifting_applications.shifting_application_id }}">Change Status</button>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<!-- Modal for Change Status -->
+{% for shifting_applications in shifting_applications %}
+<div class="modal fade" id="statusModal{{ shifting_applications.shifting_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="statusModalLabel">Change Status</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="statusForm{{ shifting_applications.shifting_application_id }}">
+          <input type="hidden" name="subject_id" value="{{ shifting_applications.shifting_application_id }}">
+          <div class="form-group">
+            <label for="newStatus">New Status:</label>
+            <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ shifting_applications.status }}" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="updateStatus('{{ shifting_applications.shifting_application_id }}')">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+<!-- DataTable Initialization Script -->
+<script>
+    // Initialize DataTable
+    $(document).ready(function() {
+    $('#shiftingTable').DataTable({
+        "pageLength": 5
+    });
+});
+
+  // Function to update status
+  function updateStatus(shifting_application_id) {
+    const formId = `statusForm${shifting_application_id}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/shifting', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+  var lastActivity = new Date().getTime();
+
+  // Function to update the activity timestamp
+  function updateActivity() {
+      lastActivity = new Date().getTime();
+  }
+
+  // Function to handle user activity events
+  function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity_shifting', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', error);
+        });
+    }
+
+
+  // Set up an interval to check for inactivity
+  setInterval(function () {
+      var now = new Date().getTime();
+      var inactiveTime = now - lastActivity;
+
+      // If inactive for more than 5 minutes (adjust as needed)
+      if (inactiveTime > 300000) {
+          // Redirect to the logout or login page
+          window.location.href = "/logout";  // Adjust the URL as needed
+      }
+  }, 60000);  // Check every minute (adjust as needed)
+
+  // Event listeners for user activity
+  document.addEventListener("mousemove", handleUserActivity);
+  document.addEventListener("mousedown", handleUserActivity);
+  document.addEventListener("keydown", handleUserActivity);
+</script>
+
+{% endblock %}
