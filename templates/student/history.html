@@ -1,97 +1,79 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-
 <!-- MAIN -->
-		<main>
-			<h1 class="title">Dashboard</h1>
-			<ul class="breadcrumbs">
-				<li><a href="#">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Dashboard</a></li>
-			</ul>
-			<div class="info-data">
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>20</h2>
-							<p>Pending</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
-					</div>
-					<span class="progress" data-value="40%"></span>
-					<span class="label">40%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>10</h2>
-							<p>In Progress</p>
-						</div>
-						<i class='bx bx-trending-down icon down' ></i>
-					</div>
-					<span class="progress" data-value="60%"></span>
-					<span class="label">60%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>10</h2>
-							<p>Closed</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
-					</div>
-					<span class="progress" data-value="30%"></span>
-					<span class="label">30%</span>
-				</div>
-				<div class="card">
-					<div class="head">
-						<div>
-							<h2>40</h2>
-							<p>Total Services</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
-					</div>
-					<span class="progress" data-value="80%"></span>
-					<span class="label">80%</span>
-				</div>
-			</div>
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Service Report</h3>
-						<div class="menu">
-							<i class='bx bx-dots-horizontal-rounded icon'></i>
-							<ul class="menu-link">
-								<li><a href="#">Edit</a></li>
-								<li><a href="#">Save</a></li>
-								<li><a href="#">Remove</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="chart">
-						<div id="chart"></div>
-					</div>
-				</div>
+<h1>Student History</h1>
 
-				<div class="content-data">
-					<div class="head">
-						<h3>Service Report</h3>
-						<div class="menu">
-							<i class='bx bx-dots-horizontal-rounded icon'></i>
-							<ul class="menu-link">
-								<li><a href="#">Edit</a></li>
-								<li><a href="#">Save</a></li>
-								<li><a href="#">Remove</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="chart">
-						<div id="chart"></div>
-					</div>
-				</div>
-				
-			</div>
-		</main>
+<!-- Add Subjects -->
+<h2>Add Subjects</h2>
+<table id="subjectTable" border="2" class="table table-bordered">
+	<tr>
+		<th>Subject ID</th>
+		<th>Student Number</th>
+		<th>Name</th>
+		<th>Subject Names</th>
+		<th>Enrollment Type</th>
+		<th>File</th>
+		<th>User Responsible</th>
+		<th>Status</th>
+		<th>Action</th>
+	</tr>
+	{% for addsubjects in services_data.addsubjects_list %}
+		<tr>
+			<td>{{ addsubjects.subject_ID }}</td>
+			<td>{{ addsubjects.StudentNumber }}</td>
+			<td>{{ addsubjects.Name }}</td>
+			<td>{{ addsubjects.subject_Names }}</td>
+			<td>{{ addsubjects.enrollment_type }}</td>
+			<td>        {% if addsubjects.file_data %}
+				<a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
+			{% else %}
+				<span class="badge badge-warning">No File</span>
+			{% endif %}</td>
+			<td>{{ addsubjects.user_responsible }}</td>
+			<td>{{ addsubjects.status }}</td>
+			<td>
+				<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
+			  </td>
+			<!-- Add other relevant columns here -->
+		</tr>
+	{% endfor %}
+</table>
+
+<!-- Change of Subjects -->
+<h2>Change of Subjects</h2>
+<table border="1">
+	<!-- Repeat the structure similar to Add Subjects for Change of Subjects -->
+	<!-- Use services_data.changesubjects_list -->
+</table>
+
+<!-- Manual Enrollment -->
+<h2>Manual Enrollment</h2>
+<table border="1">
+	<!-- Repeat the structure similar to Add Subjects for Manual Enrollment -->
+	<!-- Use services_data.manual_enrollments_list -->
+</table>
+
+<!-- Certification Requests -->
+<h2>Certification Requests</h2>
+<table border="1">
+	<!-- Repeat the structure similar to Add Subjects for Certification Requests -->
+	<!-- Use services_data.certification_requests_list -->
+</table>
+
+<!-- Grade Entries -->
+<h2>Grade Entries</h2>
+<table border="1">
+	<!-- Repeat the structure similar to Add Subjects for Grade Entries -->
+	<!-- Use services_data.grade_entries_list -->
+</table>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#subjectsTable').DataTable();
+    });
+</script>
 
 {% endblock %}

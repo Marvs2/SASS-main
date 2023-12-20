@@ -1,0 +1,73 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+</script>
+  <style>
+    /* Add DataTables styles */
+    table {
+        width: 60%;
+        border: 1px;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<!-- DataTable HTML -->
+<h1>Subject Data</h1>
+
+<table id="addSubjectsTable" class="table table-bordered">
+  <thead>
+    <tr>
+      <th>Subject ID</th>
+      <th colspan="2">Student Number</th>
+      <th>Name</th>
+      <th>Subject Names</th>
+      <th>Enrollment Type</th>
+      <th>File</th>
+      <th>User Responsible</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for addsubjects in addsubjects_list %}
+      <tr>
+        <td>{{ addsubjects.subject_ID }}</td>
+        <td>{{ addsubjects.StudentNumber }}</td>
+        <td>{{ addsubjects.Name }}</td>
+        <td>{{ addsubjects.subject_Names }}</td>
+        <td>{{ addsubjects.enrollment_type }}</td>
+        <td>        {% if addsubjects.file_data %}
+            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
+        {% else %}
+            <span class="badge badge-warning">No File</span>
+        {% endif %}</td>
+        <td>{{ addsubjects.user_responsible }}</td>
+        <td>{{ addsubjects.status }}</td>
+        <td>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js">
+</script>
+
+  <!-- DataTable initialization script -->
+  <script>
+    $(document).ready(function() {
+      $('#addSubjectsTable').DataTable();
+    });
+  </script>
+
+{% endblock %}
+

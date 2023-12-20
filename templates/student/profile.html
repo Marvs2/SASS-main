@@ -57,8 +57,7 @@
               <div class="col-sm-4">
                 <input type="email" name="Email" id="Email" required="required" class="form-control">
               </div>
-            </div>
-
+            </div>          
             <div class="form-group">
             <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
             <div class="col-sm-4">
@@ -84,6 +83,33 @@
           </form>
     </div>
 </div>
+<script>
+    async function updateStudentProfile(event) {
+        event.preventDefault();
+
+        const formData = new FormData(document.getElementById('profileForm'));
+
+        try {
+            const response = await fetch('/student/profile/updated', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update profile');
+            }
+
+            const result = await response.json();
+            console.log('Profile updated successfully:', result);
+
+            // Optionally, update the UI or show a success message
+
+        } catch (error) {
+            console.error('Error updating profile:', error.message);
+            // Handle error scenarios - display an error message, etc.
+        }
+    }
+</script>
 
 {% endblock %}
 

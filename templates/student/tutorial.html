@@ -21,7 +21,7 @@
                 <h3>Online Request for Tutorial</h3>           
             </div>
 
-            <form id="tutorialForm" action="{{ url_for('submittutorialrequest')}}" method="POST" enctype="multipart/form-data">
+            <form id="tutorialForm" action="{{ url_for('submit_tutorial_request')}}" method="POST" enctype="multipart/form-data">
 
                 <div class="row mb-3">
                     <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
@@ -38,23 +38,23 @@
                 </div>
                 
                 <div class="row mb-3">
-                    <label for="subject_code" class="col-sm-3 col-form-label">Subject Code</label>
+                    <label for="subjectCode" class="col-sm-3 col-form-label">Subject Code</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" id="subject_code" name="subject_code">
+                        <input type="text" class="form-control" id="subjectCode" name="subjectCode">
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label for="subject_name" class="col-sm-3 col-form-label">Subject Name</label>
+                    <label for="subjectName" class="col-sm-3 col-form-label">Subject Name</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" id="subject_name" name="subject_name">
+                        <input type="text" class="form-control" id="subjectName" name="subjectName">
                     </div>
                 </div>
 
                 <div class="row mb-3">
-                    <label for="File" class="col-sm-3 col-form-label">Attach Files</label>
+                    <label for="fileTutorial" class="col-sm-3 col-form-label">Attach Files</label>
                     <div class="col-sm-8">
-                        <input type="file" class="form-control" type="File" name="File" id="File" accept=".pdf">
+                        <input class="form-control" type="file" name="fileTutorial" id="fileTutorial" accept=".pdf">
                       </div>
                 </div>
 
@@ -95,13 +95,13 @@
         const form = document.getElementById('tutorialForm');
         form.addEventListener('submit', function(event) {
             const StudentNumber = document.getElementById('StudentNumber').value.trim();
-            const studentName = document.getElementById('Name').value.trim();
+            const Name = document.getElementById('Name').value.trim();
             const subjectCode = document.getElementById('subject_code').value.trim();
             const subjectName = document.getElementById('subject_name').value.trim();
             const file = document.getElementById('file').files[0];
             const userResponsible = document.getElementById('user_responsible').value.trim();
 
-            if (!StudentNumber || !studentName || !subjectCode || !subjectName || !file || !userResponsible) {
+            if (!StudentNumber || !Name || !subjectCode || !subjectName || !file || !userResponsible) {
                 alert('Please fill out all fields.');
                 event.preventDefault();
             }
@@ -133,7 +133,7 @@
 
     function displayDetails(data) {
         // Select the name input and set the value to data.studentName
-        document.getElementById('Name').value = data.studentName;
+        document.getElementById('Name').value = data.Name;
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
