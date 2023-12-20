@@ -369,37 +369,24 @@ def studentoverload():
 def submit_overload_application():
     try:
         current_StudentId = session.get('user_id')
-<<<<<<< HEAD
-=======
-
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
         new_overload_application = create_overload_application(request.form, request.files, current_StudentId)
 
         if new_overload_application:
                 db.session.add(new_overload_application)
                 db.session.commit()
-<<<<<<< HEAD
-        flash('Overload application submitted successfully!', 'success')
-        return redirect(url_for('studentoverload'))
-=======
                 # Ensure student_api_base_url is defined and accessible
                 flash('Overload application submitted successfully!', 'success')
                 return redirect(url_for('studentoverload'))
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
-<<<<<<< HEAD
-    return render_template("student/overload.html")
-=======
     return render_template('student/overload.html')
   # Adjust the template as needed
 
 
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 
 #=============================================================================================================
 
@@ -813,38 +800,7 @@ def submit_tutorial_request():
 
         new_tutorial_request = create_tutorial_request(request.form, request.files, current_StudentId)
         
-<<<<<<< HEAD
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(url_for('stude_tutorial'))
-
-        file = request.files['file']
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(url_for('studenttutorial')) 
-
-        file_data = file.read()  # Read the file data
-        file_filename = secure_filename(file.filename)
-
-        if not StudentNumber or not Name or not subject_code or not subject_name:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('studenttutorial')) 
-
-        try:
-            new_tutorial_request = TutorialRequest(
-                StudentNumber=StudentNumber,
-                Name=Name,
-                subject_code=subject_code,
-                subject_name=subject_name,
-                file_filename=file_filename,
-                file_data=file_data,
-                user_responsible=request.form.get('user_responsible'),
-                status=request.form.get('status')
-            )
-
-=======
         if new_tutorial_request:
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
             db.session.add(new_tutorial_request)
             db.session.commit()
             flash('Tutorial request has been created successfully!', 'success')
@@ -855,11 +811,7 @@ def submit_tutorial_request():
     finally:
         db.session.close()
 
-<<<<<<< HEAD
-    return redirect(url_for('studenttutorial'))
-=======
     return render_template('student/tutorial.html')
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 
 #======================================== REQUEST FOR CERTIFICATION ===========================================================
 @app.route('/student/certification')
