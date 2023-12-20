@@ -3,13 +3,10 @@ from flask import Flask, abort, render_template, jsonify, redirect, request, fla
 from flask_login import login_user
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
-<<<<<<< HEAD
 from werkzeug.security import generate_password_hash, check_password_hash 
 
  
-=======
 from datetime import datetime, timezone #, timedelta, 
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 #from models import Services
 #from models import init_db
 
