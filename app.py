@@ -3,16 +3,10 @@ from flask import Flask, abort, render_template, jsonify, redirect, request, fla
 from flask_login import login_user
 from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
-<<<<<<< HEAD
 from werkzeug.security import generate_password_hash, check_password_hash 
-
- 
-=======
 from datetime import datetime, timezone #, timedelta, 
->>>>>>> ce38d97c1e74846a79cf1de9cb38919286ec964a
 #from models import Services
 #from models import init_db
-
 from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, create_tutorial_request, fetchStudentDetails, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api, create_student
