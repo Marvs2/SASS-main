@@ -495,9 +495,7 @@ class OverloadApplication(db.Model, UserMixin):
     overload_application_id = db.Column(db.Integer, primary_key=True)
     Name = db.Column(db.String(255), nullable=False)
     StudentNumber = db.Column(db.String(100), nullable=False)
-    #Studentyr = db.Column(db.Integer)
     programcourse = db.Column(db.String(255), nullable=False)
-    #section = db.Column(db.String(255), nullable=False)
     semester = db.Column(db.String(20), nullable=False)
     subjects_to_add = db.Column(db.String(255), nullable=False)
     justification = db.Column(db.Text, nullable=False)
@@ -516,9 +514,7 @@ class OverloadApplication(db.Model, UserMixin):
             'overload_application_id':  self.overload_application_id,
             'Name': self.Name,
             'StudentNumber': self.StudentNumber,
-            'Year': self.Year,
-            'Program': self.Program,
-            'Section': self.Section,
+            'programcourse':self.programcourse,
             'semester': self.semester,
             'subjects_to_add': self.subjects_to_add,
             'justification': self.justification,

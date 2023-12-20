@@ -2,12 +2,12 @@ from datetime import datetime
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import ChangeOfSubjects, OverloadApplication, PetitionRequest, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 #from models import Services
 #from models import init_db
 
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, fetchStudentDetails, getCurrentUser, student_api#, update_student_profile #log_form_submission_to_file
+from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, create_tutorial_request, fetchStudentDetails, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
@@ -185,10 +185,11 @@ def student_practice():
     return render_template('/student/practice.html')
 
 @app.route('/student/profile', methods=['GET', 'POST'])
+@role_required('student')
 def studentprofile():
     if request.method == 'POST':
         # Get the student ID from the form
-        student_id = request.form.get('student_id')
+        student_id = request.form.get('user_id')
 
         # Update the student details using the student ID
         email = request.form.get('Email')
@@ -222,10 +223,10 @@ def studentprofile():
 @app.route('/student/setting')
 def studentsetting():
     return render_template('/student/setting.html')
-
+"""
 @app.route('/student/history')
 def studenthistory():
-    return render_template('/student/history.html')
+    return render_template('/student/history.html')"""
 
 """# Usage in your Flask route:
 @app.route('/update_profile/<int:student_id>', methods=['POST'])
@@ -271,20 +272,20 @@ def get_subjects(year_level_id, semester_id):
 def studentoverload():
     return render_template("/student/overload.html", student_api_base_url=student_api_base_url)
 
-@app.route('/student/overload/submitted-application', methods=['POST'])
+@app.route('/student/overload/submitted', methods=['POST'])
 @role_required('student')
 def submit_overload_application():
     try:
         current_StudentId = session.get('user_id')
-            # Ensure create_overload_application function returns a valid object
+
         new_overload_application = create_overload_application(request.form, request.files, current_StudentId)
 
         if new_overload_application:
                 db.session.add(new_overload_application)
                 db.session.commit()
                 # Ensure student_api_base_url is defined and accessible
-        flash('Overload application submitted successfully!', 'success')
-        return redirect(url_for('studentoverload'))
+                flash('Overload application submitted successfully!', 'success')
+                return redirect(url_for('studentoverload'))
     except Exception as e:
         db.session.rollback()
         # Make sure student_api_base_url is defined or accessible here
@@ -292,7 +293,7 @@ def submit_overload_application():
     finally:
         db.session.close()
 
-    return render_template("student/overload.html")
+    return render_template('student/overload.html')
   # Adjust the template as needed
 
 
@@ -374,6 +375,119 @@ def add_subjects():
         db.session.close()
 
     return render_template('student/adding_of_subject.html') 
+
+@app.route('/student/viewaddsubject', methods=['GET'])
+@role_required('student')
+def viewaddsubject():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    addsubjects_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        addsubjects_list = [subject.to_dict() for subject in addsubjects]
+
+    return render_template("/student/viewaddsubject.html", addsubjects_list=addsubjects_list)
+
+# take 8 pls be good ===  its good for one calling of addsubjects
+"""# Assuming you have the role_required decorator implemented
+@app.route('/student/history', methods=['GET'])
+@role_required('student')
+def student_history():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    addsubjects_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        addsubjects_list = [subject.to_dict() for subject in addsubjects]
+
+    return render_template("/student/history.html", addsubjects_list=addsubjects_list)"""
+
+# take 7 huhuhuhuhuu always odd number 
+"""# Assuming you have the role_required decorator implemented
+@app.route('/student/history', methods=['GET'])
+@role_required('student')
+def student_history():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        addsubjects_list = [subject.to_dict() for subject in addsubjects]
+
+    return render_template("/student/history.html", addsubjects_list)"""
+
+# take 5 na huhuhuhhhhuhuhhu
+"""# View function to handle adding subjects for the current student
+@app.route('/student/history', methods=['GET'])
+@role_required('student')
+def studentadding():
+    current_student_number = getCurrentUserStudentNumber()
+    
+    # Fetch the current student's data based on the student number
+    current_student = Student.query.filter_by(StudentNumber=current_student_number).first()
+
+    if not current_student:
+        return render_template("/student/history.html")  # You can render an error page or handle as per your need
+
+    # Fetch subjects based on the student's number
+    addsubjects = AddSubjects.query.filter_by(StudentNumber=current_student_number).all()
+
+    return render_template("/student/history.html", addsubjects=addsubjects)"""
+
+# take 3 huhuhuhuuuuhuhu
+"""# View function to handle operations based on the current user's ID
+@app.route('/student/viewaddsubject', methods=['GET'])
+def viewaddsubject():
+    current_user_id = getCurrentUser()
+    
+    # Fetch the current user's data based on the ID
+    current_student = Student.query.get(current_user_id)
+
+    if not current_student:
+        return render_template("/student/viewaddsubject.html", message='Student not found.')
+
+    # Fetch subjects based on the student's ID
+    subjects = AddSubjects.query.filter_by(StudentId=current_student.StudentId).all()
+
+    if not subjects:
+        return render_template("/student/viewaddsubject.html", message='No subjects found for this student.')
+
+    subjects_list = [subject.to_dict() for subject in subjects]
+
+    return render_template("/student/viewaddsubject.html", subjects=subjects_list)"""
+
+# View function to handle operations based on StudentId
+"""@app.route('/student/viewaddsubject/<int:student_id>', methods=['GET'])
+def get_student_subjects(student_id):
+    # Assuming 'student_id' is passed as part of the route
+    subjects = AddSubjects.query.filter_by(StudentId=student_id).all()
+
+    if not subjects:
+        return render_template("/student/viewaddsubject.html", message='No subjects found for this student.')
+
+    # Convert the AddSubjects objects to dictionaries
+    subjects_list = [subject.to_dict() for subject in subjects]
+
+    return render_template("/student/viewaddsubject.html", subjects=subjects_list)"""
 
 """@app.route('/log_form_submission', methods=['POST'])
 def log_form_submission():
@@ -561,7 +675,7 @@ def studentpetition():  # Include the StudentId parameter
 
 @app.route('/submit_petition_request', methods=['POST'])
 @role_required('student')
-def submitpetition():
+def submit_petition():
     try:
         current_StudentId = session.get('user_id')
         new_petition_request = create_petitionrequest_form(request.form, current_StudentId)
@@ -594,60 +708,26 @@ def view_student_petition(StudentId):
 def studenttutorial():
     return render_template("/student/tutorial.html", student_api_base_url=student_api_base_url)#
 
-#done
-# Assuming your route for this page is '/submit_tutorial'
 @app.route('/student/tutorial/submit', methods=['POST'])
-def submittutorialrequest():
-    if request.method == 'POST':
-        StudentNumber = request.form['StudentNumber']
-        Name = request.form['Name']
-        subject_code = request.form['subject_code']
-        subject_name = request.form['subject_name']
+@role_required('student')
+def submit_tutorial_request():
+    try: 
+        current_StudentId = session.get('user_id')
+
+        new_tutorial_request = create_tutorial_request(request.form, request.files, current_StudentId)
         
-        # Check if a file is provided
-        if 'file' not in request.files:
-            flash('No file part', 'danger')
-            return redirect(url_for('stude_tutorial'))  # Replace 'stude_tutorial' with the actual route
-
-        file = request.files['file']
-        # Check if the file field is empty
-        if file.filename == '':
-            flash('No selected file', 'danger')
-            return redirect(url_for('studenttutorial'))  # Replace 'stude_tutorial' with the actual route
-
-        file_data = file.read()  # Read the file data
-        file_filename = secure_filename(file.filename)
-
-        # Additional validation logic can be added here
-
-        # Check if any of the required fields is empty
-        if not StudentNumber or not Name or not subject_code or not subject_name:
-            flash('Please fill out all required fields.', 'danger')
-            return redirect(url_for('studenttutorial'))  # Replace 'stude_tutorial' with the actual route
-
-        try:
-            new_tutorial_request = TutorialRequest(
-                StudentNumber=StudentNumber,
-                Name=Name,
-                subject_code=subject_code,
-                subject_name=subject_name,
-                file_filename=file_filename,
-                file_data=file_data,
-                user_responsible=request.form.get('user_responsible'),
-                status=request.form.get('status')
-            )
-
+        if new_tutorial_request:
             db.session.add(new_tutorial_request)
             db.session.commit()
-            flash('Tutorial request submitted successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error: {str(e)}', 'danger')
-        finally:
-            db.session.close()
+            flash('Tutorial request has been created successfully!', 'success')
+            return redirect(url_for('studenttutorial'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
 
-    return redirect(url_for('studenttutorial'))
-  # Redirect to the tutorial request page after submission
+    return render_template('student/tutorial.html')
 
 #====================================================================================================================
 @app.route('/student/certification')#
@@ -673,6 +753,76 @@ def submit_certification_request():
         db.session.close()
 
     return render_template('student/certification.html')
+
+#===========================================================================================================================#
+
+# Assuming you have the role_required decorator implemented
+@app.route('/student/history', methods=['GET'])
+@role_required('student')
+def student_history():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    services_data = {}
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
+
+        # Fetch ChangeOfSubjects based on the StudentId foreign key
+        changesubjects = ChangeOfSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
+
+        # Fetch ManualEnrollment based on the StudentId foreign key
+        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
+
+        # Fetch CertificationRequest based on the StudentId foreign key
+        certification_requests = CertificationRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['certification_requests_list'] = [subject.to_dict() for subject in certification_requests]
+
+        # Fetch GradeEntry based on the StudentId foreign key
+        grade_entries = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
+        services_data['grade_entries_list'] = [subject.to_dict() for subject in grade_entries]
+
+        # Fetch CrossEnrollment based on the StudentId foreign key
+        cross_enrollments = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['cross_enrollments_list'] = [subject.to_dict() for subject in cross_enrollments]
+
+        # Fetch PetitionRequest based on the StudentId foreign key
+        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
+
+        # Fetch ShiftingApplication based on the StudentId foreign key
+        shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
+
+        # Fetch OverloadApplication based on the StudentId foreign key
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['overload_applications_list'] = [subject.to_dict() for subject in overload_applications]
+
+        # Fetch TutorialRequest based on the StudentId foreign key
+        tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
+
+    return render_template("/student/history.html", services_data=services_data)
+
+"""# View function to handle operations based on StudentId
+@app.route('/students/<int:student_id>/subjects', methods=['GET'])
+def get_student_subjects(student_id):
+    # Assuming 'student_id' is passed as part of the route
+    subjects = AddSubjects.query.filter_by(StudentId=student_id).all()
+
+    if not subjects:
+        return jsonify({'message': 'No subjects found for this student.'}), 404
+
+    # Convert the AddSubjects objects to dictionaries
+    subjects_list = [subject.to_dict() for subject in subjects]
+
+    return jsonify({'subjects': subjects_list}), 200"""
 
 #============================================================================================================================
 """@app.route('/student/submit_service_request', methods=['GET'])

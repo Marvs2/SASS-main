@@ -38,23 +38,23 @@
             </div>
 
             <div class="row mb-3">
-                <label for="crossEnrollmentSchool" class="col-sm-3 col-form-label">School to Cross-Enroll</label>
+                <label for="school_for_cross_enrollment" class="col-sm-3 col-form-label">School to Cross-Enroll</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" id="crossEnrollmentSchool" name="crossEnrollmentSchool">
+                    <input type="text" class="form-control" id="school_for_cross_enrollment" name="school_for_cross_enrollment">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label for="crossEnrollmentUnits" class="col-sm-3 col-form-label">Total Number of Units</label>
+                <label for="total_number_of_units" class="col-sm-3 col-form-label">Total Number of Units</label>
                 <div class="col-sm-8">
-                    <input type="number" class="form-control" id="crossEnrollmentUnits" name="crossEnrollmentUnits">
+                    <input type="number" class="form-control" id="total_number_of_units" name="total_number_of_units">
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label for="authorizedSubjects" class="col-sm-3 col-form-label">Authorized Subject to Take</label>
+                <label for="authorized_subjects_to_take" class="col-sm-3 col-form-label">Authorized Subject to Take</label>
                 <div class="col-sm-8">
-                    <textarea type="text" class="form-control" id="authorizedSubjects" name="authorizedSubjects"></textarea>
+                    <textarea type="text" class="form-control" id="authorized_subjects_to_take" name="authorized_subjects_to_take"></textarea>
                 </div>
             </div>
 
@@ -112,13 +112,13 @@
 
         // Form submission logic
         $('#crossEnrollmentForm').submit(function(event) {
-            const studentID = $('#StudentNumber').val().trim();
+            const StudentNumber = $('#StudentNumber').val().trim();
             const Name = $('#Name').val().trim();
-            const schoolForCrossEnrollment = $('#crossEnrollmentSchool').val().trim();
-            const totalUnits = $('#crossEnrollmentUnits').val().trim();
-            const authorizedSubjects = $('#authorizedSubjects').val().trim();
+            const school_for_cross_enrollment = $('#school_for_cross_enrollment').val().trim();
+            const total_number_of_units = $('#total_number_of_units').val().trim();
+            const authorized_subjects_to_take = $('#authorized_subjects_to_take').val().trim();
 
-            if (!studentID || !name || !schoolForCrossEnrollment || totalUnits <= 0 || !authorizedSubjects) {
+            if (!StudentNumber || !Name || !school_for_cross_enrollment || !authorized_subjects_to_take) {
                 alert('Please fill out all fields and provide valid values.');
                 event.preventDefault();  // Prevent form submission
             }

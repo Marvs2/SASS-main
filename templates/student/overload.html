@@ -2,16 +2,16 @@
 {% block content %}
   
 {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        {% for message in messages %}
-            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-        {% endfor %}
-    {% endif %}
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+        </div>
+    {% endfor %}
+{% endif %}
 {% endwith %}
 
 <div class="data data1">
@@ -19,36 +19,26 @@
         <div class="head">
             <h3>Application for Overload of Subjects</h3>           
         </div>
-        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data">
           
-            <div class="row mb-3">
-                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" required onblur="getStudentNumber()" readonly>
-                </div>
-            </div>
-           
             <div class="row mb-3">
                 <label for="Name" class="col-sm-3 col-form-label">Name</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control" id="Name" name="Name" readonly>
                 </div>
             </div>
-
+            <div class="row mb-3">
+                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                </div>
+            </div>
             <div class="row mb-3">
                 <label for="date" class="col-sm-3 col-form-label">Application Date</label>
                 <div class="col-sm-8">
-                    <div class="input-group date" id="datepicker">
-                        <input type="text" class="form-control" id="date" name="date" required>
-                        <span class="input-group-append">
-                            <span class="input-group-text bg-light d-block">
-                                <i class='bx bxs-calendar icon'></i>
-                            </span>
-                        </span>
-                    </div>
+                    <input type="text" class="form-control" id="date" name="date" required readonly>
                 </div>
             </div>
-
             <div class="row mb-3">
                 <label for="programcourse" class="col-sm-3 col-form-label">Program</label>
                     <div class="col-sm-8">
@@ -79,9 +69,9 @@
             </div>
 
             <div class="row mb-3">
-                <label for="subjectsToAdd" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <label for="subjects_To_Add" class="col-sm-3 col-form-label">Subjects to Add</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="subjectsToAdd" name="subjectsToAdd" required>
+                  <input type="text" class="form-control" id="subjects_To_Add" name="subjects_To_Add" required>
                 </div>
             </div>
 
@@ -93,52 +83,57 @@
             </div>
 
             <div class="row mb-3">
-                <label for="file" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
+                <label for="fileoverload" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
                 <div class="col-sm-8">
-                    <input class="form-control" type="file" name="file" id="file" accept=".pdf">
+                    <input class="form-control" type="file" name="fileoverload" id="fileoverload" accept=".pdf">
                   </div>
             </div>
-    
-
+            <div class="row mb-3">
+                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                            <option value="-Director/ Head of Academic Program">Director/ Head of Academic Program</option>
+                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
+                            <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
+                        </select>
+                    </div>
+            </div>
+            <div class="row mb-3">
+                <label for="status" class="col-sm-3 col-form-label">Status </label>
+                    <div class="col-sm-8">
+                        <select class="custom-select" id="status" name="status" required>
+                            <option value="Sent" selected>Sending</option>
+                            <option value="Pending" disabled>Pending</option>
+                            <option value="Approved" disabled>Approved</option>
+                            <option value="Rejected" disabled>Rejected</option>
+                        </select>
+                    </div>
+            </div>
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-success">Submit Application</button>
             </div>
         </form>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+        document.addEventListener("DOMContentLoaded", function () {
+        // Initialize flatpickr
+        flatpickr("#date", {
+            dateFormat: 'm-d-Y', // Set the date format
+            defaultDate: 'today', // Set default date to today
+            disableMobile: true, // Disable on mobile
+            onClose: function (selectedDates, dateStr, instance) {
+                // Update the input value when the user selects a date
+                document.getElementById('date').value = dateStr;
+            }
+        });
+    });
+</script>
 {% endblock content %}
 
 {% block script %}
-<!-- <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js"></script> -->
-
-<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-
 <script>
- //   $(document).ready(function () {
-   //     $('#datepicker').datepicker({
-     //       format: 'mm-dd-yyyy', // Adjust the format as needed
-       //     autoclose: true,
-        //});
-    // });
-
-    document.addEventListener("DOMContentLoaded", function () {
-            document.getElementById('date').value = flatpickr.formatDate(new Date(), 'm-d-y');
-
-            flatpickr("#datepicker", {
-                dateFormat: 'm-d-y',
-                minDate: 'today', // Disable previous dates
-                defaultDate: 'today',
-                onClose: function (selectedDates, dateStr, instance) {
-                    // Update the input value when the user selects a date
-                    document.getElementById('date').value = dateStr;
-                }
-            });
-        });
-
     // Fetch student details
     async function fetchStudentDetails() {
         try {
@@ -165,36 +160,6 @@
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
 
-    // Form submission logic
-    $('#overloadApplicationForm').submit(function(event) {
-        const StudentNumber = $('#StudentNumber').val().trim();
-        const Name = $('#Name').val().trim();
-        const programcourse = $('#programcourse').val();
-        const semester = $('#semester').val().trim();
-        const subjectsToAdd = $('#subjectsToAdd').val().trim();
-        const justification = $('#justification').val().trim();
-
-        // Additional validation logic
-        if (!StudentNumber || !Name || !programcourse || !semester || !subjectsToAdd || !justification) {
-            alert('Please fill out all fields and provide valid values.');
-            event.preventDefault(); // Prevent form submission
-        }
-    });
-
-    function validateForm() {
-        var StudentNumber = document.getElementById('StudentNumber').value;
-        var Name = document.getElementById('Name').value;
-        var programcourse = document.getElementById('programcourse').value;
-        var semester = document.getElementById('semester').value;
-        var subjectsToAdd = document.getElementById('subjectsToAdd').value;
-
-        if (!StudentNumber || !Name || !programcourse || !semester) {
-            console.error('Error: Please fill out all required fields.');
-            return false;
-        }
-
-        return true;
-    }
 </script>
 {% endblock script %}
 

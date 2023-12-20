@@ -69,30 +69,44 @@
 </div>
 <script>
     async function updateStudentProfile(event) {
-        event.preventDefault();
+    event.preventDefault();
 
-        const formData = new FormData(document.getElementById('profileForm'));
+    const formData = new FormData(document.getElementById('profileForm'));
 
-        try {
-            const response = await fetch('/student/profile', {
-                method: 'POST',
-                body: formData,
-            });
+    try {
+        const response = await fetch('/student/profile', {
+            method: 'POST',
+            body: formData,
+        });
 
-            if (!response.ok) {
-                throw new Error('Failed to update profile');
-            }
-
-            const result = await response.json();
-            console.log('Profile updated successfully:', result);
-
-            // Optionally, update the UI or show a success message
-
-        } catch (error) {
-            console.error('Error updating profile:', error.message);
-            // Handle error scenarios - display an error message, etc.
+        if (!response.ok) {
+            throw new Error('Failed to update profile');
         }
+
+        const result = await response.json();
+        console.log('Profile updated successfully:', result);
+
+        // Optionally, update the UI or show a success message
+
+        // Add the code to display the success alert here
+        document.getElementById('successAlert').style.display = 'block';
+
+        // Call the function to close the alert after 4 seconds
+        handleAlertClose();
+
+    } catch (error) {
+        console.error('Error updating profile:', error.message);
+        // Handle error scenarios - display an error message, etc.
     }
+}
+
+// Function to close the alert after 4 seconds
+function handleAlertClose() {
+    setTimeout(function () {
+        document.getElementById('successAlert').style.display = 'none';
+    }, 4000); // 4 seconds
+}
+
 </script>
 
 {% endblock %}

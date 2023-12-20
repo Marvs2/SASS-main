@@ -2,7 +2,7 @@
 import base64
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student
+from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
 from werkzeug.utils import secure_filename
 from datetime import datetime
 #from models import Services
@@ -51,6 +51,10 @@ def authenticate_user(username, Password):
 def getCurrentUser():
     current_user_id = session.get('user_id')
     return Student.query.get(current_user_id)    
+
+def getCurrentUserStudentNumber():
+    current_student_number = session.get('StudentNumber')
+    return Student.query.get(current_student_number)
 
 # Api/v1/student/api_routes.py
 #================================================================
@@ -538,39 +542,39 @@ def allstudent():
 #overload
 # Create function for OverloadApplication
 def create_overload_application(form_data, files, StudentId):
-    StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
+    StudentNumber = form_data['StudentNumber']
     programcourse = form_data['programcourse']
     semester = form_data['semester']
-    subjects_to_add = form_data['subjectsToAdd']
+    subjects_to_add = form_data['subjects_To_Add']
     justification = form_data['justification']
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
     # Check if a file is provided
-    if 'file' not in files:
+    if 'fileoverload' not in files:
         flash('No file part', 'danger')
         return None
 
-    file = files['file']
+    fileoverload = files['fileoverload']
     # Check if the file field is empty
-    if file.filename == '':
+    if fileoverload.filename == '':
         flash('No selected file', 'danger')
         return None
 
-    file_data = file.read()  # Read the file data
-    file_filename = secure_filename(file.filename)
+    file_data = fileoverload.read()  # Read the file data
+    file_filename = secure_filename(fileoverload.filename)
 
     # Additional validation logic can be added here
 
     # Check if any of the required fields is empty
-    if not StudentNumber or not Name or not semester or not subjects_to_add or not justification:
+    if not Name or not StudentNumber or not programcourse or not semester or not subjects_to_add:
         flash('Please fill out all required fields.', 'danger')
         return None
 
     new_overload_application = OverloadApplication(
-        Name=Name,  # Adjust as per your application logic
         StudentNumber=StudentNumber,
+        Name=Name,
         programcourse=programcourse,
         semester=semester,
         subjects_to_add=subjects_to_add,
@@ -579,9 +583,10 @@ def create_overload_application(form_data, files, StudentId):
         file_data=file_data,
         user_responsible=user_responsible,
         status=status,
-        StudentId=StudentId
+        StudentId=StudentId,
+        created_at=datetime.utcnow()  # Set created_at to the current timestamp
     )
-
+    
     return new_overload_application
 #===============================================================================================#
 
@@ -589,28 +594,49 @@ def create_overload_application(form_data, files, StudentId):
 def create_crossenrollment_form(form_data, files, StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
-    school_for_cross_enrollment = form_data['crossEnrollmentSchool']
-    total_number_of_units = int(form_data['crossEnrollmentUnits'])
-    authorized_subjects_to_take = form_data['authorizedSubjects']
+    school_for_cross_enrollment = form_data['school_for_cross_enrollment']
+    total_number_of_units = int(form_data['total_number_of_units'])
+    authorized_subjects_to_take = form_data['authorized_subjects_to_take']
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
-    application_letter_file = files.get('applicationLetter')
-    permit_to_cross_enroll_file = files.get('permitToCrossEnroll')
-
-    if not StudentNumber or not Name or not school_for_cross_enrollment or total_number_of_units <= 0 or not authorized_subjects_to_take:
+    if not StudentNumber or not Name or not school_for_cross_enrollment or not authorized_subjects_to_take:
         flash('Please fill out all fields and provide valid values.', 'danger')
         return None
 
-    if not application_letter_file or not permit_to_cross_enroll_file:
-        flash('Please provide both application letter and permit to cross-enroll files.', 'danger')
+    files = request.files
+
+    # Check if 'fileTutorial' is provided
+    if 'applicationLetter' not in files:
+        flash('Please provide the tutorial file.', 'danger')
         return None
 
-    application_letter_filename = secure_filename(application_letter_file.filename)
-    application_letter_data = application_letter_file.read()
+    applicationLetter = files['applicationLetter']
 
-    permit_to_cross_enroll_filename = secure_filename(permit_to_cross_enroll_file.filename)
-    permit_to_cross_enroll_data = permit_to_cross_enroll_file.read()
+    # Check if 'permitToCrossEnroll' is provided
+    if 'permitToCrossEnroll' not in files:
+        flash('Please provide the second file.', 'danger')
+        return None
+
+    permitToCrossEnroll = files['permitToCrossEnroll']
+
+    # Check if fileTutorial is provided and has a filename
+    if applicationLetter.filename == '':
+        flash('No selected tutorial file', 'danger')
+        return None
+
+    # Read the file data for fileTutorial
+    application_letter_data = applicationLetter.read()
+    application_letter_filename = secure_filename(applicationLetter.filename)
+
+    # Check if permitToCrossEnroll is provided and has a filename
+    if permitToCrossEnroll.filename == '':
+        flash('No selected second file', 'danger')
+        return None
+
+    # Read the file data for permitToCrossEnroll
+    permit_to_cross_enroll_data = permitToCrossEnroll.read()
+    permit_to_cross_enroll_filename = secure_filename(permitToCrossEnroll.filename)
 
     new_cross_enrollment = CrossEnrollment(
         StudentNumber=StudentNumber,
@@ -637,19 +663,26 @@ def create_crossenrollment_form(form_data, files, StudentId):
 def create_manualenrollment_form(form_data, files, StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
-    enrollment_type = form_data['enrollment_type']
+    enrollment_type = form_data['enrollmentType']
     reason = form_data['reason']
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
-    me_file = files.get('me_file')
-
-    if not StudentNumber or not Name or not enrollment_type or not reason:
-        flash('Please fill out all fields and provide valid values.', 'danger')
+    if 'me_file' not in files:
+        flash('Please provide the tutorial file.', 'danger')
         return None
 
-    if not me_file:
-        flash('Please provide the manual enrollment file.', 'danger')
+    me_file = files['me_file']
+
+    if me_file.filename == '':
+        flash('No Selected me_file', 'danger')
+        return None
+    
+    me_file_filename = secure_filename(me_file.filename)
+    me_file_data = me_file.read()
+    
+    if not StudentNumber or not Name or not enrollment_type or not reason:
+        flash('Please fill out all fields and provide valid values.', 'danger')
         return None
 
     me_file_filename = secure_filename(me_file.filename)
@@ -772,27 +805,27 @@ def create_changesubjects_application(form_data, files, StudentId):
 def create_petitionrequest_form(form_data, StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
-    subjectCode = form_data['subjectCode']
-    subjectName = form_data['subjectName']
-    petitionType = form_data['petitionType']
-    requestReason = form_data['requestReason']
-    userResponsible = form_data['userResponsible']
+    subject_code = form_data['subjectCode']
+    subject_name = form_data['subjectName']
+    petition_type = form_data['petitionType']
+    request_reason = form_data['requestReason']
+    user_responsible = form_data['userResponsible']
     status = form_data['status']
 
-    if not StudentNumber or not Name or not subjectCode or not subjectName or not petitionType or not requestReason or not userResponsible:
+    if not StudentNumber or not Name or not subject_code or not subject_name or not petition_type or not request_reason:
         flash('Please fill out all fields and provide valid values.', 'danger')
         return None
 
     new_petition_request = PetitionRequest(
         StudentNumber=StudentNumber,
         Name=Name,
-        subject_code=subjectCode,
-        subject_name=subjectName,
-        petition_type=petitionType,
-        request_reason=requestReason,
-        user_responsible=userResponsible,
-        status=status,
+        subject_code=subject_code,
+        subject_name=subject_name,
+        petition_type=petition_type,
+        request_reason=request_reason,
+        user_responsible=user_responsible,
         created_at=datetime.utcnow(),
+        status=status,
         StudentId=StudentId,
     )
 
@@ -1021,6 +1054,51 @@ def create_shifting_application(form_data, files, StudentId):
     
     return new_shifting_application
 
+
+#======================================================================#
+# tutorial
+def create_tutorial_request(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    subject_code = form_data['subjectCode']
+    subject_name = form_data['subjectName']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    if 'fileTutorial' not in files:
+        flash('Please provide the tutorial file.', 'danger')
+        return None
+
+    fileTutorial = files['fileTutorial']
+
+    if fileTutorial.filename == '':
+        flash('No selected file', 'danger')
+        return None
+    
+    file_data = fileTutorial.read()  # Read the file data
+    file_filename = secure_filename(fileTutorial.filename) 
+    # Check if other inputs are provided
+
+    if not StudentNumber or not Name or not subject_code or not subject_name:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    # Additional validation logic can be added here
+
+    new_tutorial_request = TutorialRequest(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        subject_code=subject_code,
+        subject_name=subject_name,
+        file_filename=file_filename,
+        file_data=file_data,
+        created_at=datetime.utcnow(),
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+    )
+    
+    return new_tutorial_request
 #===============================================================================================#
 #===============================Semester, Program, YearLevel====================================#
 #===============================================================================================#

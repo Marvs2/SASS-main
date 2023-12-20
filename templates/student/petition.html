@@ -21,7 +21,7 @@
                         <h3>Online Petition of Subjects</h3>           
                     </div>
 
-                <form id="petitionForm" action="{{url_for('submitpetition')}}" method="POST" enctype="multipart/form-data">
+                <form id="petitionForm" action="{{url_for('submit_petition')}}" method="POST" enctype="multipart/form-data">
 
                     <div class="row mb-3">
                         <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
@@ -69,9 +69,9 @@
                     </div> 
 
                     <div class="row mb-3">
-                        <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <label for="userResponsible" class="col-sm-3 col-form-label">User Responsible </label>
                             <div class="col-sm-8">
-                                <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                                <select class="custom-select" id="userResponsible" name="userResponsible" required>
                                     <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
                                     <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
                                 </select>
@@ -113,11 +113,11 @@
                 form.addEventListener('submit', function(event) {
                     const StudentNumber = document.getElementById('StudentNumber').value.trim();
                     const Name = document.getElementById('Name').value.trim();
-                    const subjectCode = document.getElementById('subjectCode').value.trim();
-                    const subjectName = document.getElementById('subjectName').value.trim();
-                    const petitionType = document.getElementById('petitionType').value.trim();
-                    const requestReason = document.getElementById('requestReason').value.trim();
-                    const userResponsible = document.getElementById('userResponsible').value.trim();
+                    const subjectCode = document.getElementById('subject_code').value.trim();
+                    const subjectName = document.getElementById('subject_name').value.trim();
+                    const petitionType = document.getElementById('petition_type').value.trim();
+                    const requestReason = document.getElementById('request_reason').value.trim();
+                    const userResponsible = document.getElementById('user_responsible').value.trim();
         
                     if (!StudentNumber || !Name || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
                         alert('Please fill out all fields.');
