@@ -141,7 +141,7 @@ def change():
 
 @app.route('/services/gradeentry')
 def correction():
-    return render_template("/services/grade_entry.html")
+    return render_template("/services/grade_entries.html")
 
 @app.route('/services/crossenrollment')
 def cross_enrollment():
@@ -461,7 +461,7 @@ def add_subjects():
     finally:
         db.session.close()
 
-    return render_template('student/adding_of_subject.html') 
+    return render_template('student/addingsubject.html') 
 
 @app.route('/student/viewaddsubject', methods=['GET'])
 @role_required('student')
@@ -913,10 +913,11 @@ def facultychange():
     changesubjects = ChangeOfSubjects.query.all()
     return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
 
+#gradeentry table
 @app.route('/faculty/correction')
 def facultycorrection():
     grade_entries = GradeEntry.query.all()
-    return render_template("/faculty/correction.html", grade_entry=grade_entries) # for grade_entry in grade_entries
+    return render_template("/faculty/correction.html", grade_entries=grade_entries) # for grade_entries in grade_entries
 
 @app.route('/faculty/crossenrollment')
 def facultycrossenrollment():
@@ -941,7 +942,8 @@ def faculty_view_tutorial():
 
 @app.route('/faculty/certification')
 def facultycertification():
-    return render_template("/faculty/certification.html")
+    certification_request = CertificationRequest.query.all()
+    return render_template("/faculty/certification.html", certification_request=certification_request)
 
 @app.route('/faculty/tutorial')
 def facultytutorial():
@@ -1760,8 +1762,76 @@ def get_mimetype(file_extension):
     return mimetypes.get(file_extension, 'application/octet-stream')
 #===========================================================#
 #certification
+@app.route('/faculty/certification/get_certification_request_file/<int:certification_request_id>')
+def get_certification_request_file(certification_request_id):
+    return redirect(url_for('download_certification_request_file', certification_request_id=certification_request_id))
+
+@app.route('/faculty/download_certification_request_file/<int:certification_request_id>')
+def download_certification_request_file(certification_request_id):
+    certification_request = CertificationRequest.query.get(certification_request_id)
+
+    if certification_request and certification_request.request_form_data:
+        file_extension = get_file_extension(certification_request.request_form_filename)
+        download_name = f'certification_request_{certification_request_id}.{file_extension}'
+
+        return send_file(
+            io.BytesIO(certification_request.request_form_data),
+            as_attachment=True,
+            download_name=download_name,
+            mimetype=get_mimetype(file_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+
+def get_file_extension(file_filename):
+    return file_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(file_extension, 'application/octet-stream')
 #===========================================================#
 #correction
+# Route to handle download requests for grade entry files
+@app.route('/faculty/grade_entries/get_file/<int:grade_entry_id>')
+def get_grade_entries_file(grade_entry_id):
+    return redirect(url_for('download_grade_entries_file', grade_entry_id=grade_entry_id))
+
+# Route to download a specific file of a grade entry
+@app.route('/faculty/download_grade_entries_file/<int:grade_entry_id>')
+def download_grade_entries_file(grade_entry_id):
+    grade_entries = GradeEntry.query.get(grade_entry_id)
+
+    if grade_entries and grade_entries.request_form_data:
+        file_extension = get_file_extension(grade_entries.request_form_filename)
+        download_name = f'certification_request_{grade_entries}.{file_extension}'
+
+        return send_file(
+            io.BytesIO(grade_entries.request_form_data),
+            as_attachment=True,
+            download_name=download_name,
+            mimetype=get_mimetype(file_extension),
+        )
+    else:
+        abort(404)
+
+def get_file_extension(file_filename):
+    return file_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(file_extension, 'application/octet-stream')
 #===========================================================#
 #crossenrollment
 #===========================================================#
