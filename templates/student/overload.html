@@ -116,20 +116,7 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-        // Initialize flatpickr
-        flatpickr("#date", {
-            dateFormat: 'm-d-Y', // Set the date format
-            defaultDate: 'today', // Set default date to today
-            disableMobile: true, // Disable on mobile
-            onClose: function (selectedDates, dateStr, instance) {
-                // Update the input value when the user selects a date
-                document.getElementById('date').value = dateStr;
-            }
-        });
-    });
-</script>
+
 {% endblock content %}
 
 {% block script %}
@@ -159,6 +146,20 @@
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+    // Initialize flatpickr
+    flatpickr("#date", {
+        dateFormat: 'm-d-Y', // Set the date format
+        defaultDate: 'today', // Set default date to today
+        // disableMobile: true, // Disable on mobile
+        minDate: 'today', // Disable previous dates
+        onClose: function (selectedDates, dateStr, instance) {
+            // Update the input value when the user selects a date
+            document.getElementById('date').value = dateStr;
+        }
+    });
+});
 
 </script>
 {% endblock script %}
