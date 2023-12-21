@@ -90,6 +90,11 @@
 {% block script %} 
 <script>
 
+     // Automatically close the alert messages after 3 seconds
+     setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
+
 // Fetch and display current user's profile details when page loads
     async function fetchStudentDetails() {
         const response = await fetch(`${api_base_url}/student-details`);
