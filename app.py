@@ -210,7 +210,7 @@ def student_update_profile():
 
     return render_template('/student/profile.html')
 
-
+#======================================== STUDENT TRANSACTION HISTORY ===================================================
 @app.route('/student/setting')
 def studentsetting():
     return render_template('/student/setting.html')
