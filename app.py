@@ -138,7 +138,7 @@ def change():
 
 @app.route('/services/gradeentry')
 def correction():
-    return render_template("/services/grade_entries.html")
+    return render_template("/services/grade_entry.html")
 
 @app.route('/services/crossenrollment')
 def cross_enrollment():
