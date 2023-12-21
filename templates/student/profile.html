@@ -7,16 +7,16 @@
 {% block content %}
 
 {% with messages = get_flashed_messages() %}
-  {% if messages %}
-    {% for message in messages %}
-      <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ message }}
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-    {% endfor %}
-  {% endif %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 
 <div class="data data1">
@@ -83,38 +83,17 @@
           </form>
     </div>
 </div>
-<script>
-    async function updateStudentProfile(event) {
-        event.preventDefault();
 
-        const formData = new FormData(document.getElementById('profileForm'));
-
-        try {
-            const response = await fetch('/student/profile/updated', {
-                method: 'POST',
-                body: formData,
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update profile');
-            }
-
-            const result = await response.json();
-            console.log('Profile updated successfully:', result);
-
-            // Optionally, update the UI or show a success message
-
-        } catch (error) {
-            console.error('Error updating profile:', error.message);
-            // Handle error scenarios - display an error message, etc.
-        }
-    }
-</script>
 
 {% endblock %}
 
 {% block script %} 
 <script>
+
+     // Automatically close the alert messages after 3 seconds
+     setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
 
 // Fetch and display current user's profile details when page loads
     async function fetchStudentDetails() {

@@ -36,7 +36,7 @@
             <div class="row mb-3">
                 <label for="date" class="col-sm-3 col-form-label">Application Date</label>
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" id="date" name="date" required readonly>
+                    <input type="text" class="form-control" id="date" name="date" required>
                 </div>
             </div>
             <div class="row mb-3">
@@ -116,20 +116,7 @@
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-<script>
-        document.addEventListener("DOMContentLoaded", function () {
-        // Initialize flatpickr
-        flatpickr("#date", {
-            dateFormat: 'm-d-Y', // Set the date format
-            defaultDate: 'today', // Set default date to today
-            disableMobile: true, // Disable on mobile
-            onClose: function (selectedDates, dateStr, instance) {
-                // Update the input value when the user selects a date
-                document.getElementById('date').value = dateStr;
-            }
-        });
-    });
-</script>
+
 {% endblock content %}
 
 {% block script %}
@@ -159,6 +146,20 @@
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById('StudentNumber').value = data.StudentNumber;
     }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+    // Initialize flatpickr
+    flatpickr("#date", {
+        dateFormat: 'm-d-Y', // Set the date format
+        defaultDate: 'today', // Set default date to today
+        // disableMobile: true, // Disable on mobile
+        minDate: 'today', // Disable previous dates
+        onClose: function (selectedDates, dateStr, instance) {
+            // Update the input value when the user selects a date
+            document.getElementById('date').value = dateStr;
+        }
+    });
+});
 
 </script>
 {% endblock script %}
