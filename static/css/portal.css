@@ -2,7 +2,7 @@ section {
     width: 100%;
     min-height: 100vh;
     overflow: hidden;
-    background-color: #e8e7e7;
+    background-color: #eeeef084;
     padding: 90px 0 90px 0;
     display: flex;
     align-items: center;
@@ -21,10 +21,10 @@ section {
     position: relative;
     width: 100%;
     max-width: 1020px;
-    height: 100vh;
-    background-color: #ffffff;
-    border-radius: 3.3rem;
-    box-shadow: 0 60px 40px -30px rgba(0, 0, 0, 0.27);
+    height: 80vh;
+    background-color: #ffffffec;
+    border-radius: 1rem;
+    box-shadow: 0 10px 10px -10px rgba(0, 0, 0, 0.10);
   }
   
   .inner-box {

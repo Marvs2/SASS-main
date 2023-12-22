@@ -22,36 +22,36 @@
 <div class="data data1">
    
     <div class="content-data">
-        <div class="head">
+        <div class="head mb-5">
             <h3>Student's Profile</h3>           
         </div>
         <form action="{{ url_for('student_update_profile') }}" id="profileForm" method="POST" onsubmit="updateStudentProfile(event)">
             <div class="form-group">
               <label for="StudentNumber" class="col-sm-2 control-label">Student Number</label>
               <div class="col-sm-4">
-                <input type="text" id="StudentNumber" name="studentNumber" required="required" class="form-control" disabled>
+                <input type="text" class="form-control"  id="StudentNumber" name="studentNumber" disabled>
               </div>
               <label for="DateofBirth" class="col-sm-2 control-label">Date of Birth</label>
               <div class="col-sm-4">
-                <input type="text" name="DateofBirth" id="DateofBirth" required="required" class="form-control" disabled>
+                <input type="text" class="form-control" name="DateofBirth" id="DateofBirth" required="required" class="form-control" disabled>
               </div>
             </div>
 
             <div class="form-group">
               <label for="Name" class="col-sm-2 control-label">Name</strong></label>
               <div class="col-sm-4">
-                <input type="text" name="Name" id="Name" required="required" class="form-control" disabled>
+                <input type="text" class="form-control" name="Name" id="Name" required="required" class="form-control" disabled>
               </div>   
               <label for="PlaceofBirth" class="col-sm-2 col-sm-2 control-label">Place of Birth</strong></label>
               <div class="col-sm-4">
-                <input type="text" name="PlaceofBirth" id="PlaceofBirth" required="required" class="form-control" disabled>
+                <input type="text" class="form-control" name="PlaceofBirth" id="PlaceofBirth" required="required" class="form-control" disabled>
               </div>
             </div>
 
             <div class="form-group">
             <label for="Gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
               <div class="col-sm-4">
-               <input type="text" name="Gender" id="Gender" required="required" class="form-control" disabled> 
+               <input type="text" class="form-control" name="Gender" id="Gender" required="required" class="form-control" disabled> 
               </div>
               <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
               <div class="col-sm-4">
@@ -78,6 +78,11 @@
                 <div class="col-sm-13 d-flex justify-content-center">
                   <button type="submit" name="save-profile-button" class="btn btn-success">Save Profile</button>
                 </div>
+
+                <div class="alert-success" role="alert">
+                  Wow! Everything worked!
+                </div>
+
               </div>
             </div>       
           </form>
@@ -113,7 +118,7 @@
   fetchStudentDetails()
 
   function displayDetails(data){
-    // Select the name input and set the value to data.studentName
+    // Select the name input and set the value to data.studentName //.innerHTML
     document.getElementById("Name").value = data.Name
     // Select the StudentNumber and set the value to data.StudentNumber
     document.getElementById("StudentNumber").value = data.StudentNumber;
