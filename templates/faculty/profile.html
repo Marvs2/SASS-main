@@ -1,67 +1,137 @@
-{%extends "faculty/layout.html" %}
+{% extends "faculty/layout.html" %}
 
 {% block content %}
-            <div class="form-container">
-                <form action="{{url_for('facultyprofile')}}" method="POST">
 
-                    <label for="faculty_Number">faculty Number:</label>
-                    <input type="text" id="facultyNumber" name="facultyNumber" disabled required>
-                    <br>
+<div class="progress progress-bar progress-bar-indeterminate bg-green"></div>
 
-                    <label for="name">Name:</label>
-                    <input type="text" id="name" name="name" disabled required>
-                    <br>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" disabled required>
-                    <br>
+<div class="data data1">
+   
+    <div class="content-data">
+        <div class="head">
+            <h3>Student's Profile</h3>           
+        </div>
+        <form action="{{ url_for('faculty_update_profile') }}" id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
+            <div class="form-group">
+              <label for="facultyNumber" class="col-sm-2 control-label">Faculty Number</label>
+              <div class="col-sm-4">
+                <input type="text" id="facultyNumber" name="facultyNumber" required="required" class="form-control" disabled>
+              </div>
+              <label for="dateofBirth" class="col-sm-2 control-label">Date of Birth</label>
+              <div class="col-sm-4">
+                <input type="text" name="dateofBirth" id="dateofBirth" required="required" class="form-control" disabled>
+              </div>
+            </div>
 
-                    <label for="name">Gender:</label>
-                    <input type="text" id="gender" name="gender" disabled required>
-                    <br>
-            
-                    <label for="dateofBirth">Date of Birth:</label>
-                    <input type="date" id="dateofBirth" name="dateofBirth" disabled>
-                    <br>
-            
-                    <label for="placeofBirth">Place of Birth:</label>
-                    <input type="text" id="placeofBirth" name="placeofBirth" disabled>
-                    <br>
-            
-                    <label for="mobile_number">Mobile Number:</label>
-                    <input type="number" id="mobile_number" name="mobile_number" disabled>
-                    <br>
-                </form>
-            </div>           
+            <div class="form-group">
+              <label for="name" class="col-sm-2 control-label">Name</strong></label>
+              <div class="col-sm-4">
+                <input type="text" name="name" id="name" required="required" class="form-control" disabled>
+              </div>   
+              <label for="placeofBirth" class="col-sm-2 col-sm-2 control-label">Place of Birth</strong></label>
+              <div class="col-sm-4">
+                <input type="text" name="placeofBirth" id="placeofBirth" required="required" class="form-control" disabled>
+              </div>
+            </div>
+
+            <div class="form-group">
+            <label for="gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
+              <div class="col-sm-4">
+               <input type="text" name="gender" id="gender" required="required" class="form-control" disabled> 
+              </div>
+              <label for="email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
+              <div class="col-sm-4">
+                <input type="email" name="email" id="email" required="required" class="form-control">
+              </div>
+            </div>          
+            <div class="form-group">
+            <label for="mobile_number" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
+            <div class="col-sm-4">
+              <input type="text"  name="mobile_number" id="mobile_number" required="required" maxlength="11" pattern="\d{11}" class="form-control">
+            </div>
+              <label for="address" class="col-sm-2 col-sm-2 control-label">Address</strong></label>
+              <div class="col-sm-4">
+              <input  name="address" id="address" required="required" class="form-control">
+             </div>              
+            </div>
+
+            <div class="form-group">
+              <div class="col-sm-11 text-center">
+                <div class="pt-3 pl-4">
+              <!---    <span><i>I hereby Certify that all the information provided are true and correct to the best of my knowledge.</i></span> -->
+                </div>
+              
+                <div class="col-sm-13 d-flex justify-content-center">
+                  <button type="submit" name="save-profile-button" class="btn btn-success">Save Profile</button>
+                </div>
+              </div>
+            </div>       
+          </form>
+    </div>
+</div>
 
 {% endblock %}
 
-{% block script %}
+{% block script %} 
 <script>
+    // Include the progress bar, alert handling, and data fetching functions as in the student profile script
+    // ...
+    setTimeout(function() {
+        $('.alert').alert('close');
+    }, 3000);
+
+
     async function fetchFacultyDetails() {
         const response = await fetch(`${api_base_url}/faculty-details`);
 
         if (!response.ok) {
-            throw new Error(`Failed to fetch data. Try to contact the admin to resolve the issue.`
-        );
+            throw new Error(`Failed to fetch data. Try to contact the admin to resolve the issue.`);
         }
 
         const data_faculty_details = await response.json();
-        console.log('data_faculty_details: ', data_faculty_details)
+        console.log('data_faculty_details: ', data_faculty_details);
         displayDetails(data_faculty_details);
     }
 
-    fetchFacultyDetails()
+    fetchFacultyDetails();
 
     function displayDetails(data){
+        // Update the faculty profile details in the form
+        // For example:
         document.getElementById("facultyNumber").value = data.facultyNumber;
-        document.getElementById("name").value = data.facultyName;
+        document.getElementById("name").value = data.name;
         document.getElementById("email").value = data.email;
+        document.getElementById("address").value = data.address;
         document.getElementById("gender").value = data.gender;
-        document.getElementById("dateOfBirth").value = data.dateofBirth;
+        const dateofBirthInput = document.getElementById("dateofBirth");
+        // Format the date to display only the birthday
+const formatteddateofBirth = new Date(data.dateofBirth).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric'
+});
+// Set the formatted date to the DateofBirth input
+dateofBirthInput.value = formatteddateofBirth;
+
         document.getElementById("placeofBirth").value = data.placeofBirth;
         document.getElementById("mobile_number").value = data.mobile_number;
+        // ... (update other fields similarly)
+
+        hideProgressBar();
     }
 
+    // ... (include other functions and event listeners as needed)
 </script>
 {% endblock script %}

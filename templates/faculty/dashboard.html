@@ -1,87 +1,97 @@
 {% extends "faculty/layout.html" %}
 
-{% block content %} 
-<style>
-    .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Adjusted alignment */
-            padding-top: 50px; /* Add space for the navbar */
-            height: calc(100vh - 50px); /* Adjust height to accommodate the navbar */
-            overflow-y: auto; /* Add scrollbar if content exceeds height */
-        }
-        
-        form {
-            max-width: 400px; /* Adjust as needed */
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: None;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        
-        input[type="submit"] {
-            background-color: #4caf50;
-            cursor: pointer;
-        }
-        
-        input:disabled {
-            cursor: not-allowed;
-        }
-        
-        
-        /* Adjust the layoutSidenav styles */
-        #layoutSidenav {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        #layoutSidenav_nav {
-            flex: 0 0 auto;
-        }
-        
-        #layoutSidenav_content {
-            flex: 1 1 0;
-            overflow: auto;
-        }
-        </style>
-<h1>Overload Applications</h1>
-    <table border="1">
-        <tr>
-            <th>Student Name</th>
-            <th>Student Number</th>
-            <th>Semester</th>
-            <th>Subjects to Add</th>
-            <th>Justification</th>
-            <th>File</th>
-            <th>User Responsible</th>
-            <th>Status</th>
-        </tr>
-        {% for overload_application in overload_applications %}
-        <tr>
-            <td>{{ overload_application.student_name }}</td>
-            <td>{{ overload_application.student_number }}</td>
-            <td>{{ overload_application.semester }}</td>
-            <td>{{ overload_application.subjects_to_add }}</td>
-            <td>{{ overload_application.justification }}</td>
-            <td><a href="{{ url_for('download_file', filename=overload_application.file_filename) }}">Download</a></td>
-            <td>{{ overload_application.user_responsible }}</td>
-            <td>{{ overload_application.status }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-{% endblock %} 
+{% block content %}
+
+<!-- MAIN -->
+		<main>
+			<h1 class="title">Dashboard</h1>
+			<ul class="breadcrumbs">
+				<li><a href="#">Home</a></li>
+				<li class="divider">/</li>
+				<li><a href="#" class="active">Dashboard</a></li>
+			</ul>
+			<div class="info-data">
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>20</h2>
+							<p>Pending</p>
+						</div>
+						<i class='bx bx-trending-up icon' ></i>
+					</div>
+					<span class="progress" data-value="40%"></span>
+					<span class="label">40%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>10</h2>
+							<p>In Progress</p>
+						</div>
+						<i class='bx bx-trending-down icon down' ></i>
+					</div>
+					<span class="progress" data-value="60%"></span>
+					<span class="label">60%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>10</h2>
+							<p>Closed</p>
+						</div>
+						<i class='bx bx-trending-up icon' ></i>
+					</div>
+					<span class="progress" data-value="30%"></span>
+					<span class="label">30%</span>
+				</div>
+				<div class="card">
+					<div class="head">
+						<div>
+							<h2>40</h2>
+							<p>Total Services</p>
+						</div>
+						<i class='bx bx-trending-up icon' ></i>
+					</div>
+					<span class="progress" data-value="80%"></span>
+					<span class="label">80%</span>
+				</div>
+			</div>
+			<div class="data">
+				<div class="content-data">
+					<div class="head">
+						<h3>Service Report</h3>
+						<div class="menu">
+							<i class='bx bx-dots-horizontal-rounded icon'></i>
+							<ul class="menu-link">
+								<li><a href="#">Edit</a></li>
+								<li><a href="#">Save</a></li>
+								<li><a href="#">Remove</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart">
+						<div id="chart"></div>
+					</div>
+				</div>
+
+				<div class="content-data">
+					<div class="head">
+						<h3>Service Report</h3>
+						<div class="menu">
+							<i class='bx bx-dots-horizontal-rounded icon'></i>
+							<ul class="menu-link">
+								<li><a href="#">Edit</a></li>
+								<li><a href="#">Save</a></li>
+								<li><a href="#">Remove</a></li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart">
+						<div id="chart"></div>
+					</div>
+				</div>
+				
+			</div>
+		</main>
+
+{% endblock %}
