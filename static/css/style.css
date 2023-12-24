@@ -54,7 +54,6 @@ li {
 	left: 0;
 	height: 100%;
 	overflow-y: auto;
-	scrollbar-width: none;
 	transition: all .3s ease;
 	z-index: 200;
 }
@@ -494,7 +493,6 @@ main .content-data .chart {
 	width: 100%;
 	max-width: 100%;
 	overflow-x: auto;
-	scrollbar-width: none;
 }
 main .content-data .chart::-webkit-scrollbar {
 	display: none;
@@ -504,7 +502,6 @@ main .chat-box {
 	width: 100%;
 	max-height: 360px;
 	overflow-y: auto;
-	scrollbar-width: none;
 }
 main .chat-box::-webkit-scrollbar {
 	display: none;
