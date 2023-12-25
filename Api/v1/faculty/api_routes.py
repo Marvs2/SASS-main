@@ -1,4 +1,5 @@
 # api/api_routes.py
+import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import Faculty
 import requests
@@ -10,6 +11,22 @@ from decorators.auth_decorators import faculty_required
 faculty_api = Blueprint('faculty_api', __name__)
 
 # Api/v1/faculty/api_routes.py
+
+def get_current_faculty_user():
+    current_faculty_id = session.get('user_id')
+    if current_faculty_id:
+        faculty = Faculty.query.get(current_faculty_id)
+        if faculty:
+            return faculty
+        else:
+            # Handle case where faculty is not found
+            print(f"Faculty with ID {current_faculty_id} not found.")
+            return None
+    else:
+        # Handle case where there is no user_id in session
+        print("No user_id found in session.")
+        return None
+
 
 
 """faculty_api_url = 'https://pupqcfis-com.onrender.com/api/all/Faculty_Profile'
@@ -44,7 +61,7 @@ def faculty_login():
     return redirect(url_for('faculty_portal'))"""
 
 
-@faculty_api.route('/login', methods=['POST'])
+@faculty_api.route('/faculty_login', methods=['POST'])
 def faculty_login():
     if request.method == 'POST':
         email = request.form['email']
@@ -55,26 +72,16 @@ def faculty_login():
             # Successfully authenticated
             access_token = create_access_token(identity=faculty.facultyID)
             session['access_token'] = access_token
+            session['user_id'] = faculty.facultyID
             session['user_role'] = 'faculty'
 
-            # Store additional faculty details in the session
-            session['user_id'] = faculty.facultyID
-            session['facultyNumber'] = faculty.facultyNumber
-            session['name'] = faculty.name
-            session['email'] = faculty.email
-            session['address'] = faculty.address
-            session['gender'] = faculty.gender
-            session['dateofBirth'] = faculty.dateofBirth
-            session['placeofBirth'] = faculty.placeofBirth
-            session['mobile_number'] = faculty.mobile_number
-            session['userImg'] = faculty.userImg
-
+            # Check if session is correctly set
             return redirect(url_for('faculty_dashboard'))
-
         else:
             flash('Invalid email or password', 'danger')
 
     return redirect(url_for('faculty_portal'))
+
 
 #===============================================================================================================#
 #==================================================FACULTY======================================================#
@@ -103,25 +110,35 @@ def get_gender_string(gender_code):
         return 'Undefined'  # Handle any other values
 
 @faculty_api.route('/faculty-details', methods=['GET'])
-# @jwt_required()
 def fetchFacultyDetails():
     user_id = session.get('user_id')
 
-    # Debug print statement
+    # Retrieve the faculty object from the database using the user_id
     faculty = Faculty.query.get(user_id)
-    if faculty:
-        gender_string = get_gender_string(faculty.gender)
 
+    if faculty:
+        # Convert userImg to base64 string if it exists
+        user_img_base64 = base64.b64encode(faculty.userImg).decode('utf-8') if faculty.userImg else None
+        gender_string = get_gender_string(faculty.gender)  # Ensure get_gender_string() is defined
+
+        # Construct and return the JSON response
         return jsonify({
-            "name": faculty.name,
             "facultyNumber": faculty.facultyNumber,
-            "gender": gender_string,
+            "name": faculty.name,
             "email": faculty.email,
-            "mobile_number": faculty.mobile_number,
             "address": faculty.address,
-            "dateofBirth": faculty.dateofBirth,
+            "gender": gender_string,
+            "dateofBirth": faculty.dateofBirth.strftime('%Y-%m-%d') if faculty.dateofBirth else None,
             "placeofBirth": faculty.placeofBirth,
+            "mobile_number": faculty.mobile_number,
+            "userImg": user_img_base64,
         })
     else:
-        flash('User not found', 'danger')
-        return redirect(url_for('faculty_api.faculty_login'))
+        # For API, it's better to return a JSON response instead of using flash and redirect
+        return jsonify({"error": "User not found"}), 404
+
+
+def get_gender_string(gender_code):
+    # Implement this function based on how you store gender information
+    gender_dict = {1: "Male", 2: "Female", 3: "Other"}
+    return gender_dict.get(gender_code, "Unknown")

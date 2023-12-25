@@ -3,182 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/style.min.css" rel="stylesheet"/>
-    <link href="{{url_for('static', filename='css/asset/admin.css')}}" rel="stylesheet"/>
-    <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
-    <style>
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start; /* Adjusted alignment */
-            padding-top: 50px; /* Add space for the navbar */
-            height: calc(100vh - 50px); /* Adjust height to accommodate the navbar */
-            overflow-y: auto; /* Add scrollbar if content exceeds height */
-        }
-        
-        form {
-            max-width: 400px; /* Adjust as needed */
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            background-color: #fff;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        
-        input {
-            width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            box-sizing: border-box;
-        }
-        
-        input[type="submit"] {
-            background-color: #4caf50;
-            cursor: pointer;
-        }
-        
-        input:disabled {
-            cursor: not-allowed;
-        }
-        
-        
-        /* Adjust the layoutSidenav styles */
-        #layoutSidenav {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        #layoutSidenav_nav {
-            flex: 0 0 auto;
-        }
-        
-        #layoutSidenav_content {
-            flex: 1 1 0;
-            overflow: auto;
-        }
-        </style>
-</head>
-<body class="sb-nav-fixed">
-        <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark fixed-top">
-            <!-- Sidebar Toggle-->
-        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!" title="button"><i class="fas fa-bars"></i></button>
-        <!-- Navbar Brand-->
-        <a class="navbar-brand ps-5" href="#"><b>Faculty SASS</b>   
-        </a>   
-        
-        <!-- Navbar Search-->
-        <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
-            <!--- <div class="input-group">
-               <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
-                <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search" title="button"></i></button>
-            </div> -->
-        </form>
-        <!-- Navbar-->
-        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
-            <li class="nav-item dropdown">
-                <a title="profile" class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-user fa-fw"></i>
-                </a>                
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="{{ url_for('facultyprofile') }}">My Profile</a></li>
-                    <li><hr class="dropdown-divider" /></li>
-                    <li><a class="dropdown-item" href="{{url_for('logout')}}">Logout</a></li>
-                </ul>
-            </li>
-        </ul>
-        </nav>
-        <div id="layoutSidenav">
-        <div id="layoutSidenav_nav">
-            <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
-                <div class="sb-sidenav-menu">
-                    <div class="nav">
-                        <div class="sb-sidenav-menu-heading">Home</div>
-                        <a class="nav-link" href="{{url_for('faculty_dashboard')}}">
-                            <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
-                            Dashboard
-                        </a>
-                        <div class="sb-sidenav-menu-heading">Services</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseServices" aria-expanded="false" aria-controls="collapseServices">
-                          <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                          Student Services
-                          <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                      </a>
-                      <div class="collapse" id="collapseServices" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                          <nav class="sb-sidenav-menu-nested nav">
-                              <a class="nav-link" href="{{ url_for('facultyadding')}}">Adding Subjects</a>
-                              <a class="nav-link" href="{{url_for('facultychange')}}">ChangeOfSubjects</a>
-                              <a class="nav-link" href="{{url_for('facultyshifting')}}">Accreditation-for-Shiftees</a>
-                              <a class="nav-link" href="{{ url_for('facultyoverload')}}">OverloadApplication</a>
-                              <a class="nav-link" href="#">TutorialRequest</a>
-                          </nav>
-                      </div>
-                      <div class="sb-sidenav-menu-heading">Requests</div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseRequest" aria-expanded="false" aria-controls="collapseRequest">
-                          <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                          Student Requests
-                          <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                      </a>
-                      <div class="collapse" id="collapseRequest" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                          <nav class="sb-sidenav-menu-nested nav">
-                              <a class="nav-link" href="#">ManualEnrollment</a>
-                              <a class="nav-link" href="#">CertificationRequest</a>
-                              <a class="nav-link" href="#">GradeEntry</a>
-                              <a class="nav-link" href="#">CrossEnrollment</a>
-                              <a class="nav-link" href="#">PetitionRequest</a>
-                              <a class="nav-link" href="#">Subjects/Schedule</a>
-                          </nav>
-                      </div>
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                            Service History
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                    </div>
-                </div>
-            </nav>
-        </div>
-        <div id="layoutSidenav_content">
-        <main>
-                {% block content %} {% endblock %}  
-        </main>
-<footer class="py-4 bg-light mt-auto">
-    <div class="container-fluid px-4">
-        <div class="d-flex align-items-right">
-            <div class="text-muted"> &copy; <script>document.write(new Date().getFullYear());</script> 
-                <a href="https://www.pup.edu.ph/" target="_blank" rel="noopener noreferrer">Polytechnic University of the Philippines |</a>      
-            </div> &nbsp;
-            <div>
-                <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Use |</a> 
-            </div>&nbsp;
-            <div>
-                <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a> 
-            </div>
-        </div>
-</footer>
-
-
-<script>
-    const api_base_url = '{{ faculty_api_base_url | default("") }}';
-    console.log('api_base_url: ', api_base_url)
-  </script>
-{% block script %} {% endblock script %}
-
+    <title>Student Academic Support System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/asset/scripts.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
-<script src="assets/demo/chart-area-demo.js"></script>
-<script src="assets/demo/chart-bar-demo.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/simple-datatables@7.1.2/dist/umd/simple-datatables.min.js" crossorigin="anonymous"></script>
-<script src="{{ url_for('static', filename='js/asset/datatables-simple-demo.js')}}"></script>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+
+	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
+
+  <!-- Add this in the <head> section of your HTML -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Include the JavaScript file (jQuery is required) -->
+</head>
+<body>
+    	<!-- SIDEBAR -->
+	<section id="sidebar">
+		<a href="{{url_for('faculty_dashboard')}}" class="brand"><i class='bx bxs-smile icon'></i>Faculty SASS</a>
+		<ul class="side-menu">
+			<li class="divider" data-text="Home">Home</li>
+			<li><a href="{{url_for('faculty_dashboard')}}" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="Services">Services</li>
+			<li>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
+				<ul class="side-dropdown">
+					<li><a href="{{url_for('facultyoverload')}}">Overload of Subjects</a></li>
+					<li><a href="{{ url_for('facultyadding')}}">Adding of Subjects</a></li>
+					<li><a href="{{url_for('facultychange')}}">Change of Schedule/Subjects</a></li>
+					<li><a href="{{url_for('facultycorrection')}}">Correction of Grade Entry</a></li>
+					<li><a href="{{url_for('facultycrossenrollment')}}">Cross-Enrollment</a></li>
+					<li><a href="{{url_for('facultyshifting')}}">Application for Shifting</a></li>
+					<li><a href="{{url_for('facultyenrollment')}}">Manual Enrollment</a></li>
+					<li><a href="{{url_for('facultypetition')}}"> Online Petition of Subjects</a></li>
+					<li><a href="{{url_for('faculty_view_tutorial')}}">Online Request for Tutorial</a></li>
+					<li><a href="{{url_for('facultycertification')}}">Request for Certification</a></li>
+
+				</ul>
+			</li>
+		</ul>
+	</section>
+    <!-- NAVBAR -->
+	<section id="content">
+    
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+      			<form action="#">
+			<!----	<div class="form-group">
+					<input type="text" placeholder="Search...">
+					<i class='bx bx-search icon' ></i>
+				</div> -->
+			</form>
+			<a href="#" class="nav-link" data-bs-toggle="dropdown" tabindex="-1" title="Notifications" aria-label="Show notifications" id="notification-icon">
+				<i class='bx bxs-bell icon'></i>
+				<span class="badge">4</span>
+			</a>
+                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
+                  <div class="card"> 
+                    <div class="list-group list-group-flush list-group-hoverable">
+                      <div class="list-group-item">
+                        <div class="row align-items-center">                          
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 1</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Change deprecated html tags to text decoration classes (#29604)
+                            </div>
+                          </div>
+                          <div class="col-auto">                           
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 2</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              justify-content:between ⇒ justify-content:space-between (#29734)
+                            </div>
+                          </div>
+                          <div class="col-auto">                           
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 3</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Update change-version.js (#29736)
+                            </div>
+                          </div>
+                          <div class="col-auto">                          
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 4</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Regenerate package-lock.json (#29730)
+                            </div>
+                          </div>                         
+                        </div>
+                      </div>
+                      <div class="col-auto">  
+                        <div class="text-right mt-2 mb-1">
+                          <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
+                      </div>                          
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+			
+		<!----	<a href="#" class="nav-link">
+				<i class='bx bxs-message-square-dots icon'></i>
+				<span class="badge">8</span> 
+			</a> -->
+			<span class="divider"></span>
+
+			<div class="profile">
+				<img src="/static/images/user.png" alt="" title="My Profile">
+				<ul class="profile-link">
+					<li><a href="{{url_for('facultyprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="{{url_for('logout')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+		<!-- NAVBAR -->
+
+		<main>
+			{% block content %} {% endblock %}
+		</main>
+	</section>
+
+	<script>
+    // Function to close the notification card
+function closeNotificationCard() {
+    var notificationCard = document.getElementById('notification-card');
+    if (notificationCard.classList.contains('show')) {
+        notificationCard.classList.remove('show');
+    }
+}
+
+// Add event listener to the notification icon
+document.getElementById('notification-icon').addEventListener('click', function (event) {
+    // Prevent the click event from propagating to the document body
+    event.stopPropagation();
+    
+    // Toggle the visibility of the notification card
+    document.getElementById('notification-card').classList.toggle('show');
+});
+
+// Add event listener to the document body to close the notification card on any click outside of it
+document.body.addEventListener('click', closeNotificationCard);
+
+// Add event listener to prevent the notification card from closing when clicking inside it
+document.getElementById('notification-card').addEventListener('click', function (event) {
+    event.stopPropagation();
+});
+
+  // JavaScript to show all notifications when "See All Notifications" is clicked
+  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+      // Prevent the link from navigating (you may adjust this behavior as needed)
+      event.preventDefault();
+
+      // Show all notifications by removing the 'd-none' class
+      var notificationList = document.getElementById('notification-list');
+      notificationList.classList.remove('d-none');
+  });
+
+        //STUDENT API
+		const api_base_url = '{{ faculty_api_base_url | default("") }}';
+		console.log('api_base_url: ', api_base_url)
+	</script>
+
+	{% block script %} {% endblock script %}
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>

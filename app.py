@@ -1,14 +1,14 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
 from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_overload_application, create_petitionrequest_form, create_shifting_application, create_tutorial_request, fetchStudentDetails, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file
-from Api.v1.faculty.api_routes import faculty_api
+from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
 
@@ -1574,23 +1574,46 @@ def faculty_portal():
     return render_template('faculty/login.html') #, api_base_url=faculty_base_api_url
 
 @app.route('/faculty/dashboard')
+@role_required('faculty')
 def faculty_dashboard():
     session.permanent = True
+    return render_template('/faculty/dashboard.html')
 
-    # Retrieve the user's name from the session (you should set it during login)
-    user_name = session.get('user_name')
-     # Check if the name is in the session
-     
-    if user_name:
-        return render_template('faculty/dashboard.html', user_name=user_name)
-    else:
-        return render_template('faculty/dashboard.html', user_name="Guest")  # Provide a default if the name is not in the session
+@app.route('/faculty/profile/updated', methods=['GET', 'POST'])
+def faculty_update_profile():
+    if request.method == 'POST':
+        # Retrieve the current logged-in faculty member
+        current_faculty = get_current_faculty_user()
 
+        if not current_faculty:
+            flash('No faculty user logged in.', 'danger')
+            return redirect(url_for('faculty_login'))
 
+        # Get the updated information from the form
+        email = request.form.get('email')
+        mobile_number = request.form.get('mobile_number')
+        address = request.form.get('address')
+
+        # Update the faculty member's details
+        current_faculty.email = email
+        current_faculty.mobile_number = mobile_number
+        current_faculty.address = address
+
+        # Commit the changes to the database
+        db.session.commit()
+        flash('Profile Updated Successfully!', 'success')
+
+        # Redirect to the faculty profile page
+        return redirect(url_for('facultyprofile'))
+
+    # Render the profile update page
+    return render_template('/faculty/profile.html')
+
+# Faculty profile route
 @app.route('/faculty/profile')
 def facultyprofile():
-    return render_template("/faculty/profile.html", faculty_api_base_url=faculty_api_base_url)
-# Modify the  faculty profile route
+    return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
+
 
 # ====================Faculty Services============================= #
 

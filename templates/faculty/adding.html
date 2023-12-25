@@ -161,7 +161,8 @@
       var inactiveTime = now - lastActivity;
 
       // If inactive for more than 5 minutes (adjust as needed)
-      if (inactiveTime > 300000) {
+      
+      if (inactiveTime > 120000) {
           // Redirect to the logout or login page
           window.location.href = "/logout";  // Adjust the URL as needed
       }
