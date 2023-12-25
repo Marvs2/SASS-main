@@ -1,19 +1,40 @@
 {% extends "student/layout.html" %}
 {% block content %}
     
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="toast toast-error">
+                <div class="toast-content">
+               
+                    <i class="fas fa-times wrong wrong"></i>
+           
+                    <div class="message">
+                      <span class="text text-2">{{ message }}</span>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="progress"></div>
+              </div>
+            {% else %}
+            <div class="toast toast-success">
+                <div class="toast-content">
+               
+                    <i class="fas fa-solid fa-check check"></i>
+           
+                    <div class="message">
+                      <span class="text text-2">{{ message }}</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="progress"></div>
+              </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 
     <div class="data data1">
         <div class="content-data">

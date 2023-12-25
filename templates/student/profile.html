@@ -3,21 +3,42 @@
 <div class="progress progress-bar progress-bar-indeterminate bg-green"></div>
 
 {% extends "student/layout.html" %}
-
 {% block content %}
 
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
-        {% for message in messages %}
-            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
+        {% for category, message in messages %}
+            {% if category == "error" %}
+            <div class="toast toast-error">
+                <div class="toast-content">
+               
+                    <i class="fas fa-times wrong wrong"></i>
+           
+                    <div class="message">
+                      <span class="text text-2">{{ message }}</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="progress"></div>
+              </div>
+            {% else %}
+            <div class="toast toast-success">
+                <div class="toast-content">
+               
+                    <i class="fas fa-solid fa-check check"></i>
+           
+                    <div class="message">
+                      <span class="text text-2">{{ message }}</span>
+                    </div>
+                </div>
+                <i class="fa-solid fa-xmark close"></i>
+                <div class="progress"></div>
+              </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
 {% endwith %}
+
 
 <div class="data data1">
    
@@ -55,7 +76,7 @@
               </div>
               <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
               <div class="col-sm-4">
-                <input type="email" name="Email" id="Email" required="required" class="form-control">
+                <input type="email" name="Email" id="Email" class="form-control" required>
               </div>
             </div>          
             <div class="form-group">
@@ -76,7 +97,7 @@
                 </div>
               
                 <div class="col-sm-13 d-flex justify-content-center">
-                  <button type="submit" name="save-profile-button" class="btn btn-success">Save Profile</button>
+                  <button type="submit" class="btn btn-success">Save Profile</button>
                 </div>
               </div>
             </div>       
@@ -94,7 +115,7 @@
      setTimeout(function() {
         $('.alert').alert('close');
     }, 3000);
-
+  
 // Fetch and display current user's profile details when page loads
     async function fetchStudentDetails() {
         const response = await fetch(`${api_base_url}/student-details`);
@@ -144,34 +165,7 @@ dateOfBirthInput.value = formattedDateOfBirth;
     document.getElementById("MobileNumber").value = data.MobileNumber;
 
     document.getElementById('name-label').innerText = data.studentName; 
-
-    hideProgressBar();
 }
-    
-
-document.addEventListener("DOMContentLoaded", function() {
-  // Show the progress bar as a loading indicator on page load
-  showProgressBar();
-});
-
-// Function to show the progress bar
-function showProgressBar() {
-  $('.loading-progress').show();
-}
-
-// Function to hide the progress bar
-function hideProgressBar() {
-  $('.loading-progress').hide();
-}
-
-// Your existing script for fetching and displaying student details
-
-// Add an event listener to the 'Save Profile' button
-document.getElementById('save-profile-button').addEventListener('click', function() {
-  // Show the progress bar when the button is clicked
-  showProgressBar();
-});
 </script>
 {% endblock script %}
-
 

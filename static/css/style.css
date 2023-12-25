@@ -703,6 +703,118 @@ main .btn-send:hover {
 }
 
 
+.toast-error{
+    position: absolute;
+    top: 70px;
+    right: 30px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 16px 30px 15px 10px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    border-left: 6px solid #FF0000;
+    overflow: hidden;
+    transform: translateX(calc(100% + 30px));
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+}
+
+.toast-success{
+    position: absolute;
+    top: 70px;
+    right: 30px;
+    border-radius: 8px;
+    background: #fff;
+    padding: 14px 30px 13px 10px;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+    border-left: 6px solid #008000;
+    overflow: hidden;
+    transform: translateX(calc(100% + 30px));
+    transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+}
+.toast.active{
+    transform: translateX(0%);
+}
+.toast .toast-content{
+    display: flex;
+    align-items: center;
+}
+
+.toast-content .wrong{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 35px;
+    background-color: #FF0000;
+    color: #fff;
+    font-size: 23px;
+    border-radius: 50%;
+}
+.toast-content .check{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 35px;
+    width: 35px;
+    background-color: #008000;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 50%;
+}
+.toast-content .message{
+    display: flex;
+    flex-direction: column;
+    margin: 0 10px;
+}
+.message .text{
+    font-size: 15px;
+    color: #666666;
+}
+.message .text.text-2{
+    font-weight:500;
+    color: #333;
+}
+.toast .close{
+    position: absolute;
+    top: 6px;
+    right: 10px;
+    padding: 5px;
+    cursor: pointer;
+    opacity: 0.7;
+	font-size: 15px;
+}
+.toast .close:hover{
+    opacity: 1;
+}
+.toast .progress{
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: #ddd;
+}
+.toast .progress:before{
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #4070f4;
+}
+.progress.active:before{
+    animation: progress 5s linear forwards;
+}
+@keyframes progress {
+    100%{
+        right: 100%;
+    }
+}
+.toast.active ~ button{
+    pointer-events: none;
+}
+
+
 @media screen and (max-width: 768px) {
 	#content {
 		position: relative;

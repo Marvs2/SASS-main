@@ -6,16 +6,17 @@
   
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
   
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
 	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
 
-  <link rel="stylesheet" href="{{url_for('static', filename='css/tabler.min.css?1692870487')}}">
+   
+
+ <!---- <link rel="stylesheet" href="{{url_for('static', filename='css/tabler.min.css?1692870487')}}"> -->
 
 
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -141,7 +142,7 @@
 			<div class="profile">
 				<img src="/static/images/user.png" alt="" title="My Profile">
 				<ul class="profile-link">
-					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="{{url_for('studentprofile')}}"><i class='bx bxs-user-circle icon'></i> Profile</a></li>
 					<li><a href="{{url_for('studentpassword')}}"><i class='bx bxs-cog' ></i> Change Password</a></li>
 					<li><a href="{{url_for('logout')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
 				</ul>
@@ -201,13 +202,8 @@ document.getElementById('notification-card').addEventListener('click', function 
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-  <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
+
 	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
+  <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
 </body>
 </html>
-
-
-test
-
-
-

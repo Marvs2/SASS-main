@@ -183,6 +183,8 @@ def student_dashboard():
 def studentprofile():
     return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
+from flask import flash
+
 @app.route('/student/profile/updated', methods=['GET', 'POST']) 
 def student_update_profile():
     if request.method == 'POST':
@@ -200,15 +202,23 @@ def student_update_profile():
         student = Student.query.get(user_id)
 
         if student:
-            student.Email = email
-            student.MobileNumber = mobile_number
-            student.address = address
+            try:
+                student.Email = email
+                student.MobileNumber = mobile_number
+                student.address = address
 
-            db.session.commit()
-            flash('Profile Updated Successfully!', 'success')
-            return redirect(url_for('studentprofile'))
+                db.session.commit()
+                flash('Profile Updated Successfully!', category='success')
+                return redirect(url_for('studentprofile'))
+            except Exception as e:
+                # Handle the specific exception or log the error
+                flash(f'Error updating profile: {str(e)}', category='error')
+                db.session.rollback()  # Rollback changes in case of an error
+        else:
+            flash('Student not found. Please try again!', category='error')
 
     return render_template('/student/profile.html')
+
 
 #======================================== STUDENT TRANSACTION HISTORY ===================================================
 @app.route('/student/setting')
@@ -294,12 +304,12 @@ def student_change_password():
 
         # Check if the current password matches the one stored in the database
         if not check_password_hash(student.Password, current_password):
-            flash('Incorrect current password. Please try again.', 'error')
+            flash('Incorrect current password. Please try again.', category='error')
             return redirect(url_for('student_change_password'))
 
         # Check if the new and confirm passwords match
         if new_password != confirm_password:
-            flash('New password and confirm password do not match. Please try again.', 'error')
+            flash('New and confirm password do not match. Please try again.', category='error')
             return redirect(url_for('student_change_password'))
 
         # Update the user's password in the database
@@ -307,7 +317,7 @@ def student_change_password():
         student.Password = hashed_password
         db.session.commit()
 
-        flash('Password changed successfully!', 'success')
+        flash('Password changed successfully!', category='success')
         return redirect(url_for('student_change_password'))
 
     return render_template('student/change_password.html')
@@ -389,7 +399,7 @@ def submit_overload_application():
 def edit_overload(overload_application_id):
     overload_application = OverloadApplication.query.get(overload_application_id)
     if not overload_application:
-        flash('Overload application not found.', 'danger')
+        flash('Overload application not found.', category='danger')
         return redirect(url_for('stud_overload'))
 
     if request.method == 'GET':
@@ -425,13 +435,10 @@ def edit_overload(overload_application_id):
             overload_application.status = status
 
             db.session.commit()
-            flash('Overload application updated successfully!', 'success')
+            flash('Overload application updated successfully!', category='success')
             return redirect(url_for('stud_overload'))
         else:  
             return redirect(url_for('stud_overload'))
-
-
-
 #==================================== ADDING OF SUBJECT =========================================================
 
 @app.route('/student/addingsubject')
@@ -450,11 +457,11 @@ def add_subjects():
         if new_addsubjects_application:
             db.session.add(new_addsubjects_application)
             db.session.commit()
-            flash('Add subjects created Successfully!', 'success')
+            flash('Request subjects created Successfully!', category='success')
             return redirect(url_for('studentaddingsubject'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -628,11 +635,11 @@ def change_of_subjects():
         if new_changesubjects_application:
             db.session.add(new_changesubjects_application)
             db.session.commit()
-            flash('Change of subjects created Successfully!', 'success')
+            flash('Change of subjects created Successfully!', category='success')
             return redirect(url_for('studentchange'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -655,11 +662,11 @@ def submit_grade_correction():
         if new_gradeentry_application:
             db.session.add(new_gradeentry_application)
             db.session.commit()
-            flash('Grade entry Submitted Successfully!', 'success')
+            flash('Grade entry submitted successfully!', category='success')
             return redirect(url_for('studentcorrection'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -682,11 +689,11 @@ def submit_cross_enrollment():
         if new_cross_enrollment:
             db.session.add(new_cross_enrollment)
             db.session.commit()
-            flash('Cross-Enrollment created successfully!', 'success')
+            flash('Cross-enrollment created successfully!', category='success')
             return redirect(url_for('studentenrollment'))  
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -709,11 +716,11 @@ def submit_shifting():
         if new_shifting_application:
             db.session.add(new_shifting_application)
             db.session.commit()
-            flash('Shifting has been created Successfully!', 'success')
+            flash('Application for shifting created Successfully!', category='success')
             return redirect(url_for('studentshifting'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -735,11 +742,11 @@ def submitmanualenrollment():
         if new_manual_enrollment:
             db.session.add(new_manual_enrollment)
             db.session.commit()
-            flash('Manual Enrollment created successfully!', 'success')
+            flash('Manual enrollment created successfully!', category='success')
             return redirect(url_for('studentmanualenrollment'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -762,11 +769,11 @@ def submit_petition():
         if new_petition_request:
             db.session.add(new_petition_request)
             db.session.commit()
-            flash('Petition Request submitted successfully!', 'success')
+            flash('Petition request submitted successfully!', category='success')
             return redirect(url_for('studentpetition'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -797,11 +804,11 @@ def submit_tutorial_request():
         if new_tutorial_request:
             db.session.add(new_tutorial_request)
             db.session.commit()
-            flash('Tutorial request has been created successfully!', 'success')
+            flash('Tutorial request created successfully!', category='success')
             return redirect(url_for('studenttutorial'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
@@ -822,11 +829,11 @@ def submit_certification_request():
         if new_certification_request:
             db.session.add(new_certification_request)
             db.session.commit()
-            flash('Certification Request submitted successfully!', 'success')
+            flash('Certification Request submitted successfully!', category='success')
             return redirect(url_for('studentcertification')) 
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
+        flash(f'Error: {str(e)}', category='danger')
     finally:
         db.session.close()
 
