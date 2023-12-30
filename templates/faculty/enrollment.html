@@ -1,0 +1,112 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<div>
+    <h1>Manual Enrollments</h1>
+    <table id="manualTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Number</th>
+                <th>Name</th>
+                <th>Enrollment Type</th>
+                <th>Reason</th>
+                <th>File</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for manual_enrollments in manual_enrollments %}
+            <tr>
+                <td>{{ manual_enrollments.m_enrollment_ID }}</td>
+                <td>{{ manual_enrollments.StudentNumber }}</td>
+                <td>{{ manual_enrollments.Name }}</td>
+                <td>{{ manual_enrollments.enrollment_type }}</td>
+                <td>{{ manual_enrollments.reason }}</td>
+                <td>
+                  {% if manual_enrollments.me_file_data %}
+                  {% set manualfile = manual_enrollments.me_file_filename[:15] + '...' if manual_enrollments.me_file_filename|length > 15 else manual_enrollments.me_file_filename %}
+                  <a href="{{ url_for('download_manual_enrollments_file', m_enrollment_ID=manual_enrollments.m_enrollment_ID) }}" class="btn btn-success" download title="{{ manual_enrollments.me_file_filename }}">{{ manualfile }}</a>
+              {% else %}
+                  <span class="badge badge-warning">No File</span>
+              {% endif %}
+                </td>
+                <td>{{ manual_enrollments.created_at }}</td>
+                <td>{{ manual_enrollments.updated_at }}</td>
+                <td>{{ manual_enrollments.user_responsible }}</td>
+                <td>{{ manual_enrollments.status }}</td>
+                <td>
+                     <!-- Button to trigger the modal form -->
+                     <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ manual_enrollments.m_enrollment_ID }}">Change Status</button>
+                </td>
+            </tr>
+            <!-- Modal for status editing -->
+            <div class="modal fade" id="statusModal{{ manual_enrollments.m_enrollment_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="statusModalLabel">Change Status for {{ manual_enrollments.Name }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <form id="statusForm{{ manual_enrollments.m_enrollment_ID }}" action="{{ url_for('update_manual_service_status', m_enrollment_ID=manual_enrollments.m_enrollment_ID) }}" method="POST">
+                            <div class="modal-body">
+                              <select name="status" class="form-select">
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="approved">Approved</option>
+                                <option value="finish">Finish</option>
+                                <option value="rejected">Rejected</option>
+                                <!-- Add other statuses as needed -->
+                              </select>
+                            </div>
+                            <div class="modal-footer">
+                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ manual_enrollments.m_enrollment_ID }})">Save changes</button>
+                            </div>
+                          </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+<script>
+      // Initialize DataTable
+      $(document).ready(function() {
+    $('#manualTable').DataTable({
+        "pageLength": 5
+    });
+});
+function updateStatus(m_enrollment_ID) {
+    const formId = `statusForm${m_enrollment_ID}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/manualenrollment', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+</script>
+{% endblock %}

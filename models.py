@@ -21,10 +21,11 @@ class Student(db.Model, UserMixin):
     PlaceofBirth = db.Column(db.String(255), nullable=True)
     ResidentialAddress = db.Column(db.String(255), nullable=True)
     MobileNumber = db.Column(db.String(11))
-    userImg = db.Column(db.LargeBinary, nullable=False)
+    userImg = db.Column(db.LargeBinary)
    # stud_status = db.Column(db.String(100), nullable=False)
 
     # Define the 'addsubjects' relationship in the Student model
+    notifications = db.relationship('Notification', back_populates='student')
     addsubjects = db.relationship('AddSubjects', back_populates='student')
     changesubjects = db.relationship('ChangeOfSubjects', back_populates='student')
     manual_enrollments = db.relationship('ManualEnrollment', back_populates='student')
@@ -151,9 +152,43 @@ class CourseSub(db.Model, UserMixin):
     def get_courseSub_Id(self):
         return str(self.courseSub_Id)
 """
+#Notification
+class Notification(db.Model, UserMixin):
+    __tablename__ = 'notifications'
+
+    notifID = db.Column(db.Integer, primary_key=True)
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    service_type = db.Column(db.String(100), nullable=False)
+    user_responsible = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.String(100), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
+
+    # Relationship to the Student model
+    student = db.relationship('Student', back_populates='notifications')
+
+    def to_dict(self):
+        return {
+            'notifID': self.notifID,
+            'StudentNumber': self.StudentNumber,
+            'service_type': self.service_type,
+            'user_responsible': self.user_responsible,
+            'status': self.status,
+            'message': self.message,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'StudentId': self.StudentId,
+        }
+
+    def get_NotifID(self):
+        return str(self.notifID)
 
 #======================================================#       
-
+#Announcements
+    
+#======================================================#       
 
 # ==========Services========== #
 # ==========Adding_subject_form========== #
@@ -331,11 +366,11 @@ class GradeEntry(db.Model, UserMixin):
     Name = db.Column(db.String(255), nullable=False)
     application_type = db.Column(db.String(150), nullable=False)
     completion_form_filename = db.Column(db.String(255), nullable=False)
-    completion_form_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    completion_form_data = db.Column(db.LargeBinary)  # Add this line
     class_record_filename = db.Column(db.String(255), nullable=False)
-    class_record_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    class_record_data = db.Column(db.LargeBinary)  # Add this line
     affidavit_filename = db.Column(db.String(255), nullable=False)
-    affidavit_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    affidavit_data = db.Column(db.LargeBinary)  # Add this line
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(100)) 
     status = db.Column(db.String(100)) #status 
@@ -376,9 +411,9 @@ class CrossEnrollment(db.Model, UserMixin):
     total_number_of_units = db.Column(db.Integer, nullable=False)
     authorized_subjects_to_take = db.Column(db.Text, nullable=False)
     application_letter_filename = db.Column(db.String(255), nullable=False)
-    application_letter_data = db.Column(db.LargeBinary, nullable=False)  # Add this line
+    application_letter_data = db.Column(db.LargeBinary)  # Add this line
     permit_to_cross_enroll_filename = db.Column(db.String(255), nullable=False)
-    permit_to_cross_enroll_data = db.Column(db.LargeBinary, nullable=False)  # Add
+    permit_to_cross_enroll_data = db.Column(db.LargeBinary)  # Add
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(100)) #status
@@ -458,7 +493,7 @@ class ShiftingApplication(db.Model, UserMixin):
     intended_program = db.Column(db.String(255), nullable=False)
     qualifications = db.Column(db.Text)
     file_filename = db.Column(db.String(255))
-    file_data = db.Column(db.LargeBinary, nullable=False)
+    file_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(100)) #status 
@@ -500,7 +535,7 @@ class OverloadApplication(db.Model, UserMixin):
     subjects_to_add = db.Column(db.String(255), nullable=False)
     justification = db.Column(db.Text, nullable=False)
     file_filename = db.Column(db.String(255))
-    file_data = db.Column(db.LargeBinary, nullable=False)
+    file_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(100)) #status 
@@ -540,7 +575,7 @@ class TutorialRequest(db.Model, UserMixin):
     subject_code = db.Column(db.String(100), nullable=False)
     subject_name = db.Column(db.String(255), nullable=False)
     file_filename = db.Column(db.String(255), nullable=False)
-    file_data = db.Column(db.LargeBinary, nullable=False)
+    file_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255))
     status = db.Column(db.String(100)) #status 
@@ -581,7 +616,7 @@ class Faculty(db.Model, UserMixin):
     dateofBirth = db.Column(db.Date)  # dateofBirth
     placeofBirth = db.Column(db.String(100))  # placeofBirth
     mobile_number = db.Column(db.String(20))  # MobileNumber
-    userImg = db.Column(db.LargeBinary, nullable=False)  # Modify the length as needed
+    userImg = db.Column(db.LargeBinary)  # Modify the length as needed
     is_active = db.Column(db.Boolean, default=True)
 
     # Define the 'addsubjects' relationship in the Faculty model

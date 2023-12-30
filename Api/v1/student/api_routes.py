@@ -2,7 +2,7 @@
 import base64
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
+from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
 from werkzeug.utils import secure_filename
 from datetime import datetime #, timedelta, timezone
 #from models import Services
@@ -45,7 +45,7 @@ def authenticate_user(username, Password):
         session['user_id'] = user.id  # Assuming user.id is the ID of the authenticated user
         return True
     return False"""
-
+# needed in the utils.py
 #have problem
 #condition needed it can put in utils.py
 def getCurrentUser():
@@ -55,6 +55,40 @@ def getCurrentUser():
 def getCurrentUserStudentNumber():
     current_student_number = session.get('StudentNumber')
     return Student.query.get(current_student_number)
+
+#===============================================================#
+#Downloadable files for Adding Subjects
+@student_api.route('/download/pdf_file/Adding_subject_form')
+def download_AddingSubs():
+    pdf_path = "static/pdf_files/Adding_subject_form.pdf"  # Replace with the actual path to your PDF file
+    return os.sendfle(pdf_path, as_attachment=True, download_name="Adding_subject_form.pdf")
+
+#Downloadable files for Change of Schedule and Subjects
+@student_api.route('/download/pdf_file/Change_of_subjects')
+def download_Change_Sched_Subs():
+    pdf_path = "static/pdf_files/Change_of_subjects.pdf"  # Replace with the actual path to your PDF file
+    return os.sendfile(pdf_path, as_attachment=True, download_name="Change_of_subjects.pdf")
+
+#Downloadable files for Accreditation
+@student_api.route('/download/pdf_file/Accreditation-for-Shiftees-and-Regular')
+def download_Accreditation():
+    pdf_path = "static/pdf_files/Accreditation-for-Shiftees-and-Regular.pdf"  # Replace with the actual path to your PDF file
+    return os.send_file(pdf_path, as_attachment=True, download_name="Accreditation-for-Shiftees-and-Regular.pdf")
+
+#Downloadable files for OverLoads
+@student_api.route('/download/pdf_file/Overload-3-6-units')
+def download_Overload_Subs():
+    pdf_path = "static/pdf_files/Overload-3-6-units.pdf"  # Replace with the actual path to your PDF file
+    return os.send_file(pdf_path, as_attachment=True, download_name="Overload-3-6-units.pdf")
+
+#Downloadable files for RO Form
+@student_api.route('/download/pdf_file/RO-Form')
+def download_RO_form():
+    pdf_path = "static/pdf_files/RO-Form.pdf"  # Replace with the actual path to your PDF file
+    return os.send_file(pdf_path, as_attachment=True, download_name="RO-Form.pdf")
+
+
+
 
 # Api/v1/student/api_routes.py
 #================================================================
@@ -370,27 +404,6 @@ def login_Crossenrollment():
 #===========================================================#
 #==============The real login in the true manners===========#
 #===========================================================#
-#for All Students
-"""@student_api.route('/login', methods=['POST'])
-def login():
-    if request.method == 'POST':
-        StudentNumber = request.form['StudentNumber']
-        Password = request.form['Password']
-
-        student = Student.query.filter_by(StudentNumber=StudentNumber).first()
-        if student and check_password_hash(student.Password, Password):
-            # Successfully authenticated
-            access_token = create_access_token(identity=student.StudentId)
-            session['access_token'] = access_token
-            session['user_id'] = student.StudentId
-            session['user_role'] = 'student'
-
-            return redirect(url_for('student_dashboard'))
-
-        else:
-            flash('Invalid Student Number or Password', 'danger')
-
-    return redirect(url_for('studentLogin'))"""
 
 @student_api.route('/login', methods=['POST'])
 def login():
@@ -541,33 +554,6 @@ def fetchStudentDetails():
     else:
         flash('User not found', 'danger')
         return redirect(url_for('student_api.login'))
-
-"""@student_api.route('/student/update-details', methods=['PUT'])
-def update_student_details():
-    user_id = session.get('user_id')
-    
-    # Retrieve the student from the database using the provided user_id
-    student = Student.query.get(user_id)
-
-    if student:
-        # Update the student's details based on the form data
-        student.Email = request.form.get('Email', student.Email)
-        student.MobileNumber = request.form.get('MobileNumber', student.MobileNumber)
-        student.address = request.form.get('address', student.address)
-        
-        # Commit changes to the database
-        db.session.commit()
-
-        # Return a success message with the updated details
-        return jsonify({
-            'message': 'Student details updated successfully',
-            'Email': student.Email,
-            'MobileNumber': student.MobileNumber,
-            'address': student.address
-        }), 200
-    else:
-        return jsonify({'message': 'Student not found'}), 404"""
-
     
 @student_api.route('/all/student', methods=['GET'])
 def allstudent():
@@ -791,19 +777,6 @@ def create_addsubjects_application(form_data, files, StudentId):
     )
     
     return new_addsubjects_application
-
-"""def log_form_submission_to_file(form_data):
-    with open('form_submissions.log', 'a') as log_file:
-        log_file.write(f"Timestamp: {datetime.datetime.now()}\n")
-        log_file.write(f"Student Number: {form_data.get('StudentNumber')}\n")
-        log_file.write(f"Student Name: {form_data.get('Name')}\n")
-        log_file.write(f"Subject Names: {form_data.get('subject_Names')}\n")
-        log_file.write(f"Enrollment Type: {form_data.get('enrollment_type')}\n")
-        log_file.write(f"User Responsible: {form_data.get('user_responsible')}\n")
-        log_file.write(f"Status: {form_data.get('status')}\n")
-        log_file.write("\n")
-"""
-
     
 #=========================================================#
 
@@ -848,11 +821,11 @@ def create_changesubjects_application(form_data, files, StudentId):
 def create_petitionrequest_form(form_data, StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
-    subject_code = form_data['subjectCode']
-    subject_name = form_data['subjectName']
-    petition_type = form_data['petitionType']
-    request_reason = form_data['requestReason']
-    user_responsible = form_data['userResponsible']
+    subject_code = form_data['subject_code']
+    subject_name = form_data['subject_name']
+    petition_type = form_data['petition_type']
+    request_reason = form_data['request_reason']
+    user_responsible = form_data['user_responsible']
     status = form_data['status']
 
     if not StudentNumber or not Name or not subject_code or not subject_name or not petition_type or not request_reason:
@@ -883,6 +856,7 @@ def create_gradeentry_application(form_data, files, StudentId):
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
+    files = request.files
      # Check if a file is provided
     if 'completion_form' not in files:
         flash('No file part', 'danger')
@@ -1143,8 +1117,34 @@ def create_tutorial_request(form_data, files, StudentId):
     
     return new_tutorial_request
 #===============================================================================================#
+#Notification
+def create_notification(StudentNumber, service_type, user_responsible, status, message, StudentId):
+    # Assuming StudentNumber is either part of the form or can be retrieved from the database
+    # using StudentId. The following line is a placeholder for actual retrieval logic.
+    StudentNumber = get_student_number_by_id(StudentId)
+
+    # Create a new Notification object
+    new_notification = Notification(
+        StudentNumber=StudentNumber,
+        service_type=service_type,
+        user_responsible=user_responsible,
+        status=status,
+        message=message,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+        StudentId=StudentId
+    )
+
+    return new_notification
+#===============================================================================================#
+
+
+
+#===============================================================================================#
 #===============================Semester, Program, YearLevel====================================#
 #===============================================================================================#
+
+
 
 """# Insert function for Program
 def insert_program(form_data):
@@ -1197,7 +1197,16 @@ def insert_course_sub(form_data):
 
 
 
+def get_student_number_by_id(StudentId):
+    # Query the database for the student using filter_by
+    student = Student.query.filter_by(StudentId=StudentId).first()
 
+    # Check if the student exists and return the StudentNumber
+    if student:
+        return student.StudentNumber
+    else:
+        # Return None if no student is found
+        return None
 
 
 
