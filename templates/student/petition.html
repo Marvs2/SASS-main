@@ -1,185 +1,183 @@
 {% extends "student/layout.html" %}
 {% block content %}
    
+<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
+
 {% with messages = get_flashed_messages(with_categories=true) %}
-{% if messages %}
-    {% for category, message in messages %}
-        {% if category == "error" %}
-        <div class="toast toast-error">
-            <div class="toast-content">
-           
-                <i class="fas fa-times wrong wrong"></i>
-       
-                <div class="message">
-                  <span class="text text-2">{{ message }}</span>
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "error" %}
+                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                        <i class="fa-solid fa-xmark wrong"></i>
+                        <div class="toast-body message">
+                            <span class="text text-1">Oh! Snap</span>
+                            <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
+                    </div>
                 </div>
-            </div>
-            <i class="fa-solid fa-xmark close"></i>
-            <div class="progress"></div>
-          </div>
-        {% else %}
-        <div class="toast toast-success">
-            <div class="toast-content">
-           
-                <i class="fas fa-solid fa-check check"></i>
-       
-                <div class="message">
-                  <span class="text text-2">{{ message }}</span>
+            {% else %}
+                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                      <i class="fas fa-solid fa-check check"></i>
+                        <div class="toast-body message">
+                            <span class="text text-1">Successful</span>
+                          <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
+                    </div>
                 </div>
-            </div>
-            <i class="fa-solid fa-xmark close"></i>
-            <div class="progress"></div>
-          </div>
-        {% endif %}
-    {% endfor %}
-{% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 
           
-            <div class="data data1">
-                <div class="content-data">
-                    <div class="head">
-                        <h3>Online Petition of Subjects</h3>           
-                    </div>
-
-                <form id="petitionForm" action="{{url_for('submit_petition')}}" method="POST" enctype="multipart/form-data">
-
-                    <div class="row mb-3">
-                        <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
-                        </div>
-                    </div>
-    
-                    <div class="row mb-3">
-                        <label for="Name" class="col-sm-3 col-form-label">Name</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="Name" name="Name" readonly>
-                        </div>
-                    </div>   
-
-                    <div class="row mb-3">
-                        <label for="subjectCode" class="col-sm-3 col-form-label">Subject Code</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="subjectCode" name="subjectCode" >
-                        </div>
-                    </div>   
-
-                    <div class="row mb-3">
-                        <label for="subjectName" class="col-sm-3 col-form-label">Subject Code</label>
-                        <div class="col-sm-8">
-                            <input type="text" class="form-control" id="subjectName" name="subjectName" >
-                        </div>
-                    </div>   
-
-                    <div class="row mb-3">
-                        <label for="petitionType" class="col-sm-3 col-form-label">Petition Type</label>
-                            <div class="col-sm-8">
-                                <select class="custom-select" id="petitionType" name="petitionType" required>
-                                    <option value="Back Subject">Back Subject</option>
-                                    <option value="Retake">Retake</option>
-                                </select>
-                            </div>
-                    </div>
-                    
-                    <div class="row mb-4">
-                        <label for="requestReason" class="col-sm-3 col-form-label">Reason for Petition</label>
-                        <div class="col-sm-8">
-                          <textarea class="form-control" id="requestReason" name="requestReason" required></textarea>
-                        </div>
-                    </div> 
-
-                    <div class="row mb-3">
-                        <label for="userResponsible" class="col-sm-3 col-form-label">User Responsible </label>
-                            <div class="col-sm-8">
-                                <select class="custom-select" id="userResponsible" name="userResponsible" required>
-                                    <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
-                                    <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
-                                </select>
-                            </div>
-                    </div>
-        
-                    <div class="row mb-3">
-                        <label for="status" class="col-sm-3 col-form-label">Status </label>
-                            <div class="col-sm-8">
-                                <select class="custom-select" id="status" name="status" required>
-                                    <option value="Sent" selected>Sending</option>
-                                    <option value="Pending" disabled>Pending</option>
-                                    <option value="Approved" disabled>Approved</option>
-                                    <option value="Rejected" disabled>Rejected</option>
-                                </select>
-                            </div>
-                    </div>
-        
-                     <div class="d-flex justify-content-center">
-                        <button type="submit" class="btn btn-success">Submit Application</button>
-                    </div>
-    
-    
-                </form>
-  
-
+        <div class="data data1">
+            <div class="content-data">
+                <div class="head">
+                    <h3>Online Petition of Subjects</h3>           
                 </div>
+
+            <form id="petitionForm" action="{{url_for('submit_petition')}}" method="POST" enctype="multipart/form-data">
+
+                <div class="row mb-3">
+                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
+                    </div>
+                </div>   
+
+                <div class="row mb-3">
+                    <label for="subjectCode" class="col-sm-3 col-form-label">Subject Code</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="subjectCode" name="subjectCode" >
+                    </div>
+                </div>   
+
+                <div class="row mb-3">
+                    <label for="subjectName" class="col-sm-3 col-form-label">Subject Code</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" id="subjectName" name="subjectName" >
+                    </div>
+                </div>   
+
+                <div class="row mb-3">
+                    <label for="petitionType" class="col-sm-3 col-form-label">Petition Type</label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="petitionType" name="petitionType" required>
+                                <option value="Back Subject">Back Subject</option>
+                                <option value="Retake">Retake</option>
+                            </select>
+                        </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <label for="requestReason" class="col-sm-3 col-form-label">Reason for Petition</label>
+                    <div class="col-sm-8">
+                    <textarea class="form-control" id="requestReason" name="requestReason" required></textarea>
+                    </div>
+                </div> 
+
+                <div class="row mb-3">
+                    <label for="userResponsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="userResponsible" name="userResponsible" required>
+                                <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
+                                <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
+                            </select>
+                        </div>
+                </div>
+    
+                <div class="row mb-3">
+                    <label for="status" class="col-sm-3 col-form-label">Status </label>
+                        <div class="col-sm-8">
+                            <select class="custom-select" id="status" name="status" required>
+                                <option value="Sent" selected>Sending</option>
+                                <option value="Pending" disabled>Pending</option>
+                                <option value="Approved" disabled>Approved</option>
+                                <option value="Rejected" disabled>Rejected</option>
+                            </select>
+                        </div>
+                </div>
+    
+                <div class="d-flex justify-content-center">
+                    <button type="submit" class="btn btn-success">Submit Application</button>
+                </div>
+
+
+            </form>
+
+
             </div>
-            
-        
-            <script>
-                $(document).ready(function () {
-                    // Automatically close the alert messages after 3 seconds
-                    setTimeout(function () {
-                        $('.alert').alert('close');
-                    }, 3000);
-
-                const form = document.getElementById('petitionForm');
-                form.addEventListener('submit', function(event) {
-                    const StudentNumber = document.getElementById('StudentNumber').value.trim();
-                    const Name = document.getElementById('Name').value.trim();
-                    const subjectCode = document.getElementById('subject_code').value.trim();
-                    const subjectName = document.getElementById('subject_name').value.trim();
-                    const petitionType = document.getElementById('petition_type').value.trim();
-                    const requestReason = document.getElementById('request_reason').value.trim();
-                    const userResponsible = document.getElementById('user_responsible').value.trim();
-        
-                    if (!StudentNumber || !Name || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
-                        alert('Please fill out all fields.');
-                        event.preventDefault();
-                    }
-                    // You can add additional validation logic here if needed
-                });
-            });
-            </script>
         </div>
+        
+    
+        <script>
+            $(document).ready(function () {
+                // Automatically close the alert messages after 3 seconds
+                setTimeout(function () {
+                    $('.alert').alert('close');
+                }, 3000);
 
-    <!-- Your petition form code -->
-    <!-- ... -->
+            const form = document.getElementById('petitionForm');
+            form.addEventListener('submit', function(event) {
+                const StudentNumber = document.getElementById('StudentNumber').value.trim();
+                const Name = document.getElementById('Name').value.trim();
+                const subjectCode = document.getElementById('subject_code').value.trim();
+                const subjectName = document.getElementById('subject_name').value.trim();
+                const petitionType = document.getElementById('petition_type').value.trim();
+                const requestReason = document.getElementById('request_reason').value.trim();
+                const userResponsible = document.getElementById('user_responsible').value.trim();
+    
+                if (!StudentNumber || !Name || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
+                    alert('Please fill out all fields.');
+                    event.preventDefault();
+                }
+                // You can add additional validation logic here if needed
+            });
+        });
+        </script>
+    </div>
+
+<!-- Your petition form code -->
+<!-- ... -->
 {% endblock content %}
 
 {% block script %}
- <script>
-    // Fetch student details
-    async function fetchStudentDetails() {
-        try {
-            const response = await fetch(`${api_base_url}/student-details`);
+<script>
+// Fetch student details
+async function fetchStudentDetails() {
+    try {
+        const response = await fetch(`${api_base_url}/student-details`);
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
-            }
-
-            const data_student_details = await response.json();
-            console.log('data_student_details:', data_student_details);
-            displayDetails(data_student_details);
-        } catch (error) {
-            console.error('Error fetching student details:', error.message);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data. Server returned ${response.status}`);
         }
-    }
 
-    fetchStudentDetails();
-
-    function displayDetails(data) {
-        // Select the name input and set the value to data.studentName
-        document.getElementById('Name').value = data.Name;
-        // Select the StudentNumber and set the value to data.StudentNumber
-        document.getElementById('StudentNumber').value = data.StudentNumber;
+        const data_student_details = await response.json();
+        console.log('data_student_details:', data_student_details);
+        displayDetails(data_student_details);
+    } catch (error) {
+        console.error('Error fetching student details:', error.message);
     }
- </script>
+}
+
+fetchStudentDetails();
+
+function displayDetails(data) {
+    // Select the name input and set the value to data.studentName
+    document.getElementById('Name').value = data.Name;
+    // Select the StudentNumber and set the value to data.StudentNumber
+    document.getElementById('StudentNumber').value = data.StudentNumber;
+}
+</script>
 {% endblock script %}

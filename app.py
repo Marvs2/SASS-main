@@ -379,7 +379,7 @@ def submit_overload_application():
                 db.session.add(new_overload_application)
                 db.session.commit()
                 # Ensure student_api_base_url is defined and accessible
-                flash('Overload application submitted successfully!', 'success')
+                flash('Application submitted successfully!', 'success')
                 return redirect(url_for('studentoverload'))
     except Exception as e:
         db.session.rollback()
@@ -457,7 +457,7 @@ def add_subjects():
         if new_addsubjects_application:
             db.session.add(new_addsubjects_application)
             db.session.commit()
-            flash('Request subjects created Successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentaddingsubject'))
     except Exception as e:
         db.session.rollback()
@@ -635,7 +635,7 @@ def change_of_subjects():
         if new_changesubjects_application:
             db.session.add(new_changesubjects_application)
             db.session.commit()
-            flash('Change of subjects created Successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentchange'))
     except Exception as e:
         db.session.rollback()
@@ -662,7 +662,7 @@ def submit_grade_correction():
         if new_gradeentry_application:
             db.session.add(new_gradeentry_application)
             db.session.commit()
-            flash('Grade entry submitted successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentcorrection'))
     except Exception as e:
         db.session.rollback()
@@ -689,7 +689,7 @@ def submit_cross_enrollment():
         if new_cross_enrollment:
             db.session.add(new_cross_enrollment)
             db.session.commit()
-            flash('Cross-enrollment created successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentenrollment'))  
     except Exception as e:
         db.session.rollback()
@@ -716,7 +716,7 @@ def submit_shifting():
         if new_shifting_application:
             db.session.add(new_shifting_application)
             db.session.commit()
-            flash('Application for shifting created Successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentshifting'))
     except Exception as e:
         db.session.rollback()
@@ -742,7 +742,7 @@ def submitmanualenrollment():
         if new_manual_enrollment:
             db.session.add(new_manual_enrollment)
             db.session.commit()
-            flash('Manual enrollment created successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentmanualenrollment'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
@@ -769,7 +769,7 @@ def submit_petition():
         if new_petition_request:
             db.session.add(new_petition_request)
             db.session.commit()
-            flash('Petition request submitted successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentpetition'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
@@ -804,7 +804,7 @@ def submit_tutorial_request():
         if new_tutorial_request:
             db.session.add(new_tutorial_request)
             db.session.commit()
-            flash('Tutorial request created successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studenttutorial'))
     except Exception as e:
         db.session.rollback()
@@ -829,7 +829,7 @@ def submit_certification_request():
         if new_certification_request:
             db.session.add(new_certification_request)
             db.session.commit()
-            flash('Certification Request submitted successfully!', category='success')
+            flash('Application submitted successfully!', category='success')
             return redirect(url_for('studentcertification')) 
     except Exception as e:
         db.session.rollback()

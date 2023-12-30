@@ -259,7 +259,7 @@ nav .form-group .icon {
 }
 nav .nav-link {
 	position: relative;
-	left: 40px;
+	left: 30px;
 	top: 3px;
 }
 nav .nav-link .icon {
@@ -268,8 +268,8 @@ nav .nav-link .icon {
 }
 nav .nav-link .badge {
 	position: absolute;
-	top: -7px;
-	right: 2px;
+	top: -15px;
+	right: -10px;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
@@ -595,6 +595,18 @@ main .btn-send {
 main .btn-send:hover {
 	background: var(--dark-blue);
 }
+
+.accordion {
+	padding-left: 15px;
+}
+
+.accordion-button::after {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-plus' viewBox='0 0 16 16'%3E%3Cpath d='M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z'/%3E%3C/svg%3E");
+	transition: all 0.5s;
+  }
+  .accordion-button:not(.collapsed)::after {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' class='bi bi-dash' viewBox='0 0 16 16'%3E%3Cpath d='M4 8a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7A.5.5 0 0 1 4 8z'/%3E%3C/svg%3E");
+  }
 /* MAIN */
 
 /* CONTENT */
@@ -699,33 +711,34 @@ main .btn-send:hover {
     animation: progress-indeterminate 1.5s cubic-bezier(.65,.815,.735,.395) infinite
 }
 
-
 .toast-error{
-    position: absolute;
-    top: 70px;
-    right: 30px;
-    border-radius: 8px;
+    position: fixed;
+    top: 66px;
+    right: 29px;
+    border-radius: 10px;
     background: #fff;
-    padding: 16px 30px 15px 10px;
+	padding: 0px 10px 0px 10px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     border-left: 6px solid #FF0000;
     overflow: hidden;
     transform: translateX(calc(100% + 30px));
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+	z-index: 1000;
 }
 
 .toast-success{
-    position: absolute;
-    top: 70px;
-    right: 30px;
-    border-radius: 8px;
+    position: fixed;
+    top: 66px;
+    right: 29px;
+    border-radius: 10px;
     background: #fff;
-    padding: 14px 30px 13px 10px;
+    padding: 0px 10px 0px 10px;
     box-shadow: 0 5px 10px rgba(0,0,0,0.1);
     border-left: 6px solid #008000;
     overflow: hidden;
     transform: translateX(calc(100% + 30px));
     transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.35);
+	z-index: 1000;
 }
 .toast.active{
     transform: translateX(0%);
@@ -739,42 +752,48 @@ main .btn-send:hover {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 35px;
-    width: 35px;
+    height:25px;
+    width: 25px;
     background-color: #FF0000;
     color: #fff;
-    font-size: 23px;
+    font-size: 15px;
     border-radius: 50%;
 }
 .toast-content .check{
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 35px;
-    width: 35px;
+    height: 20px;
+    width: 20px;
     background-color: #008000;
     color: #fff;
-    font-size: 20px;
+    font-size: 13px;
     border-radius: 50%;
 }
 .toast-content .message{
     display: flex;
     flex-direction: column;
-    margin: 0 10px;
 }
+
 .message .text{
-    font-size: 15px;
+    font-size: 13px;
     color: #666666;
 }
+
+.message .text.text-1{
+padding-bottom: 7px;
+}
+
 .message .text.text-2{
-    font-weight:500;
     color: #333;
+	font-weight: 700;
+	font-size: 13px;
 }
 .toast .close{
     position: absolute;
-    top: 6px;
-    right: 10px;
-    padding: 5px;
+    top: 8px;
+    right: 8px;
+	padding-right: 4px; 
     cursor: pointer;
     opacity: 0.7;
 	font-size: 15px;

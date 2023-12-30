@@ -1,0 +1,352 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<style>
+    /* Add DataTables styles */
+    table {
+        width: 30%;
+        border: 1px;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+<!-- MAIN -->
+<h1>Student History</h1>
+
+<!-- Add Subjects -->
+<h2>Add Subjects</h2>
+<table id="subjectTable" border="2" class="table table-bordered">
+	<tr>
+		<th>Subject ID</th>
+		<th>Student Number</th>
+		<th>Name</th>
+		<th>Subject Names</th>
+		<th>Enrollment Type</th>
+		<th>File</th>
+		<th>User Responsible</th>
+		<th>Status</th>
+		<th>Stud Id
+		</th>
+		<th>Action</th>
+	</tr>
+	{% for addsubjects in services_data.addsubjects_list %}
+		<tr>
+			<td>{{ addsubjects.subject_ID }}</td>
+			<td>{{ addsubjects.StudentNumber }}</td>
+			<td>{{ addsubjects.Name }}</td>
+			<td>{{ addsubjects.subject_Names }}</td>
+			<td>{{ addsubjects.enrollment_type }}</td>
+			<td>        {% if addsubjects.file_data %}
+				<a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
+			{% else %}
+				<span class="badge badge-warning">No File</span>
+			{% endif %}</td>
+			<td>{{ addsubjects.user_responsible }}</td>
+			<td>{{ addsubjects.status }}</td>
+			<td>{{ addsubjects.StudentId }}</td>
+			<td>
+				<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">View Status</button>
+			  </td>
+			<!-- Add other relevant columns here -->
+		</tr>
+	{% endfor %}
+</table>
+
+<!-- Change of Subjects -->
+<h2>Change of Subjects</h2>
+<table border="1">
+	<table id="changeSubjectsTable" class="table table-bordered" style="width:100%">
+		<thead>
+			<tr>
+				<th>Change Subject ID</th>
+				<th>Student Number</th>
+				<th>Name</th>
+				<th>Enrollemnt Type</th>
+				<th>Change Files</th>
+				<th>User responsible</th>
+				<th>Status</th>
+				<th>Stud ID</th>
+				<th>Action</th>
+				<!-- Add other relevant column headers here -->
+			</tr>
+		</thead>
+		<tbody>
+			{% for changesubjects in services_data.changesubjects_list %}
+				<tr>
+					<td>{{ changesubjects.Changesubject_ID }}</td>
+					<td>{{ changesubjects.StudentNumber }}</td>
+					<td>{{ changesubjects.Name }}</td>
+					<td>{{ changesubjects.enrollment_type }}</td>
+					<td>        {% if changesubjects.ace_form_data %}
+						<a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubjects.ace_form_filename }}</a>
+					{% else %}
+						<span class="badge badge-warning">No File</span>
+					{% endif %}</td>
+					<td>{{ changesubjects.user_responsible }}</td>
+					<td>{{ changesubjects.status }}</td>
+					<td>{{ changesubjects.StudentId }}</td>
+					
+					<td>
+						<!-- Add action buttons or options for Change of Subjects -->
+						<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ changesubjects.subject_ID }}">View Status</button>
+						<!-- Add other relevant action buttons -->
+					</td>
+					<!-- Add other relevant columns here -->
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</table>
+
+<!-- Manual Enrollment -->
+<h2>Manual Enrollment</h2>
+<table border="1">
+	<!-- Repeat the structure similar to Add Subjects for Manual Enrollment -->
+	<!-- Use services_data.manual_enrollments_list -->
+</table>
+
+<!-- Certification Requests -->
+<h2>Certification Requests</h2>
+<table id="certificationRequestsTable" class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th>Certification Id</th>
+			<th>Student Number</th>
+			<th>Name</th>
+			<th>Certification Type</th>
+			<th>Files</th>
+			<th>Responsible</th>
+			<th>Status</th>
+			<th>Stud Id</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for certification_requests in services_data.certification_requests_list %}
+			<tr>
+				<td>{{ certification_requests.certification_request_id }}</td>
+				<td>{{ certification_requests.StudentNumber }}</td>
+				<td>{{ certification_requests.Name }}</td>
+				<td>{{ certification_requests.certification_type }}</td>
+				<td>        {% if certification_requests.request_form_data %}
+					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}" class="btn btn-success" download>{{ certification_requests.request_form_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				,
+				{% if certification_requests.identification_card_data %}
+					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}" class="btn btn-success" download>{{ certification_requests.identification_card_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				,
+				{% if certification_requests.authorization_letter_data %}
+					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}" class="btn btn-success" download>{{ certification_requests.authorization_letter_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				,
+				{% if certification_requests.representative_id_data %}
+					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}" class="btn btn-success" download>{{ certification_requests.representative_id_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				</td>
+				<td>{{ certification_requests.user_responsible }}</td>
+				<td>{{ certification_requests.status }}</td>
+				<td>{{ certification_requests.StudentId }}</td>
+				<td>
+					<!-- Add action buttons or options for Change of Subjects -->
+					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ certification_requests.certification_request_id }}">View Status</button>
+					<!-- Add other relevant action buttons -->
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+<h2>Grade Entries</h2>
+<table id="gradeEntriesTable" class="display" style="width:100%">
+	<thead>
+		<tr>
+			<th>Grade ID</th>
+			<th>Student Number</th>
+			<th>Name</th>
+			<th>Application Type</th>
+			<th>Files</th>
+			<th>Created At</th>
+			<th>Responsible</th>
+			<th>Status</th>
+			<th>Stud ID</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for grade_entries in services_data.grade_entries_list %}
+			<tr>
+				<td>{{ grade_entries.grade_entry_id }}</td>
+				<td>{{ grade_entries.StudentNumber }}</td>
+				<td>{{ grade_entries.Name }}</td>
+				<td>{{ grade_entries.application_type }}</td>
+				<td>
+				{% if grade_entries.completion_form_data %}
+					<a href="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entries.completion_form_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				,
+				{% if grade_entries.class_record_data %}
+					<a href="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entries.class_record_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				,
+				{% if grade_entries.affidavit_data %}
+					<a href="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entries.affidavit_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}
+				</td>
+				<td>{{ grade_entries.created_at }}</td>
+				<td>{{ grade_entries.status }}</td>
+				<td>{{ grade_entries.StudentId }}</td>
+				<td>
+					<!-- Add action buttons or options for Change of Subjects -->
+					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entries.grade_entry_id }}">View Status</button>
+					<!-- Add other relevant action buttons -->
+				</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+</table>
+
+<h2>Shifting Applications</h2>
+<table id="shiftingTable" class="display">
+    <thead>
+        <tr>
+            <th>Shifting ID</th>
+            <th>Student Number</th>
+            <th>Name</th>
+            <th>Current Program</th>
+            <th>Residency Year</th>
+            <th>Intended Program</th>
+            <th>Qualifications</th>
+            <th>Document</th>
+			<th>Responsible</th>
+			<th>status</th>
+			<th>Stud ID</th>
+			<th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for shifting_applications in services_data.shifting_applications_list %}
+            <tr>
+                <td>{{ shifting_applications.shifting_application_id }}</td>
+                <td>{{ shifting_applications.StudentNumber }}</td>
+                <td>{{ shifting_applications.Name }}</td>
+                <td>{{ shifting_applications.current_program }}</td>
+                <td>{{ shifting_applications.residency_year }}</td>
+                <td>{{ shifting_applications.intended_program }}</td>
+                <td>{{ shifting_applications.qualifications }}</td>
+                <td>        {% if shifting_applications.file_data %}
+					<a href="{{ url_for('get_shifting_file', shifting_application_id=shifting_applications.shifting_application_id) }}" class="btn btn-success" download>{{ shifting_applications.file_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}</td>
+				<td>{{ shifting_applications.user_responsible }}</td>
+				<td>{{ shifting_applications.status }}</td>
+				<td>{{ shifting_applications.StudentId }}</td>
+				<td>
+					<!-- Add action buttons or options for Change of Subjects -->
+					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ shifting_applications.shifting_application_id }}">View Status</button>
+					<!-- Add other relevant action buttons -->
+				</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Overload Applications -->
+<h2>Overload Application</h2>
+<table id="overloadTable" border="2" class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Overload ID</th>
+			<th>Student Number</th>
+			<th>Name</th>
+			<th>programcourse</th>
+			<th>semester</th>
+			<th>subjects_to_add</th>
+			<th>justification</th>
+			<th>Files</th>
+			<th>user_responsible</th>
+			<th>status</th>
+			<th>Stud ID</th>
+			<th>Action</th><!--11-->
+			<!-- Add other relevant column headers here -->
+		</tr>
+	</thead>
+	<tbody>
+		{% for overload_applications in services_data.overload_applications_list %}
+			<tr>
+				<td>{{ overload_applications.overload_application_id }}</td>
+				<td>{{ overload_applications.StudentNumber }}</td>
+				<td>{{ overload_applications.Name }}</td>
+				<td>{{ overload_applications.programcourse }}</td>
+				<td>{{ overload_applications.semester }}</td>
+				<td>{{ overload_applications.subjects_to_add }}</td>
+				<td>{{ overload_applications.justification }}</td>
+				<td>        {% if overload_applications.file_data %}
+					<a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download>{{ overload_applications.file_filename }}</a>
+				{% else %}
+					<span class="badge badge-warning">No File</span>
+				{% endif %}</td>
+				<td>{{ overload_applications.user_responsible }}</td>
+				<td>{{ overload_applications.status }}</td>
+				<td>{{ overload_applications.StudentId }}</td>
+				<td>
+					<!-- Add action buttons or options for Change of Subjects -->
+					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_applications.overload_application_id }}">View Status</button>
+					<!-- Add other relevant action buttons -->
+				</td>
+				<!-- Add other relevant columns here -->
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#subjectsTable').DataTable();
+    });
+	$(document).ready(function() {
+    	 $('#changeSubjectsTable').DataTable();
+    });
+	$(document).ready(function () {
+		$('#certificationRequestsTable').DataTable();
+	});
+	$(document).ready(function () {
+		$('#gradeEntriesTable').DataTable();
+	});
+	$(document).ready(function () {
+		$('#shiftingTable').DataTable();
+	});
+	$(document).ready(function() {
+        $('#overloadTable').DataTable();
+        // Initialize DataTable for other tables if needed
+    });
+
+</script>
+
+{% endblock %}

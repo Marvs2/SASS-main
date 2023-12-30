@@ -145,19 +145,12 @@ window.addEventListener('click', function (e) {
 })
 
 
-
-
-
 // PROGRESSBAR
 const allProgress = document.querySelectorAll('main .card .progress');
 
 allProgress.forEach(item=> {
 	item.style.setProperty('--value', item.dataset.value)
 })
-
-
-
-
 
 
 // APEXCHART
@@ -192,3 +185,69 @@ tooltip: {
 
 var chart = new ApexCharts(document.querySelector("#chart"), options);
 chart.render();
+
+
+// DATA TABLES IN TRANSACTION HISTORY
+new DataTable('#example');
+
+$(document).ready(function() {
+  $('#example').DataTable({ 
+
+    lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+    searching: true,
+    paging: true,
+    ordering: true,
+    info: true,
+    order: true,
+    columnDefs: [
+      {
+        targets: 0,
+        orderable: false,
+        className: 'select-checkbox',
+      },
+    ],
+    select: {
+      style: 'multi',
+      selector: 'td:first-child',
+    },
+  });
+});
+
+
+
+// NOTIFICATION 
+
+  // Function to close the notification card
+  function closeNotificationCard() {
+	  var notificationCard = document.getElementById('notification-card');
+	  if (notificationCard.classList.contains('show')) {
+		  notificationCard.classList.remove('show');
+	  }
+  }
+
+  // Add event listener to the notification icon
+  document.getElementById('notification-icon').addEventListener('click', function (event) {
+	  // Prevent the click event from propagating to the document body
+	  event.stopPropagation();
+
+	  // Toggle the visibility of the notification card
+	  document.getElementById('notification-card').classList.toggle('show');
+  });
+
+  // Add event listener to the document body to close the notification card on any click outside of it
+  document.body.addEventListener('click', closeNotificationCard);
+
+  // Add event listener to prevent the notification card from closing when clicking inside it
+  document.getElementById('notification-card').addEventListener('click', function (event) {
+	  event.stopPropagation();
+  });
+
+  // JavaScript to show all notifications when "See All Notifications" is clicked
+  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+	  // Prevent the link from navigating (you may adjust this behavior as needed)
+	  event.preventDefault();
+
+	  // Show all notifications by removing the 'd-none' class
+	  var notificationList = document.getElementById('notification-card');
+	  notificationList.classList.toggle('show');
+  });
