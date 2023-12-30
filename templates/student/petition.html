@@ -38,23 +38,23 @@
                     </div>   
 
                     <div class="row mb-3">
-                        <label for="subjectCode" class="col-sm-3 col-form-label">Subject Code</label>
+                        <label for="subject_code" class="col-sm-3 col-form-label">Subject Code</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="subjectCode" name="subjectCode" >
+                            <input type="text" class="form-control" id="subject_code" name="subject_code" >
                         </div>
                     </div>   
 
                     <div class="row mb-3">
-                        <label for="subjectName" class="col-sm-3 col-form-label">Subject Code</label>
+                        <label for="subject_name" class="col-sm-3 col-form-label">Subject Code</label>
                         <div class="col-sm-8">
-                            <input type="text" class="form-control" id="subjectName" name="subjectName" >
+                            <input type="text" class="form-control" id="subject_name" name="subject_name" >
                         </div>
                     </div>   
 
                     <div class="row mb-3">
-                        <label for="petitionType" class="col-sm-3 col-form-label">Petition Type</label>
+                        <label for="petition_type" class="col-sm-3 col-form-label">Petition Type</label>
                             <div class="col-sm-8">
-                                <select class="custom-select" id="petitionType" name="petitionType" required>
+                                <select class="custom-select" id="petition_type" name="petition_type" required>
                                     <option value="Back Subject">Back Subject</option>
                                     <option value="Retake">Retake</option>
                                 </select>
@@ -62,16 +62,16 @@
                     </div>
                     
                     <div class="row mb-4">
-                        <label for="requestReason" class="col-sm-3 col-form-label">Reason for Petition</label>
+                        <label for="request_reason" class="col-sm-3 col-form-label">Reason for Petition</label>
                         <div class="col-sm-8">
-                          <textarea class="form-control" id="requestReason" name="requestReason" required></textarea>
+                          <textarea class="form-control" id="request_reason" name="request_reason" required></textarea>
                         </div>
                     </div> 
 
                     <div class="row mb-3">
-                        <label for="userResponsible" class="col-sm-3 col-form-label">User Responsible </label>
+                        <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
                             <div class="col-sm-8">
-                                <select class="custom-select" id="userResponsible" name="userResponsible" required>
+                                <select class="custom-select" id="user_responsible" name="user_responsible" required>
                                     <option value="Director/ Head of Academic Program">Director/ Head of Academic Program</option>
                                     <option value="Administrative Building Administrative Staff ICT Office">Administrative Building Administrative Staff ICT Office</option>
                                 </select>
@@ -113,13 +113,13 @@
                 form.addEventListener('submit', function(event) {
                     const StudentNumber = document.getElementById('StudentNumber').value.trim();
                     const Name = document.getElementById('Name').value.trim();
-                    const subjectCode = document.getElementById('subject_code').value.trim();
-                    const subjectName = document.getElementById('subject_name').value.trim();
-                    const petitionType = document.getElementById('petition_type').value.trim();
-                    const requestReason = document.getElementById('request_reason').value.trim();
-                    const userResponsible = document.getElementById('user_responsible').value.trim();
+                    const subject_code = document.getElementById('subject_code').value.trim();
+                    const subject_name = document.getElementById('subject_name').value.trim();
+                    const petition_type = document.getElementById('petition_type').value.trim();
+                    const request_reason = document.getElementById('request_reason').value.trim();
+                    const user_responsible = document.getElementById('user_responsible').value.trim();
         
-                    if (!StudentNumber || !Name || !subjectCode || !subjectName || !petitionType || !requestReason || !userResponsible) {
+                    if (!StudentNumber || !Name || !subject_code || !subject_name || !petition_type || !request_reason || !user_responsible) {
                         alert('Please fill out all fields.');
                         event.preventDefault();
                     }

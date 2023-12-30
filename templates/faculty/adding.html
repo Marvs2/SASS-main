@@ -38,59 +38,57 @@
   </thead>
   <tbody>
     {% for addsubjects in addsubjects %}
-      <tr>
-        <td>{{ addsubjects.subject_ID }}</td>
-        <td>{{ addsubjects.StudentNumber }}</td>
-        <td>{{ addsubjects.Name }}</td>
-        <td>{{ addsubjects.subject_Names }}</td>
-        <td>{{ addsubjects.enrollment_type }}</td>
-        <td>
-          {% if addsubjects.file_data %}
-              {% set truncated_file_name = addsubjects.file_name[:15] + '...' if addsubjects.file_name|length > 15 else addsubjects.file_name %}
-              <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download title="{{ addsubjects.file_name }}">{{ truncated_file_name }}</a>
-          {% else %}
-              <span class="badge badge-warning">No File</span>
-          {% endif %}
-        </td>
-        <td>{{ addsubjects.user_responsible }}</td>
-        <td>{{ addsubjects.status }}</td>
-        <td>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
-        </td>
-      </tr>
+    <tr>
+      <td>{{ addsubjects.subject_ID }}</td>
+      <td>{{ addsubjects.StudentNumber }}</td>
+      <td>{{ addsubjects.Name }}</td>
+      <td>{{ addsubjects.subject_Names }}</td>
+      <td>{{ addsubjects.enrollment_type }}</td>
+      <td>
+        {% if addsubjects.file_data %}
+            {% set truncated_file_name = addsubjects.file_name[:15] + '...' if addsubjects.file_name|length > 15 else addsubjects.file_name %}
+            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download title="{{ addsubjects.file_name }}">{{ truncated_file_name }}</a>
+        {% else %}
+            <span class="badge badge-warning">No File</span>
+        {% endif %}
+      </td>
+      <td>{{ addsubjects.user_responsible }}</td>
+      <td>{{ addsubjects.status }}</td>
+      <td>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
+      </td>
+    </tr>
+      <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ addsubjects.Name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="statusForm{{ addsubjects.subject_ID }}" action="{{ url_for('update_adding_service_status', add_subject_id=addsubjects.subject_ID) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ addsubjects.subject_ID }})">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     {% endfor %}
   </tbody>
 </table>
-
-<!-- Modal for Change Status -->
-{% for addsubjects in addsubjects %}
-<div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="statusModalLabel">Change Status</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form id="statusForm{{ addsubjects.subject_ID }}">
-          <input type="hidden" name="subject_id" value="{{ addsubjects.subject_ID }}">
-          <div class="form-group">
-            <label for="newStatus">New Status:</label>
-            <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ addsubjects.status }}" required>
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="updateStatus('{{ addsubjects.subject_ID }}')">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-{% endfor %}
-
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
@@ -137,7 +135,7 @@
 
         // Make an AJAX request to the server to notify about user activity
         // Adjust the URL as needed
-        fetch('/notify_activity', {
+        fetch('/notify_activity_add', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

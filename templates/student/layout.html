@@ -69,64 +69,64 @@
 				<i class='bx bxs-bell icon'></i>
 				<span class="badge">4</span>
 			</a>
-                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
-                  <div class="card"> 
-                    <div class="list-group list-group-flush list-group-hoverable">
-                      <div class="list-group-item">
-                        <div class="row align-items-center">                          
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 1</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Change deprecated html tags to text decoration classes (#29604)
-                            </div>
-                          </div>
-                          <div class="col-auto">                           
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 2</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              justify-content:between ⇒ justify-content:space-between (#29734)
-                            </div>
-                          </div>
-                          <div class="col-auto">                           
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 3</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Update change-version.js (#29736)
-                            </div>
-                          </div>
-                          <div class="col-auto">                          
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 4</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Regenerate package-lock.json (#29730)
-                            </div>
-                          </div>                         
-                        </div>
-                      </div>
-                      <div class="col-auto">  
-                        <div class="text-right mt-2 mb-1">
-                          <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
-                      </div>                          
-                      </div>
-                    </div>
+      <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
+          <div class="card"> 
+            <div class="list-group list-group-flush list-group-hoverable">
+            <div class="list-group-item">
+              <div class="row align-items-center">                          
+                <div class="col text-truncate">
+                  <a href="{{url_for('show_notifications')}}" class="text-body d-block">Example 1</a>
+                  <div class="d-block text-secondary text-truncate mt-n1">
+                    Change deprecated html tags to text decoration classes (#29604)
                   </div>
                 </div>
+                <div class="col-auto">                           
+                </div>
               </div>
+            </div>
+            <div class="list-group-item">
+              <div class="row align-items-center">
+                <div class="col text-truncate">
+                  <a href="#" class="text-body d-block">Example 2</a>
+                  <div class="d-block text-secondary text-truncate mt-n1">
+                    justify-content:between ⇒ justify-content:space-between (#29734)
+                  </div>
+                </div>
+                <div class="col-auto">                           
+                </div>
+              </div>
+            </div>
+            <div class="list-group-item">
+              <div class="row align-items-center">
+                <div class="col text-truncate">
+                  <a href="#" class="text-body d-block">Example 3</a>
+                  <div class="d-block text-secondary text-truncate mt-n1">
+                    Update change-version.js (#29736)
+                  </div>
+                </div>
+                <div class="col-auto">                          
+                </div>
+              </div>
+            </div>
+            <div class="list-group-item">
+              <div class="row align-items-center">
+                <div class="col text-truncate">
+                  <a href="#" class="text-body d-block">Example 4</a>
+                  <div class="d-block text-secondary text-truncate mt-n1">
+                    Regenerate package-lock.json (#29730)
+                  </div>
+                </div>                         
+              </div>
+            </div>
+            <div class="col-auto">  
+              <div class="text-right mt-2 mb-1">
+                <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
+            </div>                          
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
 			
 		<!----	<a href="#" class="nav-link">
 				<i class='bx bxs-message-square-dots icon'></i>
@@ -189,6 +189,55 @@ document.getElementById('notification-card').addEventListener('click', function 
         //STUDENT API
 		const api_base_url = '{{ student_api_base_url | default("") }}';
 		console.log('api_base_url: ', api_base_url)
+
+    var lastActivity = new Date().getTime();
+
+// Function to update the activity timestamp
+function updateActivity() {
+    lastActivity = new Date().getTime();
+}
+
+// Function to handle user activity events
+function handleUserActivity() {
+      updateActivity();
+
+      // Make an AJAX request to the server to notify about user activity
+      // Adjust the URL as needed
+      fetch('/notify_activity', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+      })
+      .then(response => response.json())
+      .then(data => {
+          // Handle the server's response if needed
+          console.log('Server notified about user activity');
+      })
+      .catch(error => {
+          console.error('Error notifying server:', error);
+      });
+  }
+
+
+// Set up an interval to check for inactivity
+setInterval(function () {
+    var now = new Date().getTime();
+    var inactiveTime = now - lastActivity;
+
+    // If inactive for more than 5 minutes (adjust as needed)
+    
+    if (inactiveTime > 120000) {
+        // Redirect to the logout or login page
+        window.location.href = "/logout";  // Adjust the URL as needed
+    }
+}, 60000);  // Check every minute (adjust as needed)
+
+// Event listeners for user activity
+document.addEventListener("mousemove", handleUserActivity);
+document.addEventListener("mousedown", handleUserActivity);
+document.addEventListener("keydown", handleUserActivity);
 	</script>
 
 	{% block script %} {% endblock script %}

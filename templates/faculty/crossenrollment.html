@@ -1,0 +1,139 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+    /* Add DataTables styles */
+    table {
+        width: 90%;
+        border: 1px;
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<!-- Cross Enrollment Table -->
+<h2>Cross Enrollment Records</h2>
+<table id="crossEnrollmentTable" class="table table-bordered" style="width:80%">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Student Number</th>
+            <th>Name</th>
+            <th>School for Cross Enrollment</th>
+            <th>Total Units</th>
+            <th>Authorized Subjects</th>
+            <th>Application Letter</th>
+            <th>Permit to Cross Enroll</th>
+            <th>Created At</th>
+            <th>User Responsible</th>
+            <th>Status</th>
+            <th>Student ID</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cross_enrollments in cross_enrollments %}
+            <tr>
+                <td>{{ cross_enrollments.cross_enrollment_id }}</td>
+                <td>{{ cross_enrollments.StudentNumber }}</td>
+                <td>{{ cross_enrollments.Name }}</td>
+                <td>{{ cross_enrollments.school_for_cross_enrollments }}</td>
+                <td>{{ cross_enrollments.total_number_of_units }}</td>
+                <td>{{ cross_enrollments.authorized_subjects_to_take }}</td>
+                <td>
+                    {% if cross_enrollments.application_letter_data %}
+                        <a href="{{ url_for('download_application_letter', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}">Download</a>
+                    {% else %}
+                        No file
+                    {% endif %}
+                </td>
+                <td>
+                    {% if cross_enrollments.permit_to_cross_enroll_data %}
+                        <a href="{{ url_for('download_permit_to_enroll', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}">Download</a>
+                    {% else %}
+                        No file
+                    {% endif %}
+                </td>
+                <td>{{ cross_enrollments.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ cross_enrollments.user_responsible }}</td>
+                <td>{{ cross_enrollments.status }}</td>
+                <td>{{ cross_enrollments.StudentId }}</td>
+                <td>
+                    <!-- Action Buttons -->
+                    <!-- You can customize these buttons according to your requirements -->
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ cross_enrollments.cross_enrollment_id }}">Change Status</button>
+                </td>
+            </tr>
+             <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ cross_enrollments.cross_enrollment_id }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ cross_enrollments.Name }}</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="statusForm{{ cross_enrollments.cross_enrollment_id }}" action="{{ url_for('update_crossenrollment_service_status', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ cross_enrollments.cross_enrollment_id }})">Save changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+<!-- DataTable Initialization Script -->
+<script>
+    $(document).ready(function() {
+        $('#crossEnrollmentTable').DataTable({
+            "pageLength": 5
+        });
+    });
+     // Function to update status
+  function updateStatus(cross_enrollment_id) {
+    const formId = `statusForm${cross_enrollment_id}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/crossenrollment', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+</script>
+
+{% endblock %}
