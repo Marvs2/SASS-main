@@ -307,22 +307,22 @@
 					<td>{{ changesubjects.StudentId }}</td>
 					
 					<td>
-                        <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ addsubjects.subject_ID }}', '{{ addsubjects.status }}')">View Status</button>
+                        <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ changesubjects.Changesubject_ID }}', '{{ changesubjects.status }}')">View Status</button>
                     </td>
                     <!-- Add other relevant columns here -->
                 </tr>
                 <!-- Modal -->
-                <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+                <div class="modal fade" id="statusModal{{ changesubjects.Changesubject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ addsubjects.subject_ID }}</h5>
+                                <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ changesubjects.Changesubject_ID }}</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <!-- Inside the modal body -->
-                            <div class="modal-body" id="statusModalBody{{ addsubjects.subject_ID }}">
+                            <div class="modal-body" id="statusModalBody{{ changesubjects.Changesubject_ID }}">
                                 <!-- Status-related information will be populated here -->
                             </div>
                             <div class="modal-footer">

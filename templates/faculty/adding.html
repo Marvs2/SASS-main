@@ -19,6 +19,19 @@
     }
 </style>
 <!--Done-->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
 <!-- DataTable HTML -->
 <h1>Subject Data</h1>
 
@@ -104,8 +117,8 @@
 });
 
   // Function to update status
-  function updateStatus(subjectId) {
-    const formId = `statusForm${subjectId}`;
+  function updateStatus(add_subject_id) {
+    const formId = `statusForm${add_subject_id}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 
@@ -119,7 +132,7 @@
         location.reload(); // Reload the page after successful update
       })
       .catch(error => {
-        console.error('Error updating status:', error);
+        console.error('Error updating status:', category='error');
       });
   }
   var lastActivity = new Date().getTime();
@@ -148,7 +161,7 @@
             console.log('Server notified about user activity');
         })
         .catch(error => {
-            console.error('Error notifying server:', error);
+            console.error('Error notifying server:', category='error');
         });
     }
 
@@ -162,7 +175,7 @@
       
       if (inactiveTime > 120000) {
           // Redirect to the logout or login page
-          window.location.href = "/logout";  // Adjust the URL as needed
+          window.location.href = "/logoutfaculty";  // Adjust the URL as needed
       }
   }, 60000);  // Check every minute (adjust as needed)
 

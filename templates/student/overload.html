@@ -122,15 +122,17 @@
                 <label for="status" class="col-sm-3 col-form-label">Status </label>
                     <div class="col-sm-8">
                         <select class="custom-select" id="status" name="status" required>
-                            <option value="Sent" selected>Sending</option>
-                            <option value="Pending" disabled>Pending</option>
-                            <option value="Approved" disabled>Approved</option>
-                            <option value="Rejected" disabled>Rejected</option>
+                            <option value="sent" selected>Sending</option>
+                            <option value="pending" disabled>Pending</option>
+                            <option value="approved" disabled>Approved</option>
+                            <option value="rejected" disabled>Rejected</option>
                         </select>
                     </div>
             </div>
             <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-success">Submit Application</button>
+                <button type="submit" class="btn btn-success">Submit Application</button>|||
+                
+                <a href="{{ url_for('viewoverload') }}">View Overload Subject</a>
             </div>
         </form>
     </div>

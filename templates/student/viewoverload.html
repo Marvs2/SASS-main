@@ -18,56 +18,60 @@
 </style>
 
 <!-- DataTable HTML -->
-<h1>Subject Data</h1>
+<h1>Overload Data</h1>
 
-<table id="addSubjectsTable" class="table table-bordered">
+<table id="overloadTable" class="table table-bordered">
   <thead>
     <tr>
-      <th>Subject ID</th>
+      <th>Overload ID</th>
       <th>Student Number</th>
       <th>Name</th>
-      <th>Subject Names</th>
-      <th>Enrollment Type</th>
+      <th>programcourse</th>
+      <th>semester</th>
+      <th>subjects_to_add</th>
       <th>File</th>
       <th>User Responsible</th>
       <th>Status</th>
       <th>Action</th>
+      <th>StudentId</th>
     </tr>
   </thead>
   <tbody>
-    {% for addsubjects in addsubjects_list %}
+    {% for overload_applications in overload_applications_list %}
     <tr>
-      <td>{{ addsubjects.subject_ID }}</td>
-      <td>{{ addsubjects.StudentNumber }}</td>
-      <td>{{ addsubjects.Name }}</td>
-      <td>{{ addsubjects.subject_Names }}</td>
-      <td>{{ addsubjects.enrollment_type }}</td>
+      <td>{{ overload_applications.overload_application_id }}</td>
+      <td>{{ overload_applications.StudentNumber }}</td>
+      <td>{{ overload_applications.Name }}</td>
+      <td>{{ overload_applications.programcourse }}</td>
+      <td>{{ overload_applications.semester }}</td>
+      <td>{{ overload_applications.subjects_to_add }}</td>
       <td>
-        {% if addsubjects.file_data %}
-        <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download>{{ addsubjects.file_name }}</a>
+        {% if overload_applications.file_data %}
+        <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download>{{ overload_applications.file_filename }}</a>
         {% else %}
         <span class="badge badge-warning">No File</span>
         {% endif %}
       </td>
-      <td>{{ addsubjects.user_responsible }}</td>
-      <td>{{ addsubjects.status }}</td>
+      <td>{{ overload_applications.user_responsible }}</td>
+      <td>{{ overload_applications.status }}</td>
+      <td>{{ overload_applications.StudentId }}</td>
       <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ addsubjects.subject_ID }}', '{{ addsubjects.status }}')">View Status</button>
+          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ overload_applications.overload_application_id }}', '{{ overload_applications.status }}')">View Status</button>
       </td>
     </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="statusModal{{ overload_applications.overload_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ addsubjects.subject_ID }}</h5>
+                  <h5 class="modal-title" id="statusModalLabel">Status for oveload ID: {{ overload_applications.overload_application_id }}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
               </div>
               <!-- Inside the modal body -->
-              <div class="modal-body" id="statusModalBody{{ addsubjects.subject_ID }}">
+              <div class="modal-body" id="statusModalBody{{ overload_applications.overload_application_id }}">
                   <!-- Status-related information will be populated here -->
               </div>
               <div class="modal-footer">
@@ -90,9 +94,9 @@
   <!-- DataTable initialization script -->
   <script>
     $(document).ready(function() {
-      $('#addSubjectsTable').DataTable();
+      $('#overloadTable').DataTable();
     });
-    function checkStatusAndShowModal(subject_ID, status) {
+    function checkStatusAndShowModal(studentID, status) {
     let message = '';
     
     switch (status) {
@@ -120,10 +124,10 @@
     }
     
     // Set the status message in the modal body based on the specific modal's ID
-    document.getElementById('statusModalBody' + subject_ID).innerHTML = `<p>Status for Student ID ${subject_ID}: ${message}</p>`;
+    document.getElementById('statusModalBody' + studentID).innerHTML = `<p>Status for Overload ID ${studentID}: ${message}</p>`;
     
     // Display the modal
-    $('#statusModal' + subject_ID).modal('show'); // Assuming you're using Bootstrap for modals
+    $('#statusModal' + studentID).modal('show'); // Assuming you're using Bootstrap for modals
 }
 
   </script>
