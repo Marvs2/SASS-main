@@ -17,7 +17,7 @@ font-family: 'Inter', sans-serif;
 	--bright-red: #c00808;
 	--grey: #eeeef084;
 	--dark-grey: #8D8D8D;
-	--light: #fff;
+	--light: #ffffffc7;
 	--dark: #000;
 	--green: #1fa41f;
 	--light-green: #E3FFCB;
@@ -828,6 +828,40 @@ padding-bottom: 7px;
 }
 .toast.active ~ button{
     pointer-events: none;
+}
+
+/*.form-control, .form-select {
+	border-width: 2px;
+}
+
+.form-control:focus {
+	box-shadow: none;
+	border: 2px solid #800000;
+}*/
+
+table th, table td {
+	font-size: 13px;
+}
+
+
+.fa-trash, .fa-eye {
+	font-size: 13px;
+}
+
+.modal-header {
+	background-color: #800000;
+}
+
+.modal-body .control-label {
+	font-weight: 600;
+}
+
+.modal-body {
+	font-size: 13px;
+}
+
+.representativeInfo{
+	display: none;
 }
 
 

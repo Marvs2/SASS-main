@@ -4,19 +4,21 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
-	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+	<link rel="stylesheet" href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css'>
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+	<link rel="stylesheet" href="{{url_for('static', filename='css/style.css')}}">
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
 
  <!---- <link rel="stylesheet" href="{{url_for('static', filename='css/tabler.min.css?1692870487')}}"> -->
 
@@ -26,7 +28,6 @@
 </head>
 <body>
   
-	
 	<!-- SIDEBAR -->
 	<section id="sidebar">
 		<a href="{{url_for('student_dashboard')}}" class="brand"><i class='bx bxs-smile icon'></i>SASS</a>
@@ -199,6 +200,43 @@ document.getElementById('notification-card').addEventListener('click', function 
 
 
 	{% block script %}
+  <script>
+  
+  // Function to close the notification card
+  function closeNotificationCard() {
+	  var notificationCard = document.getElementById('notification-card');
+	  if (notificationCard.classList.contains('show')) {
+		  notificationCard.classList.remove('show');
+	  }
+  }
+
+  // Add event listener to the notification icon
+  document.getElementById('notification-icon').addEventListener('click', function (event) {
+	  // Prevent the click event from propagating to the document body
+	  event.stopPropagation();
+
+	  // Toggle the visibility of the notification card
+	  document.getElementById('notification-card').classList.toggle('show');
+  });
+
+  // Add event listener to the document body to close the notification card on any click outside of it
+  document.body.addEventListener('click', closeNotificationCard);
+
+  // Add event listener to prevent the notification card from closing when clicking inside it
+  document.getElementById('notification-card').addEventListener('click', function (event) {
+	  event.stopPropagation();
+  });
+
+  // JavaScript to show all notifications when "See All Notifications" is clicked
+  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+	  // Prevent the link from navigating (you may adjust this behavior as needed)
+	  event.preventDefault();
+
+	  // Show all notifications by removing the 'd-none' class
+	  var notificationList = document.getElementById('notification-card');
+	  notificationList.classList.toggle('show');
+  });
+  </script>
 
   {% endblock script %}
 
@@ -207,8 +245,13 @@ document.getElementById('notification-card').addEventListener('click', function 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
 	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
   <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
+<!----  <script src="{{ url_for('static', filename='js/history.js')}}"></script> -->
 </body>
 </html>
 
