@@ -154,8 +154,6 @@ def student_dashboard():
 def studentprofile():
     return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
-from flask import flash
-
 @app.route('/student/profile/updated', methods=['GET', 'POST']) 
 def student_update_profile():
     if request.method == 'POST':
