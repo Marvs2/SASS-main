@@ -23,87 +23,124 @@
         border-bottom: 1px solid #ddd;
     }
 </style>
-
-<h1>Overload Applications</h1>
-<div id="overloadTableContainer">
-<table id="overloadTable" class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Student Number</th>
-            <th>Semester</th>
-            <th>Subjects to Add</th>
-            <th>Justification</th>
-            <th>Files</th>
-            <th>User Responsible</th>
-            <th>Status</th>
-            <th>Action</th>  <!-- Add Action column -->
-        </tr>
-    </thead>
-    <tbody>
-        {% for overload_applications in overload_applications %}
-            <tr>
-                <td>{{ overload_applications.overload_application_id }}</td>
-                <td>{{ overload_applications.Name }}</td>
-                <td>{{ overload_applications.StudentNumber }}</td>
-                <td>{{ overload_applications.semester }}</td>
-                <td>{{ overload_applications.subjects_to_add }}</td>
-                <td>{{ overload_applications.justification }}</td>
-                <td>
-                    {% if overload_applications.file_data %}
-                        {% set filename = overload_applications.file_filename[:15] + '...' if overload_applications.file_filename|length > 15 else overload_applications.file_filename %}
-                        <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download title="{{overload_applications.file_filename}}">{{ filename }}</a>
-                    {% else %}
-                        <span class="badge badge-warning">No File</span>
-                    {% endif %}
-                </td>                
-                <td>{{ overload_applications.user_responsible }}</td>
-                <td>{{ overload_applications.status }}</td>
-                <td>
-                    <!-- Button to trigger the modal form -->
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_applications.overload_application_id }}">Change Status</button>
-                </td>
-            </tr>
-
-            <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ overload_applications.overload_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="statusModalLabel">Change Status for {{ overload_applications.Name }}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form id="statusForm{{ overload_applications.overload_application_id }}" action="{{ url_for('update_overload_service_status', overload_application_id=overload_applications.overload_application_id) }}" method="POST">
-                            <div class="modal-body">
-                              <select name="status" class="form-select">
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="approved">Approved</option>
-                                <option value="finish">Finish</option>
-                                <option value="rejected">Rejected</option>
-                                <!-- Add other statuses as needed -->
-                              </select>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_applications.overload_application_id }})">Save changes</button>
-                            </div>
-                          </form>
-                        </div>
-                    </div>
-                </div>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
         {% endfor %}
-    </tbody>
-</table>
+    {% endif %}
+{% endwith %}
+
+<title>Overload Applications</title>
+    <!-- Add any necessary CSS -->
+    <style>
+        /* Adjust styling for DataTable container*/ 
+        #overloadTableContainer {
+            margin-top: 20px;
+            margin-left: 50px;
+            margin-right: 50px;
+            margin-bottom: 50px;
+            max-width: 80%; /* Adjust the maximum width as needed */
+        }
+
+        /* Add DataTables styles */
+        table {
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div id="overloadTableContainer">
+    <h1>Overload Applications</h1>
+    <table id="overloadTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Student Number</th>
+                <th>Program/Course</th>
+                <th>Semester</th>
+                <th>Subjects to Add</th>
+                <th>Justification</th>
+                <th>Files</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace with your Flask template logic to populate rows -->
+            {% for overload_application in overload_application %}
+                <tr>
+                    <td>{{ overload_application.overload_application_id }}</td>
+                    <td>{{ overload_application.Name }}</td>
+                    <td>{{ overload_application.StudentNumber }}</td>
+                    <td>{{ overload_application.programcourse }}</td>
+                    <td>{{ overload_application.semester }}</td>
+                    <td>{{ overload_application.subjects_to_add }}</td>
+                    <td>{{ overload_application.justification }}</td>
+                    <td>
+                        {% if overload_application.file_data %}
+                            <a href="{{ url_for('get_overload_file', overload_application_id=overload_application.overload_application_id) }}" download>Download</a>
+                        {% else %}
+                            No File
+                        {% endif %}
+                    </td>
+                    <td>{{ overload_application.user_responsible }}</td>
+                    <td>{{ overload_application.status }}</td>
+                    <td>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_application.overload_application_id }}">Change Status</button>
+                      </td>
+                </tr>
+                <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ overload_application.overload_application_id }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ overload_application.Name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="statusForm{{ overload_application.overload_application_id }}" action="{{ url_for('update_overload_service_status', overload_application_id=overload_application.overload_application_id) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_application.overload_application_id }})">Save Status</button>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
-<!-- Include DataTables script -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 
 <script>
     // Initialize DataTable
@@ -113,24 +150,24 @@
     });
 });
          // Function to update status
-  function updateStatus(overload_application_id) {
-    const formId = `statusForm${overload_application_id}`;
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
+        function updateStatus(overloadId) {
+        const formId = `statusForm${overloadId}`;
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
 
-    fetch('/faculty/overload', {
-      method: 'POST',
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        alert(data.message);
-        location.reload(); // Reload the page after successful update
-      })
-      .catch(error => {
-        console.error('Error updating status:', error);
-      });
-  }
+        fetch(`/faculty/overload`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // Show success/error message from the server
+            location.reload(); // Reload the page after successful update
+        })
+        .catch(error => {
+            console.error('Error updating status:', category='error');
+        });
+    }
   var lastActivity = new Date().getTime();
 
     // Function to update the activity timestamp
@@ -157,7 +194,7 @@
             console.log('Server notified about user activity');
         })
         .catch(error => {
-            console.error('Error notifying server:', error);
+            console.error('Error notifying server:', category='error');
         });
     }
 
@@ -168,9 +205,9 @@
         var inactiveTime = now - lastActivity;
 
         // If inactive for more than 5 minutes (adjust as needed)
-        if (inactiveTime > 300000) {
+        if (inactiveTime > 120000) {
             // Redirect to the logout or login page
-            window.location.href = "/logout";  // Adjust the URL as needed
+            window.location.href = "/logoutfaculty";  // Adjust the URL as needed
         }
     }, 60000);  // Check every minute (adjust as needed)
 

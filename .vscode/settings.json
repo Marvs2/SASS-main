@@ -1,3 +1,4 @@
 {
-    "editor.cursorStyle": "line"
+    "editor.cursorStyle": "line",
+    "window.autoDetectColorScheme": true
 }
