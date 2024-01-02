@@ -160,25 +160,25 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for grade_entries in services_data.grade_entries_list %}
-						<tr data-correction-application-id="{{ grade_entries.grade_entry_id }}"
-							data-correction-name="{{ grade_entries.Name }}"
-							data-correction-student-number="{{ grade_entries.StudentNumber }}"
-							data-correction-application-type="{{ grade_entries.application_type }}"
+						{% for grade_entry in services_data.grade_entry_list %}
+						<tr data-correction-application-id="{{ grade_entry.grade_entry_id }}"
+							data-correction-name="{{ grade_entry.Name }}"
+							data-correction-student-number="{{ grade_entry.StudentNumber }}"
+							data-correction-application-type="{{ grade_entry.application_type }}"
 
-							data-correction-file-completion="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
-							data-correction-completion-filename="{{ grade_entries.completion_form_filename }}"
+							data-correction-file-completion="{{ url_for('get_grade_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-completion-filename="{{ grade_entry.completion_form_filename }}"
 
-							data-correction-file-record="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
-							data-correction-record-filename="{{ grade_entries.class_record_filename }}"
+							data-correction-file-record="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-record-filename="{{ grade_entry.class_record_filename }}"
 
-							data-correction-file-affidavit="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
-							data-correction-affidavit-filename="{{ grade_entries.affidavit_filename }}"	
+							data-correction-file-affidavit="{{ url_for('get_grade_affidavit_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-affidavit-filename="{{ grade_entry.affidavit_filename }}"	
 
-							data-correction-status="{{ grade_entries.status }}">
-							<td class="applicationID">{{ grade_entries.grade_entry_id }}</td>								
-							<td>{{ grade_entries.application_type }}</td>
-							<td id="status">{{ grade_entries.status }}</td>								
+							data-correction-status="{{ grade_entry.status }}">
+							<td class="applicationID">{{ grade_entry.grade_entry_id }}</td>								
+							<td>{{ grade_entry.application_type }}</td>
+							<td id="status">{{ grade_entry.status }}</td>								
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewCorrectionModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
@@ -456,28 +456,28 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for certification_requests in services_data.certification_requests_list %}
-						<tr data-certification-application-id="{{ certification_requests.certification_request_id }}"
-							data-certification-name="{{ certification_requests.Name }}"
-							data-certification-student-number="{{ certification_requests.StudentNumber }}"
-							data-certification-type="{{ certification_requests.certification_type }}"
+						{% for certification_request in services_data.certification_request_list %}
+						<tr data-certification-application-id="{{ certification_request.certification_request_id }}"
+							data-certification-name="{{ certification_request.Name }}"
+							data-certification-student-number="{{ certification_request.StudentNumber }}"
+							data-certification-type="{{ certification_request.certification_type }}"
 
-							data-request-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
-							data-request-filename="{{ certification_requests.request_form_filename }}"	
+							data-request-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-request-filename="{{ certification_request.request_form_filename }}"	
 
-							data-registration-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
-							data-registration-filename="{{ certification_requests.request_form_filename }}"	
+							data-registration-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-registration-filename="{{ certification_request.request_form_filename }}"	
 
-							data-authorization-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
-							data-authorization-filename="{{ certification_requests.authorization_letter_filename }}"
+							data-authorization-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-authorization-filename="{{ certification_request.authorization_letter_filename }}"
 
-							data-representative-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
-							data-representative-filename="{{ certification_requests.representative_id_filename }}"
+							data-representative-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-representative-filename="{{ certification_request.representative_id_filename }}"
 
-							data-certification-status="{{ certification_requests.status }}">
-							<td class="applicationID">{{ certification_requests.certification_request_id }}</td>								
-							<td>{{ certification_requests.certification_type }}</td>																				
-							<td id="status">{{ certification_requests.status }}</td>
+							data-certification-status="{{ certification_request.status }}">
+							<td class="applicationID">{{ certification_request.certification_request_id }}</td>								
+							<td>{{ certification_request.certification_type }}</td>																				
+							<td id="status">{{ certification_request.status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewCertificationModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
