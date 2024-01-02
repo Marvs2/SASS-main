@@ -1,0 +1,76 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<div>
+    <h1>Petition Requests</h1>
+    <table id="petitionTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Number</th>
+                <th>Name</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Petition Type</th>
+                <th>Request Reason</th>
+                <th>Created At</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in petition_requests %}
+            <tr>
+                <td>{{ request.petition_request_id }}</td>
+                <td>{{ request.StudentNumber }}</td>
+                <td>{{ request.Name }}</td>
+                <td>{{ request.subject_code }}</td>
+                <td>{{ request.subject_name }}</td>
+                <td>{{ request.petition_type }}</td>
+                <td>{{ request.request_reason }}</td>
+                <td>{{ request.created_at }}</td>
+                <td>{{ request.user_responsible }}</td>
+                <td>{{ request.status }}</td>
+                <td>
+                    <!-- Action buttons like edit or update status -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script>
+
+$(document).ready(function() {
+    $('#petitionTable').DataTable({
+        "pageLength": 5
+    });
+});
+
+  // Function to update status
+  function updateStatus(petition_request_id) {
+    const formId = `statusForm${petition_request_id}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/petition', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+</script>
+
+{% endblock %}

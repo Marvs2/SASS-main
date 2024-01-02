@@ -1,0 +1,113 @@
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+    /* Add DataTables styles */
+    table {
+        width: 90%;
+        border: 1px;
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+<!--Done-->
+<!-- DataTable HTML -->
+<!-- Certification Requests -->
+<h2>Grade Entries</h2>
+<table id="gradeEntriesTable" class="table table-bordered" style="width:80%">
+    <thead>
+        <tr>
+            <th>Grade ID</th>
+            <th>Student Number</th>
+            <th>Name</th>
+            <th>Application Type</th>
+            <th>Files</th>
+            <th>Created At</th>
+            <th>Responsible</th>
+            <th>Status</th>
+            <th>Stud ID</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for grade_entry in grade_entry %}
+            <tr>
+                <td>{{ grade_entry.grade_entry_id }}</td>
+                <td>{{ grade_entry.StudentNumber }}</td>
+                <td>{{ grade_entry.Name }}</td>
+                <td>{{ grade_entry.application_type }}</td>
+                <td>
+                    <!-- File Links -->
+                    {% if grade_entry.completion_form_data %}
+                        <a href="{{ url_for('get_grade_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.completion_form_filename }}</a>
+                    {% else %}
+                        <span class="badge badge-warning">No File</span>
+                    {% endif %}
+                    {% if grade_entry.class_record_data %}
+                        <a href="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.class_record_filename }}</a>
+                    {% else %}
+                        <span class="badge badge-warning">No File</span>
+                    {% endif %}
+                    {% if grade_entry.affidavit_data %}
+                        <a href="{{ url_for('get_grade_affidavit_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.affidavit_filename }}</a>
+                    {% else %}
+                        <span class="badge badge-warning">No File</span>
+                    {% endif %}
+                </td>
+                <td>{{ grade_entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ grade_entry.user_responsible }}</td>
+                <td>{{ grade_entry.status }}</td>
+                <td>{{ grade_entry.StudentId }}</td>
+                <td>
+                    <!-- Action Buttons -->
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entry.grade_entry_id }}">View Status</button>
+                    <!-- Additional action buttons can be added here -->
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+<!-- DataTable Initialization Script -->
+<script>
+    // Initialize DataTable
+    $(document).ready(function() {
+    $('#certificationRequestsTable').DataTable({
+        "pageLength": 5
+    });
+});
+
+  // Function to update status
+  function updateStatus(grade_entry_id) {
+    const formId = `statusForm${grade_entry_id}`;
+    const form = document.getElementById(formId);
+    const formData = new FormData(form);
+
+    fetch('/faculty/correction', {
+      method: 'POST',
+      body: formData,
+    })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        location.reload(); // Reload the page after successful update
+      })
+      .catch(error => {
+        console.error('Error updating status:', error);
+      });
+  }
+</script>
+
+{% endblock %}
