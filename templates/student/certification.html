@@ -78,19 +78,19 @@
                 </div>
 
                 <label for="is_representative">Is there a representative?</label>
-                <input type="checkbox" id="is_representative" name="is_representative"><br>
-
-                <div class="row mb-3" id="representativeInfo">
+                <input type="checkbox" id="is_representative" name="is_representative" onchange="toggleRepresentativeInfo()"><br>
+            
+                <div class="row mb-3 representativeInfo">
                     <label for="authorization_letter" class="col-sm-3 col-form-label">Authorization Letter</label>
                     <div class="col-sm-8">
                         <input type="file" class="form-control" name="authorization_letter" id="authorization_letter">
-                      </div>
-
-                      <label for="representative_id" class="col-sm-3 col-form-label">Representative's Identification Card (ID)</label>
-                      <div class="col-sm-8">
-                          <input type="file" class="form-control" name="representative_id" id="representative_id">
-                        </div>                   
-                </div>
+                    </div>
+            
+                    <label for="representative_id" class="col-sm-3 col-form-label">Representative's Identification Card (ID)</label>
+                    <div class="col-sm-8">
+                        <input type="file" class="form-control" name="representative_id" id="representative_id">
+                    </div>                   
+                </div>            
 
                 <div class="row mb-3">
                     <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
@@ -123,18 +123,17 @@
         </div>
     </div>
 
-    <script>
-        const isRepresentativeCheckbox = document.getElementById('is_representative');
-        const representativeInfoDiv = document.getElementById('representativeInfo');
+    <script>    
+        function toggleRepresentativeInfo() {
+            var checkbox = document.getElementById("is_representative");
+            var representativeInfo = document.querySelector(".representativeInfo");
 
-        isRepresentativeCheckbox.addEventListener('change', function () {
-            if (isRepresentativeCheckbox.checked) {
-                representativeInfoDiv.style.display = 'block';
+            if (checkbox.checked) {
+                representativeInfo.style.display = "block";
             } else {
-                representativeInfoDiv.style.display = 'none';
+                representativeInfo.style.display = "none";
             }
-        });
-
+        }
         // Automatically close the alert messages after 3 seconds
         setTimeout(function () {
             $('.alert').alert('close');

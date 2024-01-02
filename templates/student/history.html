@@ -4,7 +4,8 @@
 
 
 <div class="accordion" id="accordionExample">
-	
+
+	<!------------------------------------------------- OVERLOAD OF SUBJECTS --------------------------------------------------->
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne"
@@ -14,32 +15,43 @@
         </h2>
         <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-				<table id="example" class="table table-bordered table-condensed">
+				<table id="overload" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
-							<th>Name</th>
-							<th>Position</th>
-							<th>Office</th>
-							<th>Age</th>
-							<th>Start date</th>
-							<th>Salary</th>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+							<th>Status</th>
+							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						<tr>
-							<td>Tiger Nixon</td>
-							<td>System Architect</td>
-							<td>Edinburgh</td>
-							<td>61</td>
-							<td>2011-04-25</td>
-							<td>$320,800</td>
-						</tr>						
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-overload-application-id="{{ overload_applications.overload_application_id }}"
+							data-overload-name="{{ overload_applications.Name }}"
+							data-overload-student-number="{{ overload_applications.StudentNumber }}"
+							data-overload-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-overload-justification="{{ overload_applications.justification }}"
+							data-overload-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-overload-file-filename="{{ overload_applications.file_filename }}"	
+							data-overload-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>														
+							<td id="status">{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
 					</tbody>					
 				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- ADDING OF SUBJECTS --------------------------------------------------->
     <div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -49,35 +61,86 @@
         </h2>
         <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="addingSubject" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Enrollment Type</th>
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for addsubjects in services_data.addsubjects_list %}
+						<tr data-add-application-id="{{  addsubjects.subject_ID }}"
+							data-add-name="{{ addsubjects.Name}}" 
+							data-add-student-number="{{ addsubjects.StudentNumber }}"
+							data-add-subjects-to-add="{{ addsubjects.subject_Names }}"
+							data-add-enrollment-type="{{ addsubjects.enrollment_type }}"
+							data-add-file-url="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}"
+							data-add-file-filename="{{ addsubjects.file_name }}"	
+							data-add-status="{{ addsubjects.status }}">
+							<td class="applicationID">{{ addsubjects.subject_ID }}</td>								
+							<td>{{ addsubjects.subject_Names }}</td>
+							<td>{{ addsubjects.enrollment_type }}</td>														
+							<td id="status">{{ addsubjects.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
-    <div class="accordion-item">
+	<!------------------------------------------------- CHANGE OF SCHEDULE/SUBJECTS --------------------------------------------------->
+	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
                 data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                <strong> Change of Schedule/Subjects</strong>
+                <strong>Change of Schedule/Subjects</strong> 
             </button>
         </h2>
         <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="changeofSchedule" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Enrollment Type</th>
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for changesubjects in services_data.changesubjects_list %}
+						<tr data-change-application-id="{{  changesubjects.Changesubject_ID }}"
+							data-change-name="{{ changesubjects.Name }}"
+							data-change-student-number="{{ changesubjects.StudentNumber }}"
+							data-change-enrollment-type="{{ changesubjects.enrollment_type }}"
+							data-change-file-url="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}"
+							data-change-file-filename="{{ changesubjects.ace_form_filenamee }}"	
+							data-change-status="{{ changesubjects.status  }}">
+							<td class="applicationID">{{ changesubjects.Changesubject_ID }}</td>								
+							<td>{{ changesubjects.enrollment_type }}</td>														
+							<td id="status">{{ changesubjects.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewChangeModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- CORRECTION OF GRADE ENTRY --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -87,16 +150,48 @@
         </h2>
         <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="correction" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Application Type</th>
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for grade_entries in services_data.grade_entries_list %}
+						<tr data-correction-application-id="{{ grade_entries.grade_entry_id }}"
+							data-correction-name="{{ grade_entries.Name }}"
+							data-correction-student-number="{{ grade_entries.StudentNumber }}"
+							data-correction-application-type="{{ grade_entries.application_type }}"
+
+							data-correction-file-completion="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
+							data-correction-completion-filename="{{ grade_entries.completion_form_filename }}"
+
+							data-correction-file-record="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
+							data-correction-record-filename="{{ grade_entries.class_record_filename }}"
+
+							data-correction-file-affidavit="{{ url_for('get_grade_entries_file', grade_entry_id=grade_entries.grade_entry_id) }}"
+							data-correction-affidavit-filename="{{ grade_entries.affidavit_filename }}"	
+
+							data-correction-status="{{ grade_entries.status }}">
+							<td class="applicationID">{{ grade_entries.grade_entry_id }}</td>								
+							<td>{{ grade_entries.application_type }}</td>
+							<td id="status">{{ grade_entries.status }}</td>								
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewCorrectionModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- CROSS ENROLLMENT --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -106,16 +201,46 @@
         </h2>
         <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="crossEnrollment" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-application-id="{{ overload_applications.overload_application_id }}"
+							data-name="{{ overload_applications.Name }}"
+							data-student-number="{{ overload_applications.StudentNumber }}"
+							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-justification="{{ overload_applications.justification }}"
+							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-file-filename="{{ overload_applications.file_filename }}"	
+							data-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>	
+							
+													
+							<td>{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- APPLICATION FOR SHIFTING --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -125,16 +250,46 @@
         </h2>
         <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="overload" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-application-id="{{ overload_applications.overload_application_id }}"
+							data-name="{{ overload_applications.Name }}"
+							data-student-number="{{ overload_applications.StudentNumber }}"
+							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-justification="{{ overload_applications.justification }}"
+							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-file-filename="{{ overload_applications.file_filename }}"	
+							data-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>	
+							
+													
+							<td>{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- MANUAL ENROLLMENT --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -144,16 +299,46 @@
         </h2>
         <div id="collapseSeven" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="manualEnrollment" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-application-id="{{ overload_applications.overload_application_id }}"
+							data-name="{{ overload_applications.Name }}"
+							data-student-number="{{ overload_applications.StudentNumber }}"
+							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-justification="{{ overload_applications.justification }}"
+							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-file-filename="{{ overload_applications.file_filename }}"	
+							data-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>	
+							
+													
+							<td>{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- ONLINE PETITION OF SUBJECTS --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -163,16 +348,46 @@
         </h2>
         <div id="collapseEight" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="overload" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-application-id="{{ overload_applications.overload_application_id }}"
+							data-name="{{ overload_applications.Name }}"
+							data-student-number="{{ overload_applications.StudentNumber }}"
+							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-justification="{{ overload_applications.justification }}"
+							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-file-filename="{{ overload_applications.file_filename }}"	
+							data-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>	
+							
+													
+							<td>{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- ONLINE REQUEST FOR TUTORIAL --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -182,16 +397,46 @@
         </h2>
         <div id="collapseNine" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="overload" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Subjects to Add</th>
+							<th>Reason/s</th>
+
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for overload_applications in services_data.overload_applications_list %}
+						<tr data-application-id="{{ overload_applications.overload_application_id }}"
+							data-name="{{ overload_applications.Name }}"
+							data-student-number="{{ overload_applications.StudentNumber }}"
+							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
+							data-justification="{{ overload_applications.justification }}"
+							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
+							data-file-filename="{{ overload_applications.file_filename }}"	
+							data-status="{{ overload_applications.status }}">
+							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
+							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.justification }}</td>	
+							
+													
+							<td>{{ overload_applications.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 
+	<!------------------------------------------------- ONLINE REQUEST FOR CERTIFICATION --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -201,44 +446,698 @@
         </h2>
         <div id="collapseTen" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the
-                collapse plugin adds the appropriate classes that we use to style each element. These classes
-                control the overall appearance, as well as the showing and hiding via CSS transitions. You can
-                modify any of this with custom CSS or overriding our default variables. It's also worth noting that
-                just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit
-                overflow.
+				<table id="certification" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+							<th>Application Number</th>														
+							<th>Certification Type</th>
+							<th>Status</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+						{% for certification_requests in services_data.certification_requests_list %}
+						<tr data-certification-application-id="{{ certification_requests.certification_request_id }}"
+							data-certification-name="{{ certification_requests.Name }}"
+							data-certification-student-number="{{ certification_requests.StudentNumber }}"
+							data-certification-type="{{ certification_requests.certification_type }}"
+
+							data-request-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
+							data-request-filename="{{ certification_requests.request_form_filename }}"	
+
+							data-registration-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
+							data-registration-filename="{{ certification_requests.request_form_filename }}"	
+
+							data-authorization-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
+							data-authorization-filename="{{ certification_requests.authorization_letter_filename }}"
+
+							data-representative-url="{{ url_for('get_certification_request_file', certification_request_id=certification_requests.certification_request_id) }}"
+							data-representative-filename="{{ certification_requests.representative_id_filename }}"
+
+							data-certification-status="{{ certification_requests.status }}">
+							<td class="applicationID">{{ certification_requests.certification_request_id }}</td>								
+							<td>{{ certification_requests.certification_type }}</td>																				
+							<td id="status">{{ certification_requests.status }}</td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewCertificationModal"></button>
+								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
+							</td>
+						</tr>	
+						{% endfor %}					
+					</tbody>					
+				</table>
             </div>
         </div>
     </div>
 </div>
 
+<!------------------------------------------------- OVERLOAD VIEW MODAL  --------------------------------------------------->
+  <div class="modal fade" id="viewoverloadModal" tabindex="-1" role="dialog" aria-labelledby="viewoverloadModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="overloadModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="overload-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="overload-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="overload-application-studentNumber"></p>
+
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Subject/s to Add:</label>
+				<div class="col-sm-4">
+					<p id="overload-subjects-to-add"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Reason/s:</label>
+				<div class="col-sm-4">
+					<p id="overload-justification"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Related Docs:</label>
+				<div class="col-sm-4">
+					<p id="overload-application-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="overload-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+<!------------------------------------------------- ADDING OF SUBJECTS VIEW MODAL --------------------------------------------------->
+  <div class="modal fade" id="viewAddModal" tabindex="-1" role="dialog" aria-labelledby="viewAddModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="addModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="add-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="add-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="add-application-studentNumber"></p>
+
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Subject/s to Add:</label>
+				<div class="col-sm-4">
+					<p id="add-subjects-to-add"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Enrollment Type:</label>
+				<div class="col-sm-4">
+					<p id="add-enrollment-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Certificate of Registration:</label>
+				<div class="col-sm-4">
+					<p id="add-certification-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="add-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+  
+<!------------------------------------------------- CHANGE OF SCHEDULE/SUBJECTS VIEW MODAL --------------------------------------------------->
+  <div class="modal fade" id="viewChangeModal" tabindex="-1" role="dialog" aria-labelledby="viewChangeModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="changeModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="change-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="change-application-name"></p>				
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="change-application-studentNumber"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Enrollment Type:</label>
+				<div class="col-sm-4">
+					<p id="change-enrollment-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Certificate of Registration:</label>
+				<div class="col-sm-4">
+					<p id="change-certification-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="change-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+  <!------------------------------------------------- CORRECTION OF GRADE ENTRY VIEW MODAL --------------------------------------------------->
+  <div class="modal fade" id="viewCorrectionModal" tabindex="-1" role="dialog" aria-labelledby="viewCorrectionModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="correctionModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="correction-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="correction-application-name"></p>				
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="correction-application-studentNumber"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Application Type:</label>
+				<div class="col-sm-4">
+					<p id="correction-application-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Completion Form:</label>
+				<div class="col-sm-4">
+					<p id="correction-completion-file"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Copy of Class Record:</label>
+				<div class="col-sm-4">
+					<p id="correction-record-file"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Notarized Affidavit for Change of Grades:</label>
+				<div class="col-sm-4">
+					<p id="correction-affidavit-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="correction-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+  <!-------------------------------------- ONLINE REQUEST FOR CERTIFICATION VIEW MODAL  --------------------------------------------------->
+  <div class="modal fade" id="viewCertificationModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificationModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="certificationModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="certification-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="certification-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="certification-application-studentNumber"></p>
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Certification Type:</label>
+				<div class="col-sm-4">
+					<p id="certification-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Request Form:</label>
+				<div class="col-sm-4">
+					<p id="certification-request-form"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Certificate of Registration:</label>
+				<div class="col-sm-4">
+					<p id="certification-registration-file"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Authorization Letter:</label>
+				<div class="col-sm-4">
+					<p id="certification-authorization-file"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Representative Identification Card (ID):</label>
+				<div class="col-sm-4">
+					<p id="certification-representative-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="certification-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+  
+  <!------------------------------------------------- DELETE MODAL --------------------------------------------------->
+  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="DeleteModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="DeleteModalLabel">Delete Application</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body delete">
+			<p id="deleteModalText">Are you sure you want to <strong>Delete</strong> this Application?</p>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+		  <button type="submit" class="btn btn-danger" id="deleteModalButton">Delete</button>
+		</div>
+	  </div>
+	</div>
+</div>
+
+
 <script>
-    $(document).ready(function() {
-        $('#subjectsTable').DataTable();
-    });
-	$(document).ready(function() {
-    	 $('#changeSubjectsTable').DataTable();
-    });
-	$(document).ready(function () {
-		$('#certificationRequestsTable').DataTable();
-	});
-	$(document).ready(function () {
-		$('#gradeEntriesTable').DataTable();
-	});
-	$(document).ready(function () {
-		$('#shiftingTable').DataTable();
-	});
-	$(document).ready(function() {
-        $('#overloadTable').DataTable();
-        // Initialize DataTable for other tables if needed
+		// VIEW OVERLOAD MODAL
+        $(document).ready(function () {
+        $('#overload tbody tr').on('click', function () {
+            // Retrieve data from the clicked row
+            var applicationId = $(this).data('overload-application-id');
+            var name = $(this).data('overload-name');
+            var studentNumber = $(this).data('overload-student-number');
+            var subjectsToAdd = $(this).data('overload-subjects-to-add');
+            var justification = $(this).data('overload-justification');
+            var fileUrl = $(this).data('overload-file-url');
+            var fileName = $(this).data('overload-file-filename');
+            var status = $(this).data('overload-status');
+
+            // Populate modal with data
+            $('#overload-application-id').text(applicationId);
+            $('#overload-application-name').text(name);
+            $('#overload-application-studentNumber').text(studentNumber);
+            $('#overload-subjects-to-add').text(subjectsToAdd);
+            $('#overload-justification').text(justification);
+
+            // Generate dynamic file download link
+			if (fileName) {
+				var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
+				$('#overload-application-file').empty().append(fileLink);
+			} else {
+				$('#overload-application-file').text('No File');
+			}
+
+			$('#overload-status').text(status);
+        });
     });
 
+	// VIEW ADDING OF SUBJECT MODAL
+	$(document).ready(function () {
+	$('#addingSubject tbody tr').on('click', function () {
+		// Retrieve data from the clicked row
+		var applicationId = $(this).data('add-application-id');
+		var name = $(this).data('add-name');
+		var studentNumber = $(this).data('add-student-number');
+		var subjectsToAdd = $(this).data('add-subjects-to-add');
+		var enrollmentType = $(this).data('add-enrollment-type');
+		var fileUrl = $(this).data('add-file-url');
+		var fileName = $(this).data('add-file-filename');
+		var status = $(this).data('add-status');
+
+		// Populate modal with data
+		$('#add-application-id').text(applicationId);
+		$('#add-application-name').text(name);
+		$('#add-application-studentNumber').text(studentNumber);
+		$('#add-subjects-to-add').text(subjectsToAdd);
+		$('#add-enrollment-type').text(enrollmentType);
+
+		// Generate dynamic file download link
+		if (fileName) {
+				var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
+				$('#add-certification-file').empty().append(fileLink);
+			} else {
+				$('#add-certification-file').text('No File');
+			}
+
+		$('#add-status').text(status);
+	});
+});
+
+	// VIEW CHANGE OF SCHEDULE/SUBJECT MODAL
+	$(document).ready(function () {
+	$('#changeofSchedule tbody tr').on('click', function () {
+		// Retrieve data from the clicked row
+		var applicationId = $(this).data('change-application-id');
+		var name = $(this).data('change-name');
+		var studentNumber = $(this).data('change-student-number');
+		var enrollmentType = $(this).data('change-enrollment-type');
+		var fileUrl = $(this).data('change-file-url');
+		var fileName = $(this).data('change-file-filename');
+		var status = $(this).data('change-status');
+
+		// Populate modal with data
+		$('#change-application-id').text(applicationId);
+		$('#change-application-name').text(name);
+		$('#change-application-studentNumber').text(studentNumber);
+		$('#change-enrollment-type').text(enrollmentType);
+
+		// Generate dynamic file download link
+		if (fileName) {
+				var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
+				$('#change-certification-file').empty().append(fileLink);
+			} else {
+				$('#change-certification-file').text('No File');
+			}
+
+		$('#change-status').text(status);
+	});
+});
+
+// VIEW CORRECTION OF GRADE ENTRY
+$(document).ready(function () {
+	$('#correction tbody tr').on('click', function () {
+		// Retrieve data from the clicked row
+		var applicationId = $(this).data('correction-application-id');
+		var name = $(this).data('correction-name');
+		var studentNumber = $(this).data('correction-student-number');
+		var applicationType = $(this).data('correction-application-type');
+		var completion = $(this).data('correction-file-completion');
+		var completionFile = $(this).data('correction-completion-filename');
+		var record = $(this).data('correction-file-record');
+		var recordFile = $(this).data('correction-record-filename');
+		var affidavit = $(this).data('correction-file-affidavit');
+		var affidavitFile = $(this).data('correction-affidavit-filename');
+		var status = $(this).data('correction-status');
+
+		// Populate modal with data
+		$('#correction-application-id').text(applicationId);
+		$('#correction-application-name').text(name);
+		$('#correction-application-studentNumber').text(studentNumber);
+		$('#correction-application-type').text(applicationType);
+
+		// Generate dynamic file download link
+		if (completionFile) {
+				var fileLink = $('<a>').attr('href', completion).attr('target', '_blank').text(completionFile);
+				$('#correction-completion-file').empty().append(fileLink);
+			} else {
+				$('#correction-completion-file').text('No File');
+			}
+
+			if (recordFile) {
+				var fileLink = $('<a>').attr('href', record).attr('target', '_blank').text(recordFile);
+				$('#correction-record-file').empty().append(fileLink);
+			} else {
+				$('#correction-record-file').text('No File');
+			}
+
+			if (affidavitFile) {
+				var fileLink = $('<a>').attr('href', affidavit).attr('target', '_blank').text(affidavitFile);
+				$('#correction-affidavit-file').empty().append(fileLink);
+			} else {
+				$('#correction-affidavit-file').text('No File');
+			}
+
+		$('#correction-status').text(status);
+	});
+});
+
+// VIEW REQUEST FOR CERTIFICATION MODAL
+$(document).ready(function () {
+        $('#certification tbody tr').on('click', function () {
+            // Retrieve data from the clicked row
+            var applicationId = $(this).data('certification-application-id');
+            var name = $(this).data('certification-name');
+            var studentNumber = $(this).data('certification-student-number');
+            var certificationType = $(this).data('certification-type');
+
+            var requestUrl = $(this).data('request-url');
+            var requestFile = $(this).data('request-filename');
+
+			var registrationUrl = $(this).data('registration-url');
+            var registrationFile = $(this).data('registration-filename');
+
+			var authorizationUrl = $(this).data('authorization-url');
+            var authorizationFile = $(this).data('authorization-filename');
+
+			var representativeUrl = $(this).data('ID-url');
+            var representativeFile = $(this).data('ID-filename');
+
+            var status = $(this).data('certification-status');
+
+            // Populate modal with data
+            $('#certification-application-id').text(applicationId);
+            $('#certification-application-name').text(name);
+            $('#certification-application-studentNumber').text(studentNumber);
+            $('#certification-type').text(certificationType);
+
+            // Generate dynamic file download link
+			if (requestFile) {
+				var fileLink = $('<a>').attr('href', requestUrl).attr('target', '_blank').text(requestFile);
+				$('#certification-request-form').empty().append(fileLink);
+			} else {
+				$('#certification-request-form').text('No File');
+			}
+
+			if (registrationFile) {
+				var fileLink = $('<a>').attr('href', registrationUrl).attr('target', '_blank').text(registrationFile);
+				$('#certification-registration-file').empty().append(fileLink);
+			} else {
+				$('#certification-registration-file').text('No File');
+			}
+
+			if (authorizationFile) {
+				var fileLink = $('<a>').attr('href', authorizationUrl).attr('target', '_blank').text(authorizationFile);
+				$('#certification-authorization-file').empty().append(fileLink);
+			} else {
+				$('#certification-authorization-file').text('No File');
+			}
+
+			if (IDFile) {
+				var fileLink = $('<a>').attr('href', IDUrl).attr('target', '_blank').text(IDFile);
+				$('#certification-ID-file').empty().append(fileLink);
+			} else {
+				$('#certification-ID-file').text('No File');
+			}
+
+			$('#certification-status').text(status);
+        });
+    });
 </script>
 
+
+
+<script>
+	//DELETE MODAL
+	$(document).ready(function () {
+		$('tbody tr').on('click', function () {
+			var status = $('#status', this).text();
+			var modalText = $('#deleteModalText');
+			var deleteButton = $('#deleteModalButton');
+
+			// Check if the status is 'Pending' or 'Process'
+			if (status === 'pending') {
+				modalText.html('Deletion for your application is not allowed because it is now in <strong>pending</strong>.');
+				// Disable the delete button
+				deleteButton.prop('disabled', true);
+			} else if (status === 'processing') {
+				modalText.html('Deletion for your application is not allowed because it is now in <strong>process</strong>.');
+				// Disable the delete button
+				deleteButton.prop('disabled', true);
+			} else {
+				// Reset the modal body text
+				modalText.html('Are you sure you want to <strong>Delete</strong> this Application?');
+				// Enable the delete button
+				deleteButton.prop('disabled', false);
+			}
+		});
+
+		// Reset the button state and modal body text when the modal is closed
+		$('#deleteModal').on('hidden.bs.modal', function () {
+			$('#deleteModalButton').prop('disabled', false);
+			$('#deleteModalText').html('Are you sure you want to <strong>Delete</strong> this Application?');
+		});
+	});
+</script>
+
+
+ 
 {% endblock %}
+
+
+
+
+
 
 
