@@ -250,35 +250,34 @@
         </h2>
         <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-				<table id="overload" class="table table-bordered table-condensed">
+				<table id="shifting" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
 							<th>Application Number</th>														
-							<th>Subjects to Add</th>
-							<th>Reason/s</th>
-
+							<th>Current Program</th>
+							<th>Intended Program</th>
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
-						<tr data-application-id="{{ overload_applications.overload_application_id }}"
-							data-name="{{ overload_applications.Name }}"
-							data-student-number="{{ overload_applications.StudentNumber }}"
-							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
-							data-justification="{{ overload_applications.justification }}"
-							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
-							data-file-filename="{{ overload_applications.file_filename }}"	
-							data-status="{{ overload_applications.status }}">
-							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
-							<td>{{ overload_applications.justification }}</td>	
-							
-													
-							<td>{{ overload_applications.status }}</td>
+						{% for shifting_applications in services_data.shifting_applications_list %}
+						<tr data-shifting-application-id="{{ shifting_applications.shifting_application_id }}"
+							data-shifting-name="{{ shifting_applications.Name }}"
+							data-shifting-student-number="{{ shifting_applications.StudentNumber }}"
+							data-shifting-current-program="{{ shifting_applications.current_program }}"
+							data-shifting-years-residency="{{ shifting_applications.residency_year }}"
+							data-shifting-intended-program="{{ shifting_applications.intended_program }}"
+							data-shifting-qualification="{{ shifting_applications.qualifications }}"
+							data-shifting-file-url="{{ url_for('get_shifting_file', shifting_application_id=shifting_applications.shifting_application_id) }}"
+							data-shifting-file-filename="{{shifting_applications.file_filename }}"	
+							data-shifting-status="{{ shifting_applications.status }}">
+							<td class="applicationID">{{ shifting_applications.shifting_application_id }}</td>								
+							<td>{{ shifting_applications.current_program }}</td>
+							<td>{{ shifting_applications.intended_program }}</td>							
+							<td id="status">{{ shifting_applications.status }}</td>
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewShiftingModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -781,6 +780,94 @@
 	</div>
   </div>
 
+  <!------------------------------------------- APPLICATION FOR SHIFTING VIEW MODAL  --------------------------------------------------->
+  <div class="modal fade" id="viewShiftingModal" tabindex="-1" role="dialog" aria-labelledby="viewShiftingModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="shiftingModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="shifting-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="shifting-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="shifting-application-studentNumber"></p>
+
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">current Program:</label>
+				<div class="col-sm-4">
+					<p id="shifting-current-program"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Years of Residency in Current Program:</label>
+				<div class="col-sm-4">
+					<p id="shifting-years-residency"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Intended Program:</label>
+				<div class="col-sm-4">
+					<p id="shifting-intended-program"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Qualification for Shifting:</label>
+				<div class="col-sm-4">
+					<p id="shifting-qualification"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Related Docs:</label>
+				<div class="col-sm-4">
+					<p id="shifting-application-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="shifting-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
   <!-------------------------------------- ONLINE REQUEST FOR CERTIFICATION VIEW MODAL  --------------------------------------------------->
   <div class="modal fade" id="viewCertificationModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificationModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
@@ -1032,6 +1119,42 @@ $(document).ready(function () {
 		$('#correction-status').text(status);
 	});
 });
+
+	// VIEW QUALIFICATION FOR SHIFTING MODAL
+	$(document).ready(function () {
+        $('#shifting tbody tr').on('click', function () {
+            // Retrieve data from the clicked row
+            var applicationId = $(this).data('shifting-application-id');
+            var name = $(this).data('shifting-name');
+            var studentNumber = $(this).data('shifting-student-number');
+            var currentProgram = $(this).data('shifting-current-program');
+			var yearsResidency = $(this).data('shifting-years-residency');
+            var intendedProgram = $(this).data('shifting-intended-program');
+            var qualification = $(this).data('shifting-qualification');
+            var fileUrl = $(this).data('shifting-file-url');
+            var fileName = $(this).data('shifting-file-filename');
+            var status = $(this).data('shifting-status');
+
+            // Populate modal with data
+            $('#shifting-application-id').text(applicationId);
+            $('#shifting-application-name').text(name);
+            $('#shifting-application-studentNumber').text(studentNumber);
+            $('#shifting-current-program').text(currentProgram);
+			$('#shifting-years-residency').text(yearsResidency);
+            $('#shifting-intended-program').text(intendedProgram);
+            $('#shifting-qualification').text(qualification);
+
+            // Generate dynamic file download link
+			if (fileName) {
+				var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
+				$('#shifting-application-file').empty().append(fileLink);
+			} else {
+				$('#shifting-application-file').text('No File');
+			}
+
+			$('#shifting-status').text(status);
+        });
+    });
 
 // VIEW REQUEST FOR CERTIFICATION MODAL
 $(document).ready(function () {
