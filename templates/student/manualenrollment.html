@@ -1,38 +1,6 @@
 {% extends "student/layout.html" %}
 {% block content %}
-    
-<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            {% if category == "error" %}
-                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                        <i class="fa-solid fa-xmark wrong"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Oh! Snap</span>
-                            <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% else %}
-                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                      <i class="fas fa-solid fa-check check"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Successful</span>
-                          <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-   
+  
     <div class="data data1">
         <div class="content-data">
             <div class="head">
