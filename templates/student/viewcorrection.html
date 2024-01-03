@@ -1,0 +1,147 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+</script>
+  <style>
+    /* Add DataTables styles */
+    table {
+        width: 60%;
+        border: 1px;
+        margin-top: 20px;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+
+<!-- DataTable HTML -->
+<h1>Subject Data</h1>
+
+<table id="gradeEntriesTable" class="table table-bordered">
+  <thead>
+    <tr>
+        <th>Grade ID</th>
+        <th>Student Number</th>
+        <th>Name</th>
+        <th>Application Type</th>
+        <th>Files</th>
+        <th>Created At</th>
+        <th>Responsible</th>
+        <th>Status</th>
+        <th>Stud ID</th>
+        <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for grade_entry in grade_entry_list %}
+    <tr>
+        <td>{{ grade_entry.grade_entry_id }}</td>
+        <td>{{ grade_entry.StudentNumber }}</td>
+        <td>{{ grade_entry.Name }}</td>
+        <td>{{ grade_entry.application_type }}</td>
+        <td>
+            <!-- File Links -->
+            {% if grade_entry.completion_form_data %}
+                <a href="{{ url_for('get_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.completion_form_filename }}</a>
+            {% else %}
+                <span class="badge badge-warning">No File</span>
+            {% endif %}
+            {% if grade_entry.class_record_data %}
+                <a href="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.class_record_filename }}</a>
+            {% else %}
+                <span class="badge badge-warning">No File</span>
+            {% endif %}
+            {% if grade_entry.affidavit_data %}
+                <a href="{{ url_for('get_grade_affidavit_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.affidavit_filename }}</a>
+            {% else %}
+                <span class="badge badge-warning">No File</span>
+            {% endif %}
+        </td>
+        <td>{{ grade_entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ grade_entry.user_responsible }}</td>
+        <td>{{ grade_entry.status }}</td>
+        <td>{{ grade_entry.StudentId }}</td>
+        <td>
+            <!-- Action Buttons -->
+            <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entry.grade_entry_id }}">View Status</button>
+            <!-- Additional action buttons can be added here -->
+        </td>
+    </tr>
+
+    <!-- Modal -->
+    <div class="modal fade" id="statusModal{{ grade_entry.grade_entry_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ grade_entry.grade_entry_id }}</h5>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                  </button>
+              </div>
+              <!-- Inside the modal body -->
+              <div class="modal-body" id="statusModalBody{{ grade_entry.grade_entry_id }}">
+                  <!-- Status-related information will be populated here -->
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+    </div>
+
+
+    {% endfor %}
+  </tbody>
+</table>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js">
+</script>
+
+  <!-- DataTable initialization script -->
+  <script>
+    $(document).ready(function() {
+      $('#gradeEntriesTable').DataTable();
+    });
+    function checkStatusAndShowModal(grade_entry_id, status) {
+    let message = '';
+    
+    switch (status) {
+        case 'Sent':
+            message = "Your item has been sent! Wait to be processed";
+            break;
+        case 'pending':
+            message = "Your item is pending.";
+            break;
+        case 'processing':
+            message = "Your item is being processed.";
+            break;
+        case 'approved':
+            message = "Your item has been approved!";
+            break;
+        case 'finish':
+            message = "Your item has been finished.";
+            break;
+        case 'rejected':
+            message = "Unfortunately, your item has been rejected.";
+            break;
+        default:
+            message = "Status not recognized.";
+            break;
+    }
+    
+    // Set the status message in the modal body based on the specific modal's ID
+    document.getElementById('statusModalBody' + grade_entry_id).innerHTML = `<p>Status for Student ID ${grade_entry_id}: ${message}</p>`;
+    
+    // Display the modal
+    $('#statusModal' + grade_entry_id).modal('show'); // Assuming you're using Bootstrap for modals
+}
+
+  </script>
+
+{% endblock %}
+

@@ -123,7 +123,7 @@
 							data-change-student-number="{{ changesubjects.StudentNumber }}"
 							data-change-enrollment-type="{{ changesubjects.enrollment_type }}"
 							data-change-file-url="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}"
-							data-change-file-filename="{{ changesubjects.ace_form_filenamee }}"	
+							data-change-file-filename="{{ changesubjects.ace_form_filename }}"	
 							data-change-status="{{ changesubjects.status  }}">
 							<td class="applicationID">{{ changesubjects.Changesubject_ID }}</td>								
 							<td>{{ changesubjects.enrollment_type }}</td>														
@@ -166,7 +166,7 @@
 							data-correction-student-number="{{ grade_entry.StudentNumber }}"
 							data-correction-application-type="{{ grade_entry.application_type }}"
 
-							data-correction-file-completion="{{ url_for('get_grade_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-completion-file="{{ url_for('get_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}"
 							data-correction-completion-filename="{{ grade_entry.completion_form_filename }}"
 
 							data-correction-file-record="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}"
@@ -204,30 +204,30 @@
 				<table id="crossEnrollment" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
-							<th>Application Number</th>														
-							<th>Subjects to Add</th>
-							<th>Reason/s</th>
-
+							<th>Application Number</th>									
+							<th>School</th>
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
-						<tr data-application-id="{{ overload_applications.overload_application_id }}"
-							data-name="{{ overload_applications.Name }}"
-							data-student-number="{{ overload_applications.StudentNumber }}"
-							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
-							data-justification="{{ overload_applications.justification }}"
-							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
-							data-file-filename="{{ overload_applications.file_filename }}"	
-							data-status="{{ overload_applications.status }}">
-							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
-							<td>{{ overload_applications.justification }}</td>	
+						{% for cross_enrollments in services_data.cross_enrollments_list %}
+						<tr data-application-id="{{ cross_enrollments.cross_enrollment_id }}"
+							data-name="{{ cross_enrollments.Name }}"
+							data-student-number="{{ cross_enrollments.StudentNumber }}"
+							data-school-to-enroll="{{ cross_enrollments.school_for_cross_enrollment }}"
+							data-total-number-of-units="{{ cross_enrollments.total_number_of_units }}"
+							data-application-letter-url="{{ url_for('get_application_letter', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}"
+							data-file-filename="{{ cross_enrollments.application_letter_filename }}"	
+							data-permit-to-cross-url="{{ url_for('get_permit_to_enroll', cross_enrollments_id=cross_enrollments.cross_enrollment_id) }}"
+							data-file-filename="{{ cross_enrollments.permit_to_cross_enroll_filename }}"	
+							data-status="{{ cross_enrollments.status }}">
+							<td class="applicationID">{{ cross_enrollments.cross_enrollment_id }}</td>								
+							<td>{{ cross_enrollments.subjects_to_add }}</td>
+							<td>{{ cross_enrollments.justification }}</td>	
 							
 													
-							<td>{{ overload_applications.status }}</td>
+							<td>{{ cross_enrollments.status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						

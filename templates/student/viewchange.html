@@ -26,7 +26,8 @@
       <th>Subject ID</th>
       <th>Student Number</th>
       <th>Name</th>
-      <th>Subject Names</th>
+      <th>enrollment_type</th>
+      <th>created at</th>
       <th>Enrollment Type</th>
       <th>File</th>
       <th>User Responsible</th>
@@ -35,40 +36,40 @@
     </tr>
   </thead>
   <tbody>
-    {% for addsubjects in addsubjects_list %}
+    {% for changesubjects in changesubjects_list %}
     <tr>
-      <td>{{ addsubjects.subject_ID }}</td>
-      <td>{{ addsubjects.StudentNumber }}</td>
-      <td>{{ addsubjects.Name }}</td>
-      <td>{{ addsubjects.subject_Names }}</td>
-      <td>{{ addsubjects.enrollment_type }}</td>
+      <td>{{ changesubjects.Changesubject_ID }}</td>
+      <td>{{ changesubjects.StudentNumber }}</td>
+      <td>{{ changesubjects.Name }}</td>
+      <td>{{ changesubjects.enrollment_type }}</td>
+      <td>{{ changesubjects.created_at }}</td>
       <td>
-        {% if addsubjects.file_data %}
-            {% set truncated_file_name = addsubjects.file_name[:15] + '...' if addsubjects.file_name|length > 15 else addsubjects.file_name %}
-            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download title="{{ addsubjects.file_name }}">{{ truncated_file_name }}</a>
+        {% if changesubjects.ace_form_data %}
+        <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubjects.ace_form_filename }}</a>
         {% else %}
-            <span class="badge badge-warning">No File</span>
+        <span class="badge badge-warning">No File</span>
         {% endif %}
       </td>
-      <td>{{ addsubjects.user_responsible }}</td>
-      <td>{{ addsubjects.status }}</td>
+      <td>{{ changesubjects.user_responsible }}</td>
+      <td>{{ changesubjects.status }}</td>
+      <td>{{ changesubjects.StudentId }}</td>
       <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ addsubjects.subject_ID }}', '{{ addsubjects.status }}')">View Status</button>
+          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ changesubjects.Changesubject_ID }}', '{{ changesubjects.status }}')">View Status</button>
       </td>
     </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="statusModal{{ changesubjects.Changesubject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ addsubjects.subject_ID }}</h5>
+                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ changesubjects.Changesubject_ID }}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
               </div>
               <!-- Inside the modal body -->
-              <div class="modal-body" id="statusModalBody{{ addsubjects.subject_ID }}">
+              <div class="modal-body" id="statusModalBody{{ changesubjects.Changesubject_ID }}">
                   <!-- Status-related information will be populated here -->
               </div>
               <div class="modal-footer">
@@ -93,7 +94,7 @@
     $(document).ready(function() {
       $('#addSubjectsTable').DataTable();
     });
-    function checkStatusAndShowModal(subject_ID, status) {
+    function checkStatusAndShowModal(Changesubject_ID, status) {
     let message = '';
     
     switch (status) {
@@ -121,10 +122,10 @@
     }
     
     // Set the status message in the modal body based on the specific modal's ID
-    document.getElementById('statusModalBody' + subject_ID).innerHTML = `<p>Status for Student ID ${subject_ID}: ${message}</p>`;
+    document.getElementById('statusModalBody' + Changesubject_ID).innerHTML = `<p>Status for Student ID ${Changesubject_ID}: ${message}</p>`;
     
     // Display the modal
-    $('#statusModal' + subject_ID).modal('show'); // Assuming you're using Bootstrap for modals
+    $('#statusModal' + Changesubject_ID).modal('show'); // Assuming you're using Bootstrap for modals
 }
 
   </script>

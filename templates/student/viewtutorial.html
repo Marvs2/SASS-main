@@ -1,0 +1,116 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div>
+    <h1>Tutorial Requests</h1>
+    <table id="tutorialTable" class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Number</th>
+                <th>Name</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>File</th>
+                <th>Created At</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tutorial_requests in tutorial_requests_list %}
+            <tr>
+                <td>{{ tutorial_requests.tutorial_request_id }}</td>
+                <td>{{ tutorial_requests.StudentNumber }}</td>
+                <td>{{ tutorial_requests.Name }}</td>
+                <td>{{ tutorial_requests.subject_code }}</td>
+                <td>{{ tutorial_requests.subject_name }}</td>
+                <td>
+                    {% if request.file_data %}
+                        <a href="{{ url_for('download_tutorial_file', tutorial_request_id=request.tutorial_request_id) }}">Download</a>
+                    {% else %}
+                        No File
+                    {% endif %}
+                </td>
+                <td>{{ tutorial_requests.created_at }}</td>
+                <td>{{ tutorial_requests.user_responsible }}</td>
+                <td>{{ tutorial_requests.status }}</td>
+                <td>
+                    <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ tutorial_requests.tutorial_request_id }}', '{{ tutorial_requests.status }}')">View Status</button>
+                </td>
+              </tr>
+          
+              <!-- Modal -->
+              <div class="modal fade" id="statusModal{{ tutorial_requests.tutorial_request_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="statusModalLabel">Status for Peition ID: {{ tutorial_requests.tutorial_request_id }}</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <!-- Inside the modal body -->
+                        <div class="modal-body" id="statusModalBody{{ tutorial_requests.tutorial_request_id }}">
+                            <!-- Status-related information will be populated here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+              </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<script>
+
+$(document).ready(function() {
+    $('#tutorialTable').DataTable({
+        "pageLength": 5
+    });
+});
+
+function checkStatusAndShowModal(tutorial_request_id, status) {
+    let message = '';
+    
+    switch (status) {
+        case 'Sent':
+            message = "Your item has been sent! Wait to be processed";
+            break;
+        case 'pending':
+            message = "Your item is pending.";
+            break;
+        case 'processing':
+            message = "Your item is being processed.";
+            break;
+        case 'approved':
+            message = "Your item has been approved!";
+            break;
+        case 'finish':
+            message = "Your item has been finished.";
+            break;
+        case 'rejected':
+            message = "Unfortunately, your item has been rejected.";
+            break;
+        default:
+            message = "Status not recognized.";
+            break;
+    }
+    
+    // Set the status message in the modal body based on the specific modal's ID
+    document.getElementById('statusModalBody' + tutorial_request_id).innerHTML = `<p>Status for Student ID ${tutorial_request_id}: ${message}</p>`;
+    
+    // Display the modal
+    $('#statusModal' + tutorial_request_id).modal('show'); // Assuming you're using Bootstrap for modals
+}
+
+</script>
+{% endblock %}

@@ -30,7 +30,7 @@
                 <td>
                   {% if manual_enrollments.me_file_data %}
                   {% set manualfile = manual_enrollments.me_file_filename[:15] + '...' if manual_enrollments.me_file_filename|length > 15 else manual_enrollments.me_file_filename %}
-                  <a href="{{ url_for('download_manual_enrollments_file', m_enrollment_ID=manual_enrollments.m_enrollment_ID) }}" class="btn btn-success" download title="{{ manual_enrollments.me_file_filename }}">{{ manualfile }}</a>
+                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.m_enrollment_ID) }}" class="btn btn-success" download title="{{ manual_enrollments.me_file_filename }}">{{ manualfile }}</a>
               {% else %}
                   <span class="badge badge-warning">No File</span>
               {% endif %}

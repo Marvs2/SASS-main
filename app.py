@@ -311,25 +311,6 @@ def student_change_password():
 
     return render_template('student/change_password.html')
 
-@app.route('/student/viewoverload', methods=['GET'])
-@role_required('student')
-def viewoverload():
-    user_id = session.get('user_id')
-
-    # Fetch the student based on the user_id
-    student = Student.query.get(user_id)
-
-    overload_list = []  # Initialize an empty list
-
-    if student:
-        # Fetch AddSubjects based on the StudentId foreign key
-        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
-
-        # Convert AddSubjects data to a list of dictionaries
-        overload_applications_list = [overload.to_dict() for overload in overload_applications]
-
-    return render_template("/student/viewoverload.html", overload_applications_list=overload_applications_list)
-
 """# Endpoint to Fetch Programs
 @app.route('/programs', methods=['GET'])
 def get_programs():
@@ -384,6 +365,24 @@ def submit_overload_application():
     return render_template('student/overload.html')
   # Adjust the template as needed
 
+@app.route('/student/viewoverload', methods=['GET'])
+@role_required('student')
+def viewoverload():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    overload_applications_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        overload_applications_list = [subject.to_dict() for subject in overload_applications]
+
+    return render_template("/student/viewoverload.html", overload_applications_list=overload_applications_list)
 #=======================================================================#
 #================== ADDING OF SUBJECT ==================================#
 
@@ -458,13 +457,33 @@ def change_of_subjects():
 
     return render_template('student/changeofsubject.html')
 
+
+@app.route('/student/viewchange', methods=['GET'])
+@role_required('student')
+def viewchange():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    changesubjects_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        changesubjects = ChangeOfSubjects.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        changesubjects_list = [subject.to_dict() for subject in changesubjects]
+
+    return render_template("/student/viewchange.html", changesubjects_list=changesubjects_list)
+
 #========================== CORRECTION OF GRADE ENTRY ================================================#
 
-@app.route('/student/gradeentry')
+@app.route('/student/correction')
 def studentcorrection():
-    return render_template("/student/gradeentry.html", student_api_base_url=student_api_base_url)
+    return render_template("/student/correction.html", student_api_base_url=student_api_base_url)
 
-@app.route('/student/gradeentry/submit', methods=['POST'])
+@app.route('/student/correction/submit', methods=['POST'])
 @role_required('student')
 def submit_grade_correction():
     try: 
@@ -483,7 +502,26 @@ def submit_grade_correction():
     finally:
         db.session.close()
 
-    return render_template('student/gradeentry.html')
+    return render_template('student/correction.html')
+
+@app.route('/student/viewcorrection', methods=['GET'])
+@role_required('student')
+def viewcorrection():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    grade_entry_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        grade_entry = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        grade_entry_list = [subject.to_dict() for subject in grade_entry]
+
+    return render_template("/student/viewcorrection.html", grade_entry_list=grade_entry_list)
 
 #====================================== CROSS ENROLLMENT =========================================================
 
@@ -512,6 +550,24 @@ def submit_cross_enrollment():
 
     return render_template('student/crossenrollment.html')
 
+@app.route('/student/viewcrossenrollment', methods=['GET'])
+@role_required('student')
+def viewcrossenrollment():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    cross_enrollments_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        cross_enrollments = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        cross_enrollments_list = [subject.to_dict() for subject in cross_enrollments]
+
+    return render_template("/student/viewcrossenrollment.html", cross_enrollments_list=cross_enrollments_list)
 
 #================================== APPLICATION FOR SHIFTING ================================================
 @app.route('/student/shifting')
@@ -565,7 +621,24 @@ def submitmanualenrollment():
 
     return render_template('student/manualenrollment.html')
 
+@app.route('/student/viewmanual', methods=['GET'])
+@role_required('student')
+def viewmanual():
+    user_id = session.get('user_id')
 
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    manual_enrollments_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        manual_enrollments_list = [subject.to_dict() for subject in manual_enrollments]
+
+    return render_template("/student/viewmanual.html", manual_enrollments_list=manual_enrollments_list)
 #===================================== ONLINE PETITION OF SUBJECTS =====================================================
 
 @app.route('/student/onlinepetitionofsubject')
@@ -593,12 +666,25 @@ def submit_petition():
     return render_template('student/petition.html')
 
 
-@app.route('/student/onlinepetitionofsubject/<int:StudentId>', methods=['GET'])
-def view_student_petition(StudentId):
-    # Fetching the petitions based on the StudentId
-    petitions = PetitionRequest.query.filter_by(StudentId=StudentId).all()
 
-    return render_template('view_petition_data.html', petitions=petitions)
+@app.route('/student/viewpetition', methods=['GET'])
+@role_required('student')
+def viewpetition():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    petition_requests_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        petition_requests_list = [subject.to_dict() for subject in petition_requests]
+
+    return render_template("/student/viewpetition.html", petition_requests_list=petition_requests_list)
 
 #================================= ONLINE REQUEST FOR TUTORIAL ===================================================
 
@@ -626,6 +712,25 @@ def submit_tutorial_request():
         db.session.close()
 
     return render_template('student/tutorial.html')
+
+@app.route('/student/viewtutorial', methods=['GET'])
+@role_required('student')
+def viewtutorial():
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    tutorial_requests_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert AddSubjects data to a list of dictionaries
+        tutorial_requests_list = [subject.to_dict() for subject in tutorial_requests]
+
+    return render_template("/student/viewtutorial.html", tutorial_requests_list=tutorial_requests_list)
 
 #======================================== REQUEST FOR CERTIFICATION ===========================================================
 @app.route('/student/certification')
@@ -702,8 +807,8 @@ def facultychange():
 @app.route('/faculty/correction')
 def facultycorrection():
     session['last_activity'] = datetime.now(timezone.utc) # none
-    grade_entries = GradeEntry.query.all()
-    return render_template("/faculty/correction.html", grade_entries=grade_entries) # for grade_entries in grade_entries
+    grade_entry = GradeEntry.query.all()
+    return render_template("/faculty/correction.html", grade_entry=grade_entry) # for grade_entries in grade_entries
 
 @app.route('/faculty/crossenrollment')
 def facultycrossenrollment():
@@ -1223,11 +1328,11 @@ def redirect_based_on_login_petition():
     
 #================================================================
 # gradeentry function for student
-@app.route('/student/gradeentry')
+@app.route('/student/correction')
 def student_portal_gradeentry():
     session.permanent = True
     if is_user_logged_in_gradeentry():
-        return render_template('student/gradeentry.html')
+        return render_template('student/correction.html')
 
 def get_student_details(StudentId):
     student = Student.query.get(StudentId)
@@ -1431,7 +1536,7 @@ def update_change_service_status(Changesubject_ID):
     return redirect(url_for('facultychange'))
 
 # Redirect to download change of change.html
-@app.route('/faculty/view_change_of_subjects_sched/get_change_file/<int:Changesubject_ID>')
+@app.route('/faculty/change/get_change_file/<int:Changesubject_ID>')
 def get_change_file(Changesubject_ID):
     return redirect(url_for('download_change_file', Changesubject_ID=Changesubject_ID))
 
@@ -1491,8 +1596,8 @@ def update_correction_service_status(grade_entry_id):
 
 #correction
 # Route to handle download requests for grade entry files
-@app.route('/faculty/correction/get_grade_completion_file/<int:grade_entry_id>')
-def get_grade_completion_file(grade_entry_id):
+@app.route('/faculty/correction/get_completion_file/<int:grade_entry_id>')
+def get_completion_file(grade_entry_id):
     return redirect(url_for('download_completion_form', grade_entry_id=grade_entry_id))
 
 @app.route('/faculty/download_completion_form/<int:grade_entry_id>')
@@ -1500,22 +1605,23 @@ def download_completion_form(grade_entry_id):
     grade_entry = GradeEntry.query.get(grade_entry_id)
 
     if grade_entry and grade_entry.completion_form_data:
-        completion_extension = get_completion_extension(grade_entry.completion_form_filename)
-        download_name = f'completion_form_{grade_entry_id}.{completion_extension}'
+        form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
+        download_name = f'completion_form_{grade_entry_id}.{form_extension}'
 
         return send_file(
             io.BytesIO(grade_entry.completion_form_data),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(completion_extension)  # Make sure this function is defined as in your previous code
+            mimetype=get_mimetype(form_extension)
         )
     else:
         abort(404)  # File not found
+
 # Route to download a specific file of a grade entry
-def get_completion_extension(completion_form_filename):
+def get_completion_form_extension(completion_form_filename):
     return completion_form_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(completion_extension):
+def get_mimetype(form_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -1523,10 +1629,10 @@ def get_mimetype(completion_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(completion_extension, 'application/octet-stream')
+    return mimetypes.get(form_extension, 'application/octet-stream')
 
 #class_record
-@app.route('/faculty/view_correction/get_grade_class_file/<int:grade_entry_id>')
+@app.route('/faculty/correction/get_grade_class_file/<int:grade_entry_id>')
 def get_grade_class_file(grade_entry_id):
     return redirect(url_for('download_class_record', grade_entry_id=grade_entry_id))
 
@@ -1630,22 +1736,22 @@ def download_application_letter(cross_enrollment_id):
     cross_enrollments = CrossEnrollment.query.get(cross_enrollment_id)
 
     if cross_enrollments and cross_enrollments.application_letter_data:
-        ace_form_extension = get_ace_form_extension(cross_enrollments.application_letter_filename)
-        download_name = f'application_letter_{cross_enrollment_id}.{ace_form_extension}'
+        application_letter_extension = get_application_letter_extension(cross_enrollments.application_letter_filename)
+        download_name = f'application_letter_{cross_enrollment_id}.{application_letter_extension}'
 
         return send_file(
             io.BytesIO(cross_enrollments.application_letter_data),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(ace_form_extension),
+            mimetype=get_mimetype(application_letter_extension),
         )
     else:
         abort(404)
     
-def get_ace_form_extension(ace_form_filename):
-    return ace_form_filename.rsplit('.', 1)[1].lower()
+def get_application_letter_extension(application_letter_filename):
+    return application_letter_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(ace_form_extension):
+def get_mimetype(application_letter_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -1653,19 +1759,19 @@ def get_mimetype(ace_form_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(ace_form_extension, 'application/octet-stream')
+    return mimetypes.get(application_letter_extension, 'application/octet-stream')
 
-@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollment_id>')
-def get_permit_to_enroll(cross_enrollment_id):
-    return redirect(url_for('download_permit_to_enroll', cross_enrollment_id=cross_enrollment_id))
+@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollments_id>')
+def get_permit_to_enroll(cross_enrollments_id):
+    return redirect(url_for('download_permit_to_enroll', cross_enrollments_id=cross_enrollments_id))
 
 @app.route('/faculty/download_permit_to_enroll/<int:cross_enrollment_id>')
-def download_permit_to_enroll(cross_enrollment_id):
-    cross_enrollments = CrossEnrollment.query.get(cross_enrollment_id)
+def download_permit_to_enroll(cross_enrollments_id):
+    cross_enrollments = CrossEnrollment.query.get(cross_enrollments_id)
 
     if cross_enrollments and cross_enrollments.permit_to_cross_enroll_data:
         permit_enroll_extension = get_permit_enroll_extension(cross_enrollments.permit_to_cross_enroll_filename)
-        download_name = f'permit_to_enroll_{cross_enrollment_id}.{permit_enroll_extension}'
+        download_name = f'permit_to_enroll_{cross_enrollments_id}.{permit_enroll_extension}'
 
         return send_file(
             io.BytesIO(cross_enrollments.permit_to_cross_enroll_data),
@@ -1862,17 +1968,17 @@ def update_manual_service_status(m_enrollment_ID):
     return redirect(url_for('facultyenrollment'))
 
 #enrollment
-@app.route('/faculty/manualenrollment/get_manual_enrollment_file/<int:m_enrollment_ID>')
-def get_manual_enrollment_file(m_enrollment_ID):
-    return redirect(url_for('download_manual_enrollment_file', m_enrollment_ID=m_enrollment_ID))
+@app.route('/faculty/manualenrollment/get_manual_file/<int:m_enrollments_ID>')
+def get_manual_file(m_enrollments_ID):
+    return redirect(url_for('download_manual_enrollment_file', m_enrollments_ID=m_enrollments_ID))
 
-@app.route('/faculty/download_manual_enrollments_file/<int:m_enrollment_ID>')
-def download_manual_enrollments_file(m_enrollment_ID):
-    manual_enrollments = ManualEnrollment.query.get(m_enrollment_ID)
+@app.route('/faculty/download_manual_enrollment_file/<int:m_enrollments_ID>')
+def download_manual_enrollment_file(m_enrollments_ID):
+    manual_enrollments = ManualEnrollment.query.get(m_enrollments_ID)
 
     if manual_enrollments and manual_enrollments.me_file_data:
         me_filename_extension = get_me_filename_extension(manual_enrollments.me_file_filename)
-        download_name = f'manual_enrollments_{m_enrollment_ID}.{me_filename_extension}'
+        download_name = f'manual_enrollment_{m_enrollments_ID}.{me_filename_extension}'
 
         return send_file(
             io.BytesIO(manual_enrollments.me_file_data),

@@ -1,0 +1,121 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<div>
+    <h1>Manual Enrollments</h1>
+    <table id="manualTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Student Number</th>
+                <th>Name</th>
+                <th>Enrollment Type</th>
+                <th>Reason</th>
+                <th>File</th>
+                <th>Created At</th>
+                <th>Updated At</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for manual_enrollments in manual_enrollments_list %}
+            <tr>
+                <td>{{ manual_enrollments.m_enrollment_ID }}</td>
+                <td>{{ manual_enrollments.StudentNumber }}</td>
+                <td>{{ manual_enrollments.Name }}</td>
+                <td>{{ manual_enrollments.enrollment_type }}</td>
+                <td>{{ manual_enrollments.reason }}</td>
+                <td>
+                  {% if manual_enrollments.me_file_data %}
+                  {% set manualfile = manual_enrollments.me_file_filename[:15] + '...' if manual_enrollments.me_file_filename|length > 15 else manual_enrollments.me_file_filename %}
+                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.m_enrollment_ID) }}" class="btn btn-success" download title="{{ manual_enrollments.me_file_filename }}">{{ manualfile }}</a>
+              {% else %}
+                  <span class="badge badge-warning">No File</span>
+              {% endif %}
+                </td>
+                <td>{{ manual_enrollments.created_at }}</td>
+                <td>{{ manual_enrollments.updated_at }}</td>
+                <td>{{ manual_enrollments.user_responsible }}</td>
+                <td>{{ manual_enrollments.status }}</td>
+                <td>
+                  <!-- Action Buttons -->
+                  <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ manual_enrollments.m_enrollment_ID }}', '{{ manual_enrollments.status }}')">View Status</button>
+                  <!-- Additional action buttons can be added here -->
+              </td>
+          </tr>
+
+            <!-- Modal -->
+            <div class="modal fade" id="statusModal{{ manual_enrollments.m_enrollment_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ manual_enrollments.m_enrollment_ID }}</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                      <!-- Inside the modal body -->
+                      <div class="modal-body" id="statusModalBody{{ manual_enrollments.m_enrollment_ID }}">
+                          <!-- Status-related information will be populated here -->
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+<script>
+      // Initialize DataTable
+      $(document).ready(function() {
+    $('#manualTable').DataTable({
+        "pageLength": 5
+    });
+});
+    function checkStatusAndShowModal(m_enrollment_ID, status) {
+    let message = '';
+    
+    switch (status) {
+        case 'Sent':
+            message = "Your item has been sent! Wait to be processed";
+            break;
+        case 'pending':
+            message = "Your item is pending.";
+            break;
+        case 'processing':
+            message = "Your item is being processed.";
+            break;
+        case 'approved':
+            message = "Your item has been approved!";
+            break;
+        case 'finish':
+            message = "Your item has been finished.";
+            break;
+        case 'rejected':
+            message = "Unfortunately, your item has been rejected.";
+            break;
+        default:
+            message = "Status not recognized.";
+            break;
+    }
+    
+    // Set the status message in the modal body based on the specific modal's ID
+    document.getElementById('statusModalBody' + m_enrollment_ID).innerHTML = `<p>Status for Student ID ${m_enrollment_ID}: ${message}</p>`;
+    
+    // Display the modal
+    $('#statusModal' + m_enrollment_ID).modal('show'); // Assuming you're using Bootstrap for modals
+}
+
+</script>
+{% endblock %}
