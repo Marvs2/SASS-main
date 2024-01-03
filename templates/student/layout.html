@@ -125,6 +125,26 @@
                           </div>                         
                         </div>
                       </div>
+                      <div class="list-group-item d-none">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 4</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Regenerate package-lock.json (#29730)
+                            </div>
+                          </div>                         
+                        </div>
+                      </div>
+                      <div class="list-group-item d-none">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 4</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Regenerate package-lock.json (#29730)
+                            </div>
+                          </div>                         
+                        </div>
+                      </div>
                       <div class="col-auto">  
                         <div class="text-right mt-2 mb-1">
                           <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
@@ -150,108 +170,233 @@
 				</ul>
 			</div>
 		</nav>
-		<!-- NAVBAR -->
 
 		<main>
-			{% block content %} {% endblock %}
+			{% block content %} 
+      
+      {% endblock content %}
 		</main>
 	</section>
 
-	<script>
+  <script>
+  
     // Function to close the notification card
-function closeNotificationCard() {
-    var notificationCard = document.getElementById('notification-card');
-    if (notificationCard.classList.contains('show')) {
+    function closeNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      if (notificationCard.classList.contains('show')) {
         notificationCard.classList.remove('show');
+      }
     }
-}
-
-// Add event listener to the notification icon
-document.getElementById('notification-icon').addEventListener('click', function (event) {
-    // Prevent the click event from propagating to the document body
-    event.stopPropagation();
-    
-    // Toggle the visibility of the notification card
-    document.getElementById('notification-card').classList.toggle('show');
-});
-
-// Add event listener to the document body to close the notification card on any click outside of it
-document.body.addEventListener('click', closeNotificationCard);
-
-// Add event listener to prevent the notification card from closing when clicking inside it
-document.getElementById('notification-card').addEventListener('click', function (event) {
-    event.stopPropagation();
-});
-
-  // JavaScript to show all notifications when "See All Notifications" is clicked
-  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+  
+    // Add event listener to the notification icon
+    document.getElementById('notification-icon').addEventListener('click', function (event) {
+      // Prevent the click event from propagating to the document body
+      event.stopPropagation();
+  
+      // Toggle the visibility of the notification card
+      document.getElementById('notification-card').classList.toggle('show');
+    });
+  
+    // Add event listener to the document body to close the notification card on any click outside of it
+    document.body.addEventListener('click', closeNotificationCard);
+  
+    // Add event listener to prevent the notification card from closing when clicking inside it
+    document.getElementById('notification-card').addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+  
+    // JavaScript to show all notifications when "See All Notifications" is clicked
+    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
       // Prevent the link from navigating (you may adjust this behavior as needed)
       event.preventDefault();
-
+  
       // Show all notifications by removing the 'd-none' class
-      var notificationList = document.getElementById('notification-list');
-      notificationList.classList.remove('d-none');
-  });
+      var notificationList = document.getElementById('notification-card');
+      notificationList.classList.toggle('show');
+    });
 
-        //STUDENT API
-		const api_base_url = '{{ student_api_base_url | default("") }}';
-		console.log('api_base_url: ', api_base_url)
-	</script>
+     // STUDENT API
+     const api_base_url = '{{ student_api_base_url | default("") }}';
+    console.log('api_base_url: ', api_base_url);
+    </script>
 
 
 	{% block script %}
   <script>
+    // NOTIFICATION ICON
+    var showAllNotifications = false;
   
-  // Function to close the notification card
-  function closeNotificationCard() {
-	  var notificationCard = document.getElementById('notification-card');
-	  if (notificationCard.classList.contains('show')) {
-		  notificationCard.classList.remove('show');
-	  }
-  }
+    // Function to close the notification card
+    function closeNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      if (notificationCard.classList.contains('show')) {
+        notificationCard.classList.remove('show');
+      }
+    }
+  
+    // Function to toggle the visibility of the notification card
+    function toggleNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      notificationCard.classList.toggle('show');
+  
+      // If not showing all notifications, only display the first four
+      if (!showAllNotifications) {
+        showFirstFourNotifications();
+      }
+    }
+  
+    // Function to show only the first four notifications
+    function showFirstFourNotifications() {
+      var allNotifications = document.querySelectorAll('#notification-card .list-group-item');
+      allNotifications.forEach(function (item, index) {
+        if (index < 4) {
+          item.classList.remove('d-none');
+        } else {
+          item.classList.add('d-none');
+        }
+      });
+    }
+  
+    // Add event listener to the notification icon
+    document.getElementById('notification-icon').addEventListener('click', function (event) {
+      // Prevent the click event from propagating to the document body
+      event.stopPropagation();
+  
+      // If notification card is already visible, close it; otherwise, show the first four notifications
+      if (document.getElementById('notification-card').classList.contains('show')) {
+        closeNotificationCard();
+      } else {
+        showFirstFourNotifications();
+        toggleNotificationCard();
+      }
+    });
+  
+    // Add event listener to the document body to close the notification card on any click outside of it
+    document.body.addEventListener('click', closeNotificationCard);
+  
+    // Add event listener to prevent the notification card from closing when clicking inside it
+    document.getElementById('notification-card').addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+  
+    // JavaScript to show all or only the first four notifications when "See All Notifications" is clicked
+    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+      // Prevent the link from navigating (you may adjust this behavior as needed)
+      event.preventDefault();
+  
+      // Toggle between showing all and displaying only the first four notifications
+      showAllNotifications = !showAllNotifications;
+  
+      if (showAllNotifications) {
+        // Show all hidden notifications by removing the 'd-none' class
+        var hiddenItems = document.querySelectorAll('#notification-card .list-group-item.d-none');
+        hiddenItems.forEach(function (item) {
+          item.classList.remove('d-none');
+        });
+      } else {
+        // Show only the first four notifications
+        showFirstFourNotifications();
+      }
+  
+      // Toggle the visibility of the notification card
+      toggleNotificationCard();
+    });
+  
+    // Show only the first four notifications initially
+    showFirstFourNotifications();
 
-  // Add event listener to the notification icon
-  document.getElementById('notification-icon').addEventListener('click', function (event) {
-	  // Prevent the click event from propagating to the document body
-	  event.stopPropagation();
 
-	  // Toggle the visibility of the notification card
-	  document.getElementById('notification-card').classList.toggle('show');
-  });
+    // FETCHING STUDENT DETAILS
+    async function fetchStudentDetails() {
+    try {
+        const response = await fetch(`${api_base_url}/student-details`);
 
-  // Add event listener to the document body to close the notification card on any click outside of it
-  document.body.addEventListener('click', closeNotificationCard);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+        }
 
-  // Add event listener to prevent the notification card from closing when clicking inside it
-  document.getElementById('notification-card').addEventListener('click', function (event) {
-	  event.stopPropagation();
-  });
+        const data_student_details = await response.json();
+        console.log('data_student_details:', data_student_details);
+        displayDetails(data_student_details);
+    } catch (error) {
+        console.error('Error fetching student details:', error.message);
+    }
+}
 
-  // JavaScript to show all notifications when "See All Notifications" is clicked
-  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-	  // Prevent the link from navigating (you may adjust this behavior as needed)
-	  event.preventDefault();
+    fetchStudentDetails()
+      function displayDetails(data){
+        // Select the name input and set the value to data.studentName //.innerHTML
+        document.getElementById("Name").value = data.Name
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById("StudentNumber").value = data.StudentNumber;
+        // Select the Gender and set the value to data.Gender
+        document.getElementById("Gender").value = data.Gender;
+        // Select the Email and set the value to data.Email
+        document.getElementById("Email").value = data.Email;
+        // Select the address and set the value to data.address
+        document.getElementById("address").value = data.address;
+        // Select the dateOfBirth and set the value to data.dateOfBirth
+        const dateOfBirthInput = document.getElementById("DateofBirth");
 
-	  // Show all notifications by removing the 'd-none' class
-	  var notificationList = document.getElementById('notification-card');
-	  notificationList.classList.toggle('show');
-  });
-  </script>
+      // Format the date to display only the birthday
+      const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
 
+      // Set the formatted date to the DateofBirth input
+      dateOfBirthInput.value = formattedDateOfBirth;
+
+        // Select the placeOfBirth and set the value to data.placeOfBirth
+        document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
+        // Select the ResidentialAddress and set the value to data.ResidentialAddress
+        //document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+        // Select the MobileNumber and set the value to data.MobileNumber
+        document.getElementById("MobileNumber").value = data.MobileNumber;
+
+        document.getElementById('name-label').innerText = data.studentName; 
+      }
+         
+      // DATEPICKER FUNCTION
+        document.addEventListener("DOMContentLoaded", function () {
+        // Initialize flatpickr
+        flatpickr("#date", {
+            dateFormat: 'm-d-Y', // Set the date format
+            defaultDate: 'today', // Set default date to today
+            // disableMobile: true, // Disable on mobile
+            minDate: 'today', // Disable previous dates
+            onClose: function (selectedDates, dateStr, instance) {
+                // Update the input value when the user selects a date
+                document.getElementById('date').value = dateStr;
+            }
+        });
+    });
+</script>
+  
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/script2.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
+
+    <!----  <script src="{{ url_for('static', filename='js/history.js')}}"></script> -->
+  
   {% endblock script %}
 
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-
-	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
-  <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
-<!----  <script src="{{ url_for('static', filename='js/history.js')}}"></script> -->
 </body>
 </html>
+
+
+
+
+
 
