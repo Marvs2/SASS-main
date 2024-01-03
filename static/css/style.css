@@ -67,14 +67,14 @@ li {
 	display: none;
 }
 #sidebar .brand {
-	font-size: 30px;
+	font-size: 35px;
 	display: flex;
 	align-items: center;
 	height: 64px;
 	font-weight:bolder;
 	color: var(--red);
 	position: sticky;
-	top: 0;
+	top: 5px;
 	left: 0;
 	z-index: 100;
 	background: var(--light);
@@ -88,6 +88,13 @@ li {
 	align-items: center;
 	margin-right: 6px;
 }
+
+#sidebar .img {
+	width: 60px;
+	margin-left: 10px;
+	margin-right: 10px;
+}
+
 #sidebar .icon-right {
 	margin-left: auto;
 	transition: all .3s ease;
