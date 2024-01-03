@@ -191,20 +191,25 @@ chart.render();
 $(document).ready(function() {
 	$('#overload').DataTable(); // OVERLOAD OF SUBJECTS
 });
+
 $(document).ready(function() {
 	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
 });
+
 $(document).ready(function () {
-	$('#changeofSchedule').DataTable();
+	$('#changeofSchedule').DataTable(); // CHANGE OF SCHEDULE/SUBJECT	
 });
+
 $(document).ready(function () {
-	$('#crossEnrollment').DataTable();
+	$('#correction').DataTable(); // CORRECTION OF GRADE ENTRY	
 });
+
 $(document).ready(function () {
-	$('#shiftingTable').DataTable();
+	$('#shifting').DataTable(); // APPLICATION FOR SHIFTING
 });
-$(document).ready(function() {
-	$('#overloadTable').DataTable();
-	// Initialize DataTable for other tables if needed
+
+$(document).ready(function () {
+	$('#certification').DataTable(); // ONLINE REQUEST FOR CERTIFICATION
 });
+
 
