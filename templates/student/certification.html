@@ -107,27 +107,26 @@
         }, 3000);
 
         // JavaScript validation logic can be added here
-        document.getElementById('certificationRequestForm').addEventListener('submit', function (event) {
-        // Add your validation logic here
-        var StudentNumber = document.getElementById('StudentNumber').value.trim();
-        var Name = document.getElementById('Name').value.trim();
-        var certificationType = document.getElementById('certification_type').value.trim();
-        var request_form = document.getElementById('request_form').value.trim();
-        var identification_card = document.getElementById('identification_card').value.trim();
-        var isRepresentativeCheckbox = document.getElementById('is_representative');
-        var authorization_letter = document.getElementById('authorization_letter').value.trim();
-        var representative_id = document.getElementById('representative_id').value.trim();
+    document.getElementById('certificationRequestForm').addEventListener('submit', function (event) {
+    var StudentNumber = document.getElementById('StudentNumber').value.trim();
+    var Name = document.getElementById('Name').value.trim();
+    var certificationType = document.getElementById('certification_type').value.trim();
+    var requestFormFile = document.getElementById('request_form').files.length;  // Assuming this is a file input
+    var identificationCardFile = document.getElementById('identification_card').files.length;  // Assuming this is a file input
+    var isRepresentativeCheckbox = document.getElementById('is_representative');
+    var authorizationLetterFile = document.getElementById('authorization_letter').files.length;  // Assuming this is a file input
+    var representativeIDFile = document.getElementById('representative_id').files.length;  // Assuming this is a file input
 
-        if (!StudentNumber || !Name || !certificationType || !requestFormFile || !identificationCardFile) {
-            alert('Please fill out all required fields.');
-            event.preventDefault();  // Prevent form submission
-        }
+    if (!StudentNumber || !Name || !certificationType || requestFormFile === 0 || identificationCardFile === 0) {
+        alert('Please fill out all required fields.');
+        event.preventDefault();  // Prevent form submission
+    }
 
-        if (isRepresentativeCheckbox.checked && (!authorizationLetterFile || !representativeIDFile)) {
-            alert('Please provide files for the representative.');
-            event.preventDefault();  // Prevent form submission
-        }
-    });
+    if (isRepresentativeCheckbox.checked && (authorizationLetterFile === 0 || representativeIDFile === 0)) {
+        alert('Please provide files for the representative.');
+        event.preventDefault();  // Prevent form submission
+    }
+});
     </script>
 {% endblock %}
 

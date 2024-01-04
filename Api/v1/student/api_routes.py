@@ -939,67 +939,43 @@ def create_certification_request(form_data, files, StudentId):
     user_responsible = form_data['user_responsible']
     status = form_data['status']
 
-     # Check if a file is provided
-    if 'request_form' not in files:
-        flash('No file part', 'danger')
-        return None
+    # Required file checks
+    for field_name in ['request_form', 'identification_card']:
+        if field_name not in files or files[field_name].filename == '':
+            flash(f'No file provided for {field_name}', 'danger')
+            return None
 
     request_form = files['request_form']
-    # Check if the file field is empty
-    if request_form.filename == '':
-        flash('No selected file', 'danger')
-        return None
-
-    request_form_data = request_form.read()  # Read the file data
-    request_form_filename = secure_filename(request_form.filename)
-#==========================================================#
-     # Check if a file is provided
-    if 'identification_card' not in files:
-        flash('No file part', 'danger')
-        return None
-
     identification_card = files['identification_card']
-    # Check if the file field is empty
-    if identification_card.filename == '':
-        flash('No selected file', 'danger')
-        return None
 
-    identification_card_data = identification_card.read()  # Read the file data
+    # Reading file data
+    request_form_data = request_form.read()
+    request_form_filename = secure_filename(request_form.filename)
+    identification_card_data = identification_card.read()
     identification_card_filename = secure_filename(identification_card.filename)
-#==========================================================#
-    is_representative = 'is_representative' in form_data  # Check if the checkbox is present in the form data
-#==========================================================#
-     # Check if a file is provided
-    if 'authorization_letter' not in files:
-        flash('No file part', 'danger')
-        return None
 
-    authorization_letter = files['authorization_letter']
-    # Check if the file field is empty
-    if authorization_letter.filename == '':
-        flash('No selected file', 'danger')
-        return None
+    is_representative = 'is_representative' in form_data and form_data['is_representative'] == 'on'
 
-    authorization_letter_data = authorization_letter.read()  # Read the file data
-    authorization_letter_filename = secure_filename(authorization_letter.filename)
-#========================================================#
-     # Check if a file is provided
-    if 'representative_id' not in files:
-        flash('No file part', 'danger')
-        return None
+    # Representative file checks
+    authorization_letter_data = authorization_letter_filename = None
+    representative_id_data = representative_id_filename = None
 
-    representative_id = files['representative_id']
-    # Check if the file field is empty
-    if representative_id.filename == '':
-        flash('No selected file', 'danger')
-        return None
+    if is_representative:
+        if 'authorization_letter' not in files or files['authorization_letter'].filename == '':
+            flash('Authorization letter is required for representatives', 'danger')
+            return None
 
-    representative_id_data = representative_id.read()  # Read the file data
-    representative_id_filename = secure_filename(representative_id.filename)
+        if 'representative_id' not in files or files['representative_id'].filename == '':
+            flash('Representative ID is required for representatives', 'danger')
+            return None
 
-    if not StudentNumber or not Name or not certification_type or not request_form or not identification_card:
-        flash('Please fill out all required fields and provide valid values.', 'danger')
-        return None
+        authorization_letter = files['authorization_letter']
+        representative_id = files['representative_id']
+
+        authorization_letter_data = authorization_letter.read()
+        authorization_letter_filename = secure_filename(authorization_letter.filename)
+        representative_id_data = representative_id.read()
+        representative_id_filename = secure_filename(representative_id.filename)
 
     # Create CertificationRequest instance
     new_certification_request = CertificationRequest(

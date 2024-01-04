@@ -205,31 +205,31 @@
 					<thead>
 						<tr>
 							<th>Application Number</th>									
-							<th>School</th>
+							<th>School to Cross enroll</th>
+							<th>Total Number of Units</th>
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						{% for cross_enrollments in services_data.cross_enrollments_list %}
-						<tr data-application-id="{{ cross_enrollments.cross_enrollment_id }}"
-							data-name="{{ cross_enrollments.Name }}"
-							data-student-number="{{ cross_enrollments.StudentNumber }}"
-							data-school-to-enroll="{{ cross_enrollments.school_for_cross_enrollment }}"
-							data-total-number-of-units="{{ cross_enrollments.total_number_of_units }}"
-							data-application-letter-url="{{ url_for('get_application_letter', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}"
-							data-file-filename="{{ cross_enrollments.application_letter_filename }}"	
-							data-permit-to-cross-url="{{ url_for('get_permit_to_enroll', cross_enrollments_id=cross_enrollments.cross_enrollment_id) }}"
-							data-file-filename="{{ cross_enrollments.permit_to_cross_enroll_filename }}"	
-							data-status="{{ cross_enrollments.status }}">
-							<td class="applicationID">{{ cross_enrollments.cross_enrollment_id }}</td>								
-							<td>{{ cross_enrollments.subjects_to_add }}</td>
-							<td>{{ cross_enrollments.justification }}</td>	
-							
-													
-							<td>{{ cross_enrollments.status }}</td>
+						{% for cross_enrollment in services_data.cross_enrollment_list %}
+						<tr data-cross-application-id="{{ cross_enrollment.cross_enrollment_id }}"
+							data-cross-name="{{ cross_enrollment.Name }}"
+							data-cross-student-number="{{ cross_enrollment.StudentNumber }}"
+							data-cross-school-to-enroll="{{ cross_enrollment.school_for_cross_enrollment }}"
+							data-cross-total-number-of-units="{{ cross_enrollment.total_number_of_units }}"
+							data-cross-authorize-subject="{{cross_enrollment.authorized_subjects_to_take}}"
+							data-cross-application-letter-url="{{ url_for('get_application_letter', cross_enrollment_id=cross_enrollment.cross_enrollment_id) }}"
+							data-cross-application-filename="{{ cross_enrollment.application_letter_filename }}"	
+							data-cross-permit-to-cross-url="{{ url_for('get_permit_to_enroll', cross_enrollment_id=cross_enrollment.cross_enrollment_id) }}"
+							data-cross-permit-filename="{{ cross_enrollment.permit_to_cross_enroll_filename }}"	
+							data-cross-status="{{ cross_enrollment.status }}">
+							<td class="applicationID">{{ cross_enrollment.cross_enrollment_id }}</td>								
+							<td>{{ cross_enrollment.school_for_cross_enrollment }}</td>
+							<td>{{ cross_enrollment.total_number_of_units }}</td>
+							<td id="status">{{ cross_enrollment.status }}</td>	
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewCrossModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -464,13 +464,13 @@
 							data-request-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-request-filename="{{ certification_request.request_form_filename }}"	
 
-							data-registration-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-registration-url="{{ url_for('get_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-registration-filename="{{ certification_request.request_form_filename }}"	
 
-							data-authorization-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-authorization-url="{{ url_for('get_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-authorization-filename="{{ certification_request.authorization_letter_filename }}"
 
-							data-representative-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-representative-url="{{ url_for('get_representative_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-representative-filename="{{ certification_request.representative_id_filename }}"
 
 							data-certification-status="{{ certification_request.status }}">
@@ -769,6 +769,93 @@
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
 					<p id="correction-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+ <!-------------------------------------- APPLICATION FOR CROSS ENROLLMENT VIEW MODAL  --------------------------------------------------->
+ <div class="modal fade" id="viewCrossModal" tabindex="-1" role="dialog" aria-labelledby="viewCrossModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="crossModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="cross-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="cross-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="cross-application-studentNumber"></p>
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">School to Cross Enroll:</label>
+				<div class="col-sm-4">
+					<p id="cross-school"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Total Number of Unit:</label>
+				<div class="col-sm-4">
+					<p id="cross-number-unit"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Authorize Subject to Take:</label>
+				<div class="col-sm-4">
+					<p id="cross-subject-to-take"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Application Letter for Cross-Enrollment:</label>
+				<div class="col-sm-4">
+					<p id="cross-application-letter"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Permit to Cross Enroll from Office of the University Registrar:</label>
+				<div class="col-sm-4">
+					<p id="cross-permit"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="cross-status"></p>
 				</div>           
 			  </div>
 			
@@ -1120,6 +1207,48 @@ $(document).ready(function () {
 	});
 });
 
+	// VIEW CROSS-ENROLLMENT MODAL
+	$(document).ready(function () {
+        $('#crossEnrollment tbody tr').on('click', function () {
+            // Retrieve data from the clicked row
+            var applicationId = $(this).data('cross-application-id');
+            var name = $(this).data('cross-name');
+            var studentNumber = $(this).data('cross-student-number');
+            var schooltoEnroll = $(this).data('cross-school-to-enroll');
+            var numberofUnits = $(this).data('cross-total-number-of-units');	
+			var subjecttoTake = $(this).data('cross-authorize-subject');
+            var applicationLetter = $(this).data('cross-application-letter-url');
+            var applicationfileName = $(this).data('cross-application-filename');
+			var permittoCross = $(this).data('cross-permit-to-cross-url');
+            var permittoCrossfileName = $(this).data('cross-permit-filename');
+            var status = $(this).data('cross-status');
+
+            // Populate modal with data
+            $('#cross-application-id').text(applicationId);
+            $('#cross-application-name').text(name);
+            $('#cross-application-studentNumber').text(studentNumber);
+            $('#cross-school').text(schooltoEnroll);
+            $('#cross-number-unit').text(numberofUnits);
+			$('#cross-subject-to-take').text(subjecttoTake);
+            // Generate dynamic file download link
+			if (applicationfileName) {
+				var fileLink = $('<a>').attr('href', applicationLetter).attr('target', '_blank').text(applicationfileName);
+				$('#cross-application-letter').empty().append(fileLink);
+			} else {
+				$('#cross-application-letter').text('No File');
+			}
+
+			if (permittoCrossfileName) {
+				var fileLink = $('<a>').attr('href', permittoCross).attr('target', '_blank').text(permittoCrossfileName);
+				$('#cross-permit').empty().append(fileLink);
+			} else {
+				$('#cross-permit').text('No File');
+			}
+
+			$('#cross-status').text(status);
+        });
+    });
+
 	// VIEW QUALIFICATION FOR SHIFTING MODAL
 	$(document).ready(function () {
         $('#shifting tbody tr').on('click', function () {
@@ -1174,8 +1303,8 @@ $(document).ready(function () {
 			var authorizationUrl = $(this).data('authorization-url');
             var authorizationFile = $(this).data('authorization-filename');
 
-			var representativeUrl = $(this).data('ID-url');
-            var representativeFile = $(this).data('ID-filename');
+			var representativeUrl = $(this).data('representative-url');
+            var representativeFile = $(this).data('representative-filename');
 
             var status = $(this).data('certification-status');
 
@@ -1208,10 +1337,10 @@ $(document).ready(function () {
 			}
 
 			if (representativeFile) {
-				var fileLink = $('<a>').attr('href', IDUrl).attr('target', '_blank').text(representativeUrl);
-				$('#certification-ID-file').empty().append(fileLink);
+				var fileLink = $('<a>').attr('href', representativeUrl).attr('target', '_blank').text(representativeUrl);
+				$('#certification-representative-file').empty().append(fileLink);
 			} else {
-				$('#certification-ID-file').text('No File');
+				$('#certification-representative-file').text('No File');
 			}
 
 			$('#certification-status').text(status);

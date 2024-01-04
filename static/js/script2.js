@@ -205,6 +205,10 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+	$('#crossEnrollment').DataTable(); // APPLICATION FOR CROSS ENROLLMENT	
+});
+
+$(document).ready(function () {
 	$('#shifting').DataTable(); // APPLICATION FOR SHIFTING
 });
 

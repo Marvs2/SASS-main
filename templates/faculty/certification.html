@@ -50,19 +50,19 @@
 				{% endif %}
 				,
 				{% if certification_request.identification_card_data %}
-					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.identification_card_filename }}</a>
+					<a href="{{ url_for('get_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.identification_card_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
 				,
 				{% if certification_request.authorization_letter_data %}
-					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.authorization_letter_filename }}</a>
+					<a href="{{ url_for('get_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.authorization_letter_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
 				,
 				{% if certification_request.representative_id_data %}
-					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.representative_id_filename }}</a>
+					<a href="{{ url_for('get_representative_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success" download>{{ certification_request.representative_id_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}

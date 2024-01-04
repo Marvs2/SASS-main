@@ -228,8 +228,8 @@ def student_history():
         services_data['grade_entry_list'] = [subject.to_dict() for subject in grade_entry]
 
         # Fetch CrossEnrollment based on the StudentId foreign key
-        cross_enrollments = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
-        services_data['cross_enrollments_list'] = [subject.to_dict() for subject in cross_enrollments]
+        cross_enrollment = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['cross_enrollment_list'] = [subject.to_dict() for subject in cross_enrollment]
 
         # Fetch PetitionRequest based on the StudentId foreign key
         petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
@@ -1761,17 +1761,17 @@ def get_mimetype(application_letter_extension):
 
     return mimetypes.get(application_letter_extension, 'application/octet-stream')
 
-@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollments_id>')
-def get_permit_to_enroll(cross_enrollments_id):
-    return redirect(url_for('download_permit_to_enroll', cross_enrollments_id=cross_enrollments_id))
+@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollment_id>')
+def get_permit_to_enroll(cross_enrollment_id):
+    return redirect(url_for('download_permit_to_enroll', cross_enrollment_id=cross_enrollment_id))
 
 @app.route('/faculty/download_permit_to_enroll/<int:cross_enrollment_id>')
-def download_permit_to_enroll(cross_enrollments_id):
-    cross_enrollments = CrossEnrollment.query.get(cross_enrollments_id)
+def download_permit_to_enroll(cross_enrollment_id):
+    cross_enrollments = CrossEnrollment.query.get(cross_enrollment_id)
 
     if cross_enrollments and cross_enrollments.permit_to_cross_enroll_data:
         permit_enroll_extension = get_permit_enroll_extension(cross_enrollments.permit_to_cross_enroll_filename)
-        download_name = f'permit_to_enroll_{cross_enrollments_id}.{permit_enroll_extension}'
+        download_name = f'permit_to_enroll_{cross_enrollment_id}.{permit_enroll_extension}'
 
         return send_file(
             io.BytesIO(cross_enrollments.permit_to_cross_enroll_data),
@@ -2191,7 +2191,7 @@ def get_mimetype(certification_request_extension):
     }
 
     return mimetypes.get(certification_request_extension, 'application/octet-stream')
-
+#===================================================================================================================================
 @app.route('/faculty/certification/get_certification_identification_file/<int:certification_request_id>')
 def get_certification_identification_file(certification_request_id):
     return redirect(url_for('download_certification_identification_file', certification_request_id=certification_request_id))
@@ -2225,7 +2225,7 @@ def get_mimetype(identification_file_extension):
     }
 
     return mimetypes.get(identification_file_extension, 'application/octet-stream')
-
+#=========================================================================================================================
 @app.route('/faculty/certification/get_certification_authorization_file/<int:certification_request_id>')
 def get_certification_authorization_file(certification_request_id):
     return redirect(url_for('download_certification_authorization_file', certification_request_id=certification_request_id))
@@ -2259,32 +2259,32 @@ def get_mimetype(authorization_file_extension):
     }
 
     return mimetypes.get(authorization_file_extension, 'application/octet-stream')
+#=============================================================================================================================
+@app.route('/faculty/certification/get_representative_file/<int:certification_request_id>')
+def get_representative_file(certification_request_id):
+    return redirect(url_for('download_representative_file', certification_request_id=certification_request_id))
 
-@app.route('/faculty/certification/get_certification_representative_file/<int:certification_request_id>')
-def get_certification_representative_file(certification_request_id):
-    return redirect(url_for('download_certification_representative_file', certification_request_id=certification_request_id))
-
-@app.route('/faculty/download_certification_representative_file/<int:certification_request_id>')
-def download_certification_representative_file(certification_request_id):
+@app.route('/faculty/download_representative_file/<int:certification_request_id>')
+def download_representative_file(certification_request_id):
     certification_request = CertificationRequest.query.get(certification_request_id)
 
     if certification_request and certification_request.representative_id_data:
-        representative_file_extension = get_representative_file_extension(certification_request.representative_id_filename)
-        download_name = f'certification_representative_{certification_request_id}.{representative_file_extension}'
+        representative_extension = get_representative_extension(certification_request.representative_id_filename)
+        download_name = f'certification_representative_{certification_request_id}.{representative_extension}'
 
         return send_file(
             io.BytesIO(certification_request.representative_id_data),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(representative_file_extension),
+            mimetype=get_mimetype(representative_extension),
         )
     else:
         abort(404)  # Certification request or file not found
 
-def get_representative_file_extension(representative_id_filename):
+def get_representative_extension(representative_id_filename):
     return representative_id_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(representative_file_extension):
+def get_mimetype(representative_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -2292,7 +2292,8 @@ def get_mimetype(representative_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(representative_file_extension, 'application/octet-stream')
+    return mimetypes.get(representative_extension, 'application/octet-stream')
+
 # The functions get_file_extension and get_mimetype remain the same as in your existing code.
 #===========================================================#
 
