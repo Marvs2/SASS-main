@@ -46,7 +46,7 @@ li {
 
 /* SIDEBAR */
 #sidebar {
-	position: fixed;
+	position: absolute;
 	max-width: 295px;
 	width: 100%;
 	background: var(--light);
@@ -886,7 +886,7 @@ table th, table td {
 	nav .toggle-sidebar {
 		font-size: 18px;
 		cursor: pointer;
-	}
+	}	
 
 	
 }
