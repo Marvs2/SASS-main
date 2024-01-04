@@ -213,6 +213,18 @@ $(document).ready(function () {
 });
 
 $(document).ready(function () {
+	$('#manualEnrollment').DataTable(); // MANUAL ENROLLMENT
+});
+
+$(document).ready(function () {
+	$('#petition').DataTable(); // ONLINE PETITION OF SUBJECTS
+});
+
+$(document).ready(function () {
+	$('#tutorial').DataTable(); // ONLINE REQUEST FOR TUTORIAL
+});
+
+$(document).ready(function () {
 	$('#certification').DataTable(); // ONLINE REQUEST FOR CERTIFICATION
 });
 
