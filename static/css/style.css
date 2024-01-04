@@ -46,7 +46,7 @@ li {
 
 /* SIDEBAR */
 #sidebar {
-	position: absolute;
+	position: fixed;
 	max-width: 295px;
 	width: 100%;
 	background: var(--light);
