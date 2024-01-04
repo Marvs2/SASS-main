@@ -198,7 +198,7 @@ class Announcement(db.Model, UserMixin):
     content_data = db.Column(db.LargeBinary)
     created_at = db.Column(DateTime, default=datetime.utcnow)
     updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    facultyID = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
+    facultyID = db.Column(db.Integer, db.ForeignKey('faculties.facultyID'))
 
     # Relationship to the Faculty model
     faculties = db.relationship('Faculty', back_populates='announcements')
@@ -649,7 +649,7 @@ class Faculty(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     # Define the 'addsubjects' relationship in the Faculty model
-    announcements = db.relationship('Announcement', back_populates='faculty')
+    announcements = db.relationship('Announcement', back_populates='faculties')
 
     def to_dict(self):
         return {
