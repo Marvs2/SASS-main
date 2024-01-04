@@ -187,7 +187,7 @@ class Notification(db.Model, UserMixin):
 
 #======================================================#       
 #Announcements
-"""class Announcement(db.Model, UserMixin):
+class Announcement(db.Model, UserMixin):
     __tablename__ = 'announcements'
 
     announcementId = db.Column(db.Integer, primary_key=True)
@@ -216,7 +216,7 @@ class Notification(db.Model, UserMixin):
         }    
     
     def get_AnnouncementID(self):
-        return str(self.announcementId)"""
+        return str(self.announcementId)
 #======================================================#       
 
 # ==========Services========== #
@@ -649,7 +649,7 @@ class Faculty(db.Model, UserMixin):
     is_active = db.Column(db.Boolean, default=True)
 
     # Define the 'addsubjects' relationship in the Faculty model
-   # addsubjects = db.relationship('AddSubjects', back_populates='faculty')
+    announcements = db.relationship('Announcement', back_populates='faculty')
 
     def to_dict(self):
         return {
