@@ -187,7 +187,36 @@ class Notification(db.Model, UserMixin):
 
 #======================================================#       
 #Announcements
+class Announcement(db.Model, UserMixin):
+    __tablename__ = 'announcements'
+
+    announcementId = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(255), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    author = db.Column(db.String(255), nullable=False)
+    content_filename = db.Column(db.String(255))
+    content_data = db.Column(db.LargeBinary)
+    created_at = db.Column(DateTime, default=datetime.utcnow)
+    updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    facultyID = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
+
+    # Relationship to the Faculty model
+    faculties = db.relationship('Faculty', back_populates='announcements')
+    # Optional: category, visibility, attached files, etc.
+
+    def to_dict(self):
+        return {
+            'announcementId': self.announcementId,
+            'title': self.title,
+            'content': self.content,
+            'author': self.author,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            'facultyID': self.facultyID
+        }    
     
+    def get_AnnouncementID(self):
+        return str(self.announcementId)
 #======================================================#       
 
 # ==========Services========== #
