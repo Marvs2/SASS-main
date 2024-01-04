@@ -356,20 +356,20 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for request in petition_requests %}
-						<tr data-petition-application-id="{{ request.petition_request_id }}"
-							data-petition-name="{{ request.Name }}"
-							data-petition-student-number="{{  request.StudentNumber }}"
-							data-petition-subject-code="{{ request.subject_code }}"
-							data-petition-subject-name="{{ request.subject_name }}"
-							data-petition-type="{{ request.petition_type }}"
-							data-petition-reason="{{ request.request_reason }}"
-							data-status="{{ request.status }}">
-							<td class="applicationID">{{ request.petition_request_id }}</td>								
-							<td>{{ request.subject_name }}</td>
-							<td>{{ request.petition_type }}</td>	
-							<td>{{ request.request_reason }}</td>													
-							<td id="status">{{ request.status }}</td>
+						{% for petition_requests in services_data.petition_requests_list %}
+						<tr data-petition-application-id="{{ petition_requests.petition_request_id }}"
+							data-petition-name="{{ petition_requests.Name }}"
+							data-petition-student-number="{{  petition_requests.StudentNumber }}"
+							data-petition-subject-code="{{ petition_requests.subject_code }}"
+							data-petition-subject-name="{{ petition_requests.subject_name }}"
+							data-petition-type="{{ petition_requests.petition_type }}"
+							data-petition-reason="{{ petition_requests.request_reason }}"
+							data-petition-status="{{ petition_requests.status }}">
+							<td class="applicationID">{{ petition_requests.petition_request_id }}</td>								
+							<td>{{ petition_requests.subject_name }}</td>
+							<td>{{ petition_requests.petition_type }}</td>	
+							<td>{{ petition_requests.request_reason }}</td>													
+							<td id="status">{{ petition_requests.status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewPetitionModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
