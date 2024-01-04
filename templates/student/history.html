@@ -326,7 +326,7 @@
 													
 							<td id="status">{{ manual_enrollments.status }}</td>
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewmanualModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewManualModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -954,6 +954,79 @@
 	</div>
   </div>
 
+  <!------------------------------------------- APPLICATION FOR MANUAL ENROLLMENT VIEW MODAL  --------------------------------------------------->
+  <div class="modal fade" id="viewManualModal" tabindex="-1" role="dialog" aria-labelledby="viewManualModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="manualModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-id"></p>
+				</div>          
+			  </div>
+
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-name"></p>
+
+				</div>           
+			  </div>
+
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-student-number"></p>
+
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Enrollment Type:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-enrollment-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Reason for Manual Enrollment:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-reason"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Related Docs:</label>
+				<div class="col-sm-4">
+					<p id="manual-enrollment-file"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="manual-status"></p>
+				</div>           
+			  </div>
+
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
     <!-------------------------------------- ONLINE PETITION OF SUBJECTS VIEW MODAL  ----------------------------------------------->
 	<div class="modal fade" id="viewPetitionModal" tabindex="-1" role="dialog" aria-labelledby="viewPetitionModal" aria-hidden="true">
 		<div class="modal-dialog modal-lg" role="document">
@@ -1362,6 +1435,38 @@ $(document).ready(function () {
 			}
 
 			$('#shifting-status').text(status);
+        });
+    });
+
+	// VIEW QUALIFICATION FOR MANUAL ENROLLMENT MODAL
+	$(document).ready(function () {
+        $('#manualEnrollment tbody tr').on('click', function () {
+            // Retrieve data from the clicked row
+            var applicationId = $(this).data('manual-enrollment-id');
+            var name = $(this).data('manual-enrollment-name');
+            var studentNumber = $(this).data('manual-enrollment-student-number');
+            var enrollmentType = $(this).data('manual-enrollment-type');
+			var enrollmentReason = $(this).data('manual-enrollment-reason');
+            var manualfileUrl = $(this).data('manual-file-url');
+            var manualfileName = $(this).data('manual-file-filename');
+            var status = $(this).data('manual-status');
+
+            // Populate modal with data
+            $('#manual-enrollment-id').text(applicationId);
+            $('#manual-enrollment-name').text(name);
+            $('#manual-enrollment-student-number').text(studentNumber);
+            $('#manual-enrollment-enrollment-type').text(enrollmentType);
+			$('#manual-enrollment-reason').text(enrollmentReason);
+
+            // Generate dynamic file download link
+			if (manualfileName) {
+				var fileLink = $('<a>').attr('href', manualfileUrl).attr('target', '_blank').text(manualfileName);
+				$('#manual-enrollment-file').empty().append(fileLink);
+			} else {
+				$('#manual-enrollment-file').text('No File');
+			}
+
+			$('#manual-status').text(status);
         });
     });
 
