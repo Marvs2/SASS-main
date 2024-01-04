@@ -187,7 +187,7 @@ class Notification(db.Model, UserMixin):
 
 #======================================================#       
 #Announcements
-class Announcement(db.Model, UserMixin):
+"""class Announcement(db.Model, UserMixin):
     __tablename__ = 'announcements'
 
     announcementId = db.Column(db.Integer, primary_key=True)
@@ -216,7 +216,7 @@ class Announcement(db.Model, UserMixin):
         }    
     
     def get_AnnouncementID(self):
-        return str(self.announcementId)
+        return str(self.announcementId)"""
 #======================================================#       
 
 # ==========Services========== #
