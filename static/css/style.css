@@ -272,12 +272,11 @@ nav .nav-link {
 nav .nav-link .icon {
 	font-size: 25px;
 	color: var(--dark);
-	padding-right: 6px;
 }
 nav .nav-link .badge {
 	position: absolute;
 	top: -15px;
-	right: -5px;
+	right: -10px;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
@@ -313,7 +312,7 @@ nav .profile .profile-link {
 	background: var(--light);
 	padding: 10px 0;
 	box-shadow: 4px 4px 16px rgba(0, 0, 0, .1);
-	border-radius: 10px;
+	border-radius: 8px;
 	width: 200px;
 	opacity: 0;
 	pointer-events: none;
@@ -322,7 +321,7 @@ nav .profile .profile-link {
 nav .profile .profile-link.show {
 	opacity: 1;
 	pointer-events: visible;
-	top: 100%;
+	top: 115%;
 }
 nav .profile .profile-link a {
 	padding: 10px 16px;
@@ -635,7 +634,7 @@ main .btn-send:hover {
     transform-origin: center;
     border: 2px solid;
     border-color: inherit;
-    z-index: -1;
+    z-index: 1;
     clip: rect(0,9px,9px,0)
 }
 
@@ -655,13 +654,15 @@ main .btn-send:hover {
 .dropdown-menu-card {
     padding: 0;
 	font-size: 13px;
-
+	max-height: 400px; /* Adjust the maximum height as needed */
+	overflow-y: auto;
+	position: relative;
+	z-index: 1;
 }
 
 .dropdown-menu-card>.card {
     margin: 0;
     border: 0;
-    box-shadow: none;
 }
 
 .text-body {
