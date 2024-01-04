@@ -347,35 +347,34 @@
         </h2>
         <div id="collapseEight" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-				<table id="overload" class="table table-bordered table-condensed">
+				<table id="petition" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
 							<th>Application Number</th>														
-							<th>Subjects to Add</th>
+							<th>Subject Name</th>
+							<th>Petition Type</th>
 							<th>Reason/s</th>
-
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
-						<tr data-application-id="{{ overload_applications.overload_application_id }}"
-							data-name="{{ overload_applications.Name }}"
-							data-student-number="{{ overload_applications.StudentNumber }}"
-							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
-							data-justification="{{ overload_applications.justification }}"
-							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
-							data-file-filename="{{ overload_applications.file_filename }}"	
-							data-status="{{ overload_applications.status }}">
-							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
-							<td>{{ overload_applications.justification }}</td>	
-							
-													
-							<td id="status">{{ overload_applications.status }}</td>
+						{% for request in petition_requests %}
+						<tr data-petition-application-id="{{ request.petition_request_id }}"
+							data-petition-name="{{ request.Name }}"
+							data-petition-student-number="{{  request.StudentNumber }}"
+							data-petition-subject-code="{{ request.subject_code }}"
+							data-petition-subject-name="{{ request.subject_name }}"
+							data-petition-type="{{ request.petition_type }}"
+							data-petition-reason="{{ request.request_reason }}"
+							data-status="{{ request.status }}">
+							<td class="applicationID">{{ request.petition_request_id }}</td>								
+							<td>{{ request.subject_name }}</td>
+							<td>{{ request.petition_type }}</td>	
+							<td>{{ request.request_reason }}</td>													
+							<td id="status">{{ request.status }}</td>
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewPetitionModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -955,78 +954,86 @@
 	</div>
   </div>
 
-  <!------------------------------------------- APPLICATION FOR MANUAL ENROLLMENT VIEW MODAL  --------------------------------------------------->
-  <div class="modal fade" id="viewmanualModal" tabindex="-1" role="dialog" aria-labelledby="viewmanualModal" aria-hidden="true">
-	<div class="modal-dialog modal-lg" role="document">
-	  <div class="modal-content">
-		<div class="modal-header">
-		  <h5 class="modal-title text-white" id="shiftingModal">Application Details</h5>
-		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-			<span class="btn-wrong" aria-hidden="true">&times;</span>
-		  </button>
-		</div>
-		<div class="modal-body view">
-
-			<div class="form-group">
-				<label class="col-sm-4 control-label">Application Number:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-id"></p>
-				</div>          
-			  </div>
-			  
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Name:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-name"></p>
-					
-				</div>           
-			  </div>
-			 
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Student Number:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-student-number"></p>
-
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Enrollment Type:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-enrollment-type"></p>
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Reason for Manual Enrollment:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-reason"></p>
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Related Docs:</label>
-				<div class="col-sm-4">
-					<p id="manual-enrollment-file"></p>
-				</div>
+    <!-------------------------------------- ONLINE PETITION OF SUBJECTS VIEW MODAL  ----------------------------------------------->
+	<div class="modal fade" id="viewPetitionModal" tabindex="-1" role="dialog" aria-labelledby="viewPetitionModal" aria-hidden="true">
+		<div class="modal-dialog modal-lg" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title text-white" id="petitionModal">Application Details</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span class="btn-wrong" aria-hidden="true">&times;</span>
+			  </button>
 			</div>
+			<div class="modal-body view">
+	
+				<div class="form-group">
+					<label class="col-sm-4 control-label">Application Number:</label>
+					<div class="col-sm-4">
+						<p id="petition-application-id"></p>
+					</div>          
+				  </div>
+				  
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Name:</label>
+					<div class="col-sm-4">
+						<p id="petition-application-name"></p>
+						
+					</div>           
+				  </div>
+				 
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Student Number:</label>
+					<div class="col-sm-4">
+						<p id="petition-application-studentNumber"></p>
+	
+					</div>           
+				  </div>
+				 
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Subject Code:</label>
+					<div class="col-sm-4">
+						<p id="petition-subject-code"></p>
+					</div>           
+				  </div>
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Subject Name:</label>
+					<div class="col-sm-4">
+						<p id="petition-subject-name"></p>
+					</div>           
+				  </div>
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Petition Type:</label>
+					<div class="col-sm-4">
+						<p id="petition-type"></p>
+					</div>           
+				  </div>
+	
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Reason/s:</label>
+					<div class="col-sm-4">
+						<p id="petition-reason"></p>
+					</div>           
+				  </div>
 
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Status:</label>
-				<div class="col-sm-4">
-					<p id="manual-status"></p>
-				</div>           
-			  </div>
-			
-		</div>
-		<div class="modal-footer">
-		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+				  <div class="form-group">
+					<label class="col-sm-4 control-label">Status:</label>
+					<div class="col-sm-4">
+						<p id="petition-status"></p>
+					</div>           
+				  </div>
+				
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+			</div>
+		  </div>
 		</div>
 	  </div>
-	</div>
-  </div>
 
   <!-------------------------------------- ONLINE REQUEST FOR CERTIFICATION VIEW MODAL  --------------------------------------------------->
   <div class="modal fade" id="viewCertificationModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificationModal" aria-hidden="true">
@@ -1358,38 +1365,31 @@ $(document).ready(function () {
         });
     });
 
-	// VIEW QUALIFICATION FOR MANUAL ENROLLMENT MODAL
-	$(document).ready(function () {
-        $('#manualEnrollment tbody tr').on('click', function () {
-            // Retrieve data from the clicked row
-            var applicationId = $(this).data('manual-enrollment-id');
-            var name = $(this).data('manual-enrollment-name');
-            var studentNumber = $(this).data('manual-enrollment-student-number');
-            var enrollmentType = $(this).data('manual-enrollment-type');
-			var enrollmentReason = $(this).data('manual-enrollment-reason');
-            var manualfileUrl = $(this).data('manual-file-url');
-            var manualfileName = $(this).data('manual-file-filename');
-            var status = $(this).data('manual-status');
+		// VIEW ONLINE PETITION OF SUBJECTS MODAL
+		$(document).ready(function () {
+	$('#petition tbody tr').on('click', function () {
+		// Retrieve data from the clicked row
+		var applicationId = $(this).data('petition-application-id');
+		var name = $(this).data('petition-name');
+		var studentNumber = $(this).data('petition-student-number');
+		var subjectCode = $(this).data('petition-subject-code');
+		var subjectName = $(this).data('petition-subject-name');
+		var petitionType = $(this).data('petition-type');
+		var petitionReason = $(this).data('petition-reason');
+		var status = $(this).data('petition-status');
 
-            // Populate modal with data
-            $('#manual-enrollment-id').text(applicationId);
-            $('#manual-enrollment-name').text(name);
-            $('#manual-enrollment-student-number').text(studentNumber);
-            $('#manual-enrollment-enrollment-type').text(enrollmentType);
-			$('#manual-enrollment-reason').text(enrollmentReason);
-
-            // Generate dynamic file download link
-			if (manualfileName) {
-				var fileLink = $('<a>').attr('href', manualfileUrl).attr('target', '_blank').text(manualfileName);
-				$('#manual-enrollment-file').empty().append(fileLink);
-			} else {
-				$('#manual-enrollment-file').text('No File');
-			}
-
-			$('#manual-status').text(status);
-        });
-    });
-
+		// Populate modal with data
+		$('#petition-application-id').text(applicationId);
+		$('#petition-application-name').text(name);
+		$('#petition-application-studentNumber').text(studentNumber);
+		$('#petition-subject-code').text(subjectCode);
+		$('#petition-subject-name').text(subjectName);
+		$('#petition-type').text(petitionType);
+		$('#petition-reason').text(petitionReason);
+		$('#petition-status').text(status);
+	});
+});
+ 
 // VIEW REQUEST FOR CERTIFICATION MODAL
 $(document).ready(function () {
         $('#certification tbody tr').on('click', function () {
