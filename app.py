@@ -274,6 +274,16 @@ def studentsetting():
 def studentpassword():
     return render_template('/student/changepassword.html')
 
+# Assuming you have a function `check_password_requirements` to check password requirements
+def check_password_requirements(password):
+    # Check if the password meets the specified requirements
+    length_requirement = len(password) >= 8
+    number_requirement = any(char.isdigit() for char in password)
+    lowercase_requirement = any(char.islower() for char in password)
+    special_symbol_requirement = any(char.isascii() and not char.isalnum() for char in password)
+    uppercase_requirement = any(char.isupper() for char in password)
+
+    return all([length_requirement, number_requirement, lowercase_requirement, special_symbol_requirement, uppercase_requirement])
 
 @app.route('/student/changepassword', methods=['GET', 'POST'])
 def student_change_password():
@@ -282,7 +292,6 @@ def student_change_password():
         current_password = request.form.get('currentPassword')
         new_password = request.form.get('newPassword')
         confirm_password = request.form.get('confirmPassword')
-
 
         user_id = getCurrentUser()
 
@@ -301,6 +310,11 @@ def student_change_password():
             flash('New and confirm password do not match. Please try again.', category='error')
             return redirect(url_for('student_change_password'))
 
+        # Check if the new password meets the requirements
+        if not check_password_requirements(new_password):
+            flash('Password must meet the specified requirements. Please try again.', category='error')
+            return redirect(url_for('student_change_password'))
+
         # Update the user's password in the database
         hashed_password = generate_password_hash(new_password, method='pbkdf2:sha256')
         student.Password = hashed_password
@@ -310,6 +324,8 @@ def student_change_password():
         return redirect(url_for('student_change_password'))
 
     return render_template('student/change_password.html')
+
+
 
 """# Endpoint to Fetch Programs
 @app.route('/programs', methods=['GET'])

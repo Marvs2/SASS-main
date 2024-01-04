@@ -338,6 +338,39 @@ nav .profile .profile-link a:hover {
 
 /* NAVBAR */
 
+.content {
+	padding-left: 19rem;
+	display: none;
+}
+
+  .content p {
+	color: var(--bright-red);
+	font-size: 13px;
+  }
+
+  .requirement-list li {
+	font-size: 14px;
+	list-style: none;
+	display: flex;
+	align-items: center;
+	margin-bottom: 15px;
+  }
+  .requirement-list li i {
+	width: 20px;
+	color: var(--bright-red);
+	font-size: 0.5rem;
+  }
+  .requirement-list li.valid i {
+	font-size: 1rem;
+	color: #28a745;
+  }
+  .requirement-list li span {
+	margin-left: 12px;
+	color: #333;
+  }
+  .requirement-list li.valid span {
+	color: #999;
+  }
 
 
 /* MAIN */
