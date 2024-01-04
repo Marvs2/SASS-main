@@ -272,11 +272,12 @@ nav .nav-link {
 nav .nav-link .icon {
 	font-size: 25px;
 	color: var(--dark);
+	padding-right: 6px;
 }
 nav .nav-link .badge {
 	position: absolute;
 	top: -15px;
-	right: -10px;
+	right: -5px;
 	width: 20px;
 	height: 20px;
 	border-radius: 50%;
@@ -626,7 +627,6 @@ main .btn-send:hover {
     content: "";
     position: absolute;
     top: -.30rem;
-    left: .75rem;
     display: block;
     background: inherit;
     width: 14px;
@@ -646,7 +646,6 @@ main .btn-send:hover {
 
 .dropend>.dropdown-menu {
     margin-top: calc(-.25rem - 1px);
-    margin-left: -.25rem;
 }
 
 .dropend .dropdown-toggle:after {
@@ -655,10 +654,7 @@ main .btn-send:hover {
 
 .dropdown-menu-card {
     padding: 0;
-	top: 55px;
-	right: 98px;
-	margin-left: 500px;	
-	font-size: 14px;
+	font-size: 13px;
 
 }
 
@@ -670,6 +666,7 @@ main .btn-send:hover {
 
 .text-body {
 	color: #800000;
+	padding-top: 10px;
 }
 
 .text-right {

@@ -10,7 +10,7 @@ progress.classList.add("active");
 
 timer1 = setTimeout(() => {
     toast.classList.remove("active");
-}, 10000);
+}, 3000);
 
 timer2 = setTimeout(() => {
     progress.classList.remove("active");
