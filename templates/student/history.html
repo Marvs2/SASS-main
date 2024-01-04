@@ -302,7 +302,7 @@
 					<thead>
 						<tr>
 							<th>Application Number</th>														
-							<th>Subjects to Add</th>
+							<th>enrollment_type</th>
 							<th>Reason/s</th>
 
 							<th>Status</th>
@@ -310,23 +310,23 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
-						<tr data-application-id="{{ overload_applications.overload_application_id }}"
-							data-name="{{ overload_applications.Name }}"
-							data-student-number="{{ overload_applications.StudentNumber }}"
-							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
-							data-justification="{{ overload_applications.justification }}"
-							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
-							data-file-filename="{{ overload_applications.file_filename }}"	
-							data-status="{{ overload_applications.status }}">
-							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
-							<td>{{ overload_applications.justification }}</td>	
+						{% for manual_enrollments in services_data.manual_enrollments_list %}
+						<tr data-manual-enrollment-id="{{ manual_enrollments.m_enrollment_ID }}"
+							data-manual-enrollment-name="{{ manual_enrollments.Name }}"
+							data-manual-enrollment-student-number="{{ manual_enrollments.StudentNumber }}"
+							data-manual-enrollment-type="{{ manual_enrollments.enrollment_type }}"
+							data-manual-enrollment-reason="{{ manual_enrollments.reason }}"
+							data-manual-file-url="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.m_enrollment_ID) }}"
+							data-manual-file-filename="{{ manual_enrollments.me_file_filename }}"	
+							data-manual-status="{{ manual_enrollments.status }}">
+							<td class="applicationID">{{ manual_enrollments.m_enrollment_ID }}</td>								
+							<td>{{ manual_enrollments.enrollment_type }}</td>
+							<td>{{ manual_enrollments.reason }}</td>	
 							
 													
-							<td>{{ overload_applications.status }}</td>
+							<td id="status">{{ manual_enrollments.status }}</td>
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewmanualModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -421,7 +421,7 @@
 							<td>{{ overload_applications.justification }}</td>	
 							
 													
-							<td>{{ overload_applications.status }}</td>
+							<td id="status">{{ overload_applications.status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
@@ -1389,7 +1389,7 @@ $(document).ready(function () {
 		$('#petition-status').text(status);
 	});
 });
-
+ 
 // VIEW REQUEST FOR CERTIFICATION MODAL
 $(document).ready(function () {
         $('#certification tbody tr').on('click', function () {
