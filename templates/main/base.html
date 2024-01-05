@@ -23,8 +23,10 @@
         <ul class="menu">      
           <li class="close-btn"></li>  
 
+        <!----------------------------------------------------- HOME ----------------------------------------------------->
             <li class="menu-item"><a href="{{ url_for('index') }}"><i class="fa-solid fa-house nav-img"></i>Home</a></li>
             
+        <!-------------------------------------------------- SERVICES ----------------------------------------------------->
             <li class="menu-item"></i>
                 <a class="sub-btn" href="#"><i class="fa-solid fa-phone-volume nav-img"></i>Services</a>
                 <ul class="sub-menu">
@@ -52,13 +54,15 @@
                     </li> -->
                 </ul>
             </li>
-           
+        
+        <!--------------------------------------------------- ACADEMIC ---------------------------------------------------->
             <li class="menu-item"></i>
                 <a class="sub-btn" href="#"><i class="fa-solid fa-chalkboard-user nav-img"></i>Academic</a>
                 <ul class="sub-menu">
-                    <li class="sub-item"> <a href="#">1</a></li>
-                    <li class="sub-item"> <a href="#">2</a></li>
-                    <li class="sub-item"> <a href="#">3</a></li>                       
+                    <li class="sub-item"> <a href="#">General Regulations</a></li>
+                    <li class="sub-item"> <a href="#">Code of Conduct</a></li>
+                    <li class="sub-item"> <a href="#">Academic Regulations and Procedures</a></li>  
+                    <li class="sub-item"> <a href="#">Code of Discipline</a></li>                       
                 </ul>
             </li>
            
@@ -71,16 +75,16 @@
                 </ul>
             </li> -->
          
-            <li class="menu-item">
+          <!----  <li class="menu-item">
                 <a class="sub-btn" href="#"><i class="fa-solid fa-calendar-days nav-img"></i> Programs</a>
                 <ul class="sub-menu">
                     <li class="sub-item"> <a href="#">1</a></li>
                     <li class="sub-item"> <a href="#">2</a></li>
                     <li class="sub-item"> <a href="#">3</a></li>
                 </ul>
-            </li>
+            </li> -->
            
-            <li class="menu-item">
+            <li class="menu-item profile">
                 <a class="sub-btn" href="#"><i class="fa-solid fa-user-lock"></i>Log-in</a>
                 <ul class="sub-menu">
                     <li class="sub-item"> <i class="fa-solid fa-user-graduate"></i><a href="{{ url_for('studentLogin') }}">Student</a></li>
@@ -103,7 +107,7 @@
         <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a></p>
     </footer>
     
-    <button id="scrollToTop" title="Scroll to top">Scroll to the Top<i class="fa-solid fa-arrow-up"></i></button>
+    <button id="scrollToTop" title="Scroll to top"><i class="fa-solid fa-arrow-up-from-bracket"></i></button>
 
     <script src="{{url_for ('static', filename='/js/script.js')}}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>

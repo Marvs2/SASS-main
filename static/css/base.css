@@ -28,7 +28,7 @@ header {
 }
 
 header .logo {
-    color: black;
+    color: #800000;
     font-size: 20px;
     font-weight: bolder;
     text-transform: uppercase;
@@ -68,10 +68,14 @@ header .navigation .menu {
     color: black;
     font-size: 17px;
     text-decoration: none;
-    margin: 0px 30px 0px 0px;
-    padding: 25px 30px 0px 0px;
+    justify-content: space-between;
+    margin-right: 50px;
     position: relative;
 }
+
+ .profile {
+  padding-left: 105px;
+ }
 
 .menu-item > a:hover {
      color: #8d0808;
@@ -183,14 +187,16 @@ header .navigation .menu {
   bottom: 60px;
   right: 20px;
   background-color: #a30808;
-  color: #fff;
-  padding: 5px 4px 5px 9px;
+  height: 45px;
+  width: 45px;
   text-decoration: none;
   border-radius: 50px;
   border-style: none;
+  align-items: center;
+  justify-content: center;
 }
 
-.fa-arrow-up {
+.fa-arrow-up-from-bracket {
   color: white;
 }
 
