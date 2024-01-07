@@ -156,7 +156,8 @@ def student_dashboard():
 
 #======================================== STUDENT PROFILE ======================================================
 
-@app.route('/student/profile') 
+@app.route('/student/profile')
+@role_required('student') 
 def studentprofile():
     return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
