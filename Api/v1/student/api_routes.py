@@ -544,7 +544,6 @@ def fetchStudentDetails():
             "StudentNumber": student.StudentNumber,
             "Gender": Gender_string,
             "Email": student.Email,
-            "MobileNumber": student.MobileNumber,
             "address": student.address,
             "DateofBirth": student.DateofBirth,
             "PlaceofBirth": student.PlaceofBirth,
