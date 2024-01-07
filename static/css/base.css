@@ -194,6 +194,7 @@ header .navigation .menu {
   border-style: none;
   align-items: center;
   justify-content: center;
+  padding-right: 12px;
 }
 
 .fa-arrow-up-from-bracket {
