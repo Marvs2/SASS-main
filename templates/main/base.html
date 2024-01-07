@@ -59,10 +59,10 @@
             <li class="menu-item"></i>
                 <a class="sub-btn" href="#"><i class="fa-solid fa-chalkboard-user nav-img"></i>Academic</a>
                 <ul class="sub-menu">
-                    <li class="sub-item"> <a href="#">General Regulations</a></li>
-                    <li class="sub-item"> <a href="#">Code of Conduct</a></li>
-                    <li class="sub-item"> <a href="#">Academic Regulations and Procedures</a></li>  
-                    <li class="sub-item"> <a href="#">Code of Discipline</a></li>                       
+                    <li class="sub-item"> <a href="{{ url_for ('regulation') }}">General Regulations</a></li>
+                    <li class="sub-item"> <a href="{{ url_for ('conduct') }}">Code of Conduct</a></li>
+                    <li class="sub-item"> <a href="{{ url_for ('procedures') }}">Academic Regulations and Procedures</a></li>  
+                    <li class="sub-item"> <a href="{{ url_for ('discipline') }}">Code of Discipline</a></li>                       
                 </ul>
             </li>
            
