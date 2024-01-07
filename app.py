@@ -447,6 +447,36 @@ def viewaddsubject():
 
     return render_template("/student/viewaddsubject.html", addsubjects_list=addsubjects_list)
 
+@app.route('/student/view_subject_file/<int:subject_ID>')
+def view_subject_file(subject_ID):
+    addsubject = AddSubjects.query.get(subject_ID)
+
+    if addsubject and addsubject.file_data:
+        file_extension = get_file_extension(addsubject.file_name)
+        mimetype = get_mimetype(file_extension)
+
+        return send_file(
+            io.BytesIO(addsubject.file_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)  # Subject or file not found
+
+def get_file_extension(file_name):
+    return file_name.rsplit('.', 1)[1].lower()
+
+def get_mimetype(file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Note: Changed 'docs' to 'docx' for the correct MIME type
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(file_extension, 'application/octet-stream')
+
 #============================== CHANGE OF SCHEDULE/SUBJECT ===============================================#
 @app.route('/student/changeofsubject')
 def studentchange():
@@ -492,6 +522,36 @@ def viewchange():
         changesubjects_list = [subject.to_dict() for subject in changesubjects]
 
     return render_template("/student/viewchange.html", changesubjects_list=changesubjects_list)
+#view_change_file
+@app.route('/student/view_change_file/<int:Changesubject_ID>')
+def view_change_file(Changesubject_ID):
+    changesubjects = ChangeOfSubjects.query.get(Changesubject_ID)
+
+    if changesubjects and changesubjects.ace_form_data:
+        file_extension = get_file_extension(changesubjects.ace_form_filename)
+        mimetype = get_mimetype(file_extension)
+
+        return send_file(
+            io.BytesIO(changesubjects.ace_form_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)  # Change of subjects application or file not found
+
+def get_file_extension(ace_form_filename):
+    return ace_form_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Note: Changed 'docs' to 'docx' for the correct MIME type
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(file_extension, 'application/octet-stream')
 
 #========================== CORRECTION OF GRADE ENTRY ================================================#
 
@@ -538,6 +598,73 @@ def viewcorrection():
         grade_entry_list = [subject.to_dict() for subject in grade_entry]
 
     return render_template("/student/viewcorrection.html", grade_entry_list=grade_entry_list)
+
+#viewfile for correction
+"""@app.route('/student/view_completion_form/<int:grade_entry_id>')
+def view_completion_form(grade_entry_id):
+    grade_entry = GradeEntry.query.get(grade_entry_id)
+
+    if grade_entry and grade_entry.completion_form_data:
+        completion_form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
+        mimetype = get_mimetype(completion_form_extension)
+
+        return send_file(
+            io.BytesIO(grade_entry.completion_form_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)  # File not found"""
+
+@app.route('/student/view_completion_form/<int:grade_entry_id>')
+def view_completion_form(grade_entry_id):
+    grade_entry = GradeEntry.query.get(grade_entry_id)
+
+    if grade_entry and grade_entry.completion_form_data:
+        completion_form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
+        mimetype = get_mimetype(completion_form_extension)
+
+        return send_file(
+            io.BytesIO(grade_entry.completion_form_data),
+            as_attachment=False,  # Changed to False
+            mimetype=mimetype
+        )
+    else:
+        abort(404)  # File not found
+
+
+
+@app.route('/student/view_class_record/<int:grade_entry_id>')
+def view_class_record(grade_entry_id):
+    grade_entry = GradeEntry.query.get(grade_entry_id)
+
+    if grade_entry and grade_entry.class_record_data:
+        class_extension = get_class_extension(grade_entry.class_record_filename)
+        mimetype = get_mimetype(class_extension)
+
+        return send_file(
+            io.BytesIO(grade_entry.class_record_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)
+
+@app.route('/student/view_affidavit/<int:grade_entry_id>')
+def view_affidavit(grade_entry_id):
+    grade_entry = GradeEntry.query.get(grade_entry_id)
+
+    if grade_entry and grade_entry.affidavit_data:
+        affidavit_extension = get_affidavit_extension(grade_entry.affidavit_filename)
+        mimetype = get_mimetype(affidavit_extension)
+
+        return send_file(
+            io.BytesIO(grade_entry.affidavit_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)
 
 #====================================== CROSS ENROLLMENT =========================================================
 
@@ -748,6 +875,21 @@ def viewtutorial():
 
     return render_template("/student/viewtutorial.html", tutorial_requests_list=tutorial_requests_list)
 
+@app.route('/student/view_tutorial_file/<int:tutorial_request_id>')
+def view_tutorial_file(tutorial_request_id):
+    tutorial_requests = TutorialRequest.query.get(tutorial_request_id)
+
+    if tutorial_requests and tutorial_requests.file_data:
+        tutorial_extension = get_tutorial_extension(tutorial_requests.file_filename)
+        mimetype = get_mimetype(tutorial_extension)
+
+        return send_file(
+            io.BytesIO(tutorial_requests.file_data),
+            as_attachment=False,
+            mimetype=mimetype
+        )
+    else:
+        abort(404)  # File not found
 #======================================== REQUEST FOR CERTIFICATION ===========================================================
 @app.route('/student/certification')
 def studentcertification():
@@ -1621,14 +1763,14 @@ def download_completion_form(grade_entry_id):
     grade_entry = GradeEntry.query.get(grade_entry_id)
 
     if grade_entry and grade_entry.completion_form_data:
-        form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
-        download_name = f'completion_form_{grade_entry_id}.{form_extension}'
+        completion_form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
+        download_name = f'completion_form_{grade_entry_id}.{completion_form_extension}'
 
         return send_file(
             io.BytesIO(grade_entry.completion_form_data),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(form_extension)
+            mimetype=get_mimetype(completion_form_extension)
         )
     else:
         abort(404)  # File not found
@@ -1637,7 +1779,7 @@ def download_completion_form(grade_entry_id):
 def get_completion_form_extension(completion_form_filename):
     return completion_form_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(form_extension):
+def get_mimetype(completion_form_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -1645,7 +1787,7 @@ def get_mimetype(form_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(form_extension, 'application/octet-stream')
+    return mimetypes.get(completion_form_extension, 'application/octet-stream')
 
 #class_record
 @app.route('/faculty/correction/get_grade_class_file/<int:grade_entry_id>')

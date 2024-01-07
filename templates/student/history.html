@@ -78,7 +78,7 @@
 							data-add-student-number="{{ addsubjects.StudentNumber }}"
 							data-add-subjects-to-add="{{ addsubjects.subject_Names }}"
 							data-add-enrollment-type="{{ addsubjects.enrollment_type }}"
-							data-add-file-url="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}"
+							data-add-file-url="{{ url_for('view_subject_file', subject_ID=addsubjects.subject_ID) }}"
 							data-add-file-filename="{{ addsubjects.file_name }}"	
 							data-add-status="{{ addsubjects.status }}">
 							<td class="applicationID">{{ addsubjects.subject_ID }}</td>								
@@ -122,7 +122,7 @@
 							data-change-name="{{ changesubjects.Name }}"
 							data-change-student-number="{{ changesubjects.StudentNumber }}"
 							data-change-enrollment-type="{{ changesubjects.enrollment_type }}"
-							data-change-file-url="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}"
+							data-change-file-url="{{ url_for('view_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}"
 							data-change-file-filename="{{ changesubjects.ace_form_filename }}"	
 							data-change-status="{{ changesubjects.status  }}">
 							<td class="applicationID">{{ changesubjects.Changesubject_ID }}</td>								
@@ -166,13 +166,13 @@
 							data-correction-student-number="{{ grade_entry.StudentNumber }}"
 							data-correction-application-type="{{ grade_entry.application_type }}"
 
-							data-correction-completion-file="{{ url_for('get_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}"
-							data-correction-completion-filename="{{ grade_entry.completion_form_filename }}"
+							data-correction-file-completion="{{ url_for('view_completion_form', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-form-filename="{{ grade_entry.completion_form_filename }}"
 
-							data-correction-file-record="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-file-record="{{ url_for('view_class_record', grade_entry_id=grade_entry.grade_entry_id) }}"
 							data-correction-record-filename="{{ grade_entry.class_record_filename }}"
 
-							data-correction-file-affidavit="{{ url_for('get_grade_affidavit_file', grade_entry_id=grade_entry.grade_entry_id) }}"
+							data-correction-file-affidavit="{{ url_for('view_affidavit', grade_entry_id=grade_entry.grade_entry_id) }}"
 							data-correction-affidavit-filename="{{ grade_entry.affidavit_filename }}"	
 
 							data-correction-status="{{ grade_entry.status }}">
@@ -392,35 +392,35 @@
         </h2>
         <div id="collapseNine" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
             <div class="accordion-body">
-				<table id="overload" class="table table-bordered table-condensed">
+				<table id="tutorial" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
 							<th>Application Number</th>														
-							<th>Subjects to Add</th>
-							<th>Reason/s</th>
+							<th>Subjects Code</th>
+							<th>Subject Name</th>
 
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
-						<tr data-application-id="{{ overload_applications.overload_application_id }}"
-							data-name="{{ overload_applications.Name }}"
-							data-student-number="{{ overload_applications.StudentNumber }}"
-							data-subjects-to-add="{{ overload_applications.subjects_to_add }}"
-							data-justification="{{ overload_applications.justification }}"
-							data-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}"
-							data-file-filename="{{ overload_applications.file_filename }}"	
-							data-status="{{ overload_applications.status }}">
-							<td class="applicationID">{{ overload_applications.overload_application_id }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
-							<td>{{ overload_applications.justification }}</td>	
+						{% for tutorial_requests in services_data.tutorial_requests_list %}
+						<tr data-tutorial-application-id="{{ tutorial_requests.tutorial_request_id }}"
+							data-tutorial-name="{{ tutorial_requests.Name }}"
+							data-tutorial-student-number="{{ tutorial_requests.StudentNumber }}"
+							data-tutorial-subject-code="{{ tutorial_requests.subject_code }}"
+							data-tutorial-subject-name="{{ tutorial_requests.subject_name }}"
+							data-tutorial-file-url="{{ url_for('view_tutorial_file', tutorial_request_id=tutorial_requests.tutorial_request_id) }}"
+							data-tutorial-file-filename="{{ tutorial_requests.file_filename }}"	
+							data-tutorial-status="{{ tutorial_requests.status }}">
+							<td class="applicationID">{{ tutorial_requests.tutorial_request_id }}</td>								
+							<td>{{ tutorial_requests.subject_code }}</td>
+							<td>{{ tutorial_requests.subject_name }}</td>	
 							
 													
-							<td id="status">{{ overload_applications.status }}</td>
+							<td id="status">{{ tutorial_requests.status }}</td>
 							<td>
-								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewtutorialModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -741,9 +741,9 @@
 			  </div>
 
 			  <div class="form-group">
-				<label class="col-sm-4 control-label">Completion Form:</label>
+				<label class="col-sm-4 control-label">Completion Form: </label>
 				<div class="col-sm-4">
-					<p id="correction-completion-file"></p>
+					<p id="correction-file-completion"></p>
 				</div>
 			</div>
 
@@ -1105,6 +1105,79 @@
 		</div>
 	  </div>
 
+	  <!-------------------------------------- Tutorial REQUEST FOR TUTORIAL VIEW MODAL  --------------------------------------------------->
+  <div class="modal fade" id="viewtutorialModal" tabindex="-1" role="dialog" aria-labelledby="viewtutorialModal" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title text-white" id="tutorialModal">Application Details</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			<span class="btn-wrong" aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body view">
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Application Number:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-application-id"></p>
+				</div>          
+			  </div>
+			  
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Name:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-application-name"></p>
+					
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Student Number:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-student-number"></p>
+				</div>           
+			  </div>
+			 
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Subject Code:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-subject-code"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Subject Name:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-subject-name"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Tutorial File:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-file-data"></p>
+				</div>
+			</div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Status:</label>
+				<div class="col-sm-4">
+					<p id="tutorial-status"></p>
+				</div>           
+			  </div>
+			
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+		</div>
+	  </div>
+	</div>
+  </div>
+
   <!-------------------------------------- ONLINE REQUEST FOR CERTIFICATION VIEW MODAL  --------------------------------------------------->
   <div class="modal fade" id="viewCertificationModal" tabindex="-1" role="dialog" aria-labelledby="viewCertificationModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
@@ -1318,7 +1391,7 @@ $(document).ready(function () {
 		var studentNumber = $(this).data('correction-student-number');
 		var applicationType = $(this).data('correction-application-type');
 		var completion = $(this).data('correction-file-completion');
-		var completionFile = $(this).data('correction-completion-filename');
+		var completionFile = $(this).data('correction-form-filename');
 		var record = $(this).data('correction-file-record');
 		var recordFile = $(this).data('correction-record-filename');
 		var affidavit = $(this).data('correction-file-affidavit');
@@ -1334,9 +1407,9 @@ $(document).ready(function () {
 		// Generate dynamic file download link
 		if (completionFile) {
 				var fileLink = $('<a>').attr('href', completion).attr('target', '_blank').text(completionFile);
-				$('#correction-completion-file').empty().append(fileLink);
+				$('#correction-file-completion').empty().append(fileLink);
 			} else {
-				$('#correction-completion-file').text('No File');
+				$('#correction-file-completion').text('No File');
 			}
 
 			if (recordFile) {
@@ -1492,6 +1565,39 @@ $(document).ready(function () {
 	});
 });
  
+// VIEW ONLINE PETITION OF SUBJECTS MODAL
+	$(document).ready(function () {
+	$('#tutorial tbody tr').on('click', function () {
+		// Retrieve data from the clicked row
+		var applicationId = $(this).data('tutorial-application-id');
+		var name = $(this).data('tutorial-name');
+		var studentNumber = $(this).data('tutorial-student-number');
+		var subjectCode = $(this).data('tutorial-subject-code');
+		var subjectName = $(this).data('tutorial-subject-name');
+		var tutorialfileUrl = $(this).data('tutorial-file-url');
+        var tutorialfileName = $(this).data('tutorial-file-filename');
+        var status = $(this).data('tutorial-status');
+
+		// Populate modal with data
+		$('#tutorial-application-id').text(applicationId);
+		$('#tutorial-application-name').text(name);
+		$('#tutorial-student-number').text(studentNumber);
+		$('#tutorial-subject-code').text(subjectCode);
+		$('#tutorial-subject-name').text(subjectName);
+
+		$('#petition-status').text(status);
+	// Generate dynamic file download link
+			if (tutorialfileName) {
+				var fileLink = $('<a>').attr('href', 						tutorialfileUrl).attr('target', '_blank').text(tutorialfileName);
+				$('#tutorial-file-data').empty().append(fileLink);
+			} else {
+				$('#tutorial-file-data').text('No File');
+			}
+
+			$('#tutorial-status').text(status);
+        });
+    });
+
 // VIEW REQUEST FOR CERTIFICATION MODAL
 $(document).ready(function () {
         $('#certification tbody tr').on('click', function () {

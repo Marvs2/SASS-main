@@ -28,7 +28,7 @@
                 <td>{{ request.subject_name }}</td>
                 <td>
                     {% if request.file_data %}
-                        <a href="{{ url_for('download_tutorial_file', tutorial_request_id=request.tutorial_request_id) }}">Download</a>
+                        <a href="{{ url_for('get_tutorial_file', tutorial_request_id=request.tutorial_request_id) }}">Download</a>
                     {% else %}
                         No File
                     {% endif %}
