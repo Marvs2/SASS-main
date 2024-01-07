@@ -2,7 +2,6 @@
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import Faculty
-import requests
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import  login_user
