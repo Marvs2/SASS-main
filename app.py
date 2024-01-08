@@ -365,17 +365,31 @@ def studentoverload():
 def submit_overload_application():
     try:
         current_StudentId = session.get('user_id')
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_overload_application = create_overload_application(request.form, request.files, current_StudentId)
 
-        if new_overload_application:
-                db.session.add(new_overload_application)
-                db.session.commit()
+        if new_overload_application and current_StudentNumber:
+            db.session.add(new_overload_application)
+            db.session.commit()
+
+                # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Overload Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="Sent",
+                message="Your overload application request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+        
                 # Ensure student_api_base_url is defined and accessible
-                flash('Application submitted successfully!', category='success')
-                return redirect(url_for('studentoverload'))
+            flash('Overload application submitted successfully!', 'success')
+            return redirect(url_for('studentoverload'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -1138,7 +1152,7 @@ def get_student_details(StudentId):
 #Student directly Services
 
 # Overload subjects function for student
-@app.route('/student/overload')
+@app.route('/student/portal_overload')
 def student_portal_overload():
     session.permanent = True
     if is_user_logged_in_overload():
@@ -1181,7 +1195,7 @@ def redirect_based_on_login_overload():
 
 #================================================================
 # Certification function for student
-@app.route('/student/certification')
+@app.route('/student/portal_certification')
 def student_portal_certification():
     session.permanent = True
     if is_user_logged_in_certification():
@@ -1222,7 +1236,7 @@ def redirect_based_on_login_certification():
         return redirect(url_for('portal_certification'))
 #========================================================================
 # Change of subject or sched function for student
-@app.route('/student/changeofsubject')
+@app.route('/student/portal_changeofsubject')
 def student_portal_changesubsched():
     session.permanent = True
 
@@ -1268,7 +1282,7 @@ def redirect_based_on_login_changesubsched():
     
 #========================================================================
 # Enrollment function for student
-@app.route('/student/manualenrollment')
+@app.route('/student/portal_manualenrollment')
 def student_portal_enrollment():
     session.permanent = True
     if is_user_logged_in_enrollment():
@@ -1311,7 +1325,7 @@ def redirect_based_on_login_enrollment():
 #========================================================================
 
 # addingsubject subjects function for student
-@app.route('/student/addingsubject')
+@app.route('/student/portal_addingsubject')
 def student_portal_addingofsubjects():
     session.permanent = True
     # Use the common login check
@@ -1359,7 +1373,7 @@ def redirect_based_on_login_addingofsubjects():
 
 #================================================================
 # shifting function for student
-@app.route('/student/shifting')
+@app.route('/student/portal_shifting')
 def student_portal_shifting():
     session.permanent = True
     if is_user_logged_in_shifting():
@@ -1403,7 +1417,7 @@ def redirect_based_on_login_shifting():
 #========================================================================
 
 # tutorial subjects function for student
-@app.route('/student/tutorial')
+@app.route('/student/portal_tutorial')
 def student_portal_tutorial():
     session.permanent = True
     if is_user_logged_in_tutorial():
@@ -1487,7 +1501,7 @@ def redirect_based_on_login_petition():
     
 #================================================================
 # gradeentry function for student
-@app.route('/student/correction')
+@app.route('/student/portal_correction')
 def student_portal_gradeentry():
     session.permanent = True
     if is_user_logged_in_gradeentry():
@@ -1529,7 +1543,7 @@ def redirect_based_on_login_gradeentry():
 
 #================================================================
 # gradeentry function for student
-@app.route('/student/crossenrollment')
+@app.route('/student/portal_crossenrollment')
 def student_portal_crossenrollment():
     session.permanent = True
     if is_user_logged_in_crossenrollment():
