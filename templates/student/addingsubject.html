@@ -1,37 +1,6 @@
 {% extends "student/layout.html" %}
 {% block content %}
 
-<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            {% if category == "error" %}
-                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                        <i class="fa-solid fa-xmark wrong"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Oh! Snap</span>
-                            <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% else %}
-                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                      <i class="fas fa-solid fa-check check"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Successful</span>
-                          <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
 
 
 <div class="data data1">
@@ -110,43 +79,7 @@
     </div>
 </div>
 
-    <script>
-        // Automatically close the alert messages after 3 seconds
-    setTimeout(function() {
-        $('.alert').alert('close');
-    }, 3000);
 
-    // Form submission logic
-    $('#addsubjectsApplicationForm').submit(function(event) {
-        const StudentNumber = $('#StudentNumber').val().trim();
-        const Name = $('#Name').val().trim();
-        const semester = $('#subject_Names').val().trim();
-        const enrollment_type = $('#enrollment_type').val().trim();
-        const userResponsible = $('#user_responsible').val().trim();
-        const status = $('#status').val().trim();
-
-        // Additional validation logic
-        if (!StudentNumber || !Name || !semester || !enrollment_type) {
-            alert('Please fill out all fields and provide valid values.');
-            event.preventDefault(); // Prevent form submission
-        }
-
-        // You can add more validation logic here as needed
-    });
-        function validateForm() {
-            var StudentNumber = document.getElementById('StudentNumber').value;
-            var studentName = document.getElementById('Name').value;
-            var subject_Names = document.getElementById('subject_Names').value;
-            var enrollmentType = document.getElementById('enrollment_type').value;
-
-            if (!StudentNumber || !studentName || !enrollmentType || !subject_Names) {
-                console.error('Error: Please fill out all required fields.');
-                return false;
-            }
-
-            return true;
-        }
-    </script>
 {% endblock content %}
 
 
