@@ -455,7 +455,7 @@ def add_subjects():
                 StudentNumber=current_StudentNumber,
                 service_type="Adding Subjects Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your add subjects request has been sent.",
                 StudentId=current_StudentId
             )
@@ -543,7 +543,7 @@ def change_of_subjects():
                 StudentNumber=current_StudentNumber,
                 service_type="Change Subject Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Change Subject request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -633,7 +633,7 @@ def submit_grade_correction():
                 StudentNumber=current_StudentNumber,
                 service_type="Grade Correction Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Grade Correction request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -760,7 +760,7 @@ def submit_cross_enrollment():
                 StudentNumber=current_StudentNumber,
                 service_type="Cross Enrollment Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Cross Enrollment request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -818,7 +818,7 @@ def submit_shifting():
                 StudentNumber=current_StudentNumber,
                 service_type="Shifting Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Shifting request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -858,7 +858,7 @@ def submitmanualenrollment():
                 StudentNumber=current_StudentNumber,
                 service_type="Manual Enrollment Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Manual EnrollmentManual Enrollment request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -916,7 +916,7 @@ def submit_petition():
                 StudentNumber=current_StudentNumber,
                 service_type="Petition Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your Petition request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -977,7 +977,7 @@ def submit_tutorial_request():
                 StudentNumber=current_StudentNumber,
                 service_type="Tutorial Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
+                status="Sent",
                 message="Your tutorial request has been submitted.",
                 StudentId=current_StudentId
             )
@@ -1052,8 +1052,8 @@ def submit_certification_request():
                 StudentNumber=current_StudentNumber,
                 service_type="Certification Request",
                 user_responsible=request.form.get('user_responsible'),
-                status="sent",
-                message="Your tutorial request has been submitted.",
+                status="Sent",
+                message="Your certification request has been submitted.",
                 StudentId=current_StudentId
             )
             db.session.add(new_notification)
