@@ -144,6 +144,22 @@ def certification():
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in {'jpg', 'jpeg', 'png', 'gif'}
 
+#==================================== LANDING PAGE ACADEMIC ROUTE ==============================================
+@app.route('/academic/generalregulations')
+def regulation():
+    return render_template("/academic/regulation.html")
+
+@app.route('/academic/codeofconduct')
+def conduct():
+    return render_template("/academic/conduct.html")
+
+@app.route('/academic/academicprocedures')
+def procedures():
+    return render_template("/academic/procedures.html")
+
+@app.route('/academic/codeofdiscipline')
+def discipline():
+    return render_template("/academic/discipline.html")
 
 #========================================= STUDENT SERVICES ====================================================
 
