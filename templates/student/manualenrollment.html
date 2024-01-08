@@ -1,6 +1,38 @@
 {% extends "student/layout.html" %}
 {% block content %}
-  
+    
+<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "error" %}
+                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                        <i class="fa-solid fa-xmark wrong"></i>
+                        <div class="toast-body message">
+                            <span class="text text-1">Oh! Snap</span>
+                            <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
+                    </div>
+                </div>
+            {% else %}
+                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                      <i class="fas fa-solid fa-check check"></i>
+                        <div class="toast-body message">
+                            <span class="text text-1">Successful</span>
+                          <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+   
     <div class="data data1">
         <div class="content-data">
             <div class="head">
@@ -11,14 +43,14 @@
                 <div class="row mb-3">
                     <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly disabled>
+                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
                     </div>
                 </div>
 
                 <div class="row mb-3">
                     <label for="Name" class="col-sm-3 col-form-label">Name</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" id="Name" name="Name" readonly disabled>
+                        <input type="text" class="form-control" id="Name" name="Name" readonly>
                     </div>
                 </div>
 
@@ -75,6 +107,29 @@
                 
                     <a href="{{ url_for('viewmanual') }}">View Enrollment</a>
                 </div>
-  
-{% endblock content %}
 
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Automatically close the alert messages after 3 seconds
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 3000);
+    
+            // Form submission logic
+            $('#manualEnrollmentForm').submit(function(event) {
+                const StudentNumber = $('#StudentNumber').val().trim();
+                const Name = $('#Name').val().trim();
+                const enrollmentType = $('#enrollment_type').val().trim();
+                const reason = $('#reason').val().trim();
+    
+                if (!StudentNumber || !Name || !enrollmentType || !reason) {
+                    alert('Please fill out all fields and provide valid values.');
+                    event.preventDefault();  // Prevent form submission
+                }
+    
+                // Additional validation logic can be added here
+            });
+        });
+    </script>
+{% endblock content %}

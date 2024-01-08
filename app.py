@@ -443,17 +443,30 @@ def studentaddingsubject():
 def add_subjects():
     try: 
         current_StudentId = session.get('user_id')
-
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_addsubjects_application = create_addsubjects_application(request.form, request.files, current_StudentId)
         
-        if new_addsubjects_application:
+        if new_addsubjects_application and current_StudentNumber:
             db.session.add(new_addsubjects_application)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Adding Subjects Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your add subjects request has been sent.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Add subjects created Successfully!', 'success')
             return redirect(url_for('studentaddingsubject'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -518,17 +531,30 @@ def studentchange():
 def change_of_subjects():
     try: 
         current_StudentId = session.get('user_id')
-
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_changesubjects_application = create_changesubjects_application(request.form, request.files, current_StudentId)
         
-        if new_changesubjects_application:
+        if new_changesubjects_application and current_StudentNumber:
             db.session.add(new_changesubjects_application)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Change Subject Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Change Subject request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Change of subjects created Successfully!', 'success')
             return redirect(url_for('studentchange'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -595,17 +621,30 @@ def studentcorrection():
 def submit_grade_correction():
     try: 
         current_StudentId = session.get('user_id')
-
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_gradeentry_application = create_gradeentry_application(request.form, request.files, current_StudentId)
         
-        if new_gradeentry_application:
+        if new_gradeentry_application and current_StudentNumber:
             db.session.add(new_gradeentry_application)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Grade Correction Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Grade Correction request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Grade entry sent Successfully!', 'success')
             return redirect(url_for('studentcorrection'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -709,16 +748,30 @@ def submit_cross_enrollment():
 
     try:
         current_StudentId = session.get('user_id')
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_cross_enrollment = create_crossenrollment_form(request.form, request.files, current_StudentId)
         
-        if new_cross_enrollment:
+        if new_cross_enrollment and current_StudentNumber:
             db.session.add(new_cross_enrollment)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Cross Enrollment Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Cross Enrollment request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Cross-Enrollment created successfully!', 'success')
             return redirect(url_for('studentenrollment'))  
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -753,21 +806,34 @@ def studentshifting():
 def submit_shifting():
     try: 
         current_StudentId = session.get('user_id')
-
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_shifting_application = create_shifting_application(request.form, request.files, current_StudentId)
         
-        if new_shifting_application:
+        if new_shifting_application and current_StudentNumber:
             db.session.add(new_shifting_application)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Shifting Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Shifting request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Shifting has been created Successfully!', 'success')
             return redirect(url_for('studentshifting'))
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
-    return render_template('student/shifting.html') 
+    return render_template('student/shifting.html')  
 
 #=========================================== MANUAL ENROLLMENT ========================================================
 @app.route('/student/manualenrollment')#
@@ -780,16 +846,30 @@ def studentmanualenrollment():
 def submitmanualenrollment():
     try:
         current_StudentId = session.get('user_id')
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_manual_enrollment = create_manualenrollment_form(request.form, request.files, current_StudentId)
 
-        if new_manual_enrollment:
+        if new_manual_enrollment and current_StudentNumber:
             db.session.add(new_manual_enrollment)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Manual Enrollment Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Manual EnrollmentManual Enrollment request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Manual Enrollment created successfully!', 'success')
             return redirect(url_for('studentmanualenrollment'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -819,21 +899,35 @@ def viewmanual():
 def studentpetition():
     return render_template("/student/petition.html", student_api_base_url=student_api_base_url)
 
-@app.route('/submit_petition_request', methods=['POST'])
+@app.route('/student/onlinepetitionofsubject/submit_petition', methods=['POST'])
 @role_required('student')
 def submit_petition():
     try:
         current_StudentId = session.get('user_id')
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_petition_request = create_petitionrequest_form(request.form, current_StudentId)
 
-        if new_petition_request:
+        if new_petition_request and current_StudentNumber:
             db.session.add(new_petition_request)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Petition Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your Petition request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Petition Request submitted successfully!', 'success')
             return redirect(url_for('studentpetition'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -871,17 +965,32 @@ def studenttutorial():
 def submit_tutorial_request():
     try: 
         current_StudentId = session.get('user_id')
-
+        current_StudentNumber = get_student_number_by_id(current_StudentId)
         new_tutorial_request = create_tutorial_request(request.form, request.files, current_StudentId)
         
-        if new_tutorial_request:
+        if new_tutorial_request and current_StudentNumber:
             db.session.add(new_tutorial_request)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Tutorial Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your tutorial request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Tutorial request and notification have been created successfully!', 'success')
             return redirect(url_for('studenttutorial'))
+        else:
+            flash('Error: Student not found.', 'danger')
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
@@ -926,21 +1035,35 @@ def view_tutorial_file(tutorial_request_id):
 def studentcertification():
     return render_template("/student/certification.html", student_api_base_url=student_api_base_url)
 
-@app.route('/submit_certification_request', methods=['POST'])
+@app.route('/student/certification/submit_certification_request', methods=['POST'])
 @role_required('student')
 def submit_certification_request():
     try:
-        current_StudentId = session.get('user_id') 
+        current_StudentId = session.get('user_id')
+        current_StudentNumber = get_student_number_by_id(current_StudentId) 
         new_certification_request = create_certification_request(request.form, request.files, current_StudentId)
 
-        if new_certification_request:
+        if new_certification_request and current_StudentNumber:
             db.session.add(new_certification_request)
             db.session.commit()
-            flash('Application submitted successfully!', category='success')
+
+            # Create a notification
+            new_notification = create_notification(
+                StudentNumber=current_StudentNumber,
+                service_type="Certification Request",
+                user_responsible=request.form.get('user_responsible'),
+                status="sent",
+                message="Your tutorial request has been submitted.",
+                StudentId=current_StudentId
+            )
+            db.session.add(new_notification)
+            db.session.commit()
+
+            flash('Certification Request submitted successfully!', 'success')
             return redirect(url_for('studentcertification')) 
     except Exception as e:
         db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
+        flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
