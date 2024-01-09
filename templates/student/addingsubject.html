@@ -7,29 +7,24 @@
             <h3>Application for Adding of Subjects</h3>
         </div>
 
-        <table id="overload" class="table table-bordered table-condensed">
+        <table id="subjectsTable" class="display">
             <thead>
                 <tr>
                     <th>Subject Code</th>
-                    <th>Subject Description</th>
-                    <th>Section</th>
+                    <th>Description</th>
                     <th>Units</th>
-                    <th>Schedule</th>
-                    <th>Action</th>
+                    <th>NSTP</th>
                 </tr>
             </thead>
             <tbody>
+                {% for subjects in subjects %}
                 <tr>
-                    <td>ABC123</td>
-                    <td>Subject ABC</td>
-                    <td>A</td>
-                    <td>3</td>
-                    <td>MWF 9:00 AM - 10:00 AM</td>
-                    <td>
-                        <button type="button" title="View Info" class="btn btn-primary fa-solid fa-edit edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
-                    </td>
+                    <td>{{ subjects.SubjectCode }}</td>
+                    <td>{{ subjects.Description }}</td>
+                    <td>{{ subjects.Units }}</td>
+                    <td>{{ 'Yes' if subjects.IsNSTP else 'No' }}</td>
                 </tr>
-                <!-- Add more rows with data as needed -->
+                {% endfor %}
             </tbody>
         </table>
 
@@ -38,5 +33,9 @@
         </div>
     </div>
 </div>
-
+<script>
+    $(document).ready( function () {
+        $('#subjectsTable').DataTable();
+    } );
+</script>
 {% endblock content %}

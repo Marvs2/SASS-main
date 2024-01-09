@@ -36,6 +36,7 @@ class Student(db.Model, UserMixin):
     shifting_applications = db.relationship('ShiftingApplication', back_populates='student')
     overload_applications = db.relationship('OverloadApplication', back_populates='student')
     tutorial_requests = db.relationship('TutorialRequest', back_populates='student')
+    classsubject = db.relationship('ClassSubject', back_populates='student')
 
     def to_dict(self):
         return {
@@ -63,36 +64,35 @@ class Student(db.Model, UserMixin):
         db.session.commit()
         
 
-class Class(db.Model):
-<<<<<<< HEAD
-    _tablename_ = 'Class'
-=======
-    __tablename__ = 'Class'
->>>>>>> TEST
+class Class(db.Model, UserMixin):
+    __tablename__ = 'classes'
 
     ClassId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Section = db.Column(db.Integer)
+    Section = db.Column(db.String(100))
     Course = db.Column(db.String(255), nullable=False) 
+
+    classsubject = db.relationship('ClassSubject', back_populates='classes')
+
     def to_dict(self):
         return {
             'ClassId': self.ClassId,
             'Section': self.Section,
             'Course': self.Course,
         }
+    def get_ClassId(self):
+        return str(self.ClassId)
+    
+class Subject(db.Model, UserMixin):
+    __tablename__ = 'subject'
 
-class Subject(db.Model):
-<<<<<<< HEAD
-    _tablename_ = 'Subject'
-=======
-    __tablename__ = 'Subject'
->>>>>>> TEST
-
-    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    SubjectId = db.Column(db.String, primary_key=True, autoincrement=True)
     SubjectCode = db.Column(db.String(20), unique=True)
     Description = db.Column(db.String(200))
     Units = db.Column(db.Float)
     IsNSTP = db.Column(db.Boolean, default=False)
     # ForBridging
+    classsubject = db.relationship('ClassSubject', back_populates='subject')
+
 
     def to_dict(self):
         return {
@@ -103,32 +103,21 @@ class Subject(db.Model):
             'Units': self.Units,
             'IsNSTP': self.IsNSTP,
         }
+    def get_SubjectId(self):
+        return str(self.SubjectId)
 
+class ClassSubject(db.Model, UserMixin):
+    __tablename__ = 'classsubject'
 
-class ClassSubject(db.Model):
-<<<<<<< HEAD
-    _tablename_ = 'ClassSubject'
-=======
-    __tablename__ = 'ClassSubject'
->>>>>>> TEST
-
-    ClassSubjectId = db.Column(
-        db.Integer, primary_key=True, autoincrement=True)
-    ClassId = db.Column(db.Integer, db.ForeignKey(
-        'Class.ClassId'))
-    SubjectId = db.Column(db.Integer, db.ForeignKey(
-        'Subject.SubjectId'))
+    ClassSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClassId = db.Column(db.Integer, db.ForeignKey('classes.ClassId'))
+    SubjectId = db.Column(db.Integer, db.ForeignKey('subject.SubjectId'))
     Schedule = db.Column(db.String(100), nullable=True)
-    StudentId = db.Column(db.Integer, db.ForeignKey(
-    'Student.StudentId'), primary_key=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
 
-    # Adding a unique constraint on the combination of ClassId, SubjectId, and StudentId
-<<<<<<< HEAD
-    _table_args_ = (db.UniqueConstraint(
-=======
-    __table_args__ = (db.UniqueConstraint(
->>>>>>> TEST
-        'ClassId', 'SubjectId', 'StudentId', name='_unique_class_subject_student'),)
+    student = db.relationship('Student', back_populates='classsubject')
+    classes = db.relationship('Class', back_populates='classsubject')
+    subject = db.relationship('Subject', back_populates='classsubject')
 
     def to_dict(self):
         return {
@@ -138,10 +127,8 @@ class ClassSubject(db.Model):
             'Schedule': self.Schedule,
             'StudentId': self.StudentId,
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> TEST
+    def get_ClassSubjectId(self):
+        return str(self.ClassSubjectId)
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#

@@ -1,7 +1,7 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -435,11 +435,13 @@ def viewoverload():
 
 @app.route('/student/addingsubject')
 def studentaddingsubject():
-    return render_template("/student/addingsubject.html", student_api_base_url=student_api_base_url)
+    subjects = Subject.query.all()
+    return render_template("/student/addingsubject.html", student_api_base_url=student_api_base_url, subjects=subjects)
 
-@app.route('/student/addingsubject/subjects')
+@app.route('/student/subjects')
 def studentsubject():
-    return render_template("/student/subjects.html", student_api_base_url=student_api_base_url)
+    subjects = Subject.query.all()
+    return render_template("/student/subjects.html", subjects=subjects)
 
 
 @app.route('/student/addingsubject/added', methods=['POST'])
