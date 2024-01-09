@@ -64,7 +64,11 @@ class Student(db.Model, UserMixin):
         
 
 class Class(db.Model):
+<<<<<<< HEAD
     _tablename_ = 'Class'
+=======
+    __tablename__ = 'Class'
+>>>>>>> TEST
 
     ClassId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     Section = db.Column(db.Integer)
@@ -77,7 +81,11 @@ class Class(db.Model):
         }
 
 class Subject(db.Model):
+<<<<<<< HEAD
     _tablename_ = 'Subject'
+=======
+    __tablename__ = 'Subject'
+>>>>>>> TEST
 
     SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     SubjectCode = db.Column(db.String(20), unique=True)
@@ -98,7 +106,11 @@ class Subject(db.Model):
 
 
 class ClassSubject(db.Model):
+<<<<<<< HEAD
     _tablename_ = 'ClassSubject'
+=======
+    __tablename__ = 'ClassSubject'
+>>>>>>> TEST
 
     ClassSubjectId = db.Column(
         db.Integer, primary_key=True, autoincrement=True)
@@ -111,7 +123,11 @@ class ClassSubject(db.Model):
     'Student.StudentId'), primary_key=True)
 
     # Adding a unique constraint on the combination of ClassId, SubjectId, and StudentId
+<<<<<<< HEAD
     _table_args_ = (db.UniqueConstraint(
+=======
+    __table_args__ = (db.UniqueConstraint(
+>>>>>>> TEST
         'ClassId', 'SubjectId', 'StudentId', name='_unique_class_subject_student'),)
 
     def to_dict(self):
@@ -122,6 +138,10 @@ class ClassSubject(db.Model):
             'Schedule': self.Schedule,
             'StudentId': self.StudentId,
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> TEST
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
