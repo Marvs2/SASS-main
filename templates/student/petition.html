@@ -1,38 +1,5 @@
 {% extends "student/layout.html" %}
 {% block content %}
-   
-<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
-
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            {% if category == "error" %}
-                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                        <i class="fa-solid fa-xmark wrong"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Oh! Snap</span>
-                            <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% else %}
-                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex toast-content">
-                      <i class="fas fa-solid fa-check check"></i>
-                        <div class="toast-body message">
-                            <span class="text text-1">Successful</span>
-                          <span class="text text-2">{{ message }}</span>
-                        </div>
-                        <i class="fa-solid fa-xmark close"></i>
-                    </div>
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-
           
         <div class="data data1">
             <div class="content-data">
@@ -111,43 +78,10 @@
         
                      <div class="d-flex justify-content-center">
                         <button type="submit" class="btn btn-success">Submit Application</button>
-                    </div>
-    
-    
+                    </div>   
                 </form>
-  
-
             </div>
         </div>
         
-    
-        <script>
-            $(document).ready(function () {
-                // Automatically close the alert messages after 3 seconds
-                setTimeout(function () {
-                    $('.alert').alert('close');
-                }, 3000);
 
-                const form = document.getElementById('petitionForm');
-                form.addEventListener('submit', function(event) {
-                    const StudentNumber = document.getElementById('StudentNumber').value.trim();
-                    const Name = document.getElementById('Name').value.trim();
-                    const subject_code = document.getElementById('subject_code').value.trim();
-                    const subject_name = document.getElementById('subject_name').value.trim();
-                    const petition_type = document.getElementById('petition_type').value.trim();
-                    const request_reason = document.getElementById('request_reason').value.trim();
-                    const user_responsible = document.getElementById('user_responsible').value.trim();
-        
-                    if (!StudentNumber || !Name || !subject_code || !subject_name || !petition_type || !request_reason || !user_responsible) {
-                        alert('Please fill out all fields.');
-                        event.preventDefault();
-                    }
-                    // You can add additional validation logic here if needed
-                });
-            });
-            </script>
-        </div>
-
-<!-- Your petition form code -->
-<!-- ... -->
 {% endblock content %}
