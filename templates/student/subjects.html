@@ -1,0 +1,58 @@
+{% extends "student/layout.html" %}
+{% block content %}
+
+<div class="data data1">
+    <div class="content-data">
+        <div class="head">
+            <h3>Add Subjects</h3>           
+        </div>
+        <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+
+            	<table id="overload" class="table table-bordered table-condensed">
+					<thead>
+						<tr>
+                            <th></th>
+							<th>Subject Code</th>														
+							<th>Subject Description</th>
+							<th>Section</th>
+                            <th>Units</th>
+							<th>Schedule</th>
+							<th>Action</th> 
+						</tr>
+					</thead>
+					<tbody>
+                        
+                        <td>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" title="checkbox"  class="custom-control-input" id="customCheck1">
+                                <label class="custom-control-label" for="customCheck1"></label>
+                            </div>
+                          </td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+                          <td></td>
+							<td>
+								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-edit edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>						
+							</td>
+						</tr>	
+				
+					</tbody>					
+				</table>
+           
+           
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-primary">Add Subject</button>               
+               <!---- <a href="{{ url_for('viewaddsubject') }}">View AddSubject</a> -->
+            </div>
+        </form>       
+    </div>
+</div>
+
+
+{% endblock content %}
+
+
+
+

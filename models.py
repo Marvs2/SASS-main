@@ -10,7 +10,7 @@ db = SQLAlchemy()
 class Student(db.Model, UserMixin):
     __tablename__ = 'student'
 
-    StudentId = db.Column(db.Integer, primary_key=True)
+    StudentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentNumber = db.Column(db.String(100), unique=True, nullable=False)
     Name = db.Column(db.String(255), nullable=False)  
     Email = db.Column(db.String(100), unique=True, nullable=False) 
@@ -61,6 +61,68 @@ class Student(db.Model, UserMixin):
     # Method to save image data
         self.userImg = image_data
         db.session.commit()
+        
+
+class Class(db.Model):
+    __tablename__ = 'Class'
+
+    ClassId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Section = db.Column(db.Integer)
+    Course = db.Column(db.String(255), nullable=False) 
+    def to_dict(self):
+        return {
+            'ClassId': self.ClassId,
+            'Section': self.Section,
+            'Course': self.Course,
+        }
+
+class Subject(db.Model):
+    __tablename__ = 'Subject'
+
+    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    SubjectCode = db.Column(db.String(20), unique=True)
+    Description = db.Column(db.String(200))
+    Units = db.Column(db.Float)
+    IsNSTP = db.Column(db.Boolean, default=False)
+    # ForBridging
+
+    def to_dict(self):
+        return {
+            'SubjectId': self.SubjectId,
+            'SubjectCode': self.SubjectCode,
+            'Name': self.Name,
+            'Description': self.Description,
+            'Units': self.Units,
+            'IsNSTP': self.IsNSTP,
+        }
+
+
+class ClassSubject(db.Model):
+    __tablename__ = 'ClassSubject'
+
+    ClassSubjectId = db.Column(
+        db.Integer, primary_key=True, autoincrement=True)
+    ClassId = db.Column(db.Integer, db.ForeignKey(
+        'Class.ClassId'))
+    SubjectId = db.Column(db.Integer, db.ForeignKey(
+        'Subject.SubjectId'))
+    Schedule = db.Column(db.String(100), nullable=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey(
+    'Student.StudentId'), primary_key=True)
+
+    # Adding a unique constraint on the combination of ClassId, SubjectId, and StudentId
+    __table_args__ = (db.UniqueConstraint(
+        'ClassId', 'SubjectId', 'StudentId', name='_unique_class_subject_student'),)
+
+    def to_dict(self):
+        return {
+            'ClassSubjectId': self.ClassSubjectId,
+            'ClassId': self.ClassId,
+            'SubjectId': self.SubjectId,
+            'Schedule': self.Schedule,
+            'StudentId': self.StudentId,
+        }
+
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
