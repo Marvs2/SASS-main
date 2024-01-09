@@ -460,14 +460,14 @@
 							data-request-url="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-request-filename="{{ certification_request.request_form_filename }}"	
 
-							data-registration-url="{{ url_for('get_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-registration-url="{{ url_for('view_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-registration-filename="{{ certification_request.request_form_filename }}"	
 
-							data-authorization-url="{{ url_for('get_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}"
+							data-authorization-url="{{ url_for('view_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}"
 							data-authorization-filename="{{ certification_request.authorization_letter_filename }}"
 
 							data-representative-url="{{ url_for('get_representative_file', certification_request_id=certification_request.certification_request_id) }}"
-							data-representative-filename="{{ certification_request.representative_id_filename }}"
+							data-representative-filename="{{ certification_request.representative_filename }}"
 
 							data-certification-status="{{ certification_request.status }}">
 							<td class="applicationID">{{ certification_request.certification_request_id }}</td>								
@@ -1650,7 +1650,7 @@ $(document).ready(function () {
 			}
 
 			if (representativeFile) {
-				var fileLink = $('<a>').attr('href', representativeUrl).attr('target', '_blank').text(representativeUrl);
+				var fileLink = $('<a>').attr('href', representativeUrl).attr('target', '_blank').text(representativeFile);
 				$('#certification-representative-file').empty().append(fileLink);
 			} else {
 				$('#certification-representative-file').text('No File');

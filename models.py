@@ -85,8 +85,9 @@ class Class(db.Model, UserMixin):
 class Subject(db.Model, UserMixin):
     __tablename__ = 'subject'
 
-    SubjectId = db.Column(db.String, primary_key=True, autoincrement=True)
+    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     SubjectCode = db.Column(db.String(20), unique=True)
+    Based = db.Column(db.Integer, nullable=False)
     Description = db.Column(db.String(200))
     Units = db.Column(db.Float)
     IsNSTP = db.Column(db.Boolean, default=False)
@@ -98,7 +99,7 @@ class Subject(db.Model, UserMixin):
         return {
             'SubjectId': self.SubjectId,
             'SubjectCode': self.SubjectCode,
-            'Name': self.Name,
+            'Based': self.Based,
             'Description': self.Description,
             'Units': self.Units,
             'IsNSTP': self.IsNSTP,
@@ -420,8 +421,8 @@ class CertificationRequest(db.Model, UserMixin):
     is_representative = db.Column(db.Boolean, default=False)
     authorization_letter_filename = db.Column(db.String(255))
     authorization_letter_data = db.Column(db.LargeBinary)
-    representative_id_filename = db.Column(db.String(255))
-    representative_id_data = db.Column(db.LargeBinary)
+    representative_filename = db.Column(db.String(255))
+    representative_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(100)) #status 
@@ -443,8 +444,8 @@ class CertificationRequest(db.Model, UserMixin):
             'is_representative': self.is_representative,
             'authorization_letter_filename': self.authorization_letter_filename,
             'authorization_letter_data': self.authorization_letter_data,
-            'representative_id_filename': self.representative_id_filename,
-            'representative_id_data': self.representative_id_data,
+            'representative_filename': self.representative_filename,
+            'representative_data': self.representative_data,
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,
