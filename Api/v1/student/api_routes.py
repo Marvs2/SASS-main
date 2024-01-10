@@ -957,24 +957,24 @@ def create_certification_request(form_data, files, StudentId):
 
     # Representative file checks
     authorization_letter_data = authorization_letter_filename = None
-    representative_id_data = representative_id_filename = None
+    representative_data = representative_filename = None
 
     if is_representative:
         if 'authorization_letter' not in files or files['authorization_letter'].filename == '':
             flash('Authorization letter is required for representatives', 'danger')
             return None
 
-        if 'representative_id' not in files or files['representative_id'].filename == '':
-            flash('Representative ID is required for representatives', 'danger')
+        if 'representative_file' not in files or files['representative_file'].filename == '':
+            flash('Representative ID is required for representative_file', 'danger')
             return None
 
         authorization_letter = files['authorization_letter']
-        representative_id = files['representative_id']
+        representative_file = files['representative_file']
 
         authorization_letter_data = authorization_letter.read()
         authorization_letter_filename = secure_filename(authorization_letter.filename)
-        representative_id_data = representative_id.read()
-        representative_id_filename = secure_filename(representative_id.filename)
+        representative_data = representative_file.read()
+        representative_filename = secure_filename(representative_file.filename)
 
     # Create CertificationRequest instance
     new_certification_request = CertificationRequest(
@@ -988,8 +988,8 @@ def create_certification_request(form_data, files, StudentId):
         is_representative=is_representative,
         authorization_letter_filename=authorization_letter_filename,
         authorization_letter_data=authorization_letter_data,
-        representative_id_filename=representative_id_filename,
-        representative_id_data=representative_id_data,
+        representative_filename=representative_filename,
+        representative_data=representative_data,
         created_at=datetime.utcnow(),
         user_responsible=user_responsible,
         status=status,

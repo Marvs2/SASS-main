@@ -36,6 +36,7 @@ class Student(db.Model, UserMixin):
     shifting_applications = db.relationship('ShiftingApplication', back_populates='student')
     overload_applications = db.relationship('OverloadApplication', back_populates='student')
     tutorial_requests = db.relationship('TutorialRequest', back_populates='student')
+    classsubject = db.relationship('ClassSubject', back_populates='student')
 
     def to_dict(self):
         return {
@@ -61,6 +62,74 @@ class Student(db.Model, UserMixin):
     # Method to save image data
         self.userImg = image_data
         db.session.commit()
+        
+
+class Class(db.Model, UserMixin):
+    __tablename__ = 'classes'
+
+    ClassId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Section = db.Column(db.String(100))
+    Course = db.Column(db.String(255), nullable=False) 
+
+    classsubject = db.relationship('ClassSubject', back_populates='classes')
+
+    def to_dict(self):
+        return {
+            'ClassId': self.ClassId,
+            'Section': self.Section,
+            'Course': self.Course,
+        }
+    def get_ClassId(self):
+        return str(self.ClassId)
+    
+class Subject(db.Model, UserMixin):
+    __tablename__ = 'subject'
+
+    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    SubjectCode = db.Column(db.String(20), unique=True)
+    Based = db.Column(db.Integer, nullable=False)
+    Description = db.Column(db.String(200))
+    Units = db.Column(db.Float)
+    IsNSTP = db.Column(db.Boolean, default=False)
+    # ForBridging
+    classsubject = db.relationship('ClassSubject', back_populates='subject')
+
+
+    def to_dict(self):
+        return {
+            'SubjectId': self.SubjectId,
+            'SubjectCode': self.SubjectCode,
+            'Based': self.Based,
+            'Description': self.Description,
+            'Units': self.Units,
+            'IsNSTP': self.IsNSTP,
+        }
+    def get_SubjectId(self):
+        return str(self.SubjectId)
+
+class ClassSubject(db.Model, UserMixin):
+    __tablename__ = 'classsubject'
+
+    ClassSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClassId = db.Column(db.Integer, db.ForeignKey('classes.ClassId'))
+    SubjectId = db.Column(db.Integer, db.ForeignKey('subject.SubjectId'))
+    Schedule = db.Column(db.String(100), nullable=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
+
+    student = db.relationship('Student', back_populates='classsubject')
+    classes = db.relationship('Class', back_populates='classsubject')
+    subject = db.relationship('Subject', back_populates='classsubject')
+
+    def to_dict(self):
+        return {
+            'ClassSubjectId': self.ClassSubjectId,
+            'ClassId': self.ClassId,
+            'SubjectId': self.SubjectId,
+            'Schedule': self.Schedule,
+            'StudentId': self.StudentId,
+        }
+    def get_ClassSubjectId(self):
+        return str(self.ClassSubjectId)
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
@@ -352,8 +421,8 @@ class CertificationRequest(db.Model, UserMixin):
     is_representative = db.Column(db.Boolean, default=False)
     authorization_letter_filename = db.Column(db.String(255))
     authorization_letter_data = db.Column(db.LargeBinary)
-    representative_id_filename = db.Column(db.String(255))
-    representative_id_data = db.Column(db.LargeBinary)
+    representative_filename = db.Column(db.String(255))
+    representative_data = db.Column(db.LargeBinary)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     user_responsible = db.Column(db.String(255)) 
     status = db.Column(db.String(100)) #status 
@@ -375,8 +444,8 @@ class CertificationRequest(db.Model, UserMixin):
             'is_representative': self.is_representative,
             'authorization_letter_filename': self.authorization_letter_filename,
             'authorization_letter_data': self.authorization_letter_data,
-            'representative_id_filename': self.representative_id_filename,
-            'representative_id_data': self.representative_id_data,
+            'representative_filename': self.representative_filename,
+            'representative_data': self.representative_data,
             'created_at': self.created_at,
             'user_responsible': self.user_responsible,
             'status': self.status,

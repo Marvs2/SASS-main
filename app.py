@@ -1,7 +1,7 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -435,7 +435,8 @@ def viewoverload():
 
 @app.route('/student/addingsubject')
 def studentaddingsubject():
-    return render_template("/student/addingsubject.html", student_api_base_url=student_api_base_url)
+    subjects = Subject.query.all()
+    return render_template("/student/addingsubject.html", student_api_base_url=student_api_base_url, subjects=subjects)
 
 @app.route('/student/addingsubject/added', methods=['POST'])
 @role_required('student')
@@ -1068,6 +1069,89 @@ def submit_certification_request():
 
     return render_template('student/certification.html')
 
+    #certification
+@app.route('/student/certification/get_certification_request_file/<int:certification_request_id>')
+def get_certification_request_file(certification_request_id):
+    return redirect(url_for('view_certification_request_file', certification_request_id=certification_request_id))
+
+@app.route('/student/view_certification_request_file/<int:certification_request_id>')
+def view_certification_request_file(certification_request_id):
+    certification_request = CertificationRequest.query.get(certification_request_id)
+
+    if certification_request and certification_request.request_form_data:
+        certification_request_extension = get_certification_request_extension(certification_request.request_form_filename)
+        return send_file(
+            io.BytesIO(certification_request.request_form_data),
+            mimetype=get_mimetype(certification_request_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+def get_certification_request_extension(request_form_filename):
+    return request_form_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(certification_request_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(certification_request_extension, 'application/octet-stream')
+
+# Repeat the above pattern for other file types/routes...
+@app.route('/student/certification/view_certification_identification_file/<int:certification_request_id>')
+def view_certification_identification_file(certification_request_id):
+    certification_request = CertificationRequest.query.get(certification_request_id)
+
+    if certification_request and certification_request.identification_card_data:
+        identification_file_extension = get_identification_file_extension(certification_request.identification_card_filename)
+        return send_file(
+            io.BytesIO(certification_request.identification_card_data),
+            mimetype=get_mimetype(identification_file_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+
+def get_identification_file_extension(identification_card_filename):
+    return identification_card_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(identification_file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(identification_file_extension, 'application/octet-stream')
+
+@app.route('/student/certification/view_certification_authorization_file/<int:certification_request_id>')
+def view_certification_authorization_file(certification_request_id):
+    certification_request = CertificationRequest.query.get(certification_request_id)
+
+    if certification_request and certification_request.authorization_letter_data:
+        authorization_file_extension = get_authorization_file_extension(certification_request.authorization_letter_filename)
+        return send_file(
+            io.BytesIO(certification_request.authorization_letter_data),
+            mimetype=get_mimetype(authorization_file_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+
+def get_authorization_file_extension(authorization_letter_filename):
+    return authorization_letter_filename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(authorization_file_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'word': 'application/word',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(authorization_file_extension, 'application/octet-stream')
 #===========================================================================================================================#
 
 """# View function to handle operations based on StudentId
@@ -2469,7 +2553,7 @@ def facultyprofile():
 # =======================Downloads File============================ #
 
 #certification
-@app.route('/faculty/certification/get_certification_request_file/<int:certification_request_id>')
+"""@app.route('/faculty/certification/get_certification_request_file/<int:certification_request_id>')
 def get_certification_request_file(certification_request_id):
     return redirect(url_for('download_certification_request_file', certification_request_id=certification_request_id))
 
@@ -2501,9 +2585,9 @@ def get_mimetype(certification_request_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(certification_request_extension, 'application/octet-stream')
+    return mimetypes.get(certification_request_extension, 'application/octet-stream')"""
 #===================================================================================================================================
-@app.route('/faculty/certification/get_certification_identification_file/<int:certification_request_id>')
+"""@app.route('/faculty/certification/get_certification_identification_file/<int:certification_request_id>')
 def get_certification_identification_file(certification_request_id):
     return redirect(url_for('download_certification_identification_file', certification_request_id=certification_request_id))
 
@@ -2535,9 +2619,9 @@ def get_mimetype(identification_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(identification_file_extension, 'application/octet-stream')
+    return mimetypes.get(identification_file_extension, 'application/octet-stream')"""
 #=========================================================================================================================
-@app.route('/faculty/certification/get_certification_authorization_file/<int:certification_request_id>')
+"""@app.route('/faculty/certification/get_certification_authorization_file/<int:certification_request_id>')
 def get_certification_authorization_file(certification_request_id):
     return redirect(url_for('download_certification_authorization_file', certification_request_id=certification_request_id))
 
@@ -2569,31 +2653,31 @@ def get_mimetype(authorization_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(authorization_file_extension, 'application/octet-stream')
+    return mimetypes.get(authorization_file_extension, 'application/octet-stream')"""
 #=============================================================================================================================
-@app.route('/faculty/certification/get_representative_file/<int:certification_request_id>')
+@app.route('/student/certification/get_representative_file/<int:certification_request_id>')
 def get_representative_file(certification_request_id):
     return redirect(url_for('download_representative_file', certification_request_id=certification_request_id))
 
-@app.route('/faculty/download_representative_file/<int:certification_request_id>')
+@app.route('/student/download_representative_file/<int:certification_request_id>')
 def download_representative_file(certification_request_id):
     certification_request = CertificationRequest.query.get(certification_request_id)
 
-    if certification_request and certification_request.representative_id_data:
-        representative_extension = get_representative_extension(certification_request.representative_id_filename)
+    if certification_request and certification_request.representative_data:
+        representative_extension = get_representative_extension(certification_request.representative_filename)
         download_name = f'certification_representative_{certification_request_id}.{representative_extension}'
 
         return send_file(
-            io.BytesIO(certification_request.representative_id_data),
-            as_attachment=True,
+            io.BytesIO(certification_request.representative_data),
+            as_attachment=False,
             download_name=download_name,
             mimetype=get_mimetype(representative_extension),
         )
     else:
         abort(404)  # Certification request or file not found
 
-def get_representative_extension(representative_id_filename):
-    return representative_id_filename.rsplit('.', 1)[1].lower()
+def get_representative_extension(representative_filename):
+    return representative_filename.rsplit('.', 1)[1].lower()
 
 def get_mimetype(representative_extension):
     mimetypes = {
