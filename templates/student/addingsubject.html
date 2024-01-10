@@ -1,13 +1,15 @@
 {% extends "student/layout.html" %}
 {% block content %}
 
-<div class="data data1">
+<!-------------------------------- DISPLAY ALL THE SUBJECTS TAKEN BY THE STUDENTS ---------------------------------------------->
+
+<div class="data data1" id="applicationSection">
     <div class="content-data">
         <div class="head">
-            <h3>Application for Adding of Subjects</h3>
+            <h3>My Subjects</h3>
         </div>
 
-        <table id="overload" class="table table-bordered table-condensed">
+        <table id="addingSubject1" class="table table-bordered table-condensed mb-5">
             <thead>
                 <tr>
                     <th>Subject Code</th>
@@ -15,28 +17,185 @@
                     <th>Section</th>
                     <th>Units</th>
                     <th>Schedule</th>
-                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
+                <!-- ACTUAL ROUTE OR LOGIC  -->
                 <tr>
-                    <td>ABC123</td>
-                    <td>Subject ABC</td>
-                    <td>A</td>
+                    <td>EDUC 2153</td>
+                    <td>Measurement and Evaluation</td>
+                    <td>BBTEIT 4-1N</td>
                     <td>3</td>
-                    <td>MWF 9:00 AM - 10:00 AM</td>
-                    <td>
-                        <button type="button" title="View Info" class="btn btn-primary fa-solid fa-edit edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
-                    </td>
+                    <td>T 02:30PM - 05:30PM N316</td>
                 </tr>
-                <!-- Add more rows with data as needed -->
+
+                <!-- ENDFOR -->
             </tbody>
         </table>
 
-        <div class="d-flex justify-content-center mt-3">
-            <a href="{{ url_for('studentsubject') }}" class="btn btn-primary">Add Subject?</a>
+        <div class="d-flex justify-content-center">
+            <button type="button" id="addSubjectsButton" class="btn btn-primary">Add Subject?</button>
         </div>
     </div>
 </div>
 
+
+<!-------------------------------- STUDENT CAN CHOOSE THE SUBJECT HE/SHE WANTS TO TAKE ---------------------------------------------->
+
+<div class="data data1" id="addSubjectsSection">
+    <div class="content-data">
+        <div class="head">
+            <h3>Application for Adding of Subjects</h3>
+        </div>
+        <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
+            <table id="addingSubject2" class="table table-bordered table-condensed">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Subject Code</th>
+                        <th>Subject Description</th>
+                        <th>Section</th>
+                        <th>Units</th>
+                        <th>Schedule</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-subject-code="EDUC 2153" 
+                        data-subject-description="Measurement and Evaluation" 
+                        data-section="BBTEIT 4-1N" 
+                        data-units="3" 
+                        data-schedule="T 02:30PM - 05:30PM N316">
+                        <td>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" title="checkbox" class="custom-control-input" id="customCheck1">
+                                <label class="custom-control-label" for="customCheck1"></label>
+                            </div>
+                        </td>
+                        <td>EDUC 2153</td>
+                        <td>Measurement and Evaluation</td>
+                        <td>BBTEIT 4-1N</td>
+                        <td>3</td>
+                        <td>T 02:30PM - 05:30PM N316</td>
+                        <td>
+                            <button type="button" title="View Info" class="btn btn-primary fa-solid fa-edit edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="d-flex justify-content-center">
+                <button type="button" id="addSubjectButton" class="btn btn-success" data-toggle="modal" data-target="#addSubjectModal">Add Subject</button>
+                <!-- <a href="{{ url_for('viewaddsubject') }}">View AddSubject</a> -->
+            </div>
+        </form>
+    </div>
+</div>
+
+<!----------------------------- MODAL TO SHOW THE SUBJECT THAT THE STUDENTS WANT TO TAKE ----------------------------------->
+
+<div class="modal fade" id="addSubjectModal" tabindex="-1" role="dialog" aria-labelledby="addSubjectModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-white" id="viewaddSubjectModal">Review Add Subjects</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="btn-wrong" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body view">
+                <div class="form-group">
+                    <label class="col-sm-4 control-label">Subject Code:</label>
+                    <div class="col-sm-4">
+                        <p id="subjectCode"></p>
+                    </div>          
+                  </div>
+                  
+    
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">Subject Description:</label>
+                    <div class="col-sm-4">
+                        <p id="subjectDescription"></p>
+                        
+                    </div>           
+                  </div>
+                 
+    
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">Section:</label>
+                    <div class="col-sm-4">
+                        <p id="section"></p>
+                    </div>           
+                  </div>
+                 
+    
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">Units:</label>
+                    <div class="col-sm-4">
+                        <p id="units"></p>
+                    </div>           
+                  </div>
+    
+                  <div class="form-group">
+                    <label class="col-sm-4 control-label">Schedule:</label>
+                    <div class="col-sm-4">
+                        <p id="schedule"></p>
+                    </div>           
+                  </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" data-dismiss="modal">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var addSubjectsButton = document.getElementById("addSubjectsButton");
+        var applicationSection = document.getElementById("applicationSection");
+        var addSubjectsSection = document.getElementById("addSubjectsSection");
+
+        addSubjectsButton.addEventListener("click", function () {
+            applicationSection.style.display = "none";
+            addSubjectsSection.style.display = "block";
+        });
+
+        var addSubjectButton = document.getElementById("addSubjectButton");
+        addSubjectButton.addEventListener("click", function () {
+            displaySelectedSubject();
+        });
+    });
+
+    function displaySelectedSubject() {
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+        if (checkboxes.length > 0) {
+            var selectedRow = checkboxes[0].closest('tr');
+            var subjectCode = selectedRow.dataset.subjectCode;
+            var subjectDescription = selectedRow.dataset.subjectDescription;
+            var section = selectedRow.dataset.section;
+            var units = selectedRow.dataset.units;
+            var schedule = selectedRow.dataset.schedule;
+
+            // Update modal content based on the selected subject
+            document.getElementById('subjectCode').innerText = subjectCode;
+            document.getElementById('subjectDescription').innerText = subjectDescription;
+            document.getElementById('section').innerText = section;
+            document.getElementById('units').innerText = units;
+            document.getElementById('schedule').innerText = schedule;
+
+        }
+    }
+</script>
+
+
+
+
+
 {% endblock content %}
+
+
+
+
+

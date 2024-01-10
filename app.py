@@ -437,11 +437,6 @@ def viewoverload():
 def studentaddingsubject():
     return render_template("/student/addingsubject.html", student_api_base_url=student_api_base_url)
 
-@app.route('/student/addingsubject/subjects')
-def studentsubject():
-    return render_template("/student/subjects.html", student_api_base_url=student_api_base_url)
-
-
 @app.route('/student/addingsubject/added', methods=['POST'])
 @role_required('student')
 def add_subjects():

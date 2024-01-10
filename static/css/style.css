@@ -902,6 +902,11 @@ table th, table td {
 }
 
 
+#addSubjectsSection {
+	display: none;
+}
+
+
 @media screen and (max-width: 768px) {
 	#content {
 		position: relative;

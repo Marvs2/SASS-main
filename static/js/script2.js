@@ -193,7 +193,12 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
+	 $('#addingSubject1').DataTable(); // ADDING OF SUBJECTS
+});
+
+
+$(document).ready(function() {
+	$('#addingSubject2').DataTable(); // ADDING OF SUBJECTS
 });
 
 $(document).ready(function () {
