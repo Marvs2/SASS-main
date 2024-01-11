@@ -1,15 +1,18 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import login_user
-from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+"""from models import CertificationRequest, ChangeOfSubjects, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Subject, TutorialRequest, db, AddSubjects, init_db, Student"""
+from models import Student, Faculty, Subject, db, init_db
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file
-from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
-from Api.v1.admin.api_routes import admin_api, create_student
+from Api.v1.student.api_routes import create_crossenrollment_form, create_overload_application,  fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file
+
+"""from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api#, update_student_profile #log_form_submission_to_file"""
+"""from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
+from Api.v1.admin.api_routes import admin_api, create_student"""
 # Assuming your Flask app is created as 'app'
 
 import os
@@ -222,8 +225,8 @@ def student_history():
     student = Student.query.get(user_id)
 
     services_data = {}
-
-    if student:
+"""
+if student:
         # Fetch AddSubjects based on the StudentId foreign key
         addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
         services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
@@ -264,9 +267,10 @@ def student_history():
         tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
         services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
 
-    return render_template("/student/history.html", services_data=services_data)
+    return render_template("/student/history.html", services_data=services_data)"""
 #=======================================For Notification=======================================#
-@app.route('/student/notifications' , methods=['GET'])
+
+"""@app.route('/student/notifications' , methods=['GET'])
 @role_required('student')
 def show_notifications():
     user_id = session.get('user_id')
@@ -277,7 +281,7 @@ def show_notifications():
     else:
         notifications = []
 
-    return render_template("/student/notification.html", notifications=notifications)
+    return render_template("/student/notification.html", notifications=notifications)"""
 
 #=======================================For Setting=======================================#
 @app.route('/student/setting')
@@ -372,7 +376,7 @@ def get_subjects(year_level_id, semester_id):
     return jsonify([subject.to_dict() for subject in subjects])"""
     
 #================================= OVERLOAD OF SUBJECT =============================================================
-@app.route('/student/overload') 
+"""@app.route('/student/overload') 
 def studentoverload():
     return render_template("/student/overload.html", student_api_base_url=student_api_base_url)
 
@@ -429,10 +433,10 @@ def viewoverload():
         # Convert AddSubjects data to a list of dictionaries
         overload_applications_list = [subject.to_dict() for subject in overload_applications]
 
-    return render_template("/student/viewoverload.html", overload_applications_list=overload_applications_list)
+    return render_template("/student/viewoverload.html", overload_applications_list=overload_applications_list)"""
 #=======================================================================#
 #================== ADDING OF SUBJECT ==================================#
-
+"""
 @app.route('/student/addingsubject')
 def studentaddingsubject():
     subjects = Subject.query.all()
@@ -519,10 +523,10 @@ def get_mimetype(file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(file_extension, 'application/octet-stream')
+    return mimetypes.get(file_extension, 'application/octet-stream')"""
 
 #============================== CHANGE OF SCHEDULE/SUBJECT ===============================================#
-@app.route('/student/changeofsubject')
+"""@app.route('/student/changeofsubject')
 def studentchange():
     return render_template("/student/changeofsubject.html", student_api_base_url=student_api_base_url)
 
@@ -608,10 +612,10 @@ def get_mimetype(file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(file_extension, 'application/octet-stream')
+    return mimetypes.get(file_extension, 'application/octet-stream')"""
 
 #========================== CORRECTION OF GRADE ENTRY ================================================#
-
+"""
 @app.route('/student/correction')
 def studentcorrection():
     return render_template("/student/correction.html", student_api_base_url=student_api_base_url)
@@ -667,7 +671,7 @@ def viewcorrection():
         # Convert AddSubjects data to a list of dictionaries
         grade_entry_list = [subject.to_dict() for subject in grade_entry]
 
-    return render_template("/student/viewcorrection.html", grade_entry_list=grade_entry_list)
+    return render_template("/student/viewcorrection.html", grade_entry_list=grade_entry_list)"""
 
 #viewfile for correction
 """@app.route('/student/view_completion_form/<int:grade_entry_id>')
@@ -686,7 +690,7 @@ def view_completion_form(grade_entry_id):
     else:
         abort(404)  # File not found"""
 
-@app.route('/student/view_completion_form/<int:grade_entry_id>')
+"""@app.route('/student/view_completion_form/<int:grade_entry_id>')
 def view_completion_form(grade_entry_id):
     grade_entry = GradeEntry.query.get(grade_entry_id)
 
@@ -734,10 +738,10 @@ def view_affidavit(grade_entry_id):
             mimetype=mimetype
         )
     else:
-        abort(404)
+        abort(404)"""
 
 #====================================== CROSS ENROLLMENT =========================================================
-
+"""
 @app.route('/student/crossenrollment')
 def studentenrollment():
     return render_template("/student/crossenrollment.html", student_api_base_url=student_api_base_url)
@@ -795,9 +799,9 @@ def viewcrossenrollment():
         cross_enrollments_list = [subject.to_dict() for subject in cross_enrollments]
 
     return render_template("/student/viewcrossenrollment.html", cross_enrollments_list=cross_enrollments_list)
-
+"""
 #================================== APPLICATION FOR SHIFTING ================================================
-@app.route('/student/shifting')
+"""@app.route('/student/shifting')
 def studentshifting():
     return render_template("/student/shifting.html", student_api_base_url=student_api_base_url)
 
@@ -892,10 +896,10 @@ def viewmanual():
         # Convert AddSubjects data to a list of dictionaries
         manual_enrollments_list = [subject.to_dict() for subject in manual_enrollments]
 
-    return render_template("/student/viewmanual.html", manual_enrollments_list=manual_enrollments_list)
+    return render_template("/student/viewmanual.html", manual_enrollments_list=manual_enrollments_list)"""
 #===================================== ONLINE PETITION OF SUBJECTS =====================================================
 
-@app.route('/student/onlinepetitionofsubject')
+"""@app.route('/student/onlinepetitionofsubject')
 def studentpetition():
     return render_template("/student/petition.html", student_api_base_url=student_api_base_url)
 
@@ -952,10 +956,10 @@ def viewpetition():
         # Convert AddSubjects data to a list of dictionaries
         petition_requests_list = [subject.to_dict() for subject in petition_requests]
 
-    return render_template("/student/viewpetition.html", petition_requests_list=petition_requests_list)
+    return render_template("/student/viewpetition.html", petition_requests_list=petition_requests_list)"""
 
 #================================= ONLINE REQUEST FOR TUTORIAL ===================================================
-
+"""
 @app.route('/student/tutorial')#
 def studenttutorial():
     return render_template("/student/tutorial.html", student_api_base_url=student_api_base_url)#
@@ -994,9 +998,9 @@ def submit_tutorial_request():
     finally:
         db.session.close()
 
-    return render_template('student/tutorial.html')
+    return render_template('student/tutorial.html')"""
 
-@app.route('/student/viewtutorial', methods=['GET'])
+"""@app.route('/student/viewtutorial', methods=['GET'])
 @role_required('student')
 def viewtutorial():
     user_id = session.get('user_id')
@@ -1124,9 +1128,9 @@ def get_mimetype(identification_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(identification_file_extension, 'application/octet-stream')
+    return mimetypes.get(identification_file_extension, 'application/octet-stream')"""
 
-@app.route('/student/certification/view_certification_authorization_file/<int:certification_request_id>')
+"""@app.route('/student/certification/view_certification_authorization_file/<int:certification_request_id>')
 def view_certification_authorization_file(certification_request_id):
     certification_request = CertificationRequest.query.get(certification_request_id)
 
@@ -1151,7 +1155,7 @@ def get_mimetype(authorization_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(authorization_file_extension, 'application/octet-stream')
+    return mimetypes.get(authorization_file_extension, 'application/octet-stream')"""
 #===========================================================================================================================#
 
 """# View function to handle operations based on StudentId
@@ -1169,7 +1173,7 @@ def get_student_subjects(student_id):
     return jsonify({'subjects': subjects_list}), 200"""
 
 #============================================================================================================================
-
+"""
 @app.route('/refresh_session', methods=['POST'])
 def refresh_session():
     # Update the last activity timestamp
@@ -1245,7 +1249,7 @@ def facultytutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
     tutorial_requests = TutorialRequest.query.all()
     return render_template("/faculty/tutorial.html", tutorial_requests=tutorial_requests)
-
+"""
 #=======================================================================#
 
 #===================================================TIMER=============================================================#
@@ -1848,7 +1852,7 @@ def submit_services_request():
 #=====================================================================
 #Adding - Faculty
 
-@app.route('/update-adding-service-status/<int:add_subject_id>', methods=['POST'])
+"""@app.route('/update-adding-service-status/<int:add_subject_id>', methods=['POST'])
 def update_adding_service_status(add_subject_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -1904,7 +1908,7 @@ def get_mimetype(file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(file_extension, 'application/octet-stream')
+    return mimetypes.get(file_extension, 'application/octet-stream')"""
 #=====================================================================
 #changesubjects
 
@@ -1913,14 +1917,14 @@ def update_change_service_status(Changesubject_ID):
     session['last_activity'] = datetime.now(timezone.utc)
 
     # Find the specific AddSubjects record
-    changesubjects = ChangeOfSubjects.query.get_or_404(Changesubject_ID)
+#    changesubjects = ChangeOfSubjects.query.get_or_404(Changesubject_ID)
 
     # Get the new status from the form data
     new_status = request.form.get('status')
 
     if new_status:
         # Update the status
-        changesubjects.status = new_status
+  #      changesubjects.status = new_status
 
         # Commit the changes to the database
         db.session.commit()
@@ -1938,9 +1942,9 @@ def get_change_file(Changesubject_ID):
 # Download change of subjects file
 @app.route('/faculty/download_change_file/<int:Changesubject_ID>')
 def download_change_file(Changesubject_ID):
-    changesubjects = ChangeOfSubjects.query.get(Changesubject_ID)
+ #   changesubjects = ChangeOfSubjects.query.get(Changesubject_ID)
 
-    if changesubjects and changesubjects.ace_form_data:
+ """   if changesubjects and changesubjects.ace_form_data:
         file_extension = get_file_extension(changesubjects.ace_form_filename)
         download_name = f'change_subject_{Changesubject_ID}.{file_extension}'
 
@@ -1964,10 +1968,10 @@ def get_mimetype(file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(file_extension, 'application/octet-stream')
+    return mimetypes.get(file_extension, 'application/octet-stream')"""
 #=====================================================================
 #gradeentry table
-@app.route('/update-correction-service-status/<int:grade_entry_id>', methods=['POST'])
+"""@app.route('/update-correction-service-status/<int:grade_entry_id>', methods=['POST'])
 def update_correction_service_status(grade_entry_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -1993,9 +1997,9 @@ def update_correction_service_status(grade_entry_id):
 # Route to handle download requests for grade entry files
 @app.route('/faculty/correction/get_completion_file/<int:grade_entry_id>')
 def get_completion_file(grade_entry_id):
-    return redirect(url_for('download_completion_form', grade_entry_id=grade_entry_id))
+    return redirect(url_for('download_completion_form', grade_entry_id=grade_entry_id))"""
 
-@app.route('/faculty/download_completion_form/<int:grade_entry_id>')
+"""@app.route('/faculty/download_completion_form/<int:grade_entry_id>')
 def download_completion_form(grade_entry_id):
     grade_entry = GradeEntry.query.get(grade_entry_id)
 
@@ -2024,14 +2028,14 @@ def get_mimetype(completion_form_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(completion_form_extension, 'application/octet-stream')
+    return mimetypes.get(completion_form_extension, 'application/octet-stream')"""
 
 #class_record
 @app.route('/faculty/correction/get_grade_class_file/<int:grade_entry_id>')
 def get_grade_class_file(grade_entry_id):
     return redirect(url_for('download_class_record', grade_entry_id=grade_entry_id))
 
-@app.route('/faculty/download_class_record/<int:grade_entry_id>')
+"""@app.route('/faculty/download_class_record/<int:grade_entry_id>')
 def download_class_record(grade_entry_id):
     grade_entry = GradeEntry.query.get(grade_entry_id)
 
@@ -2096,10 +2100,10 @@ def get_mimetype(affidavit_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(affidavit_extension, 'application/octet-stream')
+    return mimetypes.get(affidavit_extension, 'application/octet-stream')"""
 #=====================================================================
 #crossenrollment
-@app.route('/update-crossenrollment-service-status/<int:cross_enrollment_id>', methods=['POST'])
+"""@app.route('/update-crossenrollment-service-status/<int:cross_enrollment_id>', methods=['POST'])
 def update_crossenrollment_service_status(cross_enrollment_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2119,10 +2123,10 @@ def update_crossenrollment_service_status(cross_enrollment_id):
     else:
         flash('No status provided.', 'danger')
 
-    return redirect(url_for('facultycrossenrollment'))
+    return redirect(url_for('facultycrossenrollment'))"""
 
 #crossenrollment
-@app.route('/faculty/crossenrollment/get_application_letter/<int:cross_enrollment_id>')
+"""@app.route('/faculty/crossenrollment/get_application_letter/<int:cross_enrollment_id>')
 def get_application_letter(cross_enrollment_id):
     return redirect(url_for('download_application_letter', cross_enrollment_id=cross_enrollment_id))
 
@@ -2154,9 +2158,9 @@ def get_mimetype(application_letter_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(application_letter_extension, 'application/octet-stream')
+    return mimetypes.get(application_letter_extension, 'application/octet-stream')"""
 
-@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollment_id>')
+"""@app.route('/faculty/crossenrollment/get_permit_to_enroll/<int:cross_enrollment_id>')
 def get_permit_to_enroll(cross_enrollment_id):
     return redirect(url_for('download_permit_to_enroll', cross_enrollment_id=cross_enrollment_id))
 
@@ -2188,10 +2192,10 @@ def get_mimetype(permit_enroll_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(permit_enroll_extension, 'application/octet-stream')
+    return mimetypes.get(permit_enroll_extension, 'application/octet-stream')"""
 #=====================================================================
 #shifting
-@app.route('/update-shifting-service-status/<int:shifting_application_id>', methods=['POST'])
+"""@app.route('/update-shifting-service-status/<int:shifting_application_id>', methods=['POST'])
 def update_shifting_service_status(shifting_application_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2211,7 +2215,7 @@ def update_shifting_service_status(shifting_application_id):
     else:
         flash('No status provided.', 'danger')
 
-    return redirect(url_for('facultyshifting'))
+    return redirect(url_for('facultyshifting'))"""
 
 #shifting
 """@app.route('/faculty/shifting_applications')
@@ -2225,7 +2229,7 @@ def get_shifting_file(shifting_application_id):
     return redirect(url_for('download_shifting_file', shifting_application_id=shifting_application_id))
 
 # Download change of subjects file
-@app.route('/faculty/download_shifting_file/<int:shifting_application_id>')
+"""@app.route('/faculty/download_shifting_file/<int:shifting_application_id>')
 def download_shifting_file(shifting_application_id):
     shifting_applications = ShiftingApplication.query.get(shifting_application_id)
 
@@ -2253,11 +2257,11 @@ def get_mimetype(shifting_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(shifting_file_extension, 'application/octet-stream')
+    return mimetypes.get(shifting_file_extension, 'application/octet-stream')"""
 #=====================================================================
 # Overload - Faculty
 
-@app.route('/update-overload-service-status/<int:overload_application_id>', methods=['POST'])
+"""@app.route('/update-overload-service-status/<int:overload_application_id>', methods=['POST'])
 def update_overload_service_status(overload_application_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2283,11 +2287,11 @@ def update_overload_service_status(overload_application_id):
 
 @app.route('/faculty/overload/get_overload_file/<int:overload_application_id>')
 def get_overload_file(overload_application_id):
-    return redirect(url_for('download_overload_file', overload_application_id=overload_application_id))
+    return redirect(url_for('download_overload_file', overload_application_id=overload_application_id))"""
 
 # Download overload file
 
-@app.route('/faculty/download_overload_file/<int:overload_application_id>')
+"""@app.route('/faculty/download_overload_file/<int:overload_application_id>')
 def download_overload_file(overload_application_id):
     overload_application = OverloadApplication.query.get(overload_application_id)
 
@@ -2316,10 +2320,10 @@ def get_mimetype(overload_file_extension):
     }
 
     return mimetypes.get(overload_file_extension, 'application/octet-stream')
-
+"""
 #=====================================================================
 #petition
-@app.route('/update-petition-service-status/<int:petition_request_id>', methods=['POST'])
+"""@app.route('/update-petition-service-status/<int:petition_request_id>', methods=['POST'])
 def update_petition_service_status(petition_request_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2337,10 +2341,10 @@ def update_petition_service_status(petition_request_id):
     else:
         flash('No status provided.', category='danger')
 
-    return redirect(url_for('facultypetition'))
+    return redirect(url_for('facultypetition'))"""
 #=====================================================================
 #enrollement
-@app.route('/update-manual-service-status/<int:m_enrollment_ID>', methods=['POST'])
+"""@app.route('/update-manual-service-status/<int:m_enrollment_ID>', methods=['POST'])
 def update_manual_service_status(m_enrollment_ID):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2360,10 +2364,10 @@ def update_manual_service_status(m_enrollment_ID):
     else:
         flash('No status provided.', category='danger')
 
-    return redirect(url_for('facultyenrollment'))
+    return redirect(url_for('facultyenrollment'))"""
 
 #enrollment
-@app.route('/faculty/manualenrollment/get_manual_file/<int:m_enrollments_ID>')
+"""@app.route('/faculty/manualenrollment/get_manual_file/<int:m_enrollments_ID>')
 def get_manual_file(m_enrollments_ID):
     return redirect(url_for('download_manual_enrollment_file', m_enrollments_ID=m_enrollments_ID))
 
@@ -2394,10 +2398,10 @@ def get_mimetype(me_filename_extension):
         'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         # Add more file types as needed
     }
-    return mimetypes.get(me_filename_extension, 'application/octet-stream')
+    return mimetypes.get(me_filename_extension, 'application/octet-stream')"""
 #=====================================================================
 #certification
-@app.route('/update-certification-service-status/<int:certification_request_id>', methods=['POST'])
+"""@app.route('/update-certification-service-status/<int:certification_request_id>', methods=['POST'])
 def update_certification_service_status(certification_request_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2417,10 +2421,10 @@ def update_certification_service_status(certification_request_id):
     else:
         flash('No status provided.', 'danger')
 
-    return redirect(url_for('facultycertification'))
+    return redirect(url_for('facultycertification'))"""
 #=====================================================================
 #tutorial
-@app.route('/update-tutorial-service-status/<int:tutorial_request_id>', methods=['POST'])
+"""@app.route('/update-tutorial-service-status/<int:tutorial_request_id>', methods=['POST'])
 def update_tutorial_service_status(tutorial_request_id):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2475,7 +2479,7 @@ def get_mimetype(tutorial_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(tutorial_extension, 'application/octet-stream')
+    return mimetypes.get(tutorial_extension, 'application/octet-stream')"""
 
 #===================================================TIMER=============================================================#
 # Middleware to check for inactivity and redirect to login if needed
@@ -2502,7 +2506,7 @@ def check_user_activity():
 # function that is sent for teachers
 #================================================================#
 # ALL FACULTY ROUTES HERE
-@app.route('/faculty')
+"""@app.route('/faculty')
 @prevent_authenticated
 def faculty_portal():
     session.permanent=True
@@ -2547,7 +2551,7 @@ def faculty_update_profile():
 @app.route('/faculty/profile')
 def facultyprofile():
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
-
+"""
 
 # ======================Faculty Downloads========================== #
 # =======================Downloads File============================ #
@@ -2659,7 +2663,7 @@ def get_mimetype(authorization_file_extension):
 def get_representative_file(certification_request_id):
     return redirect(url_for('download_representative_file', certification_request_id=certification_request_id))
 
-@app.route('/student/download_representative_file/<int:certification_request_id>')
+"""@app.route('/student/download_representative_file/<int:certification_request_id>')
 def download_representative_file(certification_request_id):
     certification_request = CertificationRequest.query.get(certification_request_id)
 
@@ -2688,7 +2692,7 @@ def get_mimetype(representative_extension):
     }
 
     return mimetypes.get(representative_extension, 'application/octet-stream')
-
+"""
 # The functions get_file_extension and get_mimetype remain the same as in your existing code.
 #===========================================================#
 
@@ -2739,7 +2743,7 @@ def admin_create_stud():
 
 
 # Route for creating a student account
-@app.route('/admin/createstudent/submit', methods=['GET', 'POST'])
+"""@app.route('/admin/createstudent/submit', methods=['GET', 'POST'])
 def admin_create_student():
     if request.method == 'POST':
         try:
@@ -2762,7 +2766,7 @@ def admin_create_student():
         finally:
             db.session.close()
 
-    return render_template('/admin/create_student.html')
+    return render_template('/admin/create_student.html')"""
 
 
 @app.route('/admin/student_list', methods=['GET'])
@@ -2798,8 +2802,8 @@ def admin_portal():
     return render_template('admin/login.html')
 # ========================================================================
 # Register the API blueprint
-app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
-app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)
+"""app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
+app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)"""
 app.register_blueprint(student_api, url_prefix=student_api_base_url)
 
 # ========================================================================

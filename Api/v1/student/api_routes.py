@@ -2,7 +2,8 @@
 import base64
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
+"""from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest"""
+from models import Student
 from werkzeug.utils import secure_filename
 from datetime import datetime #, timedelta, timezone
 #from models import Services
@@ -600,7 +601,7 @@ def create_overload_application(form_data, files, StudentId):
         flash('Please fill out all required fields.', 'danger')
         return None
 
-    new_overload_application = OverloadApplication(
+ #   new_overload_application = OverloadApplication(
         StudentNumber=StudentNumber,
         Name=Name,
         programcourse=programcourse,
@@ -613,9 +614,9 @@ def create_overload_application(form_data, files, StudentId):
         status=status,
         StudentId=StudentId,
         created_at=datetime.utcnow()  # Set created_at to the current timestamp
-    )
+  #  )
     
-    return new_overload_application
+   # return new_overload_application 
 #===============================================================================================#
 
 #crossenrollment
@@ -666,7 +667,7 @@ def create_crossenrollment_form(form_data, files, StudentId):
     permit_to_cross_enroll_data = permitToCrossEnroll.read()
     permit_to_cross_enroll_filename = secure_filename(permitToCrossEnroll.filename)
 
-    new_cross_enrollment = CrossEnrollment(
+"""    new_cross_enrollment = CrossEnrollment(
         StudentNumber=StudentNumber,
         Name=Name,
         school_for_cross_enrollment=school_for_cross_enrollment,
@@ -682,7 +683,7 @@ def create_crossenrollment_form(form_data, files, StudentId):
         StudentId=StudentId,  # Pass the StudentId from the login
     )
 
-    return new_cross_enrollment
+    return new_cross_enrollment 
 
 #===============================================================================================#
 
@@ -1121,7 +1122,7 @@ def create_notification(StudentNumber, service_type, user_responsible, status, m
 
 
 
-"""# Insert function for Program
+# Insert function for Program
 def insert_program(form_data):
     # Get the form data
     programCode = form_data['programCode']
