@@ -20,14 +20,14 @@ class Student(db.Model): # (class SPSStudent) In DJANGO you must set the name di
     LastName = db.Column(db.String(50), nullable=False)  # Last Name
     MiddleName = db.Column(db.String(50))  # Middle Name
     Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
-    Password = db.Column(db.String(128), nullable=False)  # Password
+    Password = db.Column(db.String(256), nullable=False)  # Password
     Gender = db.Column(db.Integer, nullable=True)  # Gender
     DateOfBirth = db.Column(db.Date)  # DateOfBirth
     PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
     ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
     MobileNumber = db.Column(db.String(11))  # MobileNumber
     IsOfficer = db.Column(db.Boolean, default=False)
-    Token = db.Column(db.String(128))  # This is for handling reset password 
+    Token = db.Column(db.String(256))  # This is for handling reset password 
     TokenExpiration = db.Column(db.DateTime) # This is for handling reset password 
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
@@ -82,7 +82,7 @@ class Faculty(db.Model):
     MobileNumber = db.Column(db.String(11))  # MobileNumber
     Gender = db.Column(db.Integer) # Gender # 1 if Male 2 if Female
     
-    Password = db.Column(db.String(128), nullable=False)  # Password
+    Password = db.Column(db.String(256), nullable=False)  # Password
     ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
     IsActive = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -92,31 +92,31 @@ class Faculty(db.Model):
 
     def to_dict(self):
         return {
-            'faculty_account_id': self.FacultyId,
-            'faculty_type': self.FacultyType,
-            'rank': self.Rank,
-            'units': self.Units,
-            'name': self.Name,
-            'first_name': self.FirstName,
-            'last_name': self.LastName,
-            'middle_name': self.MiddleName,
-            'middle_initial': self.MiddleInitial,
-            'name_extension': self.NameExtension,
-            'birth_date': self.BirthDate,
-            'date_hired': self.DateHired,
-            'degree': self.Degree,
-            'remarks': self.Remarks,
-            'faculty_code': self.FacultyCode,
+            'FacultyId': self.FacultyId,
+            'FacultyType': self.FacultyType,
+            'Rank': self.Rank,
+            'Units': self.Units,
+            'Name': self.Name,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
+            'MiddleInitial': self.MiddleInitial,
+            'NameExtension': self.NameExtension,
+            'BirthDate': self.BirthDate,
+            'DateHired': self.DateHired,
+            'Degree': self.Degree,
+            'Remarks': self.Remarks,
+            'FacultyCode': self.FacultyCode,
             'honorific': self.Honorific,
-            'age': self.Age,
-            'email': self.Email,
+            'Age': self.Age,
+            'Email': self.Email,
             # 'password': self.password,
-            'profile_pic': self.ProfilePic,
-            'is_active': self.IsActive,
+            'ProfilePic': self.ProfilePic,
+            'IsActive': self.IsActive,
         }
         
     def get_id(self):
-        return str(self.faculty_account_id)  # Convert to string to ensure compatibility
+        return str(self.FacultyId)  # Convert to string to ensure compatibility
 
 
 
@@ -125,12 +125,11 @@ class SystemAdmin(db.Model):
     __tablename__ = 'SPSSystemAdmin'
 
     SysAdminId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    AdminID = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), primary_key=True) # Students Reference
-
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), primary_key=True) # Students Reference
     SysAdminNumber = db.Column(db.String(30), unique=True)  # UserID
     Name = db.Column(db.String(50), nullable=False)  # Name
     Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
-    Password = db.Column(db.String(128), nullable=False)  # Password
+    Password = db.Column(db.String(256), nullable=False)  # Password
     Gender = db.Column(db.Integer)  # Gender
     DateOfBirth = db.Column(db.Date)  # DateOfBirth
     PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
@@ -143,6 +142,7 @@ class SystemAdmin(db.Model):
     def to_dict(self):
         return {
             'SysAdminId': self.SysAdminId,
+            'FacultyId': self.FacultyId,
             'SysAdminNumber': self.SysAdminNumber,
             'Name': self.Name,
             'Email': self.Email,
@@ -416,8 +416,10 @@ class OAuth2Token(db.Model, OAuth2TokenMixin):
 
 # ------------------------------------------------
         
-config_mode = os.getenv("CONFIG_MODE")
-add_data = os.getenv("ADD_DATA")
+# config_mode = 'os.getenv("CONFIG_MODE")'
+# add_data = os.getenv("ADD_DATA")
+config_mode = 'development'
+add_data = 'True'
 
 # print('/'+config_mode+'/')
 # print('/'+add_data+'/')
@@ -427,86 +429,86 @@ def init_db(app):
     
     if add_data=='True':
         print("Adding data")
-        from data.student import student_data
-        from data.faculty import faculty_data
-        from data.universityadmin import university_admin_data
-        from data.systemadmin import system_admin_data
-        from data.course import course_data
-        from data.courseEnrolled import course_enrolled_data
-        from data.subject import subject_data
-        from data.classes import class_data
-        from data.classSubject import class_subject_data
-        from data.studentClassSubjectGrade import student_class_subject_grade_data
-        from data.studentClassGrade import student_class_grade_data
-        from data.classSubjectGrade import class_subject_grade_data
-        from data.classGrade import class_grade_data
-        # from data.data2.courseGrade import course_grade_data
+        # from data.student import student_data
+        # from data.faculty import faculty_data
+        # from data.universityadmin import university_admin_data
+        # from data.systemadmin import system_admin_data
+        # from data.course import course_data
+        # from data.courseEnrolled import course_enrolled_data
+        # from data.subject import subject_data
+        # from data.classes import class_data
+        # from data.classSubject import class_subject_data
+        # from data.studentClassSubjectGrade import student_class_subject_grade_data
+        # from data.studentClassGrade import student_class_grade_data
+        # from data.classSubjectGrade import class_subject_grade_data
+        # from data.classGrade import class_grade_data
+        # from data.courseGrade import course_grade_data
 
-        from data.curriculum import curriculum_data
-        from data.metadata import metadata_data
+        # from data.curriculum import curriculum_data
+        # from data.metadata import metadata_data
 
-        def create_sample_data():
-            for data in student_data:
-                student = Student(**data)
-                db.session.add(student)
+    def create_sample_data():
+        # for data in student_data:
+        #     student = Student(**data)
+        #     db.session.add(student)
 
-            for data in faculty_data:
-                faculty = Faculty(**data)
-                db.session.add(faculty)
+        # for data in faculty_data:
+        #     faculty = Faculty(**data) # done
+        #     db.session.add(faculty)
 
-            for data in system_admin_data:
-                system_admin = SystemAdmin(**data)
-                db.session.add(system_admin)
+        # for data in system_admin_data:
+        #     system_admin = SystemAdmin(**data) # done
+        #     db.session.add(system_admin)
 
-            for data in course_data:
-                course = Course(**data)
-                db.session.add(course)
-                db.session.flush()
-                
-            for data in subject_data:
-                subject = Subject(**data)
-                db.session.add(subject)
-                db.session.flush()
-
-            for data in metadata_data:
-                metadata = Metadata(**data)
-                db.session.add(metadata)
-                db.session.flush()
-
-            for data in curriculum_data:
-                curriculum = Curriculum(**data)
-                db.session.add(curriculum)
-                db.session.flush()
-                
-            for data in course_enrolled_data:
-                course_enrolled = CourseEnrolled(**data)
-                db.session.add(course_enrolled)
-                db.session.flush()
-
+        # for data in course_data:
+        #     course = Course(**data)
+        #     db.session.add(course) # done
+        #     db.session.flush()
             
-            for data in class_data:
-                class_ = Class(**data)
-                db.session.add(class_)
-                db.session.flush()
+        # for data in subject_data:
+        #     subject = Subject(**data) # done
+        #     db.session.add(subject)
+        #     db.session.flush()
 
-            for data in class_subject_data:
-                class_subject = ClassSubject(**data)
-                db.session.add(class_subject)
-                db.session.flush()
+        # for data in metadata_data:
+        #     metadata = Metadata(**data) # done
+        #     db.session.add(metadata)
+        #     db.session.flush()
 
-            for data in student_class_subject_grade_data:
-                student_class_subject_grade = StudentClassSubjectGrade(**data)
-                db.session.add(student_class_subject_grade)
-                db.session.flush()
-
-            # for data in course_grade_data:
-            #     course_grade = CourseGrade(**data)
-            #     db.session.add(course_grade)
-            #     db.session.flush()
-
+        # for data in curriculum_data:
+        #     curriculum = Curriculum(**data) # done
+        #     db.session.add(curriculum)
+        #     db.session.flush()
             
-            db.session.commit()
-            db.session.close()
+        # for data in course_enrolled_data:
+        #     course_enrolled = CourseEnrolled(**data) # done
+        #     db.session.add(course_enrolled)
+        #     db.session.flush()
+
+        
+        # for data in class_data:
+        #     class_ = Class(**data) # done
+        #     db.session.add(class_)
+        #     db.session.flush()
+
+        # for data in class_subject_data:
+        #     class_subject = ClassSubject(**data) # done
+        #     db.session.add(class_subject)
+        #     db.session.flush()
+
+        # for data in student_class_subject_grade_data:
+        #     student_class_subject_grade = StudentClassSubjectGrade(**data) # done
+        #     db.session.add(student_class_subject_grade)
+        #     db.session.flush()
+
+        # for data in course_grade_data:
+        #     course_grade = CourseGrade(**data) # walang data model
+        #     db.session.add(course_grade)
+        #     db.session.flush()
+
+        
+        db.session.commit()
+        db.session.close()
 
     
     # if config_mode == 'development' :
@@ -518,11 +520,14 @@ def init_db(app):
     #             print("DEVELOPMENT AND ADDING DATA")
     #             create_sample_data()
 
+    print(config_mode)
+    print(add_data)
 
+    
     if config_mode == 'development' and add_data=='True':
         print("DEVELOPMENT AND ADDING DATA")
         with app.app_context():
             inspector = inspect(db.engine)
-            if not inspector.has_table('SPSStudent'):
-                db.create_all()
-                create_sample_data()
+            # if not inspector.has_table('SPSStudent'):
+            db.create_all()
+            create_sample_data()

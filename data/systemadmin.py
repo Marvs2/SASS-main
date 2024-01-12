@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash
 system_admin_data = [
     {
         "SysAdminNumber": "2020-00001-SA-0",
+        "FacultyId":26,
         "Name": "Floyd Dela Cruz",
         "Email": "floyd@gmail.com",
         "Password": generate_password_hash("Admin123"),
@@ -17,7 +18,8 @@ system_admin_data = [
     },
     {
         "SysAdminNumber": "2020-00002-SA-0",
-        "Name": "System Administrator",
+        "FacultyId":26,
+        "Name": "Floyd Mayweahter",
         "Email": "systemadmin@gmail.com",
         "Password": generate_password_hash("Admin123"),
         "Gender": 1,
