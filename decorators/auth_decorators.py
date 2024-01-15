@@ -55,12 +55,13 @@ def role_required(required_role):
         return wrapper
     return decorator
 
-# def faculty_required(route_function):
-#     @login_required
+# def student_required(route_function):
+#     @studentlogin_required
 #     @wraps(route_function)
 #     def wrapper(*args, **kwargs):
-#         if current_user.is_authenticated and isinstance(current_user, Faculty):
+#         if current_user.is_authenticated and isinstance(current_user, Student):
 #             return route_function(*args, **kwargs)
 #         else:
 #             abort(401)  # Unauthorized
+#           return render_template("student/login.html")
 #     return wrapper

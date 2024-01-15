@@ -1,0 +1,231 @@
+{% extends "student/layout.html" %} {% block content %}
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+</style>
+<div class="custom-container"></div>
+<h2>Choice of Subject</h2>
+
+<div class="data data1" id="applicationSection">
+  <div class="content-data">
+    <div class="head">
+      <h3>
+        Course Code: {% if course %}
+        <p>{{ course.CourseCode }}</p>
+        {% endif %}
+      </h3>
+    </div>
+
+    <form
+      action="#"
+      method="POST"
+      enctype="multipart/form-data"
+      onsubmit="return validateForm()"
+      class="application-form"
+    >
+      <table id="addingSubject1" class="table table-bordered table-condensed">
+        <thead>
+          <tr>
+            <th>Check box</th>
+            <th>Subject Code</th>
+            <th>Subject Name</th>
+            <th>Units</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Loop through subjects to display -->
+          {% for subject in subject_details %}
+          <tr
+            data-subject-code="{{ subject.SubjectCode }}"
+            data-subject-description="{{ subject.Name }}"
+            data-Description="{{ subject.Description }}"
+            data-Units="{{ subject.Units }}"
+          >
+            <td>
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="custom-control-input subject-checkbox"
+                  id="checkbox{{ subject.SubjectId }}"
+                />
+                <label
+                  class="custom-control-label"
+                  for="checkbox{{ subject.SubjectId }}"
+                ></label>
+              </div>
+            </td>
+            <td>{{ subject['SubjectCode'] }}</td>
+            <td>{{ subject['Name'] }}</td>
+            <td>{{ subject['Units'] }}</td>
+          </tr>
+          {% endfor %}
+          <!-- ENDFOR -->
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-center">
+        <button type="button" id="addSubjectsButton" class="btn btn-primary">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+
+<script>
+  var checkedCheckboxesIds = []; // Array to hold the IDs of all checked checkboxes
+  var selectedSubjects = {}; // Dictionary to hold the IDs and units of all checked checkboxes
+  var totalUnits = 0; // Variable to hold the sum of selected units
+  var maxUnits = 6; // Maximum allowed units
+
+  function updateUnitsAndButtonState() {
+    var remainingUnits = maxUnits - totalUnits;
+    document.getElementById("remainingUnits").innerText =
+      "Remaining Units: " + remainingUnits;
+    document.getElementById("addSubjectsButton").disabled =
+      totalUnits > maxUnits;
+
+    // Disable or enable checkboxes based on the totalUnits
+    $(".subject-checkbox").each(function () {
+      var units = parseInt($(this).closest("tr").data("units"));
+      if (totalUnits + units > maxUnits && !this.checked) {
+        $(this).prop("disabled", true);
+      } else {
+        $(this).prop("disabled", false);
+      }
+    });
+  }
+
+  // Use event delegation to attach the change event to the checkboxes
+  $(document).on("change", ".subject-checkbox", function () {
+    var subjectId = $(this).attr("id");
+    var units = parseInt($(this).closest("tr").data("units"));
+
+    if (this.checked) {
+      // Add the subjectId and units to the dictionary if it's checked
+      selectedSubjects[subjectId] = units;
+      totalUnits += units;
+    } else {
+      // Remove the subjectId from the dictionary and subtract units if it's unchecked
+      totalUnits -= selectedSubjects[subjectId];
+      delete selectedSubjects[subjectId];
+    }
+
+    updateUnitsAndButtonState();
+    console.log(selectedSubjects);
+  });
+
+  function initRemainingUnitsDisplay() {
+    var remainingUnits = document.createElement("div");
+    remainingUnits.id = "remainingUnits";
+    remainingUnits.style.position = "absolute";
+    remainingUnits.style.top = "10px";
+    remainingUnits.style.right = "10px";
+    document.body.appendChild(remainingUnits);
+    updateUnitsAndButtonState();
+  }
+
+  // Call the function on document ready to initialize the remaining units display
+  $(document).ready(function () {
+    initRemainingUnitsDisplay();
+  });
+
+  function updateAddSubjectsButtonText() {
+    var button = document.getElementById("addSubjectsButton");
+    if (checkedCheckboxesIds.length > 0) {
+      button.innerText = "Add Subject (" + checkedCheckboxesIds.length + ")";
+    } else {
+      button.innerText = "Add Subject?";
+    }
+  }
+
+  // VIEW ADDING OF SUBJECT MODAL
+  $(document).ready(function () {
+    $("#addingSubject tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var subjectCode = $(this).data("subject-code");
+      var name = $(this).data("subject-description");
+      var section = $(this).data("section");
+      var units = $(this).data("units");
+      var schedule = $(this).data("schedule");
+      var fileUrl = $(this).data("add-file-url");
+      var fileName = $(this).data("add-file-filename");
+      var status = $(this).data("add-status");
+
+      // Populate modal with data
+      $("#subject-Code").text(subjectCode);
+      $("#subjectName").text(name);
+      $("#section").text(section);
+      $("#units").text(units);
+      $("#schedule").text(schedule);
+    });
+  });
+  document.addEventListener("DOMContentLoaded", function () {
+    var addSubjectsButton = document.getElementById("addSubjectsButton");
+    var applicationSection = document.getElementById("applicationSection");
+    var addSubjectsSection = document.getElementById("addSubjectsSection");
+
+    addSubjectsButton.addEventListener("click", function () {
+      applicationSection.style.display = "none";
+      addSubjectsSection.style.display = "block";
+    });
+
+    var addSubjectButton = document.getElementById("addSubjectButton");
+    addSubjectButton.addEventListener("click", function () {
+      displaySelectedSubject();
+    });
+  });
+
+  function displaySelectedSubject() {
+    $(".subject-checkbox").on("change", function () {
+      var checkboxId = $(this).attr("id");
+
+      if (this.checked) {
+        checkedCheckboxesIds.push(checkboxId);
+
+        var selectedRow = $(this).closest("tr");
+        // Retrieve data attributes from the selected row if needed
+      } else {
+        // If checkbox is unchecked, remove its ID from the array
+        checkedCheckboxesIds = checkedCheckboxesIds.filter(function (id) {
+          return id !== checkboxId;
+        });
+      }
+
+      updateAddSubjectsButtonText();
+      console.log(checkedCheckboxesIds);
+    });
+
+    if (checkboxes.length > 0) {
+      var selectedRow = checkboxes[0].closest("tr");
+      var subjectCode = selectedRow.dataset.subjectCode;
+      var subjectDescription = selectedRow.dataset.subjectDescription;
+      var section = selectedRow.dataset.section;
+      var units = selectedRow.dataset.units;
+      var schedule = selectedRow.dataset.schedule;
+
+      // Update modal content based on the selected subject
+      document.getElementById("subjectCode").innerText = subjectCode;
+      document.getElementById("subjectDescription").innerText =
+        subjectDescription;
+      document.getElementById("section").innerText = section;
+      document.getElementById("units").innerText = units;
+      document.getElementById("schedule").innerText = schedule;
+    }
+  }
+</script>
+
+{% endblock content %}

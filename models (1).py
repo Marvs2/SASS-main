@@ -64,6 +64,7 @@ class Faculty(db.Model):
     FacultyType = db.Column(db.String(50), nullable=False)  # Faculty Type
     Rank = db.Column(db.String(50))  # Faculty Rank
     Units = db.Column(db.Numeric, nullable=False)  # Faculty Unit
+    Name = db.Column(db.String(50), nullable=False)  # Name
     FirstName = db.Column(db.String(50), nullable=False)  # First Name
     LastName = db.Column(db.String(50), nullable=False)  # Last Name
     MiddleName = db.Column(db.String(50))  # Middle Name
@@ -96,6 +97,7 @@ class Faculty(db.Model):
             'FacultyType': self.FacultyType,
             'Rank': self.Rank,
             'Units': self.Units,
+            'Name': self.Name,
             'FirstName': self.FirstName,
             'LastName': self.LastName,
             'MiddleName': self.MiddleName,
@@ -124,11 +126,9 @@ class SystemAdmin(db.Model):
     __tablename__ = 'SPSSystemAdmin'
 
     SysAdminId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) # Students Reference
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), primary_key=True) # Students Reference
     SysAdminNumber = db.Column(db.String(30), unique=True)  # UserID
-    FirstName = db.Column(db.String(50), nullable=False)  # First Name
-    LastName = db.Column(db.String(50), nullable=False)  # Last Name
-    MiddleName = db.Column(db.String(50))  # Middle Name
+    Name = db.Column(db.String(50), nullable=False)  # Name
     Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     Password = db.Column(db.String(256), nullable=False)  # Password
     Gender = db.Column(db.Integer)  # Gender
@@ -145,9 +145,7 @@ class SystemAdmin(db.Model):
             'SysAdminId': self.SysAdminId,
             'FacultyId': self.FacultyId,
             'SysAdminNumber': self.SysAdminNumber,
-            'FirstName': self.FirstName,
-            'LastName': self.LastName,
-            'MiddleName': self.MiddleName,
+            'Name': self.Name,
             'Email': self.Email,
             'Password': self.Password,
             'Gender': self.Gender,
@@ -333,22 +331,19 @@ class Services(db.Model):
     
     ServiceId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
-    FacultyId =db.Column(db. Integer, db.ForeignKey('FISFaculty.FacultyId'))
-    ServiceType = db.Column(db.String(100))
-    ServiceDetails = db.Column(db.String(255))
-    ServicesImg = db.Column(db.LargeBinary)
-    Servicesdata = db.Column(db.LargeBinary)  # Store binary data for the file
+    ServiceType = db.Column(db.String(20))
+    ServiceDetails = db.Column(db.String(20))
+    FileAttachment = db.Column(db.String(50))
+    PaymentFile = db.Column(db.String(50))
     Status = db.Column(db.String(20))
     
     def to_dict(self):
         return {
             'ServiceId': self.ServiceId,
             'StudentId': self.StudentId,
-            'FacultyId': self.FacultyId,
             'ServiceType': self.ServiceType,
             'ServiceDetails': self.ServiceDetails,
-            'ServicesImg': self.ServicesImg,
-            'Servicesdata': self.Servicesdata,
+            'FileAttachment': self.FileAttachment,
             'PaymentFile': self.ServiceType,
             'Status': self.Status,
 
@@ -358,15 +353,16 @@ class SubjectList(db.Model):
     __tablename__ = 'SASSClassSubjectList'
     
     SubjectListId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    # StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
     SubjectId = db.Column(db.Integer, db.ForeignKey('SPSSubject.SubjectId'))
     ServiceId = db.Column(db.Integer, db.ForeignKey('SASSServices.ServiceId'))
+    Status = db.Column(db.String(20))
     
     def to_dict(self):
         return {
             'SubjectListId': self.SubjectListId,
+            'StudentId': self.StudentId,
             'SubjectId': self.SubjectId,
-            'ServiceId': self.ServiceId,
             # Add other attributes if needed
         }
         
@@ -458,8 +454,8 @@ def init_db(app):
     db.init_app(app)
     
     if add_data=='True':
-        # from data.student import student_data #done
-        # from data.faculty import faculty_data #done
+        # from data.student import student_data
+        # from data.faculty import faculty_data
         # from data.universityadmin import university_admin_data # NOT IN MODELS
         # from data.systemadmin import system_admin_data
         # from data.course import course_data

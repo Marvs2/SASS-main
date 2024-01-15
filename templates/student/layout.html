@@ -76,20 +76,20 @@
 			<li>
 				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
 				<ul class="side-dropdown">
-					<li><a href="{{url_for('studentoverload')}}">Overload of Subjects</a></li>
-					<li><a href="{{ url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
-					<li><a href="{{url_for('studentchange')}}">Change of Schedule/Subjects</a></li>
-					<li><a href="{{url_for('studentcorrection')}}">Correction of Grade Entry</a></li>
-					<li><a href="{{url_for('studentenrollment')}}">Cross-Enrollment</a></li>
-					<li><a href="{{url_for('studentshifting')}}">Application for Shifting</a></li>
-					<li><a href="{{url_for('studentmanualenrollment')}}">Manual Enrollment</a></li>
-					<li><a href="{{url_for('studentpetition')}}"> Online Petition of Subjects</a></li>
-					<li><a href="{{url_for('studenttutorial')}}">Online Request for Tutorial</a></li>
-					<li><a href="{{url_for('studentcertification')}}">Request for Certification</a></li>
+					<li><a href="{{url_for('student_adding_subjects')}}">Overload of Subjects</a></li>
+					<li><a href="{{url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
+					<li><a href="#">Change of Schedule/Subjects</a></li>
+					<li><a href="#">Correction of Grade Entry</a></li>
+					<li><a href="#">Cross-Enrollment</a></li>
+					<li><a href="#">Application for Shifting</a></li>
+					<li><a href="#">Manual Enrollment</a></li>
+					<li><a href="#"> Online Petition of Subjects</a></li>
+					<li><a href="#">Online Request for Tutorial</a></li>
+					<li><a href="#">Request for Certification</a></li>
 
 				</ul>
 			</li>
-			<li><a href="{{url_for('student_history')}}"><i class='bx bx-history icon' ></i>Transaction History</a></li>
+			<li><a href="#"><i class='bx bx-history icon' ></i>Transaction History</a></li>
 
 		<!--	<li class="divider" data-text="Complaints">Complaints</li>
 			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
@@ -272,7 +272,6 @@
   <script>
     // STUDENT API
     const api_base_url = '{{ student_api_base_url | default("") }}';
-    console.log('api_base_url: ', api_base_url);
 
     // Function to close the notification card
     function closeNotificationCard() {
@@ -329,40 +328,43 @@
         console.error('Error fetching student details:', error.message);
     }
 }
-
     fetchStudentDetails()
       function displayDetails(data){
-        // Select the name input and set the value to data.studentName //.innerHTML
-        document.getElementById("Name").value = data.Name
+        // Concatenate the first name, middle name, and last name to form the full name
+    const fullName = `${data.FirstName} ${data.MiddleName ? data.MiddleName + ' ' : ''}${data.LastName}`;
+
+// Select the Name input and set the value to the full name
+document.getElementById("Name").value = fullName;
+
+// ... (other code remains unchanged)
+// Update label to display full name
+// document.getElementById('name-label').innerText = fullName;
+
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById("StudentNumber").value = data.StudentNumber;
         // Select the Gender and set the value to data.Gender
         document.getElementById("Gender").value = data.Gender;
         // Select the Email and set the value to data.Email
         document.getElementById("Email").value = data.Email;
-        // Select the address and set the value to data.address
-        document.getElementById("address").value = data.address;
-        // Select the dateOfBirth and set the value to data.dateOfBirth
-        const dateOfBirthInput = document.getElementById("DateofBirth");
+        // Select the ResidentialAddress and set the value to data.ResidentialAddress
+        document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+        // Select the DateOfBirth and set the value to data.DateOfBirth
+        const DateOfBirthInput = document.getElementById("DateOfBirth");
 
       // Format the date to display only the birthday
-      const formattedDateOfBirth = new Date(data.DateofBirth).toLocaleDateString('en-US', {
+      const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
       });
 
-      // Set the formatted date to the DateofBirth input
-      dateOfBirthInput.value = formattedDateOfBirth;
+      // Set the formatted date to the DateOfBirth input
+      DateOfBirthInput.value = formattedDateOfBirth;
 
-        // Select the placeOfBirth and set the value to data.placeOfBirth
-        document.getElementById("PlaceofBirth").value = data.PlaceofBirth;
-        // Select the ResidentialAddress and set the value to data.ResidentialAddress
-        //document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+        // Select the PlaceOfBirth and set the value to data.PlaceOfBirth
+        document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
         // Select the MobileNumber and set the value to data.MobileNumber
         document.getElementById("MobileNumber").value = data.MobileNumber;
-
-        document.getElementById('name-label').innerText = data.studentName; 
       }
          
       // DATEPICKER FUNCTION

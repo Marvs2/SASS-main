@@ -1,19 +1,15 @@
 # api/api_routes.py
 import base64
-import logging
-from operator import and_
-
-from sqlalchemy import desc, func
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import CourseEnrolled, Services, SubjectList, db, Class, ClassSubject, Course, Metadata, Student, StudentClassSubjectGrade, Subject
+"""from models import AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, TutorialRequest"""
+from models import Student
 from werkzeug.utils import secure_filename
 from datetime import datetime #, timedelta, timezone
 #from models import Services
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS 
-from decorators.auth_decorators import role_required
 
 import os
 
@@ -61,16 +57,6 @@ def getCurrentUserStudentNumber():
     current_student_number = session.get('StudentNumber')
     return Student.query.get(current_student_number)
 
-def get_student_number_by_id(StudentId):
-    # Query the database for the student using filter_by
-    student = Student.query.filter_by(StudentId=StudentId).first()
-
-    # Check if the student exists and return the StudentNumber
-    if student:
-        return student.StudentNumber
-    else:
-        # Return None if no student is found
-        return None
 #===============================================================#
 #Downloadable files for Adding Subjects
 @student_api.route('/download/pdf_file/Adding_subject_form')
@@ -543,26 +529,27 @@ def updateStudentDetails():
 #================================================================================#
 #applicable to all the applications if you want student
 @student_api.route('/student-details', methods=['GET'])
-@role_required('student')
 def fetchStudentDetails():
     user_id = session.get('user_id')
 
     student = Student.query.get(user_id)
 
     if student:
+        # Convert userImg to base64 string
+        user_img_base64 = base64.b64encode(student.userImg).decode('utf-8')
+
         Gender_string = get_Gender_string(student.Gender)
 
         return jsonify({
-            'FirstName': student.FirstName,
-            'LastName': student.LastName,
-            'MiddleName': student.MiddleName,
-            'StudentNumber': student.StudentNumber,
-            'Gender': Gender_string,
-            'Email': student.Email,
-            'ResidentialAddress': student.ResidentialAddress,
-            'DateOfBirth': student.DateOfBirth,
-            'PlaceOfBirth': student.PlaceOfBirth,
+            'Name': student.Name,
+            "StudentNumber": student.StudentNumber,
+            "Gender": Gender_string,
+            "Email": student.Email,
+            "address": student.address,
+            "DateofBirth": student.DateofBirth,
+            "PlaceofBirth": student.PlaceofBirth,
             'MobileNumber': student.MobileNumber,
+            'userImg': user_img_base64,  # Return base64-encoded string
         })
     else:
         flash('User not found', 'danger')
@@ -580,89 +567,628 @@ def allstudent():
 #===============================================================================================#
 #====================================Students Functions=========================================#
 #===============================================================================================#
+
+#overload
+# Create function for OverloadApplication
+def create_overload_application(form_data, files, StudentId):
+    Name = form_data['Name']
+    StudentNumber = form_data['StudentNumber']
+    programcourse = form_data['programcourse']
+    semester = form_data['semester']
+    subjects_to_add = form_data['subjects_To_Add']
+    justification = form_data['justification']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    # Check if a file is provided
+    if 'fileoverload' not in files:
+        flash('No file part', 'danger')
+        return None
+
+    fileoverload = files['fileoverload']
+    # Check if the file field is empty
+    if fileoverload.filename == '':
+        flash('No selected file', 'danger')
+        return None
+
+    file_data = fileoverload.read()  # Read the file data
+    file_filename = secure_filename(fileoverload.filename)
+
+    # Additional validation logic can be added here
+
+    # Check if any of the required fields is empty
+    if not Name or not StudentNumber or not programcourse or not semester or not subjects_to_add:
+        flash('Please fill out all required fields.', 'danger')
+        return None
+
+ #   new_overload_application = OverloadApplication(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        programcourse=programcourse,
+        semester=semester,
+        subjects_to_add=subjects_to_add,
+        justification=justification,
+        file_filename=file_filename,
+        file_data=file_data,
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+        created_at=datetime.utcnow()  # Set created_at to the current timestamp
+  #  )
     
-@student_api.route('/student-subjects', methods=['GET'])
-@role_required('student')
-def fetchStudentSubjects():
-    # Retrieve student ID from the session
-    student_id = session.get('user_id')
+   # return new_overload_application 
+#===============================================================================================#
 
-    if student_id is None:
-        return jsonify({'error': 'User not authenticated'}), 401
+#crossenrollment
+def create_crossenrollment_form(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    school_for_cross_enrollment = form_data['school_for_cross_enrollment']
+    total_number_of_units = int(form_data['total_number_of_units'])
+    authorized_subjects_to_take = form_data['authorized_subjects_to_take']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
 
-    # Get current subjects for the student
-    subjects = (
-        db.session.query(Subject)
-        .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
-        .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .distinct(Subject.SubjectId)
-        .all()
+    if not StudentNumber or not Name or not school_for_cross_enrollment or not authorized_subjects_to_take:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    files = request.files
+
+    # Check if 'fileTutorial' is provided
+    if 'applicationLetter' not in files:
+        flash('Please provide the tutorial file.', 'danger')
+        return None
+
+    applicationLetter = files['applicationLetter']
+
+    # Check if 'permitToCrossEnroll' is provided
+    if 'permitToCrossEnroll' not in files:
+        flash('Please provide the second file.', 'danger')
+        return None
+
+    permitToCrossEnroll = files['permitToCrossEnroll']
+
+    # Check if fileTutorial is provided and has a filename
+    if applicationLetter.filename == '':
+        flash('No selected tutorial file', 'danger')
+        return None
+
+    # Read the file data for fileTutorial
+    application_letter_data = applicationLetter.read()
+    application_letter_filename = secure_filename(applicationLetter.filename)
+
+    # Check if permitToCrossEnroll is provided and has a filename
+    if permitToCrossEnroll.filename == '':
+        flash('No selected second file', 'danger')
+        return None
+
+    # Read the file data for permitToCrossEnroll
+    permit_to_cross_enroll_data = permitToCrossEnroll.read()
+    permit_to_cross_enroll_filename = secure_filename(permitToCrossEnroll.filename)
+
+"""    new_cross_enrollment = CrossEnrollment(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        school_for_cross_enrollment=school_for_cross_enrollment,
+        total_number_of_units=total_number_of_units,
+        authorized_subjects_to_take=authorized_subjects_to_take,
+        application_letter_filename=application_letter_filename,
+        application_letter_data=application_letter_data,
+        permit_to_cross_enroll_filename=permit_to_cross_enroll_filename,
+        permit_to_cross_enroll_data=permit_to_cross_enroll_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),  # Set the creation time
+        StudentId=StudentId,  # Pass the StudentId from the login
     )
 
-    # Convert the result to a list of dictionaries
-    subject_list = [
-        {
-            'SubjectId': subject.SubjectId,
-            'SubjectCode': subject.SubjectCode,
-            'Name': subject.Name,
-            'Credits': subject.Credits,
-            # Add more fields as needed
-        }
-        for subject in subjects
-    ]
+    return new_cross_enrollment 
 
-    return jsonify(subject_list)
+#===============================================================================================#
 
+#manualenrollment
+# Manual Enrollment Form function
+def create_manualenrollment_form(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    enrollment_type = form_data['enrollmentType']
+    reason = form_data['reason']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
 
+    if 'me_file' not in files:
+        flash('Please provide the tutorial file.', 'danger')
+        return None
 
-#================================================================================#
-#functions
-def create_services_application(form_data, files, StudentId, FacultyId):
-    ServiceType = 'add_subject'
-    ServiceDetails = form_data.get('serviceDetails', '')
+    me_file = files['me_file']
+
+    if me_file.filename == '':
+        flash('No Selected me_file', 'danger')
+        return None
     
-    subjectIDs = form_data.getlist('subjectIDs')
-    subjectIDs = [int(id) for id in subjectIDs]  # Convert to integers
+    me_file_filename = secure_filename(me_file.filename)
+    me_file_data = me_file.read()
+    
+    if not StudentNumber or not Name or not enrollment_type or not reason:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
 
-    ServicesImg = files.get('servicesImg')
-    Servicesdata = files.get('servicesdata')
+    me_file_filename = secure_filename(me_file.filename)
+    me_file_data = me_file.read()
 
-    ServicesImg_data = ServicesImg.read() if ServicesImg else None
-    Servicesdata_data = Servicesdata.read() if Servicesdata else None
+    new_manual_enrollment = ManualEnrollment(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        enrollment_type=enrollment_type,
+        reason=reason,
+        me_file_filename=me_file_filename,
+        me_file_data=me_file_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),
+        StudentId=StudentId,
+    )
 
-    # Add additional validations as needed
-    Status = 'pending'
-    try:
-        new_service_application = Services(
-            StudentId=StudentId,
-            FacultyId=FacultyId,
-            ServiceType=ServiceType,
-            ServiceDetails=ServiceDetails,
-            ServicesImg=ServicesImg_data,
-            Servicesdata=Servicesdata_data,
-            Status=Status,
-        )
-        db.session.add(new_service_application)
-        db.session.commit()
-        db.session.refresh(new_service_application)
+    return new_manual_enrollment
 
-        created_service_id = new_service_application.ServiceId
-        for subjectID in subjectIDs:
-            subject_list_entry = SubjectList(
-                SubjectId=subjectID,
-                ServiceId=created_service_id
-            )
-            db.session.add(subject_list_entry)
-        # Commit the new SubjectList entries to the database
-        db.session.commit()
-    except Exception as e:
-        # Rollback the transaction in case of an error
-        db.session.rollback()
-        print(f'An error occurred: {e}')
-        # Optionally, re-raise the exception if you want it to be handled further up the call stack
-        raise e
+#========================================Change of Subjects============================#
+
+def create_addsubjects_application(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    subject_Names = form_data['subject_Names']
+    enrollment_type = form_data['enrollment_type']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    if 'filesubject' not in files:
+        flash('Please provide the Subjects file.', 'danger')
+        return None
+
+    filesubject = files['filesubject']
+
+    if filesubject.filename == '':
+        flash('No selected file', 'danger')
+        return None
+    
+    file_data = filesubject.read()  # Read the file data
+    file_name = secure_filename(filesubject.filename) 
+    # Check if other inputs are provided
+
+    if not StudentNumber or not Name or not subject_Names or not enrollment_type:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None  # Replace 'add_subjects' with the actual route
+
+    # Log the form submission
+    #log_form_submission_to_file(form_data)
+    # Additional validation logic can be added here
+
+    new_addsubjects_application = AddSubjects(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        subject_Names=subject_Names,
+        enrollment_type=enrollment_type,
+        file_data=file_data,
+        file_name=file_name,
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+    )
+    
+    return new_addsubjects_application
+    
+#=========================================================#
+
+#changeofsubjects
+# Change Subjects Form function
+def create_changesubjects_application(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    enrollment_type = form_data['enrollment_type']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    ace_form = files.get('ace_form')
+
+    if not StudentNumber or not Name or not enrollment_type:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    if not ace_form:
+        flash('Please provide the manual enrollment file.', 'danger')
+        return None
+
+    ace_form_filename = secure_filename(ace_form.filename)
+    ace_form_data = ace_form.read()
+
+    new_changesubjects_application = ChangeOfSubjects(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        enrollment_type=enrollment_type,
+        ace_form_filename=ace_form_filename,
+        ace_form_data=ace_form_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),
+        StudentId=StudentId,
+    )
+
+    return new_changesubjects_application
+
+#=====================================Petition Requests==============================================#
+
+def create_petitionrequest_form(form_data, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    subject_code = form_data['subject_code']
+    subject_name = form_data['subject_name']
+    petition_type = form_data['petition_type']
+    request_reason = form_data['request_reason']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    if not StudentNumber or not Name or not subject_code or not subject_name or not petition_type or not request_reason:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    new_petition_request = PetitionRequest(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        subject_code=subject_code,
+        subject_name=subject_name,
+        petition_type=petition_type,
+        request_reason=request_reason,
+        user_responsible=user_responsible,
+        created_at=datetime.utcnow(),
+        status=status,
+        StudentId=StudentId,
+    )
+
+    return new_petition_request
+
+#=================================================Grade entry========================================#
+
+def create_gradeentry_application(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    application_type = form_data['application_type']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    files = request.files
+     # Check if a file is provided
+    if 'completion_form' not in files:
+        flash('No file part', 'danger')
+        return None
+
+    completion_form = files['completion_form']
+    # Check if the file field is empty
+    if completion_form.filename == '':
+        flash('No selected file', 'danger')
+        return None
+
+    completion_form_data = completion_form.read()  # Read the file data
+    completion_form_filename = secure_filename(completion_form.filename)
+#==========================================================#
+     # Check if a file is provided
+    if 'class_record' not in files:
+        flash('No file part', 'danger')
+        return None
+
+    class_record = files['class_record']
+    # Check if the file field is empty
+    if class_record.filename == '':
+        flash('No selected file', 'danger')
+        return None
+
+    class_record_data = class_record.read()  # Read the file data
+    class_record_filename = secure_filename(class_record.filename)
+#==========================================================#
+     # Check if a file is provided
+    if 'affidavit' not in files:
+        flash('No file part', 'danger')
+        return None
+
+    affidavit = files['affidavit']
+    # Check if the file field is empty
+    if affidavit.filename == '':
+        flash('No selected file', 'danger')
+        return None
+
+    affidavit_data = affidavit.read()  # Read the file data
+    affidavit_filename = secure_filename(affidavit.filename)
+
+            # Check if a other input is provided
+    if not StudentNumber or not Name or not application_type:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None  # Replace 'add_subjects' with the actual route
+
+    if not completion_form or not class_record or not affidavit:
+        flash('Please provide both application letter and permit to cross-enroll files.', 'danger')
+        return None
 
 
-    return new_service_application
+    new_gradeentry_application = GradeEntry(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        application_type=application_type,
+        completion_form_filename=completion_form_filename,
+        completion_form_data=completion_form_data,
+        class_record_filename=class_record_filename,
+        class_record_data=class_record_data,
+        affidavit_filename=affidavit_filename,
+        affidavit_data=affidavit_data,
+        user_responsible=user_responsible,
+        status=status,
+        created_at=datetime.utcnow(),  # Set the creation time
+        StudentId=StudentId,  # Pass the StudentId from the login
+    )
+
+    return new_gradeentry_application
+
+
+#====================================Certificate Requests============================================#
+#====================================================================================================#
+
+
+def create_certification_request(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    certification_type = form_data['certification_type']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    # Required file checks
+    for field_name in ['request_form', 'identification_card']:
+        if field_name not in files or files[field_name].filename == '':
+            flash(f'No file provided for {field_name}', 'danger')
+            return None
+
+    request_form = files['request_form']
+    identification_card = files['identification_card']
+
+    # Reading file data
+    request_form_data = request_form.read()
+    request_form_filename = secure_filename(request_form.filename)
+    identification_card_data = identification_card.read()
+    identification_card_filename = secure_filename(identification_card.filename)
+
+    is_representative = 'is_representative' in form_data and form_data['is_representative'] == 'on'
+
+    # Representative file checks
+    authorization_letter_data = authorization_letter_filename = None
+    representative_data = representative_filename = None
+
+    if is_representative:
+        if 'authorization_letter' not in files or files['authorization_letter'].filename == '':
+            flash('Authorization letter is required for representatives', 'danger')
+            return None
+
+        if 'representative_file' not in files or files['representative_file'].filename == '':
+            flash('Representative ID is required for representative_file', 'danger')
+            return None
+
+        authorization_letter = files['authorization_letter']
+        representative_file = files['representative_file']
+
+        authorization_letter_data = authorization_letter.read()
+        authorization_letter_filename = secure_filename(authorization_letter.filename)
+        representative_data = representative_file.read()
+        representative_filename = secure_filename(representative_file.filename)
+
+    # Create CertificationRequest instance
+    new_certification_request = CertificationRequest(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        certification_type=certification_type,
+        request_form_filename=request_form_filename,
+        request_form_data=request_form_data,
+        identification_card_filename=identification_card_filename,
+        identification_card_data=identification_card_data,
+        is_representative=is_representative,
+        authorization_letter_filename=authorization_letter_filename,
+        authorization_letter_data=authorization_letter_data,
+        representative_filename=representative_filename,
+        representative_data=representative_data,
+        created_at=datetime.utcnow(),
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+    )
+
+    return new_certification_request
+
+
+#===============================================================================================#
+def create_shifting_application(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    current_program = form_data['currentProgram']
+    residency_year = form_data['residencyYear']
+    intended_program = form_data['intendedProgram']
+    qualifications = form_data['qualifications']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    if 'fileshifting' not in files:
+        flash('Please provide the shifitng file.', 'danger')
+        return None
+
+    fileshifting = files['fileshifting']
+
+    if fileshifting.filename == '':
+        flash('No selected file', 'danger')
+        return None
+    
+    file_data = fileshifting.read()  # Read the file data
+    file_filename = secure_filename(fileshifting.filename) 
+    # Check if other inputs are provided
+
+    if not StudentNumber or not Name or not current_program or not residency_year:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None  # Replace 'add_subjects' with the actual route
+
+    # Additional validation logic can be added here
+
+    new_shifting_application = ShiftingApplication(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        current_program=current_program,
+        residency_year=residency_year,
+        intended_program=intended_program,
+        qualifications=qualifications,
+        file_filename=file_filename,
+        file_data=file_data,
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+    )
+    
+    return new_shifting_application
+
+
+#======================================================================#
+# tutorial
+def create_tutorial_request(form_data, files, StudentId):
+    StudentNumber = form_data['StudentNumber']
+    Name = form_data['Name']
+    subject_code = form_data['subjectCode']
+    subject_name = form_data['subjectName']
+    user_responsible = form_data['user_responsible']
+    status = form_data['status']
+
+    if 'fileTutorial' not in files:
+        flash('Please provide the tutorial file.', 'danger')
+        return None
+
+    fileTutorial = files['fileTutorial']
+
+    if fileTutorial.filename == '':
+        flash('No selected file', 'danger')
+        return None
+    
+    file_data = fileTutorial.read()  # Read the file data
+    file_filename = secure_filename(fileTutorial.filename) 
+    # Check if other inputs are provided
+
+    if not StudentNumber or not Name or not subject_code or not subject_name:
+        flash('Please fill out all fields and provide valid values.', 'danger')
+        return None
+
+    # Additional validation logic can be added here
+
+    new_tutorial_request = TutorialRequest(
+        StudentNumber=StudentNumber,
+        Name=Name,
+        subject_code=subject_code,
+        subject_name=subject_name,
+        file_filename=file_filename,
+        file_data=file_data,
+        created_at=datetime.utcnow(),
+        user_responsible=user_responsible,
+        status=status,
+        StudentId=StudentId,
+    )
+    
+    return new_tutorial_request
+#===============================================================================================#
+#Notification
+def create_notification(StudentNumber, service_type, user_responsible, status, message, StudentId):
+    # Assuming StudentNumber is either part of the form or can be retrieved from the database
+    # using StudentId. The following line is a placeholder for actual retrieval logic.
+    StudentNumber = get_student_number_by_id(StudentId)
+
+    # Create a new Notification object
+    new_notification = Notification(
+        StudentNumber=StudentNumber,
+        service_type=service_type,
+        user_responsible=user_responsible,
+        status=status,
+        message=message,
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow(),
+        StudentId=StudentId
+    )
+
+    return new_notification
+#===============================================================================================#
+
+
+
+#===============================================================================================#
+#===============================Semester, Program, YearLevel====================================#
+#===============================================================================================#
+
+
+
+# Insert function for Program
+def insert_program(form_data):
+    # Get the form data
+    programCode = form_data['programCode']
+    programName = form_data['programName']
+
+    new_program = Program(
+        programCode=programCode,
+        programName=programName,
+    )
+    return new_program
+
+# Insert function for YearLevel
+def insert_year_level(form_data):
+
+        # Get the form data
+    yearLevel = form_data['yearLevel']
+    #programId = form_data['programId']
+
+    new_year_level = YearLevel(
+        yearLevel=yearLevel,
+       # programId=programId,
+    )
+    return new_year_level
+
+# Insert function for Semester
+def insert_semester(form_data):
+    semesterName = form_data['semesterName']
+    
+    new_semester = Semester(
+        semesterName=semesterName, 
+    #yearId=yearId
+    )
+    
+    return new_semester
+
+# Insert function for CourseSub
+def insert_course_sub(form_data):
+
+    courseSub_Code = form_data['courseSub_Code']
+    Sub_Description = form_data['Sub_Description']
+
+    new_course_sub = CourseSub(
+        courseSub_Code=courseSub_Code, Sub_Description=Sub_Description,
+    )
+    return new_course_sub
+"""
+
+
+
+
+def get_student_number_by_id(StudentId):
+    # Query the database for the student using filter_by
+    student = Student.query.filter_by(StudentId=StudentId).first()
+
+    # Check if the student exists and return the StudentNumber
+    if student:
+        return student.StudentNumber
+    else:
+        # Return None if no student is found
+        return None
+
+
+
+
+
+
+
+
+

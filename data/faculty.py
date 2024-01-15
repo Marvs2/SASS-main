@@ -7,7 +7,6 @@ faculty_data = [
         'FacultyType': 'Professor',
         'Rank': 'Associate Professor',
         'Units': 3.5,
-        'Name': 'John Doe',
         'FirstName': 'John',
         'LastName': 'Doe',
         'MiddleName': 'Alexander',
@@ -31,7 +30,6 @@ faculty_data = [
         'FacultyType': 'Instructor',
         'Rank': 'Assistant Professor',
         'Units': 2.0,
-        'Name': 'Jane Smith',
         'FirstName': 'Jane',
         'LastName': 'Smith',
         'BirthDate': '1985-08-10',
@@ -49,7 +47,6 @@ faculty_data = [
         'FacultyType': 'Lecturer',
         'Rank': 'Full Professor',
         'Units': 4.0,
-        'Name': 'Robert Johnson',
         'FirstName': 'Robert',
         'LastName': 'Johnson',
         'BirthDate': '1990-01-05',
@@ -66,7 +63,6 @@ faculty_data = [
         'FacultyType': 'Professor',
         'Rank': 'Full Professor',
         'Units': 4.0,
-        'Name': 'Emily White',
         'FirstName': 'Emily',
         'LastName': 'White',
         'BirthDate': '1975-03-25',
@@ -84,7 +80,6 @@ faculty_data = [
         'FacultyType': 'Instructor',
         'Rank': 'Lecturer',
         'Units': 1.5,
-        'Name': 'Michael Turner',
         'FirstName': 'Michael',
         'LastName': 'Turner',
         'BirthDate': '1988-07-18',
@@ -99,4 +94,3 @@ faculty_data = [
         'Password': generate_password_hash('Faculty123')
     },
 ]
-

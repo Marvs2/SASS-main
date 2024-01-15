@@ -1,201 +1,453 @@
-{% extends "student/layout.html" %}
-{% block content %}
-
-<!-------------------------------- DISPLAY ALL THE SUBJECTS TAKEN BY THE STUDENTS ---------------------------------------------->
-
-<div class="data data1" id="applicationSection">
-    <div class="content-data">
+{% extends "student/layout.html" %} {% block content %}
+<style>
+  .custom-container {
+    display: flex;
+  }
+  table {
+    width: 25%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+</style>
+<h2>
+  Student Class Data of
+  <input
+    type="text"
+    class="form-control"
+    name="Name"
+    id="Name"
+    required="required"
+    class="form-control"
+    disabled
+  />
+</h2>
+<div class="custom-container">
+  <div class="col-md-6">
+    <div class="data data1" id="applicationSection">
+      <div class="content-data">
         <div class="head">
-            <h3>My Subjects</h3>
+          <h3>
+            Course Code: {% if course %}
+            <p>{{ course.CourseCode }}</p>
+            {% endif %}
+          </h3>
         </div>
 
-        <table id="addingSubject1" class="table table-bordered table-condensed mb-5">
+        <form
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+          class="application-form"
+        >
+          <table
+            id="addingSubject"
+            class="table table-bordered table-condensed"
+          >
             <thead>
-                <tr>
-                    <th>Subject Code</th>
-                    <th>Description</th>
-                    <th>Section</th>
-                    <th>Units</th>
-                    <th>Schedule</th>
-                </tr>
+              <tr>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Description</th>
+                <th>Units</th>
+              </tr>
             </thead>
             <tbody>
-                <!-- ACTUAL ROUTE OR LOGIC  -->
-                <tr>
-                    <td>EDUC 2153</td>
-                    <td>Measurement and Evaluation</td>
-                    <td>BBTEIT 4-1N</td>
-                    <td>3</td>
-                    <td>T 02:30PM - 05:30PM N316</td>
-                </tr>
-
-                <!-- ENDFOR -->
+              <!-- Loop through subjects to display -->
+              {% for subject in subject_list %}
+              <tr
+                data-subject-code="{{ subject.SubjectCode }}"
+                data-subject-description="{{ subject.Name }}"
+                data-Description="{{ subject.Description }}"
+                data-Units="{{ subject.Units }}"
+                data-IsNSTP="{{ subject.IsNSTP }}"
+              >
+                <td>{{ subject['SubjectCode'] }}</td>
+                <td>{{ subject['Name'] }}</td>
+                <td>{{ subject['Description'] }}</td>
+                <td>{{ subject['Units'] }}</td>
+              </tr>
+              {% endfor %}
+              <!-- ENDFOR -->
             </tbody>
-        </table>
-
-        <div class="d-flex justify-content-center">
-            <button type="button" id="addSubjectsButton" class="btn btn-primary">Add Subject?</button>
-        </div>
-    </div>
-</div>
-
-
-<!-------------------------------- STUDENT CAN CHOOSE THE SUBJECT HE/SHE WANTS TO TAKE ---------------------------------------------->
-
-<div class="data data1" id="addSubjectsSection">
-    <div class="content-data">
-        <div class="head">
-            <h3>Application for Adding of Subjects</h3>
-        </div>
-        <form action="{{ url_for('add_subjects') }}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()" class="application-form">
-            <table id="addingSubject2" class="table table-bordered table-condensed">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Subject Code</th>
-                        <th>Subject Description</th>
-                        <th>Section</th>
-                        <th>Units</th>
-                        <th>Schedule</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr data-subject-code="EDUC 2153" 
-                        data-subject-description="Measurement and Evaluation" 
-                        data-section="BBTEIT 4-1N" 
-                        data-units="3" 
-                        data-schedule="T 02:30PM - 05:30PM N316">
-                        <td>
-                            <div class="custom-control custom-checkbox">
-                                <input type="checkbox" title="checkbox" class="custom-control-input" id="customCheck1">
-                                <label class="custom-control-label" for="customCheck1"></label>
-                            </div>
-                        </td>
-                        <td>EDUC 2153</td>
-                        <td>Measurement and Evaluation</td>
-                        <td>BBTEIT 4-1N</td>
-                        <td>3</td>
-                        <td>T 02:30PM - 05:30PM N316</td>
-                        <td>
-                            <button type="button" title="View Info" class="btn btn-primary fa-solid fa-edit edit_btn" data-toggle="modal" data-target="#viewoverloadModal"></button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-center">
-                <button type="button" id="addSubjectButton" class="btn btn-success" data-toggle="modal" data-target="#addSubjectModal">Add Subject</button>
-                <!-- <a href="{{ url_for('viewaddsubject') }}">View AddSubject</a> -->
-            </div>
+          </table>
         </form>
+      </div>
     </div>
-</div>
-
-<!----------------------------- MODAL TO SHOW THE SUBJECT THAT THE STUDENTS WANT TO TAKE ----------------------------------->
-
-<div class="modal fade" id="addSubjectModal" tabindex="-1" role="dialog" aria-labelledby="addSubjectModal" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-white" id="viewaddSubjectModal">Review Add Subjects</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span class="btn-wrong" aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body view">
-                <div class="form-group">
-                    <label class="col-sm-4 control-label">Subject Code:</label>
-                    <div class="col-sm-4">
-                        <p id="subjectCode"></p>
-                    </div>          
-                  </div>
-                  
-    
-                  <div class="form-group">
-                    <label class="col-sm-4 control-label">Subject Description:</label>
-                    <div class="col-sm-4">
-                        <p id="subjectDescription"></p>
-                        
-                    </div>           
-                  </div>
-                 
-    
-                  <div class="form-group">
-                    <label class="col-sm-4 control-label">Section:</label>
-                    <div class="col-sm-4">
-                        <p id="section"></p>
-                    </div>           
-                  </div>
-                 
-    
-                  <div class="form-group">
-                    <label class="col-sm-4 control-label">Units:</label>
-                    <div class="col-sm-4">
-                        <p id="units"></p>
-                    </div>           
-                  </div>
-    
-                  <div class="form-group">
-                    <label class="col-sm-4 control-label">Schedule:</label>
-                    <div class="col-sm-4">
-                        <p id="schedule"></p>
-                    </div>           
-                  </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" data-dismiss="modal">Submit</button>
-            </div>
+  </div>
+  <div class="col-md-6">
+    <div class="data data1" id="futureSubjectSection">
+      <div class="content-data">
+        <div class="head">
+          <h3>
+            My Courses: {% if course %} {{ course.CourseCode }} {% endif %}
+          </h3>
         </div>
+
+        <form
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+          class="application-form"
+        >
+          <table
+            id="futureSubject1"
+            class="table table-bordered table-condensed"
+          >
+            <thead>
+              <tr>
+                <th>Check box</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Units</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Loop through selections to display -->
+              {% for selections in selection_list %}
+              <tr
+                data-subject-code="{{ selections.SubjectCode }}"
+                data-subject-description="{{ selections.Name }}"
+                data-Description="{{ selections.Description }}"
+                data-Units="{{ selections.Units }}"
+              >
+                <td>
+                  <div class="custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input selections-checkbox"
+                      id="checkbox{{ selections.SubjectId }}"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="checkbox{{ selections.SubjectId }}"
+                    ></label>
+                  </div>
+                </td>
+                <td>{{ selections['SubjectCode'] }}</td>
+                <td>{{ selections['Name'] }}</td>
+                <td>{{ selections['Units'] }}</td>
+              </tr>
+              {% endfor %}
+              <!-- ENDFOR -->
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-center">
+            <button
+              type="button"
+              id="futureSubjectsButton"
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#subjectModal"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 </div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="subjectModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="subjectModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="subjectModalLabel">Request Service</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Form to submit selected subjects and service request -->
+        <form
+          id="serviceRequestForm"
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
+          <input
+            type="hidden"
+            name="StudentId"
+            value="{{ session['user_id'] }}"
+          />
+
+          <!-- Dropdown for selecting Faculty -->
+          <div class="form-group">
+            <label for="FacultyId">Select Faculty:</label>
+            <select class="form-control" id="FacultyId" name="FacultyId">
+              <!-- Assuming you have a list of faculties in `faculties` -->
+              <option value="1">Professor</option>
+              <option value="2">CDO</option>
+              <option value="3">Head Academic</option>
+              <option value="4">Director</option>
+              <option value="5">Registrar</option>
+            </select>
+          </div>
+
+          <!-- Service Details -->
+          <div class="form-group">
+            <label for="ServiceDetails">Service Details:</label>
+            <textarea
+              class="form-control"
+              id="ServiceDetails"
+              name="ServiceDetails"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- File Uploads -->
+          <div class="form-group">
+            <label for="ServicesImg">Upload Image:</label>
+            <input
+              type="file"
+              class="form-control-file"
+              id="ServicesImg"
+              name="ServicesImg"
+              accept="image/jpeg, image/png, image/gif"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="Servicesdata">Upload File:</label>
+            <input
+              type="file"
+              class="form-control-file"
+              id="Servicesdata"
+              name="Servicesdata"
+              accept=".docx, .pdf, .xls, .xlsx"
+            />
+          </div>
+
+          <!-- Updated Submit button with onclick event -->
+          <button
+            type="button"
+            id="futureSubjectsButton"
+            class="btn btn-primary"
+            data-toggle="modal"
+            data-target="#subjectModal"
+            onclick="logUserDetails()"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- <div class="modal fade" id="subjectModal" tabindex="-1" role="dialog" aria-labelledby="subjectModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="subjectModalLabel">Selected Subjects</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      Form to submit selected subjects
+      <form id="subjectForm" action="{{url_for('submitapplication')}}" method="POST" enctype="multipart/form-data">
+        <div id="selectedSubjectsList"></div>
+        <div class="form-group">
+          <label for="FacultyId">Faculty ID:</label>
+          <input type="text" class="form-control" id="FacultyId" name="FacultyId" required>
+        </div>
+
+        Inputs for files and images
+        <div class="form-group">
+          <label for="ServicesImg">Image:</label>
+          <input type="file" class="form-control-file" id="ServicesImg" name="ServicesImg">
+        </div>
+
+        <div class="form-group">
+          <label for="Servicesdata">Document:</label>
+          <input type="file" class="form-control-file" id="Servicesdata" name="Servicesdata">
+        </div>
+
+        <div class="form-group">
+          <label for="Servicesname">Service Name:</label>
+          <input type="text" class="form-control" id="Servicesname" name="Servicesname">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Selected Subjects</button>
+      </form>
+    </div>
+  </div>
+</div>
+</div> -->
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var addSubjectsButton = document.getElementById("addSubjectsButton");
-        var applicationSection = document.getElementById("applicationSection");
-        var addSubjectsSection = document.getElementById("addSubjectsSection");
+  // Define the maximum number of units allowed
+  var maxUnits = 6;
+  // Object to keep track of selected subjects and their units
+  var selectedSubjects = {};
+  // Variable to keep track of the total units selected
+  var totalUnits = 0;
 
-        addSubjectsButton.addEventListener("click", function () {
-            applicationSection.style.display = "none";
-            addSubjectsSection.style.display = "block";
-        });
+  // Function to update the state of checkboxes and the submit button
+  function updateSelectionState() {
+    var remainingUnits = maxUnits - totalUnits;
+    // Update the display for remaining units
+    $("#remainingUnits").text("Remaining Units: " + remainingUnits);
 
-        var addSubjectButton = document.getElementById("addSubjectButton");
-        addSubjectButton.addEventListener("click", function () {
-            displaySelectedSubject();
-        });
+    // Disable all other checkboxes if the limit is reached
+    $(".selections-checkbox").each(function () {
+      var subjectUnits = parseInt($(this).closest("tr").data("units"));
+      if (totalUnits + subjectUnits > maxUnits && !this.checked) {
+        $(this).prop("disabled", true);
+      } else {
+        $(this).prop("disabled", false);
+      }
+    });
+  }
+
+  // Event handler for checkbox changes
+  $(".selections-checkbox").change(function () {
+    var subjectId = $(this).attr("id").replace("checkbox", "");
+    var units = parseInt($(this).closest("tr").data("units"));
+
+    if (this.checked) {
+      selectedSubjects[subjectId] = units;
+      totalUnits += units;
+    } else {
+      totalUnits -= selectedSubjects[subjectId];
+      delete selectedSubjects[subjectId];
+    }
+
+    updateSelectionState();
+
+    // Update the selected subjects list in the modal
+    updateSelectedSubjectsList();
+  });
+
+  // Function to log user details
+  function logUserDetails() {
+    // Access and log form inputs
+    var facultyId = document.getElementById("FacultyId").value;
+    var serviceDetails = document.getElementById("ServiceDetails").value;
+    var servicesImg = document.getElementById("ServicesImg");
+    var servicesdata = document.getElementById("Servicesdata");
+    // Add more inputs as needed
+    const formData = new FormData();
+
+    // Append each value to the FormData object
+    formData.append("facultyId", facultyId);
+    formData.append("serviceDetails", serviceDetails);
+    Object.keys(selectedSubjects).forEach((subjectId) => {
+      formData.append("subjectIDs", subjectId);
     });
 
-    function displaySelectedSubject() {
-        var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        if (checkboxes.length > 0) {
-            var selectedRow = checkboxes[0].closest('tr');
-            var subjectCode = selectedRow.dataset.subjectCode;
-            var subjectDescription = selectedRow.dataset.subjectDescription;
-            var section = selectedRow.dataset.section;
-            var units = selectedRow.dataset.units;
-            var schedule = selectedRow.dataset.schedule;
-
-            // Update modal content based on the selected subject
-            document.getElementById('subjectCode').innerText = subjectCode;
-            document.getElementById('subjectDescription').innerText = subjectDescription;
-            document.getElementById('section').innerText = section;
-            document.getElementById('units').innerText = units;
-            document.getElementById('schedule').innerText = schedule;
-
-        }
+    // Assuming servicesImg and servicesdata are file inputs
+    // Append files from these inputs to FormData
+    // Append file inputs to FormData if they exist and are under 3MB
+    if (
+      servicesImg &&
+      servicesImg.files[0] &&
+      servicesImg.files[0].size <= 3145728
+    ) {
+      formData.append("servicesImg", servicesImg.files[0]);
+    } else if (servicesImg && servicesImg.files[0]) {
+      alert("Image file is too large. Please upload an image less than 3MB.");
+      return; // Prevent form submission
     }
+
+    if (
+      servicesdata &&
+      servicesdata.files[0] &&
+      servicesdata.files[0].size <= 3145728
+    ) {
+      formData.append("servicesdata", servicesdata.files[0]);
+    } else if (servicesdata && servicesdata.files[0]) {
+      alert("Document file is too large. Please upload a file less than 3MB.");
+      return; // Prevent form submission
+    }
+
+    fetch("/student/addingsubject/submitapplication", {
+      method: "POST",
+      body: formData,
+    })
+      .then((data) => {
+        console.log(data);
+        // window.location.href = 'URL_to_redirect_on_success'; // Replace with your redirect URL
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        if (error.response) {
+          error.response.text().then((text) => {
+            console.log("Server Response:", text);
+          });
+        }
+      });
+
+  }
+
+  // Function to update the selected subjects list in the modal
+  function updateSelectedSubjectsList() {
+    var selectedSubjectsList = $("#selectedSubjectsList");
+    selectedSubjectsList.empty();
+
+    for (var subjectId in selectedSubjects) {
+      var subjectName = $("#checkbox" + subjectId)
+        .closest("tr")
+        .data("subject-description");
+      selectedSubjectsList.append("<p>" + subjectName + "</p>");
+    }
+  }
+
+  // Initialize the remaining units display
+  $(document).ready(function () {
+    var remainingUnitsDisplay = $(
+      "<div id='remainingUnits' style='position: absolute; top: 10px; right: 10px;'>Remaining Units: 6</div>"
+    );
+    $("body").append(remainingUnitsDisplay);
+    updateSelectionState(); // Initial update on page load
+  });
+
+  // VIEW ADDING OF SUBJECT MODAL
+  $(document).ready(function () {
+    $("#addingSubject tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var subjectcode = $(this).data("subject-code");
+      var name = $(this).data("subject-description");
+      var section = $(this).data("section");
+      var units = $(this).data("units");
+    });
+  });
+  // Before submitting the form, append selected subjects data to the form
+  $("#serviceRequestForm").submit(function (e) {
+    var selectedSubjectsInput = $("<input>")
+      .attr("type", "hidden")
+      .attr("name", "selectedSubjects")
+      .val(JSON.stringify(selectedSubjects));
+    $(this).append(selectedSubjectsInput);
+  });
 </script>
 
-
-
-
-
 {% endblock content %}
-
-
-
-
-
