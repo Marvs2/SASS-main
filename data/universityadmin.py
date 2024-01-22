@@ -4,7 +4,13 @@ from werkzeug.security import generate_password_hash
 university_admin_data = [
     {
         "UnivAdminNumber": "2020-00001-UA-0",
+<<<<<<< HEAD
         "Name": "Deanne Louise Astra",
+=======
+        "FirstName": "Deanne",
+        "LastName": "Astra",
+        "MiddleName": "Louise",
+>>>>>>> TEST
         "Email": "admin@gmail.com",
         "Password": generate_password_hash("Admin123"),
         "Gender": 2,
@@ -17,7 +23,13 @@ university_admin_data = [
     },
     {
         "UnivAdminNumber": "2020-00002-UA-0",
+<<<<<<< HEAD
         "Name": "Admin 2",
+=======
+        "FirstName": "Asmhei",
+        "LastName": "Lop",
+        "MiddleName": "Repez",
+>>>>>>> TEST
         "Email": "admin2@gmail.com",
         "Password": generate_password_hash("Admin123"),
         "Gender": 1,

@@ -85,28 +85,29 @@
             <!-- Replace with your Flask template logic to populate rows -->
             {% for overload_application in overload_application %}
                 <tr>
-                    <td>{{ overload_application.overload_application_id }}</td>
+                    <td>{{ overload_application.OverloadId }}</td>
                     <td>{{ overload_application.Name }}</td>
                     <td>{{ overload_application.StudentNumber }}</td>
-                    <td>{{ overload_application.programcourse }}</td>
-                    <td>{{ overload_application.semester }}</td>
-                    <td>{{ overload_application.subjects_to_add }}</td>
-                    <td>{{ overload_application.justification }}</td>
+                    <td>{{ overload_application.ProgramCourse }}</td>
+                    <td>{{ overload_application.Semester }}</td>
+                    <td>{{ overload_application.SubjectsToAdd }}</td>
+                    <td>{{ overload_application.Justification }}</td>
                     <td>
-                        {% if overload_application.file_data %}
-                            <a href="{{ url_for('get_overload_file', overload_application_id=overload_application.overload_application_id) }}" download>Download</a>
+                        {% if overload_application.Overloaddata %}
+                            {% set truncated_overload_name = overload_application.Overloadfilename[:15] + '...' if overload_application.Overloadfilename|length > 15 else overload_application.Overloadfilename %}
+                        <a href="{{ url_for('get_overload_file', OverloadId=overload_application.OverloadId) }}" class="btn btn-success" download title="{{ overload_application.Overloadfilename }}">{{ truncated_overload_name }}</a>
                         {% else %}
-                            No File
+                        <span class="badge badge-warning">No File</span>
                         {% endif %}
-                    </td>
-                    <td>{{ overload_application.user_responsible }}</td>
-                    <td>{{ overload_application.status }}</td>
+                      </td>
+                    <td>{{ overload_application.UserResponsible }}</td>
+                    <td>{{ overload_application.Status }}</td>
                     <td>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_application.overload_application_id }}">Change Status</button>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_application.OverloadId }}">Change Status</button>
                       </td>
                 </tr>
                 <!-- Modal for Changing Status -->
-      <div class="modal fade" id="statusModal{{ overload_application.overload_application_id }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+      <div class="modal fade" id="statusModal{{ overload_application.OverloadId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -114,7 +115,7 @@
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span></button>
             </div>
-            <form id="statusForm{{ overload_application.overload_application_id }}" action="{{ url_for('update_overload_service_status', overload_application_id=overload_application.overload_application_id) }}" method="POST">
+            <form id="statusForm{{ overload_application.OverloadId }}" action="{{ url_for('update_overload_service_status', OverloadId=overload_application.OverloadId) }}" method="POST">
               <div class="modal-body">
                 <select name="status" class="form-select">
                   <option value="pending">Pending</option>
@@ -127,7 +128,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_application.overload_application_id }})">Save Status</button>
+                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_application.OverloadId }})">Save Status</button>
 
               </div>
             </form>
@@ -150,8 +151,8 @@
     });
 });
          // Function to update status
-        function updateStatus(overloadId) {
-        const formId = `statusForm${overloadId}`;
+        function updateStatus(OverloadId) {
+        const formId = `statusForm${OverloadId}`;
         const form = document.getElementById(formId);
         const formData = new FormData(form);
 

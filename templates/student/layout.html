@@ -313,7 +313,7 @@
 	{% block script %}
   <script>
       // FETCHING STUDENT DETAILS
-  async function fetchStudentDetails() {
+      async function fetchStudentDetails() {
     try {
         const response = await fetch(`${api_base_url}/student-details`);
 
@@ -362,7 +362,11 @@ document.getElementById("Name").value = fullName;
       DateOfBirthInput.value = formattedDateOfBirth;
 
         // Select the PlaceOfBirth and set the value to data.PlaceOfBirth
+<<<<<<< HEAD
         document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
+=======
+        // document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
+>>>>>>> TEST
         // Select the MobileNumber and set the value to data.MobileNumber
         document.getElementById("MobileNumber").value = data.MobileNumber;
       }

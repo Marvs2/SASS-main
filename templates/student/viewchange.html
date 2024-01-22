@@ -38,38 +38,38 @@
   <tbody>
     {% for changesubjects in changesubjects_list %}
     <tr>
-      <td>{{ changesubjects.Changesubject_ID }}</td>
+      <td>{{ changesubjects.ChangeSubjectId }}</td>
       <td>{{ changesubjects.StudentNumber }}</td>
       <td>{{ changesubjects.Name }}</td>
-      <td>{{ changesubjects.enrollment_type }}</td>
+      <td>{{ changesubjects.EnrollmentType }}</td>
       <td>{{ changesubjects.created_at }}</td>
       <td>
         {% if changesubjects.ace_form_data %}
-        <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download>{{ changesubjects.ace_form_filename }}</a>
+        <a href="{{ url_for('get_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" class="btn btn-success" download>{{ changesubjects.AceFormfilename }}</a>
         {% else %}
         <span class="badge badge-warning">No File</span>
         {% endif %}
       </td>
-      <td>{{ changesubjects.user_responsible }}</td>
-      <td>{{ changesubjects.status }}</td>
+      <td>{{ changesubjects.UserResponsible }}</td>
+      <td>{{ changesubjects.Status }}</td>
       <td>{{ changesubjects.StudentId }}</td>
       <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ changesubjects.Changesubject_ID }}', '{{ changesubjects.status }}')">View Status</button>
+          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ changesubjects.ChangeSubjectId }}', '{{ changesubjects.Status }}')">View Status</button>
       </td>
     </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="statusModal{{ changesubjects.Changesubject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="StatusModal{{ changesubjects.ChangeSubjectId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ changesubjects.Changesubject_ID }}</h5>
+                  <h5 class="modal-title" id="StatusModalLabel">Status for Subject ID: {{ changesubjects.ChangeSubjectId }}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
               </div>
               <!-- Inside the modal body -->
-              <div class="modal-body" id="statusModalBody{{ changesubjects.Changesubject_ID }}">
+              <div class="modal-body" id="StatusModalBody{{ changesubjects.ChangeSubjectId }}">
                   <!-- Status-related information will be populated here -->
               </div>
               <div class="modal-footer">
@@ -94,10 +94,10 @@
     $(document).ready(function() {
       $('#addSubjectsTable').DataTable();
     });
-    function checkStatusAndShowModal(Changesubject_ID, status) {
+    function checkStatusAndShowModal(ChangeSubjectId, Status) {
     let message = '';
     
-    switch (status) {
+    switch (Status) {
         case 'Sent':
             message = "Your item has been sent! Wait to be processed";
             break;
@@ -121,11 +121,11 @@
             break;
     }
     
-    // Set the status message in the modal body based on the specific modal's ID
-    document.getElementById('statusModalBody' + Changesubject_ID).innerHTML = `<p>Status for Student ID ${Changesubject_ID}: ${message}</p>`;
+    // Set the Status message in the modal body based on the specific modal's ID
+    document.getElementById('StatusModalBody' + ChangeSubjectId).innerHTML = `<p>Status for Subject ID ${ChangeSubjectId}: ${message}</p>`;
     
     // Display the modal
-    $('#statusModal' + Changesubject_ID).modal('show'); // Assuming you're using Bootstrap for modals
+    $('#StatusModal' + ChangeSubjectId).modal('show'); // Assuming you're using Bootstrap for modals
 }
 
   </script>

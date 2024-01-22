@@ -1,0 +1,50 @@
+{% extends "student/layout.html" %}
+{% block content %}
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+    th, td {
+        padding: 10px;
+    }
+    th {
+        text-align: left;
+    }
+</style>
+<h1>Overload Applications</h1>
+{% if applications %}
+    <table>
+        <tr>
+            <th>Overload ID</th>
+            <th>Student ID</th>
+            <th>Name</th>
+            <th>Student Number</th>
+            <th>Program/Course</th>
+            <th>Semester</th>
+            <th>Subjects To Add</th>
+            <th>Justification</th>
+            <th>File Name</th>
+            <th>User Responsible</th>
+            <th>Status</th>
+        </tr>
+        {% for app in applications %}
+            <tr>
+                <td>{{ app.OverloadId }}</td>
+                <td>{{ app.StudentId }}</td>
+                <td>{{ app.Name }}</td>
+                <td>{{ app.StudentNumber }}</td>
+                <td>{{ app.ProgramCourse }}</td>
+                <td>{{ app.Semester }}</td>
+                <td>{{ app.SubjectsToAdd }}</td>
+                <td>{{ app.Justification }}</td>
+                <td>{{ app.Overloadfilename }}</td>
+                <td>{{ app.UserResponsible }}</td>
+                <td>{{ app.Status }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No applications found for this student.</p>
+{% endif %}
+{% endblock content %}

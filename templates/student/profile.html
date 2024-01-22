@@ -31,14 +31,26 @@
             </div>
 
             <div class="form-group">
-            <label for="Gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
+              <label for="Gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
+                <div class="col-sm-4">
+                 <input type="text" class="form-control" name="Gender" id="Gender" required="required" class="form-control" disabled> 
+                </div>
+                <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
+                <div class="col-sm-4">
+                  <input type="email" name="Email" id="Email" class="form-control" required>
+                </div>
+              </div>          
+              <div class="form-group">
+              <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
               <div class="col-sm-4">
-               <input type="text" class="form-control" name="Gender" id="Gender" required="required" class="form-control" disabled> 
+                <input type="text"  name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}" class="form-control">
               </div>
-              <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
-              <div class="col-sm-4">
-                <input type="email" name="Email" id="Email" class="form-control" required>
+                <label for="ResidentialAddress" class="col-sm-2 col-sm-2 control-label">Address</strong></label>
+                <div class="col-sm-4">
+                <input  name="ResidentialAddress" id="ResidentialAddress" required="required" class="form-control">
+               </div>              
               </div>
+<<<<<<< HEAD
             </div>          
             <div class="form-group">
             <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
@@ -50,6 +62,8 @@
               <input  name="ResidentialAddress" id="ResidentialAddress" required="required" class="form-control">
              </div>              
             </div>
+=======
+>>>>>>> TEST
 
             <div class="form-group">
               <div class="col-sm-11 text-center">
@@ -65,5 +79,79 @@
           </form>
     </div>
 </div>
+<<<<<<< HEAD
+=======
+<script>
+       // FETCHING STUDENT DETAILS
+       async function fetchStudentDetails() {
+    try {
+        const response = await fetch(`${api_base_url}/student-details`);
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+        }
+
+        const data_student_details = await response.json();
+        console.log('data_student_details:', data_student_details);
+        displayDetails(data_student_details);
+    } catch (error) {
+        console.error('Error fetching student details:', error.message);
+    }
+}
+    fetchStudentDetails()
+      function displayDetails(data){
+        // Concatenate the first name, middle name, and last name to form the full name
+    const fullName = `${data.FirstName} ${data.MiddleName ? data.MiddleName + ' ' : ''}${data.LastName}`;
+
+// Select the Name input and set the value to the full name
+document.getElementById("Name").value = fullName;
+
+// ... (other code remains unchanged)
+// Update label to display full name
+// document.getElementById('name-label').innerText = fullName;
+
+        // Select the StudentNumber and set the value to data.StudentNumber
+        document.getElementById("StudentNumber").value = data.StudentNumber;
+        // Select the Gender and set the value to data.Gender
+        document.getElementById("Gender").value = data.Gender;
+        // Select the Email and set the value to data.Email
+        document.getElementById("Email").value = data.Email;
+        // Select the ResidentialAddress and set the value to data.ResidentialAddress
+        document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+        // Select the DateOfBirth and set the value to data.DateOfBirth
+        const DateOfBirthInput = document.getElementById("DateOfBirth");
+
+      // Format the date to display only the birthday
+      const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      // Set the formatted date to the DateOfBirth input
+      DateOfBirthInput.value = formattedDateOfBirth;
+
+        // Select the PlaceOfBirth and set the value to data.PlaceOfBirth
+        document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
+        // Select the MobileNumber and set the value to data.MobileNumber
+        document.getElementById("MobileNumber").value = data.MobileNumber;
+      }
+         
+      // DATEPICKER FUNCTION
+        document.addEventListener("DOMContentLoaded", function () {
+        // Initialize flatpickr
+        flatpickr("#date", {
+            dateFormat: 'm-d-Y', // Set the date format
+            defaultDate: 'today', // Set default date to today
+            // disableMobile: true, // Disable on mobile
+            minDate: 'today', // Disable previous dates
+            onClose: function (selectedDates, dateStr, instance) {
+                // Update the input value when the user selects a date
+                document.getElementById('date').value = dateStr;
+            }
+        });
+    });
+</script>
+>>>>>>> TEST
 {% endblock content %}
 

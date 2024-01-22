@@ -10,7 +10,7 @@ def student_required(fn):
         if 'user_role' in session and session['user_role'] == 'student':
             return fn(*args, **kwargs)
         else:
-            flash('', 'danger')
+            flash('Access Denied', category='danger')
             return redirect(url_for('studentLogin'))
     return wrapper
 
@@ -20,7 +20,7 @@ def faculty_required(fn):
         if 'user_role' in session and session['user_role'] == 'faculty':
             return fn(*args, **kwargs)
         else:
-            flash('Access denied', 'danger')
+            flash('Access denied', category='danger')
             return redirect(url_for('home'))
     return wrapper
 

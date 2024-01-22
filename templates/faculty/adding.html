@@ -52,27 +52,27 @@
   <tbody>
     {% for addsubjects in addsubjects %}
     <tr>
-      <td>{{ addsubjects.subject_ID }}</td>
+      <td>{{ addsubjects.SubjectId }}</td>
       <td>{{ addsubjects.StudentNumber }}</td>
       <td>{{ addsubjects.Name }}</td>
-      <td>{{ addsubjects.subject_Names }}</td>
-      <td>{{ addsubjects.enrollment_type }}</td>
+      <td>{{ addsubjects.SubjectNames }}</td>
+      <td>{{ addsubjects.EnrollmentType }}</td>
       <td>
-        {% if addsubjects.file_data %}
-            {% set truncated_file_name = addsubjects.file_name[:15] + '...' if addsubjects.file_name|length > 15 else addsubjects.file_name %}
-            <a href="{{ url_for('get_subject_file', subject_ID=addsubjects.subject_ID) }}" class="btn btn-success" download title="{{ addsubjects.file_name }}">{{ truncated_file_name }}</a>
+        {% if addsubjects.AddSubjectFiledata %}
+            {% set truncated_AddSubjectFilefilename = addsubjects.AddSubjectFilefilename[:15] + '...' if addsubjects.AddSubjectFilefilename|length > 15 else addsubjects.AddSubjectFilefilename %}
+            <a href="{{ url_for('get_subject_file', SubjectId=addsubjects.SubjectId) }}" class="btn btn-success" download title="{{ addsubjects.AddSubjectFilefilename }}">{{ truncated_AddSubjectFilefilename }}</a>
         {% else %}
             <span class="badge badge-warning">No File</span>
         {% endif %}
       </td>
-      <td>{{ addsubjects.user_responsible }}</td>
-      <td>{{ addsubjects.status }}</td>
+      <td>{{ addsubjects.UserResponsible }}</td>
+      <td>{{ addsubjects.Status }}</td>
       <td>
-        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.subject_ID }}">Change Status</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ addsubjects.SubjectId }}">Change Status</button>
       </td>
     </tr>
       <!-- Modal for Changing Status -->
-      <div class="modal fade" id="statusModal{{ addsubjects.subject_ID }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+      <div class="modal fade" id="statusModal{{ addsubjects.SubjectId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
@@ -80,7 +80,7 @@
               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                 <span aria-hidden="true">&times;</span></button>
             </div>
-            <form id="statusForm{{ addsubjects.subject_ID }}" action="{{ url_for('update_adding_service_status', add_subject_id=addsubjects.subject_ID) }}" method="POST">
+            <form id="statusForm{{ addsubjects.SubjectId }}" action="{{ url_for('update_adding_service_status', add_SubjectId=addsubjects.SubjectId) }}" method="POST">
               <div class="modal-body">
                 <select name="status" class="form-select">
                   <option value="pending">Pending</option>
@@ -93,7 +93,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ addsubjects.subject_ID }})">Save changes</button>
+                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ addsubjects.SubjectId }})">Save changes</button>
               </div>
             </form>
           </div>
@@ -117,8 +117,8 @@
 });
 
   // Function to update status
-  function updateStatus(add_subject_id) {
-    const formId = `statusForm${add_subject_id}`;
+  function updateStatus(add_SubjectId) {
+    const formId = `statusForm${add_SubjectId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

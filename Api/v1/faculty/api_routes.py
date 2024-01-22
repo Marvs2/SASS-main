@@ -5,7 +5,7 @@ from models import Faculty
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_login import  login_user
-from decorators.auth_decorators import faculty_required
+from decorators.auth_decorators import faculty_required, role_required
 
 faculty_api = Blueprint('faculty_api', __name__)
 
@@ -34,13 +34,13 @@ api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJrZXkiOiIzM2Y0ZWI4NWNjNDQ0MTQz
 @faculty_api.route('/login', methods=['POST'])
 def faculty_login():
     # Existing code...
-    email = request.form['email']
-    password = request.form['password']
+    Email = request.form['Email']
+    Password = request.form['Password']
 
     # Prepare the data to send to the authentication endpoint
     payload = {
-        'email': email,
-        'password': password
+        'Email': Email,
+        'Password': Password
     }
 
     response = requests.post(faculty_api_url, json=payload)
@@ -63,21 +63,21 @@ def faculty_login():
 @faculty_api.route('/faculty_login', methods=['POST'])
 def faculty_login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        Email = request.form['Email']
+        Password = request.form['Password']
 
-        faculty = Faculty.query.filter_by(email=email).first()
-        if faculty and check_password_hash(faculty.password, password):
+        faculty = Faculty.query.filter_by(Email=Email).first()
+        if faculty and check_password_hash(faculty.Password, Password):
             # Successfully authenticated
-            access_token = create_access_token(identity=faculty.facultyID)
+            access_token = create_access_token(identity=faculty.FacultyId)
             session['access_token'] = access_token
-            session['user_id'] = faculty.facultyID
+            session['user_id'] = faculty.FacultyId
             session['user_role'] = 'faculty'
 
             # Check if session is correctly set
             return redirect(url_for('faculty_dashboard'))
         else:
-            flash('Invalid email or password', 'danger')
+            flash('Invalid Email or Password', 'danger')
 
     return redirect(url_for('faculty_portal'))
 
@@ -110,27 +110,25 @@ def get_gender_string(gender_code):
 
 @faculty_api.route('/faculty-details', methods=['GET'])
 def fetchFacultyDetails():
-    user_id = session.get('user_id')
-
-    # Retrieve the faculty object from the database using the user_id
-    faculty = Faculty.query.get(user_id)
+    faculty = get_current_faculty_user()
 
     if faculty:
         # Convert userImg to base64 string if it exists
         user_img_base64 = base64.b64encode(faculty.userImg).decode('utf-8') if faculty.userImg else None
-        gender_string = get_gender_string(faculty.gender)  # Ensure get_gender_string() is defined
+        gender_string = get_gender_string(faculty.Gender)  # Ensure get_gender_string() is defined
 
         # Construct and return the JSON response
         return jsonify({
-            "facultyNumber": faculty.facultyNumber,
-            "name": faculty.name,
-            "email": faculty.email,
-            "address": faculty.address,
-            "gender": gender_string,
-            "dateofBirth": faculty.dateofBirth.strftime('%Y-%m-%d') if faculty.dateofBirth else None,
-            "placeofBirth": faculty.placeofBirth,
-            "mobile_number": faculty.mobile_number,
-            "userImg": user_img_base64,
+            "FacultyCode": faculty.FacultyCode,
+            'FirstName': faculty.FirstName,
+            'LastName': faculty.LastName,
+            'MiddleName': faculty.MiddleName,
+            "Email": faculty.Email,
+            "ResidentialAddress": faculty.ResidentialAddress,
+            "Gender": gender_string,
+            "BirthDate": faculty.BirthDate.strftime('%Y-%m-%d') if faculty.BirthDate else None,
+            "MobileNumber": faculty.MobileNumber,
+            "ProfilePic": user_img_base64,
         })
     else:
         # For API, it's better to return a JSON response instead of using flash and redirect

@@ -2,12 +2,12 @@
 {% block content %}
 
 
-<div class="data data1">
+<div class="data data2">
     <div class="content-data">
         <div class="head">
             <h3>Application for Overload of Subjects</h3>           
         </div>
-        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_application')}}" method="POST" enctype="multipart/form-data">
+        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_applications')}}" method="POST" enctype="multipart/form-data">
           
             <div class="row mb-3">
                 <label for="Name" class="col-sm-3 col-form-label">Name</label>
@@ -28,9 +28,9 @@
                 </div>
             </div>
             <div class="row mb-3">
-                <label for="programcourse" class="col-sm-3 col-form-label">Program</label>
+                <label for="ProgramCourse" class="col-sm-3 col-form-label">Program</label>
                     <div class="col-sm-8">
-                        <select class="custom-select" id="programcourse" name="programcourse" required>
+                        <select class="custom-select" id="ProgramCourse" name="ProgramCourse" required>
                             <option value ="">Select Program...</option>
                             <option value="BSIT">Bachelor of Science in Information Technology</option>
                             <option value="BBTLE_HE">Bachelor of Business Technology and Livelihood Education - Home Economics</option>
@@ -45,9 +45,9 @@
             </div>
 
             <div class="row mb-3">
-                <label for="semester" class="col-sm-3 col-form-label">Semester</label>
+                <label for="Semester" class="col-sm-3 col-form-label">Semester</label>
                     <div class="col-sm-8">
-                        <select class="custom-select" id="semester" name="semester" required>
+                        <select class="custom-select" id="Semester" name="Semester" required>
                             <option value="">Select Semester...</option>
                             <option value="First">First Semester</option>
                             <option value="Second">Second Semester</option>
@@ -57,16 +57,16 @@
             </div>
 
             <div class="row mb-3">
-                <label for="subjects_To_Add" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <label for="SubjectsToAdd" class="col-sm-3 col-form-label">Subjects to Add</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="subjects_To_Add" name="subjects_To_Add" required>
+                  <input type="text" class="form-control" id="SubjectsToAdd" name="SubjectsToAdd" required>
                 </div>
             </div>
 
             <div class="row mb-4">
-                <label for="justification" class="col-sm-3 col-form-label">Justification for Overload <br> (State your Reason/s)</label>
+                <label for="Justification" class="col-sm-3 col-form-label">Justification for Overload <br> (State your Reason/s)</label>
                 <div class="col-sm-8">
-                  <textarea class="form-control" id="justification" name="justification" required></textarea>
+                  <textarea class="form-control" id="Justification" name="Justification" required></textarea>
                 </div>
             </div>
 
@@ -77,30 +77,31 @@
                   </div>
             </div>
             <div class="row mb-3">
-                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
                     <div class="col-sm-8">
-                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                        <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
                             <option value="-Director/ Head of Academic Program">Director/ Head of Academic Program</option>
                             <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
                             <option value="Administrative Staff ICT Office">Administrative Staff ICT Office</option>
                         </select>
                     </div>
             </div>
-            <div class="row mb-3">
-                <label for="status" class="col-sm-3 col-form-label">Status </label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="status" name="status" required>
-                            <option value="Sent" selected>Sending</option>
-                            <option value="Pending" disabled>Pending</option>
-                            <option value="Approved" disabled>Approved</option>
-                            <option value="Rejected" disabled>Rejected</option>
-                        </select>
-                    </div>
+            <div class="row mb-3" style="display: none;">
+                <label for="Status" class="col-sm-3 col-form-label">Status </label>
+                <div class="col-sm-8">
+                    <select class="custom-select" id="Status" name="Status" required>
+                        <option value="Sent" selected>Sending</option>
+                        <option value="Pending" disabled>Pending</option>
+                        <option value="Approved" disabled>Approved</option>
+                        <option value="Rejected" disabled>Rejected</option>
+                    </select>
+                </div>
             </div>
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-success">Submit Application</button>|||
                 
-                <a href="{{ url_for('viewoverload') }}">View Overload Subject</a>
+                <a href="{{ url_for('viewoverload') }}">View Overload Subject</a>|||
+                
             </div>
         </form>
     </div>

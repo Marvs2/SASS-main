@@ -37,41 +37,42 @@
     </tr>
   </thead>
   <tbody>
-    {% for overload_applications in overload_applications_list %}
+    {% for overload_applications in overload_applicationss_list %}
     <tr>
-      <td>{{ overload_applications.overload_application_id }}</td>
+      <td>{{ overload_applications.OverloadId }}</td>
       <td>{{ overload_applications.StudentNumber }}</td>
       <td>{{ overload_applications.Name }}</td>
-      <td>{{ overload_applications.programcourse }}</td>
-      <td>{{ overload_applications.semester }}</td>
-      <td>{{ overload_applications.subjects_to_add }}</td>
+      <td>{{ overload_applications.ProgramCourse }}</td>
+      <td>{{ overload_applications.Semester }}</td>
+      <td>{{ overload_applications.SubjectsToAdd }}</td>
       <td>
-        {% if overload_applications.file_data %}
-        <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.overload_application_id) }}" class="btn btn-success" download>{{ overload_applications.file_filename }}</a>
+        {% if overload_applications.Overloaddata %}
+            {% set truncated_overload_name = overload_applications.Overloadfilename[:15] + '...' if overload_applications.Overloadfilename|length > 15 else overload_applications.Overloadfilename %}
+        <a href="{{ url_for('view_overload_file', Overload_Id=overload_applications.OverloadId) }}" class="btn btn-success" download title="{{ overload_applications.Overloadfilename }}">{{ truncated_overload_name }}</a>
         {% else %}
         <span class="badge badge-warning">No File</span>
         {% endif %}
       </td>
-      <td>{{ overload_applications.user_responsible }}</td>
-      <td>{{ overload_applications.status }}</td>
+      <td>{{ overload_applications.UserResponsible }}</td>
+      <td>{{ overload_applications.Status }}</td>
       <td>{{ overload_applications.StudentId }}</td>
       <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ overload_applications.overload_application_id }}', '{{ overload_applications.status }}')">View Status</button>
+          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ overload_applications.OverloadId }}', '{{ overload_applications.Status }}')">View Status</button>
       </td>
     </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="statusModal{{ overload_applications.overload_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="StatusModal{{ overload_applications.OverloadId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="statusModalLabel">Status for oveload ID: {{ overload_applications.overload_application_id }}</h5>
+                  <h5 class="modal-title" id="StatusModalLabel">Status for oveload ID: {{ overload_applications.OverloadId }}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
               </div>
               <!-- Inside the modal body -->
-              <div class="modal-body" id="statusModalBody{{ overload_applications.overload_application_id }}">
+              <div class="modal-body" id="StatusModalBody{{ overload_applications.OverloadId }}">
                   <!-- Status-related information will be populated here -->
               </div>
               <div class="modal-footer">
@@ -96,10 +97,10 @@
     $(document).ready(function() {
       $('#overloadTable').DataTable();
     });
-    function checkStatusAndShowModal(studentID, status) {
+    function checkStatusAndShowModal(studentID, Status) {
     let message = '';
     
-    switch (status) {
+    switch (Status) {
         case 'Sent':
             message = "Your item has been sent! Wait to be processed";
             break;
@@ -123,11 +124,11 @@
             break;
     }
     
-    // Set the status message in the modal body based on the specific modal's ID
-    document.getElementById('statusModalBody' + studentID).innerHTML = `<p>Status for Overload ID ${studentID}: ${message}</p>`;
+    // Set the Status message in the modal body based on the specific modal's ID
+    document.getElementById('StatusModalBody' + studentID).innerHTML = `<p>Status for Overload ID ${studentID}: ${message}</p>`;
     
     // Display the modal
-    $('#statusModal' + studentID).modal('show'); // Assuming you're using Bootstrap for modals
+    $('#StatusModal' + studentID).modal('show'); // Assuming you're using Bootstrap for modals
 }
 
   </script>

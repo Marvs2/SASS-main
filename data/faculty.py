@@ -94,3 +94,7 @@ faculty_data = [
         'Password': generate_password_hash('Faculty123')
     },
 ]
+<<<<<<< HEAD
+=======
+
+>>>>>>> TEST

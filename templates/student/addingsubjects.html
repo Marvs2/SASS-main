@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "student/layout.html" %}
 {% block content %}
 <style>
@@ -47,5 +48,470 @@
         {% endfor %}
     </tbody>
 </table>
+=======
+{% extends "student/layout.html" %} {% block content %}
+<style>
+  .custom-container {
+    display: flex;
+  }
+  table {
+    width: 25%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  th {
+    background-color: #f2f2f2;
+  }
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+</style>
+<h2>
+  Student Class Data of
+  <input
+    type="text"
+    class="form-control"
+    name="Name"
+    id="Name"
+    required="required"
+    class="form-control"
+    disabled
+  />
+</h2>
+<div class="custom-container">
+  <div class="col-md-6">
+    <div class="data data1" id="applicationSection">
+      <div class="content-data">
+        <div class="head">
+          <h3>
+            Course Code: {% if course %}
+            <p>{{ course.CourseCode }}</p>
+            {% endif %}
+          </h3>
+        </div>
+
+        <form
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+          class="application-form"
+        >
+          <table
+            id="addingSubject"
+            class="table table-bordered table-condensed"
+          >
+          <thead>
+            <tr>
+                <th>Subject Name</th>
+                <th>Subject Code</th>
+                <th>Teacher</th>
+                <th>Batch</th>
+                <th>Year</th>
+                <th>Semester</th>
+            </tr>
+        </thead>
+        <tbody id="result"></tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="data data1" id="futureSubjectSection">
+      <div class="content-data">
+        <div class="head">
+          <h3>
+            My Courses: {% if course %} {{ course.CourseCode }} {% endif %}
+          </h3>
+        </div>
+
+        <form
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+          onsubmit="return validateForm()"
+          class="application-form"
+        >
+          <table
+            id="futureSubject1"
+            class="table table-bordered table-condensed"
+          >
+            <thead>
+              <tr>
+                <th>Check box</th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Units</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Loop through selections to display -->
+              {% for selections in selection_list %}
+              <tr
+                data-subject-code="{{ selections.SubjectCode }}"
+                data-subject-description="{{ selections.Name }}"
+                data-Description="{{ selections.Description }}"
+                data-Units="{{ selections.Units }}"
+              >
+                <td>
+                  <div class="custom-control custom-checkbox">
+                    <input
+                      type="checkbox"
+                      class="custom-control-input selections-checkbox"
+                      id="checkbox{{ selections.SubjectId }}"
+                    />
+                    <label
+                      class="custom-control-label"
+                      for="checkbox{{ selections.SubjectId }}"
+                    ></label>
+                  </div>
+                </td>
+                <td>{{ selections['SubjectCode'] }}</td>
+                <td>{{ selections['Name'] }}</td>
+                <td>{{ selections['Units'] }}</td>
+              </tr>
+              {% endfor %}
+              <!-- ENDFOR -->
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-center">
+            <button
+              type="button"
+              id="futureSubjectsButton"
+              class="btn btn-primary"
+              data-toggle="modal"
+              data-target="#subjectModal"
+            >
+              Submit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div
+  class="modal fade"
+  id="subjectModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="subjectModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="subjectModalLabel">Request Service</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <!-- Form to submit selected subjects and service request -->
+        <form
+          id="serviceRequestForm"
+          action="{{url_for('submitapplication')}}"
+          method="POST"
+          enctype="multipart/form-data"
+        >
+          <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
+          <input
+            type="hidden"
+            name="StudentId"
+            value="{{ session['user_id'] }}"
+          />
+
+          <!-- Dropdown for selecting Faculty -->
+          <div class="form-group">
+            <label for="FacultyId">Select Faculty:</label>
+            <select class="form-control" id="FacultyId" name="FacultyId">
+              <!-- Assuming you have a list of faculties in `faculties` -->
+              <option value="1">Professor</option>
+              <option value="2">CDO</option>
+              <option value="3">Head Academic</option>
+              <option value="4">Director</option>
+              <option value="5">Registrar</option>
+            </select>
+          </div>
+
+          <!-- Service Details -->
+          <div class="form-group">
+            <label for="serviceDetails">Service Details:</label>
+            <textarea
+              class="form-control"
+              id="serviceDetails"
+              name="serviceDetails"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- File Uploads -->
+          <div class="form-group">
+            <label for="servicesImg">Upload Image:</label>
+            <input
+              type="file"
+              class="form-control-file"
+              id="servicesImg"
+              name="servicesImg"
+              accept="image/jpeg, image/png, image/gif"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="servicesdata">Upload File:</label>
+            <input
+              type="file"
+              class="form-control-file"
+              id="servicesdata"
+              name="servicesdata"
+              accept=".docx, .pdf, .xls, .xlsx"
+            />
+          </div>
+
+          <!-- Updated Submit button with onclick event -->
+          <button
+            type="submit"
+            class="btn btn-primary"
+            onclick="logUserDetails()"
+          >
+            Submit
+          </button>
+        </form>
+
+        <!-- Selected Subjects List -->
+        <div id="selectedSubjectsList"></div>
+
+        <!-- Remaining Units Display -->
+        <div
+          id="remainingUnits"
+          style="position: absolute; top: 10px; right: 10px"
+        >
+          Remaining Units: 6
+        </div>
+
+        <!-- VIEW ADDING OF SUBJECT MODAL -->
+        <script>
+          // Define the maximum number of units allowed
+          var maxUnits = 6;
+          // Object to keep track of selected subjects and their units
+          var selectedSubjects = {};
+          // Variable to keep track of the total units selected
+          var totalUnits = 0;
+
+          // Function to update the state of checkboxes and the submit button
+          function updateSelectionState() {
+            var remainingUnits = maxUnits - totalUnits;
+            // Update the display for remaining units
+            $("#remainingUnits").text("Remaining Units: " + remainingUnits);
+
+            // Disable all other checkboxes if the limit is reached
+            $(".selections-checkbox").each(function () {
+              var subjectUnits = parseInt($(this).closest("tr").data("units"));
+              if (totalUnits + subjectUnits > maxUnits && !this.checked) {
+                $(this).prop("disabled", true);
+              } else {
+                $(this).prop("disabled", false);
+              }
+            });
+          }
+
+          // Event handler for checkbox changes
+          $(".selections-checkbox").change(function () {
+            var subjectId = $(this).attr("id").replace("checkbox", "");
+            var units = parseInt($(this).closest("tr").data("units"));
+
+            if (this.checked) {
+              selectedSubjects[subjectId] = units;
+              totalUnits += units;
+            } else {
+              totalUnits -= selectedSubjects[subjectId];
+              delete selectedSubjects[subjectId];
+            }
+
+            updateSelectionState();
+
+            // Update the selected subjects list in the modal
+            updateSelectedSubjectsList();
+          });
+
+          // Function to log user details
+  function logUserDetails() {
+    // Access and log form inputs
+    var facultyId = document.getElementById("FacultyId").value;
+    var serviceDetails = document.getElementById("serviceDetails").value;
+    var servicesImg = document.getElementById("servicesImg");
+    var servicesdata = document.getElementById("servicesdata");
+    // Add more inputs as needed
+    const formData = new FormData();
+
+    // Append each value to the FormData object
+    formData.append("FacultyId", facultyId);
+    formData.append("serviceDetails", serviceDetails);
+    Object.keys(selectedSubjects).forEach((subjectId) => {
+      formData.append("subjectIDs", subjectId);
+    });
+
+    // Assuming servicesImg and servicesdata are file inputs
+    // Append files from these inputs to FormData
+    // Append file inputs to FormData if they exist and are under 3MB
+    if (
+      servicesImg &&
+      servicesImg.files[0] &&
+      servicesImg.files[0].size <= 3145728
+    ) {
+      formData.append("servicesImg", servicesImg.files[0]);
+    } else if (servicesImg && servicesImg.files[0]) {
+      alert("Image file is too large. Please upload an image less than 3MB.");
+      return; // Prevent form submission
+    }
+
+    if (
+      servicesdata &&
+      servicesdata.files[0] &&
+      servicesdata.files[0].size <= 3145728
+    ) {
+      formData.append("servicesdata", servicesdata.files[0]);
+    } else if (servicesdata && servicesdata.files[0]) {
+      alert("Document file is too large. Please upload a file less than 3MB.");
+      return; // Prevent form submission
+    }
+
+    fetch("/student/addingsubject/submitapplication", {
+      method: "POST",
+      body: formData,
+    })
+      .then((data) => {
+        console.log(data);
+        // window.location.href = 'URL_to_redirect_on_success'; // Replace with your redirect URL
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        if (error.response) {
+          error.response.text().then((text) => {
+            console.log("Server Response:", text);
+          });
+        }
+      });
+    }
+          // Function to update the selected subjects list in the modal
+          function updateSelectedSubjectsList() {
+            var selectedSubjectsList = $("#selectedSubjectsList");
+            selectedSubjectsList.empty();
+
+            for (var subjectId in selectedSubjects) {
+              var subjectName = $("#checkbox" + subjectId)
+                .closest("tr")
+                .data("subject-description");
+              selectedSubjectsList.append("<p>" + subjectName + "</p>");
+            }
+          }
+
+          // VIEW ADDING OF SUBJECT MODAL
+          $(document).ready(function () {
+            $("#addingSubject tbody tr").on("click", function () {
+              // Retrieve data from the clicked row
+              var subjectcode = $(this).data("subject-code");
+              var name = $(this).data("subject-description");
+              var section = $(this).data("section");
+              var units = $(this).data("units");
+            });
+          });
+
+          // Before submitting the form, append selected subjects data to the form
+          $("#serviceRequestForm").submit(function (e) {
+            var selectedSubjectsInput = $("<input>")
+              .attr("type", "hidden")
+              .attr("name", "selectedSubjects")
+              .val(JSON.stringify(selectedSubjects));
+            $(this).append(selectedSubjectsInput);
+          });
+          async function fetchStudentSubjects() {
+        try {
+            const response = await fetch('/api/v1/student/studentsubject');
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch data. Server returned ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('Fetched Data:', data);
+
+            // Handle the data as needed
+            displaySubjects(data);
+        } catch (error) {
+            console.error('Error fetching student subjects:', error.message);
+        }
+    }
+
+    function displaySubjects(data) {
+        const resultTbody = document.getElementById('result');
+        resultTbody.innerHTML = ''; // Clear previous content
+
+        if (data && data.error) {
+            // Display error message
+            const errorRow = document.createElement('tr');
+            errorRow.innerHTML = `<td colspan="6">Error: ${data.error}</td>`;
+            resultTbody.appendChild(errorRow);
+        } else if (data) {
+            // Assuming your data is an array of subjects
+            data.forEach(subject => {
+                const subjectRow = document.createElement('tr');
+                subjectRow.innerHTML = `
+                    <td>${subject.SubjectName}</td>
+                    <td>${subject.SubjectCode}</td>
+                    <td>${subject.Teacher}</td>
+                    <td>${subject.Batch}</td>
+                    <td>${subject.Year}</td>
+                    <td>${subject.Semester}</td>
+                `;
+                resultTbody.appendChild(subjectRow);
+            });
+        }
+    }
+
+    function searchSubjects() {
+        const searchBar = document.getElementById('searchBar');
+        const filter = searchBar.value.toUpperCase();
+        const rows = document.getElementById('subjectTable').getElementsByTagName('tr');
+
+        for (let i = 0; i < rows.length; i++) {
+            const cells = rows[i].getElementsByTagName('td');
+            let found = false;
+
+            for (let j = 0; j < cells.length; j++) {
+                const cellText = cells[j].textContent || cells[j].innerText;
+
+                if (cellText.toUpperCase().indexOf(filter) > -1) {
+                    found = true;
+                    break;
+                }
+            }
+
+            rows[i].style.display = found ? '' : 'none';
+        }
+    }
+
+    // Fetch student subjects on page load
+    fetchStudentSubjects();
+        </script>
+      </div>
+    </div>
+  </div>
+</div>
+>>>>>>> TEST
 
 {% endblock content %}
