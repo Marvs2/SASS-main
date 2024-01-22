@@ -21,50 +21,50 @@
    
     <div class="content-data">
         <div class="head">
-            <h3>Student's Profile</h3>           
+            <h3>Faculty Profile</h3>           
         </div>
         <form action="{{ url_for('faculty_update_profile') }}" id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
             <div class="form-group">
-              <label for="facultyNumber" class="col-sm-2 control-label">Faculty Number</label>
+              <label for="FacultyCode" class="col-sm-2 control-label">Faculty Type</label>
               <div class="col-sm-4">
-                <input type="text" id="facultyNumber" name="facultyNumber" required="required" class="form-control" disabled>
+                <input type="text" id="FacultyCode" name="FacultyCode" required="required" class="form-control" disabled>
               </div>
-              <label for="dateofBirth" class="col-sm-2 control-label">Date of Birth</label>
+              <label for="BirthDate" class="col-sm-2 control-label">Date of Birth</label>
               <div class="col-sm-4">
-                <input type="text" name="dateofBirth" id="dateofBirth" required="required" class="form-control" disabled>
+                <input type="text" name="BirthDate" id="BirthDate" required="required" class="form-control" disabled>
               </div>
             </div>
 
             <div class="form-group">
-              <label for="name" class="col-sm-2 control-label">Name</strong></label>
+              <label for="Name" class="col-sm-2 control-label">Name</strong></label>
               <div class="col-sm-4">
-                <input type="text" name="name" id="name" required="required" class="form-control" disabled>
+                <input type="text" name="Name" id="Name" required="required" class="form-control" disabled>
               </div>   
-              <label for="placeofBirth" class="col-sm-2 col-sm-2 control-label">Place of Birth</strong></label>
+              <label for="ResidentialAddress" class="col-sm-2 col-sm-2 control-label">Place of Birth</strong></label>
               <div class="col-sm-4">
-                <input type="text" name="placeofBirth" id="placeofBirth" required="required" class="form-control" disabled>
+                <input type="text" name="ResidentialAddress" id="ResidentialAddress" required="required" class="form-control" disabled>
               </div>
             </div>
 
             <div class="form-group">
-            <label for="gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
+            <label for="Gender" class="col-sm-2 col-sm-2 control-label">Gender</strong></label>
               <div class="col-sm-4">
-               <input type="text" name="gender" id="gender" required="required" class="form-control" disabled> 
+               <input type="text" name="Gender" id="Gender" required="required" class="form-control" disabled> 
               </div>
-              <label for="email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
+              <label for="Email" class="col-sm-2 col-sm-2 control-label">Email Address</strong></label>
               <div class="col-sm-4">
-                <input type="email" name="email" id="email" required="required" class="form-control">
+                <input type="Email" name="Email" id="Email" required="required" class="form-control">
               </div>
             </div>          
             <div class="form-group">
-            <label for="mobile_number" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
+            <label for="MobileNumber" class="col-sm-2 col-sm-2 control-label">Contact Number</strong></label>
             <div class="col-sm-4">
-              <input type="text"  name="mobile_number" id="mobile_number" required="required" maxlength="11" pattern="\d{11}" class="form-control">
-            </div>
+              <input type="text"  name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}" class="form-control">
+            <!-- </div>
               <label for="address" class="col-sm-2 col-sm-2 control-label">Address</strong></label>
               <div class="col-sm-4">
               <input  name="address" id="address" required="required" class="form-control">
-             </div>              
+             </div>               -->
             </div>
 
             <div class="form-group">
@@ -108,25 +108,27 @@
     fetchFacultyDetails();
 
     function displayDetails(data){
+      const fullName = `${data.FirstName} ${data.MiddleName ? data.MiddleName + ' ' : ''}${data.LastName}`;
+
+        document.getElementById("Name").value = fullName;
         // Update the faculty profile details in the form
         // For example:
-        document.getElementById("facultyNumber").value = data.facultyNumber;
-        document.getElementById("name").value = data.name;
-        document.getElementById("email").value = data.email;
-        document.getElementById("address").value = data.address;
-        document.getElementById("gender").value = data.gender;
-        const dateofBirthInput = document.getElementById("dateofBirth");
+        document.getElementById("FacultyCode").value = data.FacultyCode;
+        document.getElementById("Email").value = data.Email;
+        // document.getElementById("address").value = data.address;
+        document.getElementById("Gender").value = data.Gender;
+        const BirthDateInput = document.getElementById("BirthDate");
         // Format the date to display only the birthday
-const formatteddateofBirth = new Date(data.dateofBirth).toLocaleDateString('en-US', {
+const formattedBirthDate = new Date(data.BirthDate).toLocaleDateString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric'
 });
-// Set the formatted date to the DateofBirth input
-dateofBirthInput.value = formatteddateofBirth;
+// Set the formatted date to the BirthDate input
+BirthDateInput.value = formattedBirthDate;
 
-        document.getElementById("placeofBirth").value = data.placeofBirth;
-        document.getElementById("mobile_number").value = data.mobile_number;
+        document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
+        document.getElementById("MobileNumber").value = data.MobileNumber;
         // ... (update other fields similarly)
 
         hideProgressBar();

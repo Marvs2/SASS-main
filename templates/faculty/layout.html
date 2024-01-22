@@ -138,48 +138,51 @@
 		</main>
 	</section>
 
-	<script>
-    // Function to close the notification card
-function closeNotificationCard() {
-    var notificationCard = document.getElementById('notification-card');
-    if (notificationCard.classList.contains('show')) {
-        notificationCard.classList.remove('show');
+<script>
+            //FAculty API
+	const api_base_url = '{{ faculty_api_base_url | default("") }}';
+	console.log('api_base_url: ', api_base_url)
+  var lastActivity = new Date().getTime();
+
+        // Function to close the notification card
+    function closeNotificationCard() {
+        var notificationCard = document.getElementById('notification-card');
+        if (notificationCard.classList.contains('show')) {
+            notificationCard.classList.remove('show');
+        }
     }
-}
 
-// Add event listener to the notification icon
-document.getElementById('notification-icon').addEventListener('click', function (event) {
-    // Prevent the click event from propagating to the document body
-    event.stopPropagation();
-    
-    // Toggle the visibility of the notification card
-    document.getElementById('notification-card').classList.toggle('show');
-});
+    // Add event listener to the notification icon
+    document.getElementById('notification-icon').addEventListener('click', function (event) {
+        // Prevent the click event from propagating to the document body
+        event.stopPropagation();
+        
+        // Toggle the visibility of the notification card
+        document.getElementById('notification-card').classList.toggle('show');
+    });
 
-// Add event listener to the document body to close the notification card on any click outside of it
-document.body.addEventListener('click', closeNotificationCard);
+    // Add event listener to the document body to close the notification card on any click outside of it
+    document.body.addEventListener('click', closeNotificationCard);
 
-// Add event listener to prevent the notification card from closing when clicking inside it
-document.getElementById('notification-card').addEventListener('click', function (event) {
-    event.stopPropagation();
-});
+    // Add event listener to prevent the notification card from closing when clicking inside it
+    document.getElementById('notification-card').addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
 
-  // JavaScript to show all notifications when "See All Notifications" is clicked
-  document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-      // Prevent the link from navigating (you may adjust this behavior as needed)
-      event.preventDefault();
+      // JavaScript to show all notifications when "See All Notifications" is clicked
+      document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+          // Prevent the link from navigating (you may adjust this behavior as needed)
+          event.preventDefault();
 
-      // Show all notifications by removing the 'd-none' class
-      var notificationList = document.getElementById('notification-list');
-      notificationList.classList.remove('d-none');
-  });
+          // Show all notifications by removing the 'd-none' class
+          var notificationList = document.getElementById('notification-list');
+          notificationList.classList.remove('d-none');
+      });
+	</script>
 
-        //STUDENT API
-		const api_base_url = '{{ faculty_api_base_url | default("") }}';
-		console.log('api_base_url: ', api_base_url)
-    var lastActivity = new Date().getTime();
-
-  // Function to update the activity timestamp
+	{% block script %}
+  <script>
+    // Function to update the activity timestamp
   function updateActivity() {
       lastActivity = new Date().getTime();
   }
@@ -225,9 +228,8 @@ document.getElementById('notification-card').addEventListener('click', function 
   document.addEventListener("mousemove", handleUserActivity);
   document.addEventListener("mousedown", handleUserActivity);
   document.addEventListener("keydown", handleUserActivity);
-	</script>
-
-	{% block script %} {% endblock script %}
+  </script>
+  {% endblock script %}
 
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>

@@ -31,7 +31,6 @@
             <th>Authorized Subjects</th>
             <th>Application Letter</th>
             <th>Permit to Cross Enroll</th>
-            <th>Created At</th>
             <th>User Responsible</th>
             <th>Status</th>
             <th>Student ID</th>
@@ -41,51 +40,50 @@
     <tbody>
         {% for cross_enrollments in cross_enrollments_list %}
             <tr>
-                <td>{{ cross_enrollments.cross_enrollment_id }}</td>
+                <td>{{ cross_enrollments.CrossEnrollmentId }}</td>
                 <td>{{ cross_enrollments.StudentNumber }}</td>
                 <td>{{ cross_enrollments.Name }}</td>
-                <td>{{ cross_enrollments.school_for_cross_enrollment }}</td>
-                <td>{{ cross_enrollments.total_number_of_units }}</td>
-                <td>{{ cross_enrollments.authorized_subjects_to_take }}</td>
+                <td>{{ cross_enrollments.SchoolforCrossEnrollment }}</td>
+                <td>{{ cross_enrollments.TotalNumberofUnits }}</td>
+                <td>{{ cross_enrollments.AuthorizedSubjectstoTake }}</td>
                 <td>
-                    {% if cross_enrollments.application_letter_data %}
-                    {% set truncated_cross_enrollments = cross_enrollments.application_letter_filename[:15] + '...' if cross_enrollments.application_letter_filename|length > 15 else cross_enrollments.application_letter_filename %}
-                        <a href="{{ url_for('get_application_letter', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}" class="btn btn-success" download title="{{ cross_enrollments.application_letter_filename }}">{{ truncated_cross_enrollments }}</a>
+                    {% if cross_enrollments.ApplicationLetterdata %}
+                    {% set truncated_cross_enrollments = cross_enrollments.ApplicationLetterfilename[:15] + '...' if cross_enrollments.ApplicationLetterfilename|length > 15 else cross_enrollments.ApplicationLetterfilename %}
+                        <a href="{{ url_for('get_application_letter', CrossEnrollmentId=cross_enrollments.CrossEnrollmentId) }}" class="btn btn-success" download title="{{ cross_enrollments.ApplicationLetterfilename }}">{{ truncated_cross_enrollments }}</a>
                     {% else %}
                         No file
                     {% endif %}
                 </td>
                 <td>
-                    {% if cross_enrollments.permit_to_cross_enroll_data %}
-                    {% set truncated_permit_to_cross = cross_enrollments.permit_to_cross_enroll_filename[:15] + '...' if cross_enrollments.permit_to_cross_enroll_filename|length > 15 else cross_enrollments.permit_to_cross_enroll_filename %}  
-                        <a href="{{ url_for('get_permit_to_enroll', cross_enrollments_id=cross_enrollments.cross_enrollment_id) }}" class="btn btn-success" download title="{{ cross_enrollments.permit_to_cross_enroll_filename }}">{{ truncated_permit_to_cross }}</a>
+                    {% if cross_enrollments.PermitCrossEnrolldata %}
+                    {% set truncated_permit_to_cross = cross_enrollments.PermitCrossEnrollfilename[:15] + '...' if cross_enrollments.PermitCrossEnrollfilename|length > 15 else cross_enrollments.PermitCrossEnrollfilename %}  
+                        <a href="{{ url_for('get_permit_to_enroll', CrossEnrollmentId=cross_enrollments.CrossEnrollmentId) }}" class="btn btn-success" download title="{{ cross_enrollments.PermitCrossEnrollfilename }}">{{ truncated_permit_to_cross }}</a>
                     {% else %}
                         No file
                     {% endif %}
                 </td>
-                <td>{{ cross_enrollments.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ cross_enrollments.user_responsible }}</td>
-                <td>{{ cross_enrollments.status }}</td>
+                <td>{{ cross_enrollments.UserResponsible }}</td>
+                <td>{{ cross_enrollments.Status }}</td>
                 <td>{{ cross_enrollments.StudentId }}</td>
                 <td>
                     <!-- Action Buttons -->
-                    <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ cross_enrollments.cross_enrollment_id }}', '{{ cross_enrollments.status }}')">View Status</button>
+                    <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ cross_enrollments.CrossEnrollmentId }}', '{{ cross_enrollments.Status }}')">View Status</button>
                     <!-- Additional action buttons can be added here -->
                 </td>
             </tr>
 
     <!-- Modal -->
-    <div class="modal fade" id="statusModal{{ cross_enrollments.cross_enrollment_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+    <div class="modal fade" id="StatusModal{{ cross_enrollments.CrossEnrollmentId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
       <div class="modal-dialog" role="document">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="statusModalLabel">Status for Subject ID: {{ cross_enrollments.cross_enrollment_id }}</h5>
+                  <h5 class="modal-title" id="StatusModalLabel">Status for Subject ID: {{ cross_enrollments.CrossEnrollmentId }}</h5>
                   <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                   </button>
               </div>
               <!-- Inside the modal body -->
-              <div class="modal-body" id="statusModalBody{{ cross_enrollments.cross_enrollment_id }}">
+              <div class="modal-body" id="StatusModalBody{{ cross_enrollments.CrossEnrollmentId }}">
                   <!-- Status-related information will be populated here -->
               </div>
               <div class="modal-footer">
@@ -110,10 +108,10 @@
     $(document).ready(function() {
       $('#crossEnrollmentTable').DataTable();
     });
-    function checkStatusAndShowModal(cross_enrollment_id, status) {
+    function checkStatusAndShowModal(CrossEnrollmentId, Status) {
     let message = '';
     
-    switch (status) {
+    switch (Status) {
         case 'Sent':
             message = "Your item has been sent! Wait to be processed";
             break;
@@ -137,11 +135,11 @@
             break;
     }
     
-    // Set the status message in the modal body based on the specific modal's ID
-    document.getElementById('statusModalBody' + cross_enrollment_id).innerHTML = `<p>Status for Student ID ${cross_enrollment_id}: ${message}</p>`;
+    // Set the Status message in the modal body based on the specific modal's ID
+    document.getElementById('StatusModalBody' + CrossEnrollmentId).innerHTML = `<p>Status for Crossenrollment ID ${CrossEnrollmentId}: ${message}</p>`;
     
     // Display the modal
-    $('#statusModal' + cross_enrollment_id).modal('show'); // Assuming you're using Bootstrap for modals
+    $('#StatusModal' + CrossEnrollmentId).modal('show'); // Assuming you're using Bootstrap for modals
 }
 
   </script>

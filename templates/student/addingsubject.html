@@ -1,7 +1,6 @@
 {% extends "student/layout.html" %}
 {% block content %}
-
-<div class="data data1">
+  <div class="data data">
     <div class="content-data">
         <div class="head">
             <h3>Application for Adding of Subjects</h3>           
@@ -23,16 +22,16 @@
             </div>
 
             <div class="row mb-3">
-                <label for="subject_Names" class="col-sm-3 col-form-label">Subjects to Add</label>
+                <label for="SubjectNames" class="col-sm-3 col-form-label">Subjects to Add</label>
                 <div class="col-sm-8">
-                  <input type="text" class="form-control" id="subject_Names" name="subject_Names" required>
+                  <input type="text" class="form-control" id="SubjectNames" name="SubjectNames" required>
                 </div>
             </div>
 
             <div class="row mb-3">
-                <label for="enrollment_type" class="col-sm-3 col-form-label">Enrollment Type</label>
+                <label for="EnrollmentType" class="col-sm-3 col-form-label">Enrollment Type</label>
                     <div class="col-sm-8">
-                        <select class="custom-select" id="enrollment_type" name="enrollment_type" required>
+                        <select class="custom-select" id="EnrollmentType" name="EnrollmentType" required>
                             <option value="">Select Enrollment Type...</option>
                             <option value="Regular">Regular</option>
                             <option value="Irregular">Irregular</option>
@@ -48,9 +47,9 @@
             </div>
 
             <div class="row mb-3">
-                <label for="user_responsible" class="col-sm-3 col-form-label">User Responsible </label>
+                <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
                     <div class="col-sm-8">
-                        <select class="custom-select" id="user_responsible" name="user_responsible" required>
+                        <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
                             <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
             <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
             <option value="Registrar's Office">Registrar's Office</option>
@@ -58,16 +57,16 @@
                     </div>
             </div>
 
-            <div class="row mb-3">
-                <label for="status" class="col-sm-3 col-form-label">Status </label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="status" name="status" required>
-                            <option value="Sent" selected>Sending</option>
-                            <option value="Pending" disabled>Pending</option>
-                            <option value="Approved" disabled>Approved</option>
-                            <option value="Rejected" disabled>Rejected</option>
-                        </select>
-                    </div>
+            <div class="row mb-3" style="display: none;">
+                <label for="Status" class="col-sm-3 col-form-label">Status </label>
+                <div class="col-sm-8">
+                    <select class="custom-select" id="Status" name="Status" required>
+                        <option value="Sent" selected>Sending</option>
+                        <option value="Pending" disabled>Pending</option>
+                        <option value="Approved" disabled>Approved</option>
+                        <option value="Rejected" disabled>Rejected</option>
+                    </select>
+                </div>
             </div>
             <div class="d-flex justify-content-center">
                 <button type="submit" class="btn btn-success">Submit Application</button>|||               
@@ -76,8 +75,6 @@
         </form>       
     </div>
 </div>
-
-
 {% endblock content %}
 
 

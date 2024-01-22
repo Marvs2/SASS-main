@@ -4,681 +4,176 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import TIMESTAMP, inspect
 from werkzeug.security import generate_password_hash
 from flask_login import UserMixin
+import os
+import time
+import sys
+print(sys.path)
+
+
 
 db = SQLAlchemy()
+
+# Student Users
+class Student(db.Model):
+    __tablename__ = 'SPSStudent' # Set the name of table in database (Available for FLASK framework)
+
+    StudentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentNumber = db.Column(db.String(30), unique=True, nullable=False)  # UserID
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    Password = db.Column(db.String(256), nullable=False)  # Password
+    Gender = db.Column(db.Integer, nullable=True)  # Gender
+    DateOfBirth = db.Column(db.Date)  # DateOfBirth
+    PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
+    MobileNumber = db.Column(db.String(11))  # MobileNumber
+    IsOfficer = db.Column(db.Boolean, default=False)
+    Token = db.Column(db.String(256))  # This is for handling reset password 
+    TokenExpiration = db.Column(db.DateTime) # This is for handling reset password 
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    # IsBridging
     
-class Student(db.Model, UserMixin):
-    __tablename__ = 'student'
-
-    StudentId = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), unique=True, nullable=False)
-    Name = db.Column(db.String(255), nullable=False)  
-    Email = db.Column(db.String(100), unique=True, nullable=False) 
-    address = db.Column(db.String(255), nullable=True) 
-    Password = db.Column(db.String(128), nullable=False)
-    Gender = db.Column(db.Integer)  
-    DateofBirth = db.Column(db.Date)  
-    PlaceofBirth = db.Column(db.String(255), nullable=True)
-    ResidentialAddress = db.Column(db.String(255), nullable=True)
-    MobileNumber = db.Column(db.String(11))
-    userImg = db.Column(db.LargeBinary)
-   # stud_status = db.Column(db.String(100), nullable=False)
-
-    # Define the 'addsubjects' relationship in the Student model
-    notifications = db.relationship('Notification', back_populates='student')
-    addsubjects = db.relationship('AddSubjects', back_populates='student')
-    changesubjects = db.relationship('ChangeOfSubjects', back_populates='student')
-    manual_enrollments = db.relationship('ManualEnrollment', back_populates='student')
-    certification_requests = db.relationship('CertificationRequest', back_populates='student')
-    grade_entries = db.relationship('GradeEntry', back_populates='student')
-    cross_enrollments = db.relationship('CrossEnrollment', back_populates='student')
-    petition_requests = db.relationship('PetitionRequest', back_populates='student')
-    shifting_applications = db.relationship('ShiftingApplication', back_populates='student')
-    overload_applications = db.relationship('OverloadApplication', back_populates='student')
-    tutorial_requests = db.relationship('TutorialRequest', back_populates='student')
-
     def to_dict(self):
         return {
             'StudentId': self.StudentId,
             'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
             'Email': self.Email,
-            'address': self.address, 
             'Password': self.Password,
-            'Gender': self.Gender,           
-            'DateofBirth': self.DateofBirth,
-            'PlaceofBirth': self.PlaceofBirth,
+            'Gender': self.Gender,
+            'DateOfBirth': self.DateOfBirth,
+            'PlaceOfBirth': self.PlaceOfBirth,
             'ResidentialAddress': self.ResidentialAddress,
             'MobileNumber': self.MobileNumber,
-            'userImg': self.userImg,
-            #'stud_status': self.stud_status,
+            'IsOfficer': self.IsOfficer,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+    def get_id(self):
+        return str(self.StudentId)  # Convert to string to ensure compatibility
+
+    def get_user_id(self):
+        return self.StudentId
+
+# Faculty Users
+class Faculty(db.Model):
+    __tablename__ = 'FISFaculty' # Set the name of table in database
+
+    FacultyId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyType = db.Column(db.String(50), nullable=False)  # Faculty Type
+    Rank = db.Column(db.String(50))  # Faculty Rank
+    Units = db.Column(db.Numeric, nullable=False)  # Faculty Unit
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
+    MiddleInitial = db.Column(db.String(50))  # Middle Initial
+    NameExtension = db.Column(db.String(50))  # Name Extension
+    BirthDate = db.Column(db.Date, nullable=False)  # Birthdate
+    DateHired = db.Column(db.Date, nullable=False)  # Date Hired
+    Degree = db.Column(db.String)  # Degree
+    Remarks = db.Column(db.String)  # Remarks
+    FacultyCode = db.Column(db.Integer, nullable=False)  # Faculty Code
+    Honorific = db.Column(db.String(50))  # Honorific
+    Age = db.Column(db.Numeric, nullable=False)  # Age
+    
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
+    MobileNumber = db.Column(db.String(11))  # MobileNumber
+    Gender = db.Column(db.Integer) # Gender # 1 if Male 2 if Female
+    
+    Password = db.Column(db.String(256), nullable=False)  # Password
+    ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
+    IsActive = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    # FOREIGN TABLES
+    
+
+    def to_dict(self):
+        return {
+            'FacultyId': self.FacultyId,
+            'FacultyType': self.FacultyType,
+            'Rank': self.Rank,
+            'Units': self.Units,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
+            'MiddleInitial': self.MiddleInitial,
+            'NameExtension': self.NameExtension,
+            'BirthDate': self.BirthDate,
+            'DateHired': self.DateHired,
+            'Degree': self.Degree,
+            'Remarks': self.Remarks,
+            'FacultyCode': self.FacultyCode,
+            'honorific': self.Honorific,
+            'Age': self.Age,
+            'Email': self.Email,
+            # 'password': self.password,
+            'ProfilePic': self.ProfilePic,
+            'IsActive': self.IsActive,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
         }
         
     def get_id(self):
-        return str(self.id)  # Convert to string to ensure compatibility
-    
-    def save_image(self, image_data):
-    # Method to save image data
-        self.userImg = image_data
-        db.session.commit()
-#======================================================#
-#==============Link with the Students==================#
-#======================================================#
-"""class Programs(db.Model, UserMixin):
-    __tablename__ = 'programs'
+        return str(self.FacultyId)  # Convert to string to ensure compatibility
 
-    programId = db.Column(db.Integer, primary_key=True)
-    programCode = db.Column(db.String(150), nullable=False)
-    programName = db.Column(db.String(255), nullable=False)
 
-    # Establish a relationship with the YearLevel class
-    year = db.relationship('YearLevel', back_populates='programs')
 
-    def to_dict(self):
-        return {
-            'programId': self.programId,
-            'programCode': self.programCode,
-            'programName': self.programName,
-        }
+# System Admins Users
+class SystemAdmin(db.Model):
+    __tablename__ = 'SPSSystemAdmin'
 
-    def get_programID(self):
-        return str(self.programId)
-
-class YearLevel(db.Model, UserMixin):
-    __tablename__ = 'yearlevel'
-
-    yearId = db.Column(db.Integer, primary_key=True)
-    Level = db.Column(db.String(150), nullable=False)
-    programId = db.Column(db.Integer, db.ForeignKey('programs.programId'))
-
-    # Establish relationships with other classes
-    programs = db.relationship('Programs', back_populates='yearlevel')
-    semesters = db.relationship('Semesters', back_populates='yearlevel')
-    courseSub = db.relationship('CourseSub', back_populates='yearlevel')
+    SysAdminId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) # Students Reference
+    SysAdminNumber = db.Column(db.String(30), unique=True)  # UserID
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    Password = db.Column(db.String(256), nullable=False)  # Password
+    Gender = db.Column(db.Integer)  # Gender
+    DateOfBirth = db.Column(db.Date)  # DateOfBirth
+    PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
+    MobileNumber = db.Column(db.String(11))  # MobileNumber
+    IsActive = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     def to_dict(self):
         return {
-            'yearId': self.yearId,
-            'Level': self.Level,
-            'programId': self.programId,
-        }
-
-    def get_yearId(self):
-        return str(self.yearId)
-
-class Semesters(db.Model, UserMixin):
-    __tablename__ = 'semesters'
-
-    semesterId = db.Column(db.Integer, primary_key=True)
-    semesterName = db.Column(db.String(150), nullable=False)
-    yearId = db.Column(db.Integer, db.ForeignKey('year.yearId'))
-
-    # Establish a relationship with YearLevel and CourseSub
-    yearlevel = db.relationship('YearLevel', back_populates='semesters')
-    courseSubs = db.relationship('CourseSub', back_populates='semesters')
-
-    def to_dict(self):
-        return {
-            'semesterId': self.semesterId,
-            'semesterName': self.semesterName,
-            'yearId': self.yearId,
-        }
-
-    def get_semesterId(self):
-        return str(self.semesterId)
-
-class CourseSub(db.Model, UserMixin):
-    __tablename__ = 'courseSub'
-
-    courseSub_Id = db.Column(db.Integer, primary_key=True)
-    courseSub_Code = db.Column(db.String(255), nullable=False)
-    Sub_Description = db.Column(db.String(255), nullable=False)
-    yearId = db.Column(db.Integer, db.ForeignKey('year.yearId'))
-    semesterId = db.Column(db.Integer, db.ForeignKey('semesters.semesterId'))
-
-    # Establish relationships with YearLevel and Semester
-    yearlevel = db.relationship('YearLevel', back_populates='courseSub')
-    semesters = db.relationship('Semesters', back_populates='courseSub')
-
-    def to_dict(self):
-        return {
-            'courseSub_Id': self.courseSub_Id,
-            'courseSub_Code': self.courseSub_Code,
-            'Sub_Description': self.Sub_Description,
-            'yearId': self.yearId,
-            'semesterId': self.semesterId,
-        }
-
-    def get_courseSub_Id(self):
-        return str(self.courseSub_Id)
-"""
-#Notification
-class Notification(db.Model, UserMixin):
-    __tablename__ = 'notifications'
-
-    notifID = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    service_type = db.Column(db.String(100), nullable=False)
-    user_responsible = db.Column(db.String(255), nullable=False)
-    status = db.Column(db.String(100), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-    # Relationship to the Student model
-    student = db.relationship('Student', back_populates='notifications')
-
-    def to_dict(self):
-        return {
-            'notifID': self.notifID,
-            'StudentNumber': self.StudentNumber,
-            'service_type': self.service_type,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'message': self.message,
+            'SysAdminId': self.SysAdminId,
+            'FacultyId': self.FacultyId,
+            'SysAdminNumber': self.SysAdminNumber,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
+            'Email': self.Email,
+            'Password': self.Password,
+            'Gender': self.Gender,
+            'DateOfBirth': self.DateOfBirth,
+            'PlaceOfBirth': self.PlaceOfBirth,
+            'ResidentialAddress': self.ResidentialAddress,
+            'MobileNumber': self.MobileNumber,
+            'IsActive': self.IsActive,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
-            'StudentId': self.StudentId,
         }
 
-    def get_NotifID(self):
-        return str(self.notifID)
-
-#======================================================#       
-#Announcements
-class Announcement(db.Model, UserMixin):
-    __tablename__ = 'announcements'
-
-    announcementId = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    author = db.Column(db.String(255), nullable=False)
-    content_filename = db.Column(db.String(255))
-    content_data = db.Column(db.LargeBinary)
-    created_at = db.Column(DateTime, default=datetime.utcnow)
-    updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    facultyID = db.Column(db.Integer, db.ForeignKey('faculties.facultyID'))
-
-    # Relationship to the Faculty model
-    faculties = db.relationship('Faculty', back_populates='announcements')
-    # Optional: category, visibility, attached files, etc.
-
-    def to_dict(self):
-        return {
-            'announcementId': self.announcementId,
-            'title': self.title,
-            'content': self.content,
-            'author': self.author,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at,
-            'facultyID': self.facultyID
-        }    
-    
-    def get_AnnouncementID(self):
-        return str(self.announcementId)
-#======================================================#       
-
-# ==========Services========== #
-# ==========Adding_subject_form========== #
-class AddSubjects(db.Model, UserMixin):
-    __tablename__ = 'addsubjects'
-
-    subject_ID = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)  
-    subject_Names = db.Column(db.String(255), nullable=False)
-    enrollment_type = db.Column(db.String(100))  # 'regular50or 'irregular'
-    file_data = db.Column(db.LargeBinary)  # Store binary data for the file
-    file_name = db.Column(db.String(255))  # Store the filename
-    user_responsible = db.Column(db.String(255))  # Add user role attribute
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-    # Establish a relationship with the Student class
-    student = db.relationship('Student', back_populates='addsubjects')
-
-    def to_dict(self):
-        return {
-            'subject_ID': self.subject_ID,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'subject_Names': self.subject_Names,
-            'enrollment_type': self.enrollment_type,
-            'file_data': self.file_data,
-            'file_name': self.file_name,
-            'user_responsible': self.user_responsible,  # Include user role in the dictionary
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_AddSubjectsID(self):
-        return str(self.subject_ID)
-    
-# ==========Services========== #
-# ==========Change_of_subjects=========== #
-class ChangeOfSubjects(db.Model, UserMixin):
-    __tablename__ = 'changesubjects'
-
-    Changesubject_ID = db.Column(db.Integer, primary_key=True)  
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255))
-    enrollment_type = db.Column(db.String(100))  # 'regular' or 'irregular'
-    ace_form_filename = db.Column(db.String(255))
-    ace_form_data = db.Column(db.LargeBinary)
-    created_at = db.Column(TIMESTAMP, default=datetime.utcnow)
-    updated_at = db.Column(TIMESTAMP)
-    user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))  
- 
-
-    # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='changesubjects')
-
-    def to_dict(self):
-        return {
-            'Changesubject_ID': self.Changesubject_ID,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'enrollment_type': self.enrollment_type,
-            'ace_form_filename': self.ace_form_filename,
-            'ace_form_data': self.ace_form_data,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at,
-            'user_responsible': self.user_responsible,  # Include user role in the dictionary
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_ChangesubjectID(self):
-        return str(self.Changesubject_ID)
-
-# ==========Requests========== #
-# ========== Reason need pdf file ========== #
-class ManualEnrollment(db.Model, UserMixin):
-    __tablename__ = 'manual_enrollments'
-
-    m_enrollment_ID = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    enrollment_type = db.Column(db.String(100), nullable=False)
-    reason = db.Column(db.Text, nullable=False)
-    me_file_filename = db.Column(db.String(255))
-    me_file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(DateTime, default=datetime.utcnow)
-    updated_at = db.Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    user_responsible = db.Column(db.String(255))  # Add user role attribute
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='manual_enrollments')
-
-    def to_dict(self):
-        return {
-            'm_enrollment_ID': self.m_enrollment_ID,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'enrollment_type': self.enrollment_type,
-            'reason': self.reason,
-            'me_file_filename': self.me_file_filename,
-            'me_file_data': self.me_file_data,
-            'created_at': self.created_at,
-            'updated_at': self.updated_at,
-            'user_responsible': self.user_responsible,  # Include user role in the dictionary
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_ManualEnrollmentID(self):
-        return str(self.m_enrollment_ID)
-
-# ==========Requests========== #
-# ========== Files needed for the Certification ========== #
-
-class CertificationRequest(db.Model, UserMixin):
-    __tablename__ = 'certification_requests'
-
-    certification_request_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(255), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    certification_type = db.Column(db.String(100), nullable=False)
-    request_form_filename = db.Column(db.String(255), nullable=False)
-    request_form_data = db.Column(db.LargeBinary)
-    identification_card_filename = db.Column(db.String(255), nullable=False)
-    identification_card_data = db.Column(db.LargeBinary)
-    is_representative = db.Column(db.Boolean, default=False)
-    authorization_letter_filename = db.Column(db.String(255))
-    authorization_letter_data = db.Column(db.LargeBinary)
-    representative_id_filename = db.Column(db.String(255))
-    representative_id_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='certification_requests')
-
-    def to_dict(self):
-        return {
-            'certification_request_id': self.certification_request_id,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'certification_type': self.certification_type,
-            'request_form_filename': self.request_form_filename,
-            'request_form_data': self.request_form_data,
-            'identification_card_filename': self.identification_card_filename,
-            'identification_card_data': self.identification_card_data,
-            'is_representative': self.is_representative,
-            'authorization_letter_filename': self.authorization_letter_filename,
-            'authorization_letter_data': self.authorization_letter_data,
-            'representative_id_filename': self.representative_id_filename,
-            'representative_id_data': self.representative_id_data,
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_CertificationRequestID(self):
-        return str(self.certification_request_id)
-
-# ========== Requests ========== #
-class GradeEntry(db.Model, UserMixin):
-    __tablename__ = 'grade_entries'
-
-    grade_entry_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber =db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    application_type = db.Column(db.String(150), nullable=False)
-    completion_form_filename = db.Column(db.String(255), nullable=False)
-    completion_form_data = db.Column(db.LargeBinary)  # Add this line
-    class_record_filename = db.Column(db.String(255), nullable=False)
-    class_record_data = db.Column(db.LargeBinary)  # Add this line
-    affidavit_filename = db.Column(db.String(255), nullable=False)
-    affidavit_data = db.Column(db.LargeBinary)  # Add this line
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(100)) 
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='grade_entries')
-
-    def to_dict(self):
-        return {
-            'grade_entry_id': self.grade_entry_id,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'application_type': self.application_type,
-            'completion_form_data': self.completion_form_data,  # Add this line
-            'class_record_filename': self.class_record_filename,
-            'class_record_data': self.class_record_data,  # Add this line
-            'affidavit_filename': self.affidavit_filename,
-            'affidavit_data': self.affidavit_data,  # Add this line
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_GradeEntryID(self):
-        return str(self.grade_entry_id)
-    
-# ==========Requests========== #  
-# ========== Files needed to the request ========== #
-class CrossEnrollment(db.Model, UserMixin):
-    __tablename__ = 'cross_enrollments'
-
-    cross_enrollment_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    school_for_cross_enrollment = db.Column(db.String(255), nullable=False)
-    total_number_of_units = db.Column(db.Integer, nullable=False)
-    authorized_subjects_to_take = db.Column(db.Text, nullable=False)
-    application_letter_filename = db.Column(db.String(255), nullable=False)
-    application_letter_data = db.Column(db.LargeBinary)  # Add this line
-    permit_to_cross_enroll_filename = db.Column(db.String(255), nullable=False)
-    permit_to_cross_enroll_data = db.Column(db.LargeBinary)  # Add
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(100)) #status
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId')) 
-
-         # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='cross_enrollments')
-
-    def to_dict(self):
-        return {
-            'cross_enrollment_id': self.cross_enrollment_id,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'school_for_cross_enrollment': self.school_for_cross_enrollment,
-            'total_number_of_units': self.total_number_of_units,
-            'authorized_subjects_to_take': self.authorized_subjects_to_take,
-            'application_letter_filename': self.application_letter_filename,
-            'application_letter_data': self.application_letter_data,  # Add this line
-            'permit_to_cross_enroll_filename': self.permit_to_cross_enroll_filename,
-            'permit_to_cross_enroll_data': self.permit_to_cross_enroll_data,  #
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_CrossEnrollmentID(self):
-        return str(self.cross_enrollment_id)
-    
-# ==========Requests========== #
-class PetitionRequest(db.Model, UserMixin):
-    __tablename__ = 'petition_requests'
-
-    petition_request_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
-    Name = db.Column(db.String(255), nullable=False)
-    subject_code = db.Column(db.String(100), nullable=False)
-    subject_name = db.Column(db.String(255), nullable=False)
-    petition_type = db.Column(db.String(100), nullable=False)
-    request_reason = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='petition_requests')
-
-    def to_dict(self):
-        return {
-            'petition_request_id': self.petition_request_id,
-            'StudentNumber':self.StudentNumber,
-            'Name': self.Name,
-            'subject_code': self.subject_code,
-            'subject_name': self.subject_name,
-            'petition_type': self.petition_type,
-            'request_reason': self.request_reason,
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_PetitionRequestID(self):
-        return str(self.petition_request_id)
-    
-# ==========Services========== #  
-# ========Accreditation-for-Shiftees-and-Regular========= #  
-class ShiftingApplication(db.Model, UserMixin):
-    __tablename__ = 'shifting_applications'
-
-    shifting_application_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    current_program = db.Column(db.String(255), nullable=False)
-    residency_year = db.Column(db.Integer, nullable=False)
-    intended_program = db.Column(db.String(255), nullable=False)
-    qualifications = db.Column(db.Text)
-    file_filename = db.Column(db.String(255))
-    file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255)) 
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='shifting_applications')
-
-    def to_dict(self):
-        return {
-            'shifting_application_id': self.shifting_application_id,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'current_program': self.current_program,
-            'residency_year': self.residency_year,
-            'intended_program': self.intended_program,
-            'qualifications': self.qualifications,
-            'file_filename': self.file_filename,
-            'file_data': self.file_data,
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_ShiftingApplicationID(self):
-        return str(self.shifting_application_id)
-
-# ==========Services========== #
-# ==========Overload-3-6-units========== #
-class OverloadApplication(db.Model, UserMixin):
-    __tablename__ = 'overload_applications'
-
-    overload_application_id = db.Column(db.Integer, primary_key=True)
-    Name = db.Column(db.String(255), nullable=False)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    programcourse = db.Column(db.String(255), nullable=False)
-    semester = db.Column(db.String(20), nullable=False)
-    subjects_to_add = db.Column(db.String(255), nullable=False)
-    justification = db.Column(db.Text, nullable=False)
-    file_filename = db.Column(db.String(255))
-    file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
- 
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='overload_applications')
-
-    def to_dict(self):
-        return {
-            'overload_application_id':  self.overload_application_id,
-            'Name': self.Name,
-            'StudentNumber': self.StudentNumber,
-            'programcourse':self.programcourse,
-            'semester': self.semester,
-            'subjects_to_add': self.subjects_to_add,
-            'justification': self.justification,
-            'file_filename': self.file_filename,
-            'file_data': self.file_data,
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_OverloadApplicationID(self):
-        return str(self.overload_application_id)
-#Done
-# ==========Services========== #
-# ==========RO FORM========== #
-class TutorialRequest(db.Model, UserMixin):
-    __tablename__ = 'tutorial_requests'
-
-    tutorial_request_id = db.Column(db.Integer, primary_key=True)
-    StudentNumber = db.Column(db.String(100), nullable=False)
-    Name = db.Column(db.String(255), nullable=False)
-    subject_code = db.Column(db.String(100), nullable=False)
-    subject_name = db.Column(db.String(255), nullable=False)
-    file_filename = db.Column(db.String(255), nullable=False)
-    file_data = db.Column(db.LargeBinary)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    user_responsible = db.Column(db.String(255))
-    status = db.Column(db.String(100)) #status 
-    StudentId = db.Column(db.Integer, db.ForeignKey('student.StudentId'))
-     
-     # Add a relationship to the 'student' table
-    student = db.relationship('Student', back_populates='tutorial_requests')
-
-    def to_dict(self):
-        return {
-            'tutorial_request_id': self.tutorial_request_id,
-            'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
-            'subject_code': self.subject_code,
-            'subject_name': self.subject_name,
-            'file_filename': self.file_filename,
-            'created_at': self.created_at,
-            'user_responsible': self.user_responsible,
-            'status': self.status,
-            'StudentId': self.StudentId,
-        }
-
-    def get_TutorialRequestID(self):
-        return str(self.tutorial_request_id)
-
-
-class Faculty(db.Model, UserMixin):
-    __tablename__ = 'faculties'
-
-    facultyID = db.Column(db.Integer, primary_key=True)  # UserID
-    facultyNumber = db.Column(db.String(255), unique=True, nullable=False) #Faculty_Number
-    userType = db.Column(db.String(255))  # e.g., 'Admin', 'Professor', etc.
-    name = db.Column(db.String(255), nullable=False)  # Name
-    email = db.Column(db.String(100), unique=True, nullable=False)  # Email
-    address = db.Column(db.String(255))  # You can use String or TEXT depending on the length
-    password = db.Column(db.String(128), nullable=False)  # Password
-    gender = db.Column(db.Integer)  # Gender
-    dateofBirth = db.Column(db.Date)  # dateofBirth
-    placeofBirth = db.Column(db.String(100))  # placeofBirth
-    mobile_number = db.Column(db.String(20))  # MobileNumber
-    userImg = db.Column(db.LargeBinary)  # Modify the length as needed
-    is_active = db.Column(db.Boolean, default=True)
-
-    # Define the 'addsubjects' relationship in the Faculty model
-    announcements = db.relationship('Announcement', back_populates='faculties')
-
-    def to_dict(self):
-        return {
-            'facultyID': self.facultyID,
-            'facultyNumber': self.facultyNumber,
-            'userType': self.userType,
-            'name': self.name,
-            'email': self.email,
-            'address': self.address,
-            'password': self.password,
-            'gender': self.gender,
-            'dateofBirth': self.dateofBirth,
-            'placeofBirth': self.placeofBirth,
-            'mobile_number': self.mobile_number,
-            'userImg': self.userImg,
-            'is_active': self.is_active
-        }
-    def get_id(self):
-        return str(self.id)  # Convert to string to ensure compatibility
-    
-    def save_image(self, image_data):
-    # Method to save image data
-        self.userImg = image_data
-        db.session.commit()
+    def get_user_id(self):
+        return self.SysAdminId
 
 class Admin(db.Model, UserMixin):
     __tablename__ = 'admins'
 
-    adm_Id = db.Column(db.Integer, primary_key=True)  # UserID
+    adm_Id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # UserID
     admin_Number = db.Column(db.String(30), unique=True, nullable=False) #AdminNumber
     name = db.Column(db.String(255), nullable=False)  # Name
     email = db.Column(db.String(100), unique=True, nullable=False)  # Email
@@ -704,127 +199,872 @@ class Admin(db.Model, UserMixin):
         }
     def get_id(self):
         return str(self.id)  # Convert to string to ensure compatibility
+# Course List
+class Course(db.Model):
+    __tablename__ = 'SPSCourse'
+
+    CourseId = db.Column(db.Integer, primary_key=True, autoincrement=True) # Unique Identifier
+    CourseCode = db.Column(db.String(10), unique=True) # Course Code - (BSIT, BSHM, BSCS)
+    Name = db.Column(db.String(200)) # (Name of Course (Bachelor of Science in Information Technology)
+    Description = db.Column(db.String(200)) # Description of course
+    IsValidPUPQCCourses = db.Column(db.Boolean, default=True) # APMS are handling different courses so there are specific courses available in QC Only
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CourseId': self.CourseId,
+            'CourseCode': self.CourseCode,
+            'Name': self.Name,
+            'Description': self.Description,
+            'IsValidPUPQCCourses': self.IsValidPUPQCCourses,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+# Student Enrolled in the courses
+class CourseEnrolled(db.Model):
+    __tablename__ = 'SPSCourseEnrolled'
+
+    CourseId = db.Column(db.Integer, db.ForeignKey('SPSCourse.CourseId', ondelete="CASCADE"), primary_key=True)  # Unique Identifier
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)# Students Reference
+    DateEnrolled = db.Column(db.Date) # Date they enrolled
+    Status = db.Column(db.Integer, nullable=False)  # (0 - Not Graduated ||  1 - Graduated  ||  2 - Drop  ||  3 - Transfer Course || 4 - Transfer School)
+    CurriculumYear = db.Column(db.Integer, nullable=False)  # (2019, 2020, 2021) - For checking what the subjects they should taken
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+    def to_dict(self):
+        return {
+            'CourseId': self.CourseId,
+            'StudentId': self.StudentId,
+            'DateEnrolled': self.DateEnrolled,
+            'Status': self.Status,
+            'CurriculumYear': self.CurriculumYear,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+# Metadata containing the details of class such as Year, Semester, Batch and Course
+class Metadata(db.Model):
+    __tablename__ = 'SPSMetadata'
+
+    MetadataId = db.Column(db.Integer, primary_key=True, autoincrement=True) # Unique Identifier
+    CourseId = db.Column(db.Integer, db.ForeignKey('SPSCourse.CourseId', ondelete="CASCADE")) # Course References
+    Year = db.Column(db.Integer, nullable=False) # (1, 2, 3, 4) - Current year of the class 
+    Semester = db.Column(db.Integer, nullable=False) # (1, 2, 3) - Current Semester of class
+    Batch = db.Column(db.Integer, nullable=False) # (2019, 2020, 2021, ...) - Batch of the class
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'MetadataId': self.MetadataId,
+            'CourseId': self.CourseId,
+            'Year': self.Year,
+            'Semester': self.Semester,
+            'Batch': self.Batch,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+# Class Details 
+class Class(db.Model):
+    __tablename__ = 'SPSClass'
+
+    ClassId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    MetadataId = db.Column(db.Integer, db.ForeignKey('SPSMetadata.MetadataId', ondelete="CASCADE")) # Metadata containing details of class year, Semester, batch, course
+    Section = db.Column(db.Integer) # Section of the class
+    IsGradeFinalized = db.Column(db.Boolean, default=False) # Checker if the grade is Finalized
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    __table_args__ = (db.UniqueConstraint('MetadataId', 'Section', name='uq_metadata_section'),)
+
+    def to_dict(self):
+        return {
+            'ClassId': self.ClassId,
+            'Section': self.Section,
+            'IsGradeFinalized': self.IsGradeFinalized,
+            'MetadataId': self.MetadataId,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+    
+    # Adding a unique constraint
+   
+# Subject List
+class Subject(db.Model):
+    __tablename__ = 'SPSSubject'
+
+    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)  
+    SubjectCode = db.Column(db.String(20), unique=True) # Subject Code (COMP 20333, GEED 10013, ...)
+    Name = db.Column(db.String(200)) # Subject Name
+    Description = db.Column(db.String(200)) # Description of Subject
+    Units = db.Column(db.Float) # Units of Subjects
+    IsNSTP = db.Column(db.Boolean, default=False) # NSTP Cheker
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    # ForBridging
+
+    def to_dict(self):
+        return {
+            'SubjectId': self.SubjectId,
+            'SubjectCode': self.SubjectCode,
+            'Name': self.Name,
+            'Description': self.Description,
+            'Units': self.Units,
+            'IsNSTP': self.IsNSTP,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+# Class Subject contains the list of all subjects in the class
+class ClassSubject(db.Model):
+    __tablename__ = 'SPSClassSubject'
+
+    ClassSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    ClassId = db.Column(db.Integer, db.ForeignKey('SPSClass.ClassId', ondelete="CASCADE")) # Referencing to the Class
+    SubjectId = db.Column(db.Integer, db.ForeignKey('SPSSubject.SubjectId', ondelete="CASCADE")) # Referencing to the Subject 
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), nullable=True) # Referencing to the Faculty
+    Schedule = db.Column(db.String(100), nullable=True) # Schedule of Subjects
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    # Adding a unique constraint on the combination of ClassId, SubjectId, and FacultyId
+    __table_args__ = (db.UniqueConstraint(
+        'ClassId', 'SubjectId', 'FacultyId', name='_unique_class_subject_teacher'),)
+
+    def to_dict(self):
+        return {
+            'ClassSubjectId': self.ClassSubjectId,
+            'ClassId': self.ClassId,
+            'SubjectId': self.SubjectId,
+            'FacultyId': self.FacultyId,
+            'Schedule': self.Schedule,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+        
+class StudentClassGrade(db.Model):
+    __tablename__ = 'SPSStudentClassGrade'
+    
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) # Referencing to Student
+    ClassId = db.Column(db.Integer, db.ForeignKey('SPSClass.ClassId', ondelete="CASCADE"), primary_key=True) # Referencing to the Class
+    Grade = db.Column(db.Float) # Average Grade
+    Lister = db.Column(db.Integer, default=0) # 1 - President, 2 - Dean, 0 - Not Lister
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'StudentId': self.StudentId,
+            'ClassId': self.ClassId,
+            'Grade': self.Grade,
+            'Lister': self.Lister,  
+            'created_at': self.created_at,
+            'updated_at': self.updated_at, 
+        }
+
+# Student Class Subject Grade contains the student Class subject that they currently taking in
+
+class StudentClassSubjectGrade(db.Model):
+    __tablename__ = 'SPSStudentClassSubjectGrade'
+
+    StudentClassSubjectGradeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClassSubjectId = db.Column(db.Integer, db.ForeignKey('SPSClassSubject.ClassSubjectId', ondelete="CASCADE"), primary_key=True) # Reference to the class subject
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)# Referencing to the student in subject taken
+    Grade = db.Column(db.Float) # Students Gradec
+    DateEnrolled = db.Column(db.Date) # Date enrolled in the subject
+    AcademicStatus = db.Column(db.Integer) # (1 - Passed, 2 - Failed, 3 - Incomplete or INC,  4 - Withdrawn )
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ClassSubjectId': self.ClassSubjectId,
+            'StudentId': self.StudentId,
+            'Grade': self.Grade,
+            'DateEnrolled': self.DateEnrolled,
+            'AcademicStatus': self.AcademicStatus,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+# Curriculum is the list of subject that must taken of specific Course, Year, Semester and Batch. Subject automatically added in class when there is a curriculum
+class Curriculum(db.Model):
+    __tablename__ = 'SPSCurriculum'
+
+    CurriculumId = db.Column(db.Integer, primary_key=True, autoincrement=True) 
+    SubjectId = db.Column(db.Integer, db.ForeignKey('SPSSubject.SubjectId', ondelete="CASCADE")) # Subejct that can be added in the classes if the same year, Semester, course and batch
+    MetadataId = db.Column(db.Integer, db.ForeignKey('SPSMetadata.MetadataId', ondelete="CASCADE"), nullable=False) # Metadata contains the year, Semester, course and batch
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    def to_dict(self):
+        return {
+            'CurriculumId': self.CurriculumId,
+            'SubjectId': self.SubjectId,
+            'MetadataId': self.MetadataId,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+            # Add other attributes if needed
+        }
+
+class Services(db.Model):
+    __tablename__ = 'SASSServices'
+    
+    ServiceId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
+    FacultyId = db.Column(db. Integer, db.ForeignKey('FISFaculty.FacultyId'), nullable=False)
+    ServiceType = db.Column(db.String(100))
+    ServiceDetails = db.Column(db.String(255))
+    ServicesImg = db.Column(db.LargeBinary)
+    Servicesdata = db.Column(db.LargeBinary)  # Store binary data for the file
+    Status = db.Column(db.String(20))
+    
+    def to_dict(self):
+        return {
+            'ServiceId': self.ServiceId,
+            'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
+            'ServiceType': self.ServiceType,
+            'ServiceDetails': self.ServiceDetails,
+            'ServicesImg': self.ServicesImg,
+            'Servicesdata': self.Servicesdata,
+            'Status': self.Status,
+
+        }
+        
+# This table will trigger everytime there is addded new batch Semester
+class LatestBatchSemester(db.Model):
+    __tablename__ = 'SPSLatestBatchSemester'
+
+    LatestBatchSemesterId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    Batch = db.Column(db.Integer, nullable=False) # (2019, 2020, 2021, ...) - Batch course grades
+    Semester = db.Column(db.Integer, nullable=False) # (1, 2, 3) - Semester
+    IsEnrollmentStarted = db.Column(db.Boolean, default=False)
+    IsGradeFinalized = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    def to_dict(self):
+        return {
+            'LatestBatchSemesterId': self.LatestBatchSemesterId,
+            'Batch': self.Batch,
+            'Semester': self.Semester,
+            'IsEnrollmentStarted': self.IsEnrollmentStarted,
+            'IsGradeFinalized': self.IsGradeFinalized
+            # Add other attributes if needed
+        }
+    
+# Average Grade of Class
+class ClassGrade(db.Model):
+    __tablename__ = 'SPSClassGrade'
+
+    ClassGradeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    ClassId = db.Column(db.Integer, db.ForeignKey('SPSClass.ClassId', ondelete="CASCADE"), unique=True) # Class reference
+    DeansLister = db.Column(db.Integer) # Amount of DeansLister
+    PresidentsLister = db.Column(db.Integer) # Amount of PresidentsLister
+    Grade = db.Column(db.Float) # Average Grade of the class
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ClassGradeId': self.ClassGradeId,
+            'ClassId': self.ClassId,
+            'DeanLister': self.DeanLister,
+            'PresidentLister': self.PresidentLister,
+            'Grade': self.Grade
+        }
+
+    
+# Average Grade of Course in specific year and Semester
+class CourseGrade(db.Model):
+    __tablename__ = 'SPSCourseGrade'
+
+    CourseGradeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    CourseId = db.Column(db.Integer, db.ForeignKey('SPSCourse.CourseId', ondelete="CASCADE")) # Referenccing to specific course
+    Batch = db.Column(db.Integer, primary_key=True) # (2019, 2020, 2021, ...) - Batch course grades
+    Semester = db.Column(db.Integer, primary_key=True, nullable=False) # (1, 2, 3) - Semester
+    Grade = db.Column(db.Float) # Average grade of course
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CourseGradeId': self.CourseGradeId,
+            'CourseId': self.CourseId,
+            'Year': self.Year,
+            'Grade': self.Grade,
+        }
+
+class SubjectList(db.Model):
+    __tablename__ = 'SASSClassSubjectList'
+    
+    SubjectListId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
+    SubjectId = db.Column(db.Integer, db.ForeignKey('SPSSubject.SubjectId'))
+    ServiceId = db.Column(db.Integer, db.ForeignKey('SASSServices.ServiceId'))
+    
+    def to_dict(self):
+        return {
+            'SubjectListId': self.SubjectListId,
+            'SubjectId': self.SubjectId,
+            'ServiceId': self.ServiceId,
+            # Add other attributes if needed
+        }
+
+#======================================================#
+#==============Link with the Students==================#
+#======================================================#
+
+#Notification
+class Notification(db.Model, UserMixin):
+    __tablename__ = 'SASSNotifications'
+
+    NotificationId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    ServiceType = db.Column(db.String(100), nullable=False)
+    UserResponsible = db.Column(db.String(255), nullable=False)
+    Status = db.Column(db.String(100), nullable=False)
+    Message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+    def to_dict(self):
+        return {
+            'NotificationId': self.NotificationId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'ServiceType': self.ServiceType,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+            'Message': self.Message,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+
+#======================================================#       
+#Announcements
+class Announcement(db.Model):
+    __tablename__ = 'SASSAnnouncement'
+
+    AnnouncementId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
+    SystemAdminId = db.Column(db.Integer, db.ForeignKey('SPSSystemAdmin.SysAdminId'))
+    AnnouncementType = db.Column(db.String(255))
+    AnnouncementDetails = db.Column(db.Text)  # Fixing typo in column name
+    DatePosted = db.Column(db.DateTime)
+    AnnouncementFile = db.Column(db.String(50))
+
+    def to_dict(self):
+        return {
+            'AnnouncementId': self.AnnouncementId,
+            'FacultyId': self.FacultyId,
+            'AnnouncementType': self.AnnouncementType,
+            'AnnouncementDetails': self.AnnouncementDetails,
+            'DatePosted': self.DatePosted,
+            'AnnouncementFile': self.AnnouncementFile,
+        }   
+
+#======================================================#       
+
+# ==========Services========== #
+# ==========Adding_subject_form========== #
+class AddSubjects(db.Model, UserMixin):
+    __tablename__ = 'SASSAddSubjects'
+
+    SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)  
+    SubjectNames = db.Column(db.String(255), nullable=False)
+    EnrollmentType = db.Column(db.String(100))  # 'regular50or 'irregular'
+    AddSubjectFiledata = db.Column(db.LargeBinary)  # Store binary data for the file
+    AddSubjectFilefilename = db.Column(db.String(255))  # Store the filename
+    UserResponsible = db.Column(db.String(255))  # Add user role attribute
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'SubjectId': self.SubjectId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'SubjectNames': self.SubjectNames,
+            'EnrollmentType': self.EnrollmentType,
+            'AddSubjectFiledata': self.AddSubjectFiledata,
+            'AddSubjectFilefilename': self.AddSubjectFilefilename,
+            'UserResponsible': self.UserResponsible,  # Include user role in the dictionary
+            'Status': self.Status,
+        }
+
+    def get_AddSubjectsID(self):
+        return str(self.SubjectId)
+    
+# ==========Services========== #
+# ==========Change_of_subjects=========== #
+class ChangeOfSubjects(db.Model, UserMixin):
+    __tablename__ = 'SASSChangeSubjects'
+
+    ChangeSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)     
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255))
+    EnrollmentType = db.Column(db.String(100))  # 'regular' or 'irregular'
+    AceFormfilename = db.Column(db.String(255))
+    AceFormdata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255))
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ChangeSubjectId': self.ChangeSubjectId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'EnrollmentType': self.EnrollmentType,
+            'AceFormfilename': self.AceFormfilename,
+            'AceFormdata': self.AceFormdata,
+            'UserResponsible': self.UserResponsible,  # Include user role in the dictionary
+            'Status': self.Status,
+        }
+
+# ==========Requests========== #
+# ========== Reason need pdf file ========== #
+class ManualEnrollment(db.Model, UserMixin):
+    __tablename__ = 'SASSManualEnrollment'
+
+    ManualEnrollmentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    EnrollmentType = db.Column(db.String(100), nullable=False)
+    Reason = db.Column(db.Text, nullable=False)
+    MeFilefilename = db.Column(db.String(255))
+    MeFiledata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255))  # Add user role attribute
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ManualEnrollmentId': self.ManualEnrollmentId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'EnrollmentType': self.EnrollmentType,
+            'Reason': self.Reason,
+            'MeFilefilename': self.MeFilefilename,
+            'MeFiledata': self.MeFiledata,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at,
+        }
+
+
+# ==========Requests========== #
+# ========== Files needed for the Certification ========== #
+
+class CertificationRequest(db.Model, UserMixin):
+    __tablename__ = 'SASSCertification'
+
+    CertificationId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentNumber = db.Column(db.String(255), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    CertificationType = db.Column(db.String(100), nullable=False)
+    RequestFormfilename = db.Column(db.String(255), nullable=False)
+    RequestFormdata = db.Column(db.LargeBinary)
+    IdentificationCardfilename = db.Column(db.String(255), nullable=False)
+    IdentificationCarddata = db.Column(db.LargeBinary)
+    IsRepresentative = db.Column(db.Boolean, default=False)
+    AuthorizationLetterfilename = db.Column(db.String(255))
+    AuthorizationLetterdata = db.Column(db.LargeBinary)
+    RepresentativeIdfilename = db.Column(db.String(255))
+    RepresentativeIddata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255)) 
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+
+    def to_dict(self):
+        return {
+            'CertificationId': self.CertificationId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'CertificationType': self.CertificationType,
+            'RequestFormfilename': self.RequestFormfilename,
+            'RequestFormdata': self.RequestFormdata,
+            'IdentificationCardfilename': self.IdentificationCardfilename,
+            'IdentificationCarddata': self.IdentificationCarddata,
+            'IsRepresentative': self.IsRepresentative,
+            'AuthorizationLetterfilename': self.AuthorizationLetterfilename,
+            'AuthorizationLetterdata': self.AuthorizationLetterdata,
+            'RepresentativeIdfilename': self.RepresentativeIdfilename,
+            'RepresentativeIddata': self.RepresentativeIddata,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+# ========== Requests ========== #
+class GradeEntry(db.Model, UserMixin):
+    __tablename__ = 'SASSGradeEntry'
+
+    GradeEntryId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+
+    StudentNumber =db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    ApplicationType = db.Column(db.String(150), nullable=False)
+    CompletionFormfilename = db.Column(db.String(255), nullable=False)
+    CompletionFormdata = db.Column(db.LargeBinary)  # Add this line
+    ClassRecordfilename = db.Column(db.String(255), nullable=False)
+    ClassRecorddata = db.Column(db.LargeBinary)  # Add this line
+    Affidavitfilename = db.Column(db.String(255), nullable=False)
+    Affidavitdata = db.Column(db.LargeBinary)  # Add this line
+    UserResponsible = db.Column(db.String(100)) 
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'GradeEntryId': self.GradeEntryId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'ApplicationType': self.ApplicationType,
+            'CompletionFormfilename': self.CompletionFormfilename,
+            'CompletionFormdata': self.CompletionFormdata,  # Add this line
+            'ClassRecordfilename': self.ClassRecordfilename,
+            'ClassRecorddata': self.ClassRecorddata,  # Add this line
+            'Affidavitfilename': self.Affidavitfilename,
+            'Affidavitdata': self.Affidavitdata,  # Add this line
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+    
+# ==========Requests========== #  
+# ========== Files needed to the request ========== #
+class CrossEnrollment(db.Model, UserMixin):
+    __tablename__ = 'SASSCrossEnrollment'
+
+    CrossEnrollmentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)  
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    SchoolforCrossEnrollment = db.Column(db.String(255), nullable=False)
+    TotalNumberofUnits = db.Column(db.Integer, nullable=False)
+    AuthorizedSubjectstoTake = db.Column(db.Text, nullable=False)
+    ApplicationLetterfilename = db.Column(db.String(255), nullable=False)
+    ApplicationLetterdata = db.Column(db.LargeBinary)  # Add this line
+    PermitCrossEnrollfilename = db.Column(db.String(255), nullable=False)
+    PermitCrossEnrolldata = db.Column(db.LargeBinary)  # Add
+    UserResponsible = db.Column(db.String(255)) 
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+
+    def to_dict(self):
+        return {
+            'CrossEnrollmentId': self.CrossEnrollmentId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'SchoolforCrossEnrollment': self.SchoolforCrossEnrollment,
+            'TotalNumberofUnits': self.TotalNumberofUnits,
+            'AuthorizedSubjectstoTake': self.AuthorizedSubjectstoTake,
+            'ApplicationLetterfilename': self.ApplicationLetterfilename,
+            'ApplicationLetterdata': self.ApplicationLetterdata,  # Add this line
+            'PermitCrossEnrollfilename': self.PermitCrossEnrollfilename,
+            'PermitCrossEnrolldata': self.PermitCrossEnrolldata,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+            'StudentId': self.StudentId,
+        }
+
+    
+# ==========Requests========== #
+class PetitionRequest(db.Model, UserMixin):
+    __tablename__ = 'SASSPetitionRequest'
+
+    PetitionId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentNumber = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
+    Name = db.Column(db.String(255), nullable=False)
+    SubjectCode = db.Column(db.String(100), nullable=False)
+    SubjectName = db.Column(db.String(255), nullable=False)
+    PetitionType = db.Column(db.String(100), nullable=False)
+    RequestReason = db.Column(db.Text, nullable=False)
+    UserResponsible = db.Column(db.String(255)) 
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+
+    def to_dict(self):
+        return {
+            'PetitionId': self.PetitionId,
+            'StudentId': self.StudentId,
+            'StudentNumber':self.StudentNumber,
+            'Name': self.Name,
+            'SubjectCode': self.SubjectCode,
+            'SubjectName': self.SubjectName,
+            'PetitionType': self.PetitionType,
+            'RequestReason': self.RequestReason,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+    
+# ==========Services========== #  
+# ========Accreditation-for-Shiftees-and-Regular========= #  
+class ShiftingApplication(db.Model, UserMixin):
+    __tablename__ = 'SASSShiftingApplication'
+
+    ShiftingId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    CurrentProgram = db.Column(db.String(255), nullable=False)
+    ResidencyYear = db.Column(db.Integer, nullable=False)
+    IntendedProgram = db.Column(db.String(255), nullable=False)
+    Qualifications = db.Column(db.Text)
+    Shiftingfilename = db.Column(db.String(255))
+    Shiftingdata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255)) 
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now) 
+
+    def to_dict(self):
+        return {
+            'ShiftingId': self.ShiftingId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'CurrentProgram': self.CurrentProgram,
+            'ResidencyYear': self.ResidencyYear,
+            'IntendedProgram': self.IntendedProgram,
+            'Qualifications': self.Qualifications,
+            'Shiftingfilename': self.Shiftingfilename,
+            'Shiftingdata': self.Shiftingdata,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+# ==========Services========== #
+# ==========Overload-3-6-units========== #
+class OverloadApplication(db.Model, UserMixin):
+    __tablename__ = 'SASSOverloadApplication'
+
+    OverloadId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    Name = db.Column(db.String(255), nullable=False)
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    ProgramCourse = db.Column(db.String(255), nullable=False)
+    Semester = db.Column(db.String(20), nullable=False)
+    SubjectsToAdd = db.Column(db.String(255), nullable=False)
+    Justification = db.Column(db.Text, nullable=False)
+    Overloadfilename = db.Column(db.String(255))
+    Overloaddata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255))
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'OverloadId':  self.OverloadId,
+            'StudentId': self.StudentId,
+            'Name': self.Name,
+            'StudentNumber': self.StudentNumber,
+            'ProgramCourse':self.ProgramCourse,
+            'Semester': self.Semester,
+            'SubjectsToAdd': self.SubjectsToAdd,
+            'Justification': self.Justification,
+            'Overloadfilename': self.Overloadfilename,
+            'Overloaddata': self.Overloaddata,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+#Done
+# ==========Services========== #
+# ==========RO FORM========== #
+class TutorialRequest(db.Model, UserMixin):
+    __tablename__ = 'SASSTutorialRequest'
+
+    TutorialId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    StudentNumber = db.Column(db.String(100), nullable=False)
+    Name = db.Column(db.String(255), nullable=False)
+    SubjectCode = db.Column(db.String(100), nullable=False)
+    SubjectName = db.Column(db.String(255), nullable=False)
+    Tutorialfilename = db.Column(db.String(255))
+    Tutorialdata = db.Column(db.LargeBinary)
+    UserResponsible = db.Column(db.String(255))
+    Status = db.Column(db.String(100))
+    created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+    updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+ #Status 
+    
+     
+    def to_dict(self):
+        return {
+            'TutorialId': self.TutorialId,
+            'StudentId': self.StudentId,
+            'StudentNumber': self.StudentNumber,
+            'Name': self.Name,
+            'SubjectCode': self.SubjectCode,
+            'SubjectName': self.SubjectName,
+            'Tutorialdata': self.Tutorialdata,
+            'Tutorialfilename': self.Tutorialfilename,
+            'created_at': self.created_at,
+            'UserResponsible': self.UserResponsible,
+            'Status': self.Status,
+        }
+
+# ------------------------------------------------
+# List of Faculty that is being called in the services needed
+# FacultyList
+# 
+# ------------------------------------------------
+# config_mode = 'os.getenv("CONFIG_MODE")'
+# add_data = os.getenv("ADD_DATA")
+config_mode = 'development'
+add_data = 'True'
+
+# print('/'+config_mode+'/')
+# print('/'+add_data+'/')
 
 def init_db(app):
     db.init_app(app)
-    with app.app_context():
-      inspector = inspect(db.engine)
-      if not inspector.has_table('Student'):
-        db.create_all()
-    #    create_sample_data()
-        
-#=====================================================================================================#
-# INSERTING DATA
-"""def create_sample_data():
-    # Create and insert student data
-    student_data = [
-        {   
-            'StudentId':'1',
-            'StudentNumber': '2020-00001-CM-0',
-            'name': 'student 1',
-            'email': 'student1@example.com',
-            'address': '301 Don Fabian st. Commonwealth City 1',
-            'password': generate_password_hash('password1'),
-            'gender': 1,
-            'dateofBirth': '2003-01-15',
-            'placeofBirth': 'City 1',
-            'mobileNumber': '09123123123',
-            'userImg': 'default.jpg'
-        },
-        {
-            'StudentId':'2',
-            'StudentNumber': '2020-00002-CM-0',
-            'name': 'student 2',
-            'email': 'student2@example.com',
-            'address': '201 Don Juan st. Commonwealth City 2',
-            'password': generate_password_hash('password2'),
-            'gender': 2,
-            'dateofBirth': '2002-05-20',
-            'placeofBirth': 'City 2',
-            'mobileNumber': '09123123124',
-            'userImg': 'pup2.jpg'
-        },
-        # Add more student data as needed
-    ]
     
-    for data in student_data:
-        student = Student(**data)
-        db.session.add(student)
-        db.session.flush()
+    if add_data=='False':
+        # from data.student import student_data #done
+        # from data.faculty import faculty_data #done
+        # from data.systemadmin import system_admin_data
+        # from data.course import course_data
+        # from data.subject import subject_data
+        # from data.metadata import metadata_data
+        # from data.curriculum import curriculum_data
+        # from data.courseEnrolled import course_enrolled_data
+        # from data.classes import class_data
+        # from data.classSubject import class_subject_data
+        # from data.classSubjectGrade import class_subject_grade_data
+        # from data.studentClassSubjectGrade import student_class_subject_grade_data # DONT HAVE DATA YET
+        # from data.studentClassGrade import student_class_grade_data
+        # from data.classGrade import class_grade_data # NOT IN MODELS
+        # from data.courseGrade import course_grade_data
+        # from data.latestBatchSemester import batch_semester_data
 
-    # Create and insert faculty data
-    faculty_data = [
-        {
-            'facultyID':'1',
-            'facultyNumber': '2020-00001-TC-0',
-            'userType': 'Director',
-            'name': 'Faculty 1',
-            'email': 'faculty1@example.com',
-            'address': '100 Galaxy st. City 2',
-            'password': generate_password_hash('director'),
-            'gender': 1,
-            'dateofBirth': '1988-07-20',
-            'placeofBirth': 'City 2',
-            'mobile_number': '09123123111',
-            'userImg': 'default.jpg',
-            'is_active': True
-        },
-        {
-            'facultyID': '2',
-            'facultyNumber': '2020-00002-TC-0',
-            'userType': 'Head Academic Program',
-            'name': 'Faculty 2',
-            'email': 'faculty2@example.com',
-            'address': '101 Mercury st. City 3',
-            'password': generate_password_hash('headacademicprogram'),
-            'gender': 2,
-            'dateofBirth': '1975-12-05',
-            'placeofBirth': 'City 3',
-            'mobile_number': '09123123125',
-            'userImg': 'default.jpg',
-            'is_active': False
-        },
-        # Add more faculty data as needed
-    ]
-    
-    for data in faculty_data:
-        faculty = Faculty(**data)
-        db.session.add(faculty)
-        db.session.flush()
-        
-    # Create and insert admin data
-    admin_data = [
-        {
-            'adm_Id': 1,
-            'admin_Number': '2020-00001-AD-0',
-            'name': 'Admin 1',
-            'email': 'admin1@example.com',
-            'password': generate_password_hash('password1'),
-            'gender': 2,
-            'dateofBirth': '1995-03-10',
-            'placeofBirth': 'City 3',
-            'mobile_number': '09123123222',
-            'is_active': True
-        },
-        {
-            'adm_Id': 2,
-            'admin_Number': '2020-00002-AD-0',
-            'name': 'Admin 2',
-            'email': 'admin2@example.com',
-            'password': generate_password_hash('password2'),
-            'gender': 1,
-            'dateofBirth': '1980-09-18',
-            'placeofBirth': 'City 4',
-            'mobile_number': '09123123223',
-            'is_active': True
-        },
-        # Add more admin data as needed
-    ]
-    
-    for data in admin_data:
-        admin = Admin(**data)
-        db.session.add(admin)
-        db.session.flush()
+        def create_sample_data():
+            print('adding')
+            # for data in student_data:
+            #     student = Student(**data)
+            #     db.session.add(student)
 
-db.session.commit()
-db.session.close()"""
+            # for data in faculty_data:
+            #     faculty = Faculty(**data) 
+            #     db.session.add(faculty)
+
+            # for data in system_admin_data:
+            #     system_admin = SystemAdmin(**data) 
+            #     db.session.add(system_admin)
+
+            # for data in course_data:
+            #     course = Course(**data)
+            #     db.session.add(course) 
+            #     db.session.flush()
+                
+            # for data in subject_data:
+            #     subject = Subject(**data) 
+            #     db.session.add(subject)
+            #     db.session.flush()
+
+            # for data in metadata_data:
+            #     metadata = Metadata(**data) 
+            #     db.session.add(metadata)
+            #     db.session.flush()
+
+            # for data in curriculum_data:
+            #     curriculum = Curriculum(**data) 
+            #     db.session.add(curriculum)
+            #     db.session.flush()
+                
+            # for data in course_enrolled_data:
+            #     course_enrolled = CourseEnrolled(**data) 
+            #     db.session.add(course_enrolled)
+            #     db.session.flush()
+
+            
+            # for data in class_data:
+            #     class_ = Class(**data)
+            #     db.session.add(class_)
+            #     db.session.flush()
+
+            # for data in class_subject_data:
+            #     class_subject = ClassSubject(**data) 
+            #     db.session.add(class_subject)
+            #     db.session.flush()
+ 
+            # for data in student_class_grade_data:
+            #     student_class_grade = StudentClassGrade(**data)
+            #     db.session.add(student_class_grade)
+            #     db.session.flush()
+                
+            # for data in student_class_subject_grade_data:
+            #     student_class_subject_grade = StudentClassSubjectGrade(**data) # DONT HAVE DATA YET
+            #     db.session.add(student_class_subject_grade)
+            #     db.session.flush()
+
+            # for data in course_grade_data:
+            #     course_grade = CourseGrade(**data) # walang data model
+            #     db.session.add(course_grade)
+            #     db.session.flush()
+
+            # for data in batch_semester_data:
+            #     latest_batch_semester = LatestBatchSemester(**data)
+            #     db.session.add(latest_batch_semester)
+            #     db.session.flush()
+                 
+            db.session.commit()
+            db.session.close()
+
+        
+        # if config_mode == 'development' :
+        #     with app.app_context():
+        #         inspector = inspect(db.engine)
+        #         db.create_all()
+
+        #         if add_data=='False':
+        #             print("DEVELOPMENT AND ADDING DATA")
+        #             create_sample_data()
+
+
+        if config_mode == 'development' and add_data=='False':
+            # print("DEVELOPMENT AND ADDING DATA")
+            with app.app_context():
+                inspector = inspect(db.engine)
+                # if not inspector.has_table('SPSStudent'):
+                db.create_all()
+                create_sample_data()
