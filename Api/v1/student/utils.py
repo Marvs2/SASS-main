@@ -437,6 +437,7 @@ def getAllSubjects(str_student_id):
         return None
     
 def get_student_services(student_id):
+    addsubject_list = AddSubjects.query.filter_by(StudentId=student_id).all()
     changesubjects_list = ChangeSubject.query.filter_by(StudentId=student_id).all()
     manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
     certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
@@ -449,7 +450,7 @@ def get_student_services(student_id):
 
     # Concatenate all lists into one comprehensive list
     all_services_list = (
-        # [subject.to_dict() for subject in addsubjects_list] +
+        [subject.to_dict() for subject in addsubject_list] +
         [subject.to_dict() for subject in changesubjects_list] +
         [subject.to_dict() for subject in manual_enrollments_list] +
         [subject.to_dict() for subject in certification_request_list] +
@@ -462,7 +463,7 @@ def get_student_services(student_id):
     )
     total_services = len(all_services_list)
     # Count the number of services with status "pending"
-    pending_count = sum(1 for service in all_services_list if service.get('Status') == 'Sent')
+    pending_count = sum(1 for service in all_services_list if service.get('Status') == 'pending')
     approved_count = sum(1 for service in all_services_list if service.get('Status') == 'Approved')
     denied_count = sum(1 for service in all_services_list if service.get('Status') == 'Rejected')
 
@@ -470,4 +471,82 @@ def get_student_services(student_id):
     print(f"Number of services with status 'approved': {approved_count}")
     print(f"Number of services with status 'rejected': {denied_count}")
     print(total_services)
+    
     return all_services_list, total_services, pending_count, approved_count, denied_count
+
+ 
+# def totalfailure(student_id=None):
+#     try:
+#         # Query to fetch student grades, join with CourseEnrolled and Metadata to get course and year level
+#         query = (db.session.query(StudentClassGrade, Metadata.Year, Metadata.CourseId)
+#                  .join(CourseEnrolled, CourseEnrolled.StudentId == StudentClassGrade.StudentId)
+#                  .join(Metadata, Metadata.CourseId == CourseEnrolled.CourseId)
+#                  .filter(and_(StudentClassGrade.Grade > 2.5, StudentClassGrade.Grade < 3.0))
+#                  .all())
+
+#         # Initialize an empty dictionary for course and year level counts
+#         course_year_level_counts = {}
+
+#         # Process query results to get count of students per course and year level
+#         for record in query:
+#             grade, year, course_id = record
+#             if course_id not in course_year_level_counts:
+#                 course_year_level_counts[course_id] = {}
+#             course_year_level_counts[course_id][year] = course_year_level_counts[course_id].get(year, 0) + 1
+
+#         print(course_year_level_counts)
+#         return jsonify(course_year_level_counts)
+
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         return None
+
+
+def totalfailure(student_id=None):
+    try:
+        # Query to fetch student grades, join with CourseEnrolled and Metadata to get year level
+        query = (db.session.query(StudentClassGrade, Metadata.Year)
+                 .join(CourseEnrolled, CourseEnrolled.StudentId == StudentClassGrade.StudentId)
+                 .join(Metadata, Metadata.CourseId == CourseEnrolled.CourseId)
+                 .filter(and_(StudentClassGrade.Grade > 2.5, StudentClassGrade.Grade < 3.0))
+                 .all())
+
+        # Initialize an empty dictionary for year level counts
+        year_level_counts = {}
+
+        # Process query results to get count of students per year level
+        for record in query:
+            # Assuming record is a tuple with (StudentClassGrade, Year)
+            Grade, year = record
+            year_level_counts[year] = year_level_counts.get(year, 0) + 1
+
+        print(record)
+        return jsonify(year_level_counts)
+
+    except Exception as e:
+        print("ERROR HERE: ", e)
+        return None
+    
+#======================================Failing per Batch===========================#
+def failingradeperbatch():
+    try:
+        result = (
+            db.session.query(
+                Metadata.Batch,
+                func.count(StudentClassSubjectGrade.AcademicStatus).label('status_count')
+            )
+            .join(Class, Metadata.MetadataId == Class.MetadataId)
+            .join(ClassSubject, Class.ClassId == ClassSubject.ClassId)
+            .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+            .filter(StudentClassSubjectGrade.AcademicStatus == 2)
+            .group_by(Metadata.Batch)
+            .all()
+        )
+
+        # The result will be a list of tuples, each containing (Batch, status_count)
+        for batch, count in result:
+            print(f'Batch: {batch}, Count of AcademicStatus Failed == 2: {count}')
+
+    except Exception as e:
+        print("ERROR HERE: ", e)
+        return None

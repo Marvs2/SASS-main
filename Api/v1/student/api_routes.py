@@ -1,6 +1,6 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  get_student_services, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade
+from Api.v1.student.utils import  failingradeperbatch, get_student_services, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
@@ -687,6 +687,34 @@ def subjectsall():
             return jsonify(error="No data available")
     else:
         return render_template('404.html'), 404
+    
+@student_api.route('/failuregrades', methods=['GET'])
+@role_required('student')
+def failuregrades():
+    student = getCurrentUser()
+    print('STUDEINT ID: ', student.StudentId)
+    if student:
+        json_subjects_grade = totalfailure(student.StudentId)
+        if json_subjects_grade:
+            return (json_subjects_grade)
+        else:
+            return jsonify(error="No data available")
+    else:
+        return render_template('404.html'), 404
+
+@student_api.route('/failureperbatch', methods=['GET'])
+@role_required('student')
+def failureperbatch():
+    student = getCurrentUser()
+    if student:
+        json_subjects_grade = failingradeperbatch()
+        if json_subjects_grade:
+            return (json_subjects_grade)
+        else:
+            return jsonify(error="No data available")
+    else:
+        return render_template('404.html'), 404
+
     
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):

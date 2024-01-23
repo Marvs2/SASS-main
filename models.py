@@ -435,36 +435,6 @@ class Curriculum(db.Model):
 #             'Status': self.Status,
 
 #         }
-
-
-class AddSubjects(db.Model):
-    __tablename__ = 'SASSAddSubjects'
-    
-    AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
-    FacultyRole =db.Column(db. String(50))
-    Subject = db.Column(db.String(255))
-    ServiceDetails = db.Column(db.String(255))
-    SenderName = db.Column(db.String(50))
-    SenderContactNo = db.Column(db.String(50))
-    PaymentFile = db.Column(db.LargeBinary)
-    Status = db.Column(db.String(20))
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    
-    def to_dict(self):
-        return {
-            'AddSubjectId': self.AddSubjectId,
-            'StudentId': self.StudentId,
-            'FacultyRole': self.FacultyRole,
-            'SubjectId': self.Subject,
-            'ServiceDetails': self.ServiceDetails,
-            'SenderName': self.SenderName,
-            'SenderContactNo': self.SenderContactNo,
-            'PaymentFile': self.PaymentFile,
-            'Status': self.Status,
-
-        }
         
 # This table will trigger everytime there is addded new batch Semester
 class LatestBatchSemester(db.Model):
@@ -549,7 +519,35 @@ class CourseGrade(db.Model):
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
+# SassSubject
+class AddSubjects(db.Model):
+    __tablename__ = 'SASSAddSubjects'
+    
+    AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
+    FacultyRole =db.Column(db. String(50))
+    Subject = db.Column(db.String(255))
+    ServiceDetails = db.Column(db.String(255))
+    SenderName = db.Column(db.String(50))
+    SenderContactNo = db.Column(db.String(50))
+    PaymentFile = db.Column(db.LargeBinary)
+    Status = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    def to_dict(self):
+        return {
+            'AddSubjectId': self.AddSubjectId,
+            'StudentId': self.StudentId,
+            'FacultyRole': self.FacultyRole,
+            'SubjectId': self.Subject,
+            'ServiceDetails': self.ServiceDetails,
+            'SenderName': self.SenderName,
+            'SenderContactNo': self.SenderContactNo,
+            'PaymentFile': self.PaymentFile,
+            'Status': self.Status,
 
+        }
 #Notification
 class Notification(db.Model, UserMixin):
     __tablename__ = 'SASSNotifications'
@@ -606,39 +604,7 @@ class Announcement(db.Model):
 
 # ==========Services========== #
 # ==========Adding_subject_form========== #
-# class AddSubjects(db.Model, UserMixin):
-#     __tablename__ = 'SASSAddSubjects'
 
-#     SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-#     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
-#     StudentNumber = db.Column(db.String(100), nullable=False)
-#     Name = db.Column(db.String(255), nullable=False)  
-#     SubjectNames = db.Column(db.String(255), nullable=False)
-#     EnrollmentType = db.Column(db.String(100))  # 'regular50or 'irregular'
-#     AddSubjectFiledata = db.Column(db.LargeBinary)  # Store binary data for the file
-#     AddSubjectFilefilename = db.Column(db.String(255))  # Store the filename
-#     UserResponsible = db.Column(db.String(255))  # Add user role attribute
-#     Status = db.Column(db.String(100))
-#     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
-#     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
-
-#     def to_dict(self):
-#         return {
-#             'SubjectId': self.SubjectId,
-#             'StudentId': self.StudentId,
-#             'StudentNumber': self.StudentNumber,
-#             'Name': self.Name,
-#             'SubjectNames': self.SubjectNames,
-#             'EnrollmentType': self.EnrollmentType,
-#             'AddSubjectFiledata': self.AddSubjectFiledata,
-#             'AddSubjectFilefilename': self.AddSubjectFilefilename,
-#             'UserResponsible': self.UserResponsible,  # Include user role in the dictionary
-#             'Status': self.Status,
-#         }
-
-#     def get_AddSubjectsID(self):
-#         return str(self.SubjectId)
-    
 # ==========Services========== #
 # ==========Change_of_subjects=========== #
 class ChangeSubject(db.Model):

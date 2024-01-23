@@ -63,19 +63,13 @@ def custom_context_processor():
 @app.route('/')
 @prevent_authenticated
 def index():
-    session.permanent = True
     return render_template('main/home.html')
 
 #===========================================================================
 @app.route('/')
 @prevent_authenticated
 def home():
-    if current_user.__class__.__name__ == "student":
-        return render_template('student/dashboard.html')
-    elif current_user.__class__.__name__ == "faculty":
-        return render_template('faculty/dashboard.html')
-    else:
-        return render_template('main/home.html')
+    return render_template('main/home.html')
 
 #=============================== LOGOUT FUNCTION ====================================
 
@@ -175,28 +169,42 @@ def discipline():
 @student_required
 @role_required('student')
 def student_dashboard():
-#    # Assuming you have a function to get student services based on their ID
-#     student_id = session.get('user_id')
-#     all_services_list, pending_count, approved_count, denied_count, total_services = get_student_services(student_id)  # Unpack the tuple
+   # Assuming you have a function to get student services based on their ID
+    student_id = session.get('user_id')
+    all_services_list, total_services, pending_count, approved_count, denied_count = get_student_services(student_id)  
+  # Unpack the tuple
 
-#     # Count the number of services with "Sent" status
-#     pending_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-#     pending_count = len(pending_services)
+    # Count the number of services with "Sent" status
+    pending_services = [service for service in all_services_list if service.get('Status') == 'pending']
+    pending_count = len(pending_services)
     
-#     approved_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-#     approved_count = len(approved_services)
+    approved_services = [service for service in all_services_list if service.get('Status') == 'Approved']
+    approved_count = len(approved_services)
 
-#     denied_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-#     denied_count = len(denied_services)
+    denied_services = [service for service in all_services_list if service.get('Status') == 'Rejected']
+    denied_count = len(denied_services)
     
 
-#     # Calculate the percentage of pending services
-#     total_services = len(all_services_list)
-#     pending_percentage = f"{(pending_count / total_services) * 100}%"
-#     approved_percentage = f"{(approved_count / total_services) * 100}%"
-#     denied_percentage = f"{(denied_count / total_services) * 100}%"
+    total_services = len(all_services_list)
+    if total_services > 0:
+        pending_percentage = "{:.2f}%".format((pending_count / total_services) * 100)
+        approved_percentage = "{:.2f}%".format((approved_count / total_services) * 100)
+        denied_percentage = "{:.2f}%".format((denied_count / total_services) * 100)
+        total_percentage = "{:.2f}%".format((total_services / total_services) * 100)
+    else:
+        pending_percentage = "0.00%"
+        approved_percentage = "0.00%"
+        denied_percentage = "0.00%"
+        total_percentage = "0.00%"
 
-    return render_template('/student/dashboard.html') #, pending_count=pending_count, pending_percentage=pending_percentage, approved_percentage=approved_percentage, denied_percentage=denied_percentage)
+    data = {
+        'series': [pending_percentage, approved_percentage, denied_percentage, 100],  # Assuming 'Total' is always 100%
+        'labels': ['Pending', 'Approved', 'Rejected', 'Total']
+    }
+
+    print(data)
+    
+    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
 
 
 #======================================== STUDENT PROFILE ======================================================
@@ -1414,7 +1422,6 @@ def check_user_activity():
 @app.route('/student')
 @prevent_authenticated
 def studentLogin():
-    session.permanent = True
     return render_template("student/login.html")
 
 #foroverload
