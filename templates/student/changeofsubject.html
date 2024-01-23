@@ -1,116 +1,664 @@
 {% extends "student/layout.html" %}
-{% block content %}
-             
-    <h1>Student Class Subjects</h1>
-    <table id="subjectsTable">
-        <thead>
-            <tr>
-                <th>Course Code</th>
-                <th>Subject</th>
-                <th>Schedule</th>
-                <!-- Add other necessary columns -->
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Rows will be added here -->
-        </tbody>
-    </table>
 
-    <script>
-        async function loadStudentClassSubjects(studentId) {
-            const response = await fetch(`/api/student_class_subjects/${studentId}`);
-            if (!response.ok) {
-                console.error('Error fetching data');
-                return;
-            }
-            const subjects = await response.json();
-            const tableBody = document.getElementById('subjectsTable').getElementsByTagName('tbody')[0];
-            subjects.forEach(subject => {
-                let row = tableBody.insertRow();
-                // Modify these according to your actual data structure
-                let cellCourse = row.insertCell(0);
-                cellCourse.innerHTML = subject.CourseCode;
-                let cellSubject = row.insertCell(1);
-                cellSubject.innerHTML = subject.SubjectName;
-                let cellSchedule = row.insertCell(2);
-                cellSchedule.innerHTML = subject.Schedule;
-                // Add other cells as necessary
+{% block content %}
+
+  <!-- Progress bar -->
+  <div class="progressbar">
+    <div class="progress1" id="progress1"></div>
+    <div class="progress-step progress-step-active" data-title="Current Subjects"></div>
+    <div class="progress-step" data-title="Change Subject/s"></div>
+    <div class="progress-step" data-title="Payment"></div>
+    <div class="progress-step" data-title="Review Subject"></div>
+  </div>
+
+  <!-- SHOW CURRENT SUBJECT -->
+  <div class="form-step form-step-active">
+    <div class="data data1" id="firstTableContainer">
+      
+      <div class="content-data">
+        <div class="head mb-3">
+          <h3>Current Subjects</h3>
+        </div>
+
+        <div class="row mb-3">
+          <span class="mb-3">  
+            <b>Student:</b>
+            <input type="text" class="form-control" name="Name" title="Name" id="Name" readonly>
+          </input>
+          </span>
+
+          <span>
+            <b>Course:</b> {% if course %} {{ course.CourseCode }} {% endif %}
+          </span>
+        </div>
+
+        <table id="addingSubject" class="table table-bordered table-condensed display">
+          <thead>
+            <tr>
+              <th>Subject Code</th>
+              <th>Subject Name</th>
+              <th>Description</th>
+              <th>Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in subject_list %}
+              <tr
+                data-subject-code="{{ subject.SubjectCode }}"
+                data-subject-description="{{ subject.Name }}"
+                data-Description="{{ subject.Description }}"
+                data-Units="{{ subject.Units }}"
+                data-IsNSTP="{{ subject.IsNSTP }}"
+              >
+                <td>{{ subject.SubjectCode }}</td>
+                <td>{{ subject.Name }}</td>
+                <td>{{ subject.Description }}</td>
+                <td>{{ subject.Units }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-primary btn-next">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOW OPTION FOR ADDING OF SUBJECTS  -->
+
+  <div class="form-step">
+    <div class="data data1"  id="reviewHeading">
+      <div class="content-data">
+        <div class="head mb-3">
+          <b>FROM:</b>
+        </div>
+
+        <!-- Review Table for Selected Subjects -->
+        <table class="table table-bordered table-condensed" id="reviewSubjectsTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Subject Code</th>
+              <th>Subject Name</th>
+              <th>Description</th>
+              <th>Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Selected subjects will be added here -->
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <div class="data data1" id="selectHeading">
+        <div class="content-data">
+          <div class="head mb-3">
+            <b>TO:</b>
+          </div>
+  
+          <!-- Dropdown for Selecting Subjects -->
+            <select id="selectedSubjectsDropdown" title="select" class="form-control" onchange="handleDropdownChange(this);">
+                <option value="" selected disabled>Select a Subject</option>
+                {% for selections in selection_list %}
+                <option value="{{ selections.SubjectCode }}">
+                    {{ selections.SubjectCode }} - {{ selections.Name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+  
+      <div class="data data1">
+        <div class="content-data">
+
+        <div class="head mb-3">
+          <h3>Change of Schedule/Subjects</h3>
+        </div>
+          <!-- Table for Displaying Subjects to Select -->
+          <table id="selectedSubjectsTable" class="table table-bordered table-condensed">
+            <thead>
+              <tr>
+                <th></th>
+                <th>Subject Code</th>
+                <th>Subject Name</th>
+                <th>Description</th>
+                <th>Units</th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for subject in subject_list %}
+                <tr
+                data-subject-code="{{ subject.SubjectCode }}"
+                data-subject-description="{{ subject.Name }}"
+                data-Description="{{ subject.Description }}"
+                data-Units="{{ subject.Units }}"
+                data-IsNSTP="{{ subject.IsNSTP }}">
+                  <td>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" name="checkbox" title="checkbox" class="custom-control-input selections-checkbox" id="checkbox{{ subject_list.SubjectId }}" onclick="handleCheckboxClick(this);"/>
+
+                      <label class="custom-control-label" for="checkbox{{ subject_list.SubjectId }}"></label>
+                    </div>
+                  </td>
+                  <td>{{ subject.SubjectCode }}</td>
+                  <td>{{ subject.Name }}</td>
+                  <td>{{ subject.Description }}</td>
+                  <td>{{ subject.Units }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-end mt-3">
+            <button type="button" class="btn btn-primary btn-prev">Previous</button>
+            <button type="button" class="btn btn-primary btn-next ml-2">Next</button>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAYMENT-->
+  <div class="form-step">
+    <div class="data data1">
+      <div class="content-data">
+        <div class="head mb-5">
+          <h3 id="user-info">Payment</h3>
+        </div>
+
+        <form>
+          <div class="row mb-5">
+            <label for="name" class="col-sm-2 col-form-label">Sender Name</label>
+            <div class="col-sm-8">
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
+          </div>
+
+          <div class="row mb-5">
+            <label for="MobileNumber" class="col-sm-2 col-form-label">Number</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}">
+          </div>
+          </div>
+        
+          <div class="row mb-5">
+            <label for="paymentScreenshot" class="col-sm-2 col-form-label">Proof of Payment</label>
+            <div class="col-sm-8">
+              <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" accept="image/*" required>
+          </div>
+          </div>
+      
+          <!-- <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="agreeTerms" name="agreeTerms">
+            <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions</label>
+          </div>          -->
+        </form>        
+
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-primary btn-prev">Previous</button>
+          <button type="button" class="btn btn-primary btn-next ml-2"  onclick="showResponse()">Next</button>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+<!-- REVIEW TRANSACTIONS -->
+<div class="form-step">
+  <div class="data data1">
+    <div class="content-data">
+      <div class="head mb-5">
+        <h3>Review Transactions</h3>
+      </div>
+
+      <form id="serviceRequestForm" action="{{url_for('changeApplication')}}" method="POST" enctype="multipart/form-data">
+      <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
+      <input type="hidden" name="StudentId" title="text" value="{{ session['user_id'] }}"/>
+      <input type="hidden" id="fromSubjectsHidden" title="text" name="fromSubjects" value="">
+      <input type="hidden" id="toSubjectsHidden" title="text" name="toSubjects" value="">
+      <input type="hidden" id="selectedSubjects" title="text" name="selectedSubjects" value="">
+      <input type="hidden" id="SenderNameHidden" title="text" name="SenderName" value="">
+      <input type="hidden" id="SenderContactNoHidden" title="text" name="SenderContactNo" value="">
+      <input type="hidden" id="PaymentFileHidden" title="text" name="PaymentFile" value="">
+
+      <div class="row mb-5">
+        <label for="reviewSubjectList" class="col-sm-2 col-form-label">From</label>
+        <div class="col-sm-8">
+        <span id="reviewSubjectList" class="form-control"></span>
+      </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="toSubject" class="col-sm-2 col-form-label">To</label>
+        <div class="col-sm-8">
+        <span id="toSubject" class="form-control"></span>
+      </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="SenderName" class="col-sm-2 col-form-label">Sender Name</label>
+        <div class="col-sm-8">
+          <span id="SenderName" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="SenderContactNo" class="col-sm-2 col-form-label">Number</label>
+        <div class="col-sm-8">
+          <span id="SenderContactNo" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="PaymentFile" class="col-sm-2 col-form-label">Proof of Payment</label>
+        <div class="col-sm-8">
+          <span id="PaymentFile" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="ServiceDetails" class="col-sm-2 col-form-label">Reason/s</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="ServiceDetails" name="ServiceDetails" required>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary btn-prev">Previous</button>
+        <button type="submit" class="btn btn-primary ml-2" onclick="submitForm()">Submit</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+
+<script>
+    var selectedSubjectIds = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        function handleCheckboxClick(checkbox) {
+            updateCheckboxState();
+            handleFromSubjectDisplay();
+            handleToSubjectDropdown();
+        }
+
+        var checkboxes = document.getElementsByClassName('selections-checkbox');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('click', function () {
+                handleCheckboxClick(this);
             });
         }
 
-<<<<<<< HEAD
-        // Example student ID, replace with actual data or logic to determine student ID
-        loadStudentClassSubjects(12345);
-    </script>
-=======
-        
-        <div class="row mb-3">
-            <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
-            </div>
-        </div>
+        function updateCheckboxState() {
+            var checkboxes = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+            var totalUnits = 0;
+            checkboxes.forEach(function (checkbox) {
+                var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+                totalUnits += units;
+            });
 
-        <div class="row mb-3">
-            <label for="Name" class="col-sm-3 col-form-label">Name</label>
-            <div class="col-sm-8">
-                <input type="text" class="form-control" id="Name" name="Name" readonly>
-            </div>
-        </div>
+            document.querySelectorAll('#selectedSubjectsTable .selections-checkbox').forEach(function (checkbox) {
+                var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+                if (!checkbox.checked && (totalUnits + units) > 6) {
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.disabled = false;
+                }
+            });
+        }
 
-        <div class="row mb-3">
-            <label for="EnrollmentType" class="col-sm-3 col-form-label">Enrollment Type</label>
-                <div class="col-sm-8">
-                    <select class="custom-select" id="EnrollmentType" name="EnrollmentType" required>
-                        <option value="">Select Enrollment Type...</option>
-                        <option value="Regular">Regular</option>
-                        <option value="Irregular">Irregular</option>
-                    </select>
-                </div>
-        </div>
-        
-        <div class="row mb-3">
-            <label for="ace_form" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
-            <div class="col-sm-8">
-                <input class="form-control" type="file" name="ace_form" id="ace_form" accept=".pdf">
-              </div>
-        </div>
+        function handleFromSubjectDisplay() {
+            // Update the "From" subjects text based on selected checkboxes
+            var fromSubjects = [];
+            document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+                var tr = checkbox.closest('tr');
+                var subjectCode = tr.getAttribute('data-subject-code');
+                var subjectName = tr.getAttribute('data-subject-description');
+                fromSubjects.push(`${subjectCode} - ${subjectName}`);
+            });
+            document.getElementById('reviewSubjectList').textContent = fromSubjects.join(', ');
+            document.getElementById('fromSubjectsHidden').value = fromSubjects.join(','); // Update hidden field
+        }
 
-        <div class="row mb-3">
-            <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
-                <div class="col-sm-8">
-                    <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
-                        <option value="6">Professor</option>
-                        <option value="7">CDO</option>
-                        <option value="8">Head Academic</option>
-                        <option value="9">Director</option>
-                        <option value="10">Registrar's Office</option>
-                    </select>
-                </div>
-        </div>
+        function handleToSubjectDropdown() {
+            var toSubjectDropdown = document.getElementById('selectedSubjectsDropdown');
+            var selectedSubjects = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+            var options = toSubjectDropdown.options;
 
-        <div class="row mb-3" style="display: none;">
-            <label for="Status" class="col-sm-3 col-form-label">Status </label>
-            <div class="col-sm-8">
-                <select class="custom-select" id="Status" name="Status" required>
-                    <option value="Sent" selected>Sending</option>
-                    <option value="Pending" disabled>Pending</option>
-                    <option value="Approved" disabled>Approved</option>
-                    <option value="Rejected" disabled>Rejected</option>
-                </select>
-            </div>
-        </div>
+            // Reset previous selections
+            for (var i = 1; i < options.length; i++) {
+                options[i].disabled = false;
+            }
 
-        <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-success">Submit Application</button>
-            |||
-                <a href="{{ url_for('viewchange') }}">View change Subject</a>
-        </div>
-    </form>
-    </div>
-</div>
->>>>>>> TEST
- 
+            // Disable options that are already selected
+            selectedSubjects.forEach(function (checkbox) {
+                var subjectCode = checkbox.closest('tr').getAttribute('data-subject-code');
+                for (var i = 1; i < options.length; i++) {
+                    if (options[i].value === subjectCode) {
+                        options[i].disabled = true;
+                    }
+                }
+            });
+        }
+
+        updateCheckboxState();
+    });
+
+    function handleCheckboxClick(checkbox) {
+        var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+        var reviewHeading = document.getElementById('reviewHeading');
+        var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+        var tr = checkbox.closest('tr');
+
+        if (checkbox.checked) {
+            var clonedRow = tr.cloneNode(true);
+            clonedRow.querySelector('input[type="checkbox"]').onclick = function () {
+                handleCheckboxClick(this);
+            };
+            reviewTableBody.appendChild(clonedRow);
+            reviewSubjectsTable.style.display = 'table';
+            tr.style.display = 'none';
+
+            reviewHeading.style.display = 'block';
+
+            var subjectId = checkbox.id.replace('checkbox', '');
+            var subjectCode = tr.getAttribute('data-subject-code');
+            var subjectName = tr.getAttribute('data-subject-description');
+            selectedSubjectIds.push(subjectId);
+            document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+
+            var reviewSubjectList = document.getElementById('reviewSubjectList');
+            var listItem = document.createElement('li');
+            listItem.textContent = `${subjectCode} - ${subjectName}`;
+            reviewSubjectList.appendChild(listItem);
+        } else {
+            Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+                if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+                    reviewTableBody.removeChild(row);
+                }
+            });
+
+            tr.style.display = '';
+
+            var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
+            if (indexToRemove !== -1) {
+                selectedSubjectIds.splice(indexToRemove, 1);
+                document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+            }
+
+            var reviewSubjectList = document.getElementById('reviewSubjectList');
+            reviewSubjectList.removeChild(reviewSubjectList.lastChild);
+        }
+
+        updateCheckboxState();
+
+        if (reviewTableBody.getElementsByTagName('tr').length === 0) {
+            reviewSubjectsTable.style.display = 'none';
+            reviewHeading.style.display = 'none';
+        }
+
+        handleFromSubjectDisplay();
+        handleToSubjectDropdown();
+    }
+
+    function toggleDropdownVisibility() {
+        var checkboxes = document.querySelectorAll('#addingSubject .selections-checkbox:checked');
+        var selectedSubjectsDropdown = document.getElementById('selectedSubjectsDropdown');
+        var selectHeading = document.getElementById('selectHeading');
+
+        if (checkboxes.length > 0) {
+            selectHeading.style.display = 'block';
+        } else {
+            selectHeading.style.display = 'none';
+        }
+    }
+
+    var checkboxesAddingSubject = document.querySelectorAll('#addingSubject .selections-checkbox');
+    for (var i = 0; i < checkboxesAddingSubject.length; i++) {
+        checkboxesAddingSubject[i].addEventListener('click', function () {
+            handleCheckboxClick(this);
+            toggleDropdownVisibility();
+        });
+    }
+
+    function showResponse() {
+        var reviewSubjectList = document.getElementById('reviewSubjectList');
+        var senderName = document.getElementById('name').value;
+        var mobileNumber = document.getElementById('MobileNumber').value;
+        var proofOfPaymentInput = document.getElementById('paymentScreenshot');
+        var proofOfPaymentFileName = proofOfPaymentInput.value.split('\\').pop();
+        var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
+
+        document.getElementById('SenderName').textContent = senderName;
+        document.getElementById('SenderContactNo').textContent = mobileNumber;
+        document.getElementById('SenderNameHidden').value = senderName;
+        document.getElementById('SenderContactNoHidden').value = mobileNumber;
+
+        if (proofOfPaymentFilePath) {
+            var proofOfPaymentLink = document.createElement('a');
+            proofOfPaymentLink.textContent = proofOfPaymentFileName;
+            proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
+            proofOfPaymentLink.target = '_blank';
+
+            document.getElementById('PaymentFile').innerHTML = '';
+            document.getElementById('PaymentFile').appendChild(proofOfPaymentLink);
+            document.getElementById('PaymentFileHidden').value = proofOfPaymentFileName;
+        }
+
+        var selectedSubjects = [];
+        document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+            var tr = checkbox.closest('tr');
+            var subjectCode = tr.getAttribute('data-subject-code');
+            var subjectName = tr.getAttribute('data-subject-description');
+            selectedSubjects.push(`${subjectCode} - ${subjectName}`);
+        });
+        document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
+
+        reviewSubjectList.innerHTML = '';
+        document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
+            var tr = checkbox.closest('tr');
+            var subjectCode = tr.getAttribute('data-subject-code');
+            var subjectName = tr.getAttribute('data-subject-description');
+            var listItem = document.createElement('li');
+            listItem.textContent = `${subjectCode} - ${subjectName}`;
+
+            reviewSubjectList.appendChild(listItem);
+        });
+    }
+
+    function handleDropdownChange(dropdown) {
+        var selectedSubject = dropdown.options[dropdown.selectedIndex].text;
+        document.getElementById('toSubject').textContent = selectedSubject;
+        document.getElementById('toSubjectsHidden').value = selectedSubject; // Update hidden field
+    }
+</script>
+
+  
+  
+  
+
 {% endblock content %}
+
+<!-- 
+<script>
+  // Function to update the state of the checkboxes and the "Add Subject" button
+  function updateCheckboxState() {
+    var checkboxes = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+    var totalUnits = 0;
+    checkboxes.forEach(function (checkbox) {
+      var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+      totalUnits += units;
+    });
+
+    // Disable or enable checkboxes based on the total units
+    document.querySelectorAll('#selectedSubjectsTable .selections-checkbox').forEach(function (checkbox) {
+      var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+      if (!checkbox.checked && (totalUnits + units) > 6) {
+        checkbox.disabled = true;
+      } else {
+        checkbox.disabled = false;
+      }
+    });
+  }
+
+  // Function to handle the checkbox click and move rows to the review table
+  function handleCheckboxClick(checkbox) {
+    var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+    var reviewHeading = document.getElementById('reviewHeading'); // The h3 element
+    var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+    var tr = checkbox.closest('tr');
+
+    // Move the row to the review table if the checkbox is checked
+    if (checkbox.checked) {
+      var clonedRow = tr.cloneNode(true);
+      clonedRow.querySelector('input[type="checkbox"]').onclick = function () { handleCheckboxClick(this); };
+      reviewTableBody.appendChild(clonedRow);
+      reviewSubjectsTable.style.display = 'table'; // Show the review table
+      reviewHeading.style.display = 'block'; // Show the review heading
+
+      // Hide the row in the second table
+      tr.style.display = 'none';
+    } else {
+      // If unchecked, find the corresponding row in the review table and remove it
+      Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+        if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+          reviewTableBody.removeChild(row);
+        }
+      });
+
+      // Show the row again in the second table
+      tr.style.display = '';
+    }
+
+    // Update the state of checkboxes after any change
+    updateCheckboxState();
+  }
+
+  // Function to handle the checkbox click in the review table and move rows back to the second table
+  function handleReviewCheckboxClick(checkbox) {
+    var selectedSubjectsTable = document.getElementById('selectedSubjectsTable');
+    var selectedTableBody = selectedSubjectsTable.getElementsByTagName('tbody')[0];
+    var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+    var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+    var tr = checkbox.closest('tr');
+
+    // Move the row back to the second table if the checkbox is checked
+    if (checkbox.checked) {
+      var clonedRow = tr.cloneNode(true);
+      clonedRow.querySelector('input[type="checkbox"]').onclick = function () { handleCheckboxClick(this); };
+      selectedTableBody.appendChild(clonedRow);
+
+      // Hide the row in the review table
+      tr.style.display = 'none';
+    } else {
+      // If unchecked, find the corresponding row in the second table and remove it
+      Array.from(selectedTableBody.getElementsByTagName('tr')).forEach(function (row) {
+        if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+          selectedTableBody.removeChild(row);
+        }
+      });
+
+      // Show the row again in the review table
+      tr.style.display = '';
+    }
+
+    // Update the state of checkboxes after any change in both tables
+    updateCheckboxState();
+  }
+
+  function showResponse() {
+  // Clear existing data
+  var FacultyRole = document.getElementById("FacultyRole");
+  var reviewSubjectList = document.getElementById('reviewSubjectList');
+  var reviewName = document.getElementById('SenderName');
+  var reviewNumber = document.getElementById('SenderContactNo');
+  var reviewProof = document.getElementById('PaymentFile');
+  reviewSubjectList.innerHTML = '';
+
+  var selectedSubjects = [];
+  document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+    var tr = checkbox.closest('tr');
+    var subjectCode = tr.getAttribute('data-subject-code');
+    selectedSubjects.push(subjectCode);
+  });
+
+  // Update the hidden input field with selected subjects
+  document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
+
+  // Get selected subjects from the review table and display them
+  document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
+    var tr = checkbox.closest('tr');
+    var subjectCode = tr.getAttribute('data-subject-code');
+    var subjectName = tr.getAttribute('data-subject-description');
+    // var units = tr.getAttribute('data-Units');
+    var listItem = document.createElement('li');
+    listItem.textContent = `${subjectCode} - ${subjectName} `; //(${units} units)
+
+    // Add padding below every two data items
+    if (index === 0) {
+      listItem.style.marginBottom = '10px'; // No margin between items
+    }
+
+    reviewSubjectList.appendChild(listItem);
+  });
+
+  // Get and display payment information
+  reviewName.textContent = document.getElementById('name').value;
+  reviewNumber.textContent = document.getElementById('MobileNumber').value;
+  var proofFile = document.getElementById('paymentScreenshot').files[0];
+  reviewProof.textContent = proofFile ? proofFile.name : 'No file chosen';
+
+  // Display the information in the specified form
+  document.getElementById('serviceRequestForm').style.display = 'block';
+
+  }
+
+  updateCheckboxState();
+
+  function submitForm() {
+    // Get data from the form
+    var FacultyRole = document.getElementById('FacultyRole');
+    var reviewSubjectList = document.getElementById('reviewSubjectList');
+    var SenderName = document.getElementById('SenderName').textContent;
+    var SenderContactNo = document.getElementById('SenderContactNo').textContent;
+    var proofFileInput = document.getElementById('paymentScreenshot'); // Update the ID to match your file input
+    var proofFile = proofFileInput.files[0];
+    var ServiceDetails = document.getElementById('ServiceDetails').value;
+
+    // Create FormData object and append form fields
+    var formData = new FormData();
+    
+    formData.append("FacultyRole", FacultyRole);
+    formData.append('reviewSubjects', reviewSubjectList.textContent);
+    formData.append('SenderName', SenderName);
+    formData.append('SenderContactNo', SenderContactNo);
+    formData.append('paymentScreenshot', proofFile); // Update the key to match your server-side expectation
+    formData.append('ServiceDetails', ServiceDetails);
+
+    // You can use AJAX to send the data to the server
+    // Example using jQuery AJAX:
+    $.ajax({
+      type: 'POST',
+      url: '/student/addingsubject/submitapplication', // Update the URL to match your server endpoint
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        // Handle success response from the server
+        console.log(response);
+      },
+      error: function(error) {
+        // Handle error response from the server
+        console.error(error);
+      }
+    });
+  }
+</script> -->
+
+
+
 
 

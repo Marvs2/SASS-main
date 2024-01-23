@@ -76,20 +76,20 @@
 			<li>
 				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
 				<ul class="side-dropdown">
-					<li><a href="{{url_for('student_adding_subjects')}}">Overload of Subjects</a></li>
-					<li><a href="{{url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
-					<li><a href="#">Change of Schedule/Subjects</a></li>
-					<li><a href="#">Correction of Grade Entry</a></li>
-					<li><a href="#">Cross-Enrollment</a></li>
-					<li><a href="#">Application for Shifting</a></li>
-					<li><a href="#">Manual Enrollment</a></li>
-					<li><a href="#"> Online Petition of Subjects</a></li>
-					<li><a href="#">Online Request for Tutorial</a></li>
-					<li><a href="#">Request for Certification</a></li>
+					<li><a href="{{url_for('studentoverload')}}">Overload of Subjects</a></li>
+					<li><a href="{{ url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
+					<li><a href="{{url_for('studentchange')}}">Change of Schedule/Subjects</a></li>
+					<li><a href="{{url_for('studentcorrection')}}">Correction of Grade Entry</a></li>
+					<li><a href="{{url_for('studentenrollment')}}">Cross-Enrollment</a></li>
+					<li><a href="{{url_for('studentshifting')}}">Application for Shifting</a></li>
+					<li><a href="{{url_for('studentmanualenrollment')}}">Manual Enrollment</a></li>
+					<li><a href="{{url_for('studentpetition')}}"> Online Petition of Subjects</a></li>
+					<li><a href="{{url_for('studenttutorial')}}">Online Request for Tutorial</a></li>
+					<li><a href="{{url_for('studentcertification')}}">Request for Certification</a></li>
 
 				</ul>
 			</li>
-			<li><a href="#"><i class='bx bx-history icon' ></i>Transaction History</a></li>
+			<li><a href="{{url_for('student_history')}}"><i class='bx bx-history icon' ></i>Transaction History</a></li>
 
 		<!--	<li class="divider" data-text="Complaints">Complaints</li>
 			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
@@ -272,6 +272,7 @@
   <script>
     // STUDENT API
     const api_base_url = '{{ student_api_base_url | default("") }}';
+    console.log('api_base_url: ', api_base_url);
 
     // Function to close the notification card
     function closeNotificationCard() {
@@ -362,11 +363,7 @@ document.getElementById("Name").value = fullName;
       DateOfBirthInput.value = formattedDateOfBirth;
 
         // Select the PlaceOfBirth and set the value to data.PlaceOfBirth
-<<<<<<< HEAD
-        document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
-=======
         // document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
->>>>>>> TEST
         // Select the MobileNumber and set the value to data.MobileNumber
         document.getElementById("MobileNumber").value = data.MobileNumber;
       }

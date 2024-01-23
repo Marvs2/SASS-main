@@ -1,19 +1,9 @@
 # api/api_routes.py
 import base64
-<<<<<<< HEAD
-import logging
-from operator import and_
-
-from sqlalchemy import desc, func
+from Api.v1.student.utils import  get_student_services, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import CourseEnrolled, Services, SubjectList, db, Class, ClassSubject, Course, Metadata, Student, StudentClassSubjectGrade, Subject
-=======
-from Api.v1.student.utils import get_student_services, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade
-from decorators.auth_decorators import role_required
-from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import SubjectList, db, AddSubjects, CertificationRequest, ChangeOfSubjects, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, Services, ShiftingApplication, Student, TutorialRequest
->>>>>>> TEST
+from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
 from werkzeug.utils import secure_filename
 from datetime import datetime #, timedelta, timezone
 #from models import Services
@@ -605,17 +595,10 @@ def fetchStudentDetails():
             'StudentNumber': student.StudentNumber,
             'Gender': Gender_string,
             'Email': student.Email,
-<<<<<<< HEAD
-            'ResidentialAddress': student.ResidentialAddress,
-            'DateOfBirth': student.DateOfBirth,
-            'PlaceOfBirth': student.PlaceOfBirth,
-            'MobileNumber': student.MobileNumber,
-=======
             'MobileNumber': student.MobileNumber,
             'ResidentialAddress': student.ResidentialAddress,
             'DateOfBirth': student.DateOfBirth,
             'PlaceOfBirth': student.PlaceOfBirth,
->>>>>>> TEST
         })
     else:
         flash('User not found', 'danger')
@@ -661,7 +644,7 @@ def currentsubject():
     else:
         return render_template('404.html'), 404
     
-
+#For 3rd sem only 
 @student_api.route('/studentsubject', methods=['GET'])
 @role_required('student')
 def subjectsstudent():
@@ -675,7 +658,8 @@ def subjectsstudent():
             return jsonify(error="No data available")
     else:
         return render_template('404.html'), 404
-
+    
+# for 3rd eyar becasue all the grades are finalized
 @student_api.route('/futuresubject', methods=['GET'])
 @role_required('student')
 def subjectsfuture():
@@ -689,74 +673,55 @@ def subjectsfuture():
             return jsonify(error="No data available")
     else:
         return render_template('404.html'), 404
-#===============================================================================================#
-def create_services_application(form_data, files, StudentId, FacultyId):
-    current_StudentId = session.get('user_id')
-    FacultyId = form_data.get('FacultyId')
-
-    ServiceType = 'add_subject'
-    ServiceDetails = form_data.get('serviceDetails', '')
     
-    subjectIDs = form_data.getlist('subjectIDs')
-    subjectIDs = [int(id) for id in subjectIDs]  # Convert to integers
+@student_api.route('/allsubject', methods=['GET'])
+@role_required('student')
+def subjectsall():
+    student = getCurrentUser()
+    print('STUDEINT ID: ', student.StudentId)
+    if student:
+        json_subjects_grade = getAllSubjects(student.StudentId)
+        if json_subjects_grade:
+            return (json_subjects_grade)
+        else:
+            return jsonify(error="No data available")
+    else:
+        return render_template('404.html'), 404
+    
+#====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
+def create_services_application(form_data, files, StudentId):
+    FacultyRole = 'Academic Head'
 
-    ServicesImg = files.get('servicesImg')
-    Servicesdata = files.get('servicesdata')
+    # Extract individual form data
+    SenderName = form_data.get('SenderName', '')
+    SenderContactNo = form_data.get('SenderContactNo', '')
+    selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
+    ServiceDetails = form_data.get('ServiceDetails', '')
 
-    ServicesImg_data = ServicesImg.read() if ServicesImg else None
-    Servicesdata_data = Servicesdata.read() if Servicesdata else None
+    PaymentFile = files.get('PaymentFile')  # Adjust the key based on your form
+    PaymentFile_data = PaymentFile.read() if PaymentFile else None
 
     # Add additional validations as needed
     Status = 'pending'
 
     try:
-        # Check if a service application already exists for the current student and faculty
-        existing_service_application = Services.query.filter_by(
-            StudentId=current_StudentId,
-            FacultyId=FacultyId,
-            ServiceType=ServiceType
-        ).first()
-
-        if existing_service_application:
-            # If a service application already exists, check its Status
-            if existing_service_application.Status in ['approved', 'denied']:
-                raise Exception("You already have a service request with a Status of 'approved' or 'denied'. You cannot create a new request.")
-            
-            # If the Status is 'pending', you can proceed to check for subject IDs
-
         # Create a new service application
-        new_service_application = Services(
-            StudentId=current_StudentId,
-            FacultyId=FacultyId,
-            ServiceType=ServiceType,
+        new_service_application = AddSubjects(
+            StudentId=StudentId,
+            FacultyRole=FacultyRole,
+            Subject=selectedSubjects,  # Use the modified field name
             ServiceDetails=ServiceDetails,
-            ServicesImg=ServicesImg_data,
-            Servicesdata=Servicesdata_data,
+            PaymentFile=PaymentFile_data,
+            SenderName=SenderName,
+            SenderContactNo=SenderContactNo,
             Status=Status,
         )
+
         db.session.add(new_service_application)
-        db.session.flush()
-
-        created_service_id = new_service_application.ServiceId
-
-        for subjectID in subjectIDs:
-            # Check if the subject ID is already associated with a 'pending' service application
-            existing_subject_entry = SubjectList.query.filter_by(
-                SubjectId=subjectID,
-                ServiceId=created_service_id
-            ).first()
-
-            if existing_subject_entry:
-                raise Exception(f"Subject ID {subjectID} is already associated with your pending service application.")
-
-            subject_list_entry = SubjectList(
-                SubjectId=subjectID,
-                ServiceId=created_service_id
-            )
-            db.session.add(subject_list_entry)
-
-        # Commit the new SubjectList entries to the database
         db.session.commit()
+        db.session.refresh(new_service_application)
+
+        created_service_id = new_service_application.AddSubjectId
 
     except Exception as e:
         # Rollback the transaction in case of an error
@@ -765,31 +730,60 @@ def create_services_application(form_data, files, StudentId, FacultyId):
         # Optionally, re-raise the exception if you want it to be handled further up the call stack
         raise e
 
-    return new_service_application
+    return created_service_id
+
+#=========================================== FUNCTION FOR CHANGE OF SUBJECTS ============================================
+
+def create_change_subject(form_data, files, StudentId):
+    FacultyRole = 'Academic Head'
+
+    # Extract individual form data
+    FromSubject = form_data.get('fromSubjects', '')
+    ToSubject = form_data.get('toSubjects', '')
+    SenderName = form_data.get('SenderName', '')
+    SenderContactNo = form_data.get('SenderContactNo', '')
+    ServiceDetails = form_data.get('ServiceDetails', '')
+
+    PaymentFile = files.get('PaymentFile')  # Adjust the key based on your form
+
+    PaymentFile_data = PaymentFile.read() if PaymentFile else None
+
+
+    # Add additional validations as needed
+    Status = 'pending'
+
+    try:
+        # Create a new service application
+        changeApplication = ChangeSubject(
+            StudentId=StudentId,
+            FacultyRole=FacultyRole,
+            FromSubject=FromSubject, 
+            ToSubject=ToSubject, 
+            ServiceDetails=ServiceDetails,
+            PaymentFile=PaymentFile_data,
+            SenderName=SenderName,
+            SenderContactNo=SenderContactNo,
+            Status=Status,
+        )
+
+        db.session.add(changeApplication)
+        db.session.commit()
+        db.session.refresh(changeApplication)
+
+        created_change_id = changeApplication.ChangeSubjectId
+
+    except Exception as e:
+        # Rollback the transaction in case of an error
+        db.session.rollback()
+        print(f'An error occurred: {e}')
+        # Optionally, re-raise the exception if you want it to be handled further up the call stack
+        raise e
+
+    return created_change_id
+
 #===============================================================================================#
 #====================================Students Functions=========================================#
 #===============================================================================================#
-<<<<<<< HEAD
-    
-@student_api.route('/student-subjects', methods=['GET'])
-@role_required('student')
-def fetchStudentSubjects():
-    # Retrieve student ID from the session
-    student_id = session.get('user_id')
-
-    if student_id is None:
-        return jsonify({'error': 'User not authenticated'}), 401
-
-    # Get current subjects for the student
-    subjects = (
-        db.session.query(Subject)
-        .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
-        .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .distinct(Subject.SubjectId)
-        .all()
-=======
 
 #overload DONE
 # Create function for OverloadApplication
@@ -905,25 +899,10 @@ def create_crossenrollment_form(form_data, files, current_StudentId):
         UserResponsible=UserResponsible,
         Status=Status,
         created_at=datetime.utcnow(),  # Set the creation time
->>>>>>> TEST
     )
 
-    # Convert the result to a list of dictionaries
-    subject_list = [
-        {
-            'SubjectId': subject.SubjectId,
-            'SubjectCode': subject.SubjectCode,
-            'Name': subject.Name,
-            'Credits': subject.Credits,
-            # Add more fields as needed
-        }
-        for subject in subjects
-    ]
+    return new_cross_enrollment
 
-    return jsonify(subject_list)
-
-<<<<<<< HEAD
-=======
 #manualenrollment
 # Manual Enrollment Form function
 def create_manualenrollment_form(form_data, files, current_StudentId):
@@ -933,60 +912,8 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
     Reason = form_data['Reason']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
->>>>>>> TEST
 
 
-<<<<<<< HEAD
-#================================================================================#
-#functions
-def create_services_application(form_data, files, StudentId, FacultyId):
-    ServiceType = 'add_subject'
-    ServiceDetails = form_data.get('serviceDetails', '')
-    
-    subjectIDs = form_data.getlist('subjectIDs')
-    subjectIDs = [int(id) for id in subjectIDs]  # Convert to integers
-
-    ServicesImg = files.get('servicesImg')
-    Servicesdata = files.get('servicesdata')
-
-    ServicesImg_data = ServicesImg.read() if ServicesImg else None
-    Servicesdata_data = Servicesdata.read() if Servicesdata else None
-
-    # Add additional validations as needed
-    Status = 'pending'
-    try:
-        new_service_application = Services(
-            StudentId=StudentId,
-            FacultyId=FacultyId,
-            ServiceType=ServiceType,
-            ServiceDetails=ServiceDetails,
-            ServicesImg=ServicesImg_data,
-            Servicesdata=Servicesdata_data,
-            Status=Status,
-        )
-        db.session.add(new_service_application)
-        db.session.commit()
-        db.session.refresh(new_service_application)
-
-        created_service_id = new_service_application.ServiceId
-        for subjectID in subjectIDs:
-            subject_list_entry = SubjectList(
-                SubjectId=subjectID,
-                ServiceId=created_service_id
-            )
-            db.session.add(subject_list_entry)
-        # Commit the new SubjectList entries to the database
-        db.session.commit()
-    except Exception as e:
-        # Rollback the transaction in case of an error
-        db.session.rollback()
-        print(f'An error occurred: {e}')
-        # Optionally, re-raise the exception if you want it to be handled further up the call stack
-        raise e
-
-
-    return new_service_application
-=======
     me_file = files['me_file']
 
     if me_file.filename == '':
@@ -1063,41 +990,6 @@ def create_addsubjects_application(form_data, files, StudentId):
     
 #=========================================================#
 
-#changeofsubjects
-# Change Subjects Form function
-def create_changesubjects_application(form_data, files, StudentId):
-    StudentNumber = form_data['StudentNumber']
-    Name = form_data['Name']
-    EnrollmentType = form_data['EnrollmentType']
-    UserResponsible = form_data['UserResponsible']
-    Status = form_data['Status']
-
-    ace_form = files.get('ace_form')
-
-    if not StudentNumber or not Name or not EnrollmentType:
-        flash('Please fill out all fields and provide valid values.', 'danger')
-        return None
-
-    if not ace_form:
-        flash('Please provide the manual enrollment file.', 'danger')
-        return None
-
-    AceFormfilename = secure_filename(ace_form.filename)
-    AceFormdata = ace_form.read()
-
-    new_changesubjects_application = ChangeOfSubjects(
-        StudentNumber=StudentNumber,
-        Name=Name,
-        EnrollmentType=EnrollmentType,
-        AceFormfilename=AceFormfilename,
-        AceFormdata=AceFormdata,
-        UserResponsible=UserResponsible,
-        Status=Status,
-        created_at=datetime.utcnow(),
-        StudentId=StudentId,
-    )
-
-    return new_changesubjects_application
 
 #=====================================Petition Requests==============================================#
 
@@ -1474,4 +1366,3 @@ def get_student_number_by_id(StudentId):
 
 
 
->>>>>>> TEST

@@ -21,7 +21,7 @@ def faculty_required(fn):
             return fn(*args, **kwargs)
         else:
             flash('Access denied', category='danger')
-            return redirect(url_for('home'))
+            return redirect(url_for('faculty_portal'))
     return wrapper
 
 def admin_required(fn):

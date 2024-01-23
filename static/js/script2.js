@@ -145,13 +145,6 @@ window.addEventListener('click', function (e) {
 })
 
 
-// PROGRESSBAR
-const allProgress = document.querySelectorAll('main .card .progress');
-
-allProgress.forEach(item=> {
-	item.style.setProperty('--value', item.dataset.value)
-})
-
 
 // APEXCHART
 var options = {
@@ -187,18 +180,21 @@ var chart = new ApexCharts(document.querySelector("#chart"), options);
 chart.render();
 
 
+ 
+
+
 // DATA TABLES IN TRANSACTION HISTORY
 $(document).ready(function() {
 	$('#overload').DataTable(); // OVERLOAD OF SUBJECTS
 });
 
-$(document).ready(function() {
-	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
-});
+// $(document).ready(function() {
+// 	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
+// });
 
 
-$(document).ready(function() {
-	$('#addingSubject2').DataTable(); // ADDING OF SUBJECTS
+$(document).ready(function () {
+	$('#selectedSubjectsTable').DataTable(); // CHANGE OF SCHEDULE/SUBJECT	
 });
 
 $(document).ready(function () {
@@ -234,3 +230,52 @@ $(document).ready(function () {
 });
 
 
+
+// PROGRESS BAR
+const prevBtns = document.querySelectorAll(".btn-prev");
+const nextBtns = document.querySelectorAll(".btn-next");
+const progress = document.getElementById("progress1");
+const formSteps = document.querySelectorAll(".form-step");
+const progressSteps = document.querySelectorAll(".progress-step");
+
+let formStepsNum = 0;
+
+nextBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    formStepsNum++;
+    updateFormSteps();
+    updateProgressbar();
+  });
+});
+
+prevBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    formStepsNum--;
+    updateFormSteps();
+    updateProgressbar();
+  });
+});
+
+function updateFormSteps() {
+  formSteps.forEach((formStep) => {
+    formStep.classList.contains("form-step-active") &&
+      formStep.classList.remove("form-step-active");
+  });
+
+  formSteps[formStepsNum].classList.add("form-step-active");
+}
+
+function updateProgressbar() {
+  progressSteps.forEach((progressStep, idx) => {
+    if (idx < formStepsNum + 1) {
+      progressStep.classList.add("progress-step-active");
+    } else {
+      progressStep.classList.remove("progress-step-active");
+    }
+  });
+
+  const progressActive = document.querySelectorAll(".progress-step-active");
+
+  progress.style.width =
+    ((progressActive.length - 1) / (progressSteps.length - 1)) * 100 + "%";
+}  

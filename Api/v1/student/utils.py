@@ -1,5 +1,5 @@
 
-from models import AddSubjects, CertificationRequest, ChangeOfSubjects, Class, Course, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassGrade, LatestBatchSemester, StudentClassSubjectGrade, ClassSubject, Student, Subject, TutorialRequest, db, CourseEnrolled, Curriculum
+from models import AddSubjects, CertificationRequest, ChangeSubject, Class, Course, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassGrade, LatestBatchSemester, StudentClassSubjectGrade, ClassSubject, Student, Subject, TutorialRequest, db, CourseEnrolled, Curriculum
 from sqlalchemy import desc, func, and_
 import re
 from collections import defaultdict
@@ -8,6 +8,7 @@ from datetime import date, datetime
 
 
 from flask import session, jsonify
+from static.js.utils import convertGradeToPercentage, checkStatus
 from flask_mail import Message
 #from mail import mail
 import pandas as pd
@@ -181,58 +182,6 @@ def getCurrentSubjectFaculty(str_student_id):
         print(f"Error: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
 
-#none
-# def getCurrentSubject(str_student_id):
-#     try:
-#         print("Hello from current subject str_student_id: ", str_student_id)
-
-#         # Get the Class of the student where IsGradeFinalized is False
-#         # Metadata = Year, Semester, Batch
-#         # Class = Section
-#         # ClassSubject = Reference to the class subject
-#         # StudentClassSubjectGrade = Reference to the class subject and has reference in student Grade
-#         # Curriculum = Curriculum information for subjects in a specific year, semester, course, and batch
-#         # CourseEnrolled = Information about the courses in which the student is enrolled
-#         class_of_students = db.session.query( StudentClassSubjectGrade, ClassSubject, Class, Metadata, Subject, CourseEnrolled, Course
-#         ).join(Class, Class.ClassId == ClassSubject.ClassId)\
-#         .join(Metadata, Metadata.MetadataId == Class.MetadataId)\
-#         .join(StudentClassSubjectGrade, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)\
-#         .join(Course, Course.CourseId == CourseEnrolled.CourseId)\
-#         .join(Subject, Subject.SubjectId == ClassSubject.ClassSubjectId)\
-#         .join(CourseEnrolled, and_(
-#             CourseEnrolled.StudentId == str_student_id,
-#             CourseEnrolled.CurriculumYear == Metadata.Year,
-#         ))\
-#         .filter(Class.IsGradeFinalized == True, StudentClassSubjectGrade.StudentId == str_student_id).all()
-
-#         # Execute the query
-#         class_of_students = class_of_students.all()
-
-#         print(class_of_students)
-
-#         subject_list = []
-
-#         for class_of_student in class_of_students:
-#             dict_class_subject = {
-#                 "Subject Code": class_of_student.Subject.SubjectCode,
-#                 "Subject Name": class_of_student.Subject.Name,
-#             }
-
-#             subject_list.append(dict_class_subject)
-
-#         # Using that class get all class subjects along with StudentClassSubjectGrade that have the same studentidFilter
-
-#         # dict
-#         print(subject_list)
-
-#         return jsonify(subject_list)
-
-
-    # except Exception as e:
-    #     # Handle exceptions appropriately
-    #     print(f"Error: {e}")
-    #     return jsonify({'error': 'Internal Server Error'}), 500
-
 #1 - confirm
 def getCurrentSubject(str_student_id):
     try:
@@ -403,12 +352,6 @@ def getStudentClassSGrade(str_student_id):
         # Handle the exception here, e.g., log it or return an error response
         return None
 
-
-#     give me a query to this given code with join based on the sentence given here:
-# studentclassgrade associated with student and class and if (isnotfinalized) same with studentid and other query class associated with (classsubject) then same studentclasssubjectgrade then using studentclasssubjectgrade then get the studentID that is same in the studentclassgrade
-    
-#query CourseEnrolled - CurriculumYear - get Curriculum(MetadataId == Metadata.MetadataId) with the same batch Batch in metadata is join == Curriculum.CurriculumYear, join course course.ID == MEtadata.CourseID
-#4
 def getSubjectFuture(str_student_id):
     try:       
         no_list_subject = (
@@ -426,43 +369,75 @@ def getSubjectFuture(str_student_id):
         # Handle the exception here, e.g., log it or return an error response
         return None
 #5
+# def getAllSubjects(str_student_id):
+#     try:
+#         # Assuming you have a specific course ID, replace 'your_course_id' with the actual course ID
+#         data_all_subjects = (
+#             db.session.query(Subject, ClassSubject, Class, Metadata, Course, CourseEnrolled)
+#             .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .join(Class, Class.ClassId == ClassSubject.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
+#             .filter(Class.IsGradeFinalized == True, CourseEnrolled.StudentId == str_student_id)
+#             .all()
+#         )
+
+#         list_data_subject_grade = []
+#         print(list_data_subject_grade)
+        
+#         for data in data_all_subjects:
+#             # Processing data and creating a dictionary
+#             section_code = data.Course.CourseCode + ' ' + str(data.Metadata.Year) + '-' + str(data.Class.Section)
+#             teacher = data.ClassSubject.FacultyId if data.ClassSubject.FacultyId else ''
+#             subject_data = {
+#                 'SectionCode': section_code,
+#                 'SubjectName': data.Subject.Name,
+#                 'SubjectCode': data.Subject.SubjectCode,
+#                 'Teacher': teacher,
+#                 'Batch': data.Metadata.Batch
+#             }
+
+#             list_data_subject_grade.append(subject_data)
+#         return jsonify(list_data_subject_grade)
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         return None
+        
 def getAllSubjects(str_student_id):
     try:
-        # Assuming you have a specific course ID, replace 'your_course_id' with the actual course ID
+        # Query to fetch all subjects for the courses a student is enrolled in
         data_all_subjects = (
             db.session.query(Subject, ClassSubject, Class, Metadata, Course, CourseEnrolled)
             .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
             .join(Class, Class.ClassId == ClassSubject.ClassId)
             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
-            .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
-            .filter(Class.IsGradeFinalized == True, CourseEnrolled.StudentId == str_student_id)
+            .join(Course, Course.CourseId == Metadata.CourseId)
+            .join(CourseEnrolled, CourseEnrolled.CourseId == Course.CourseId)
+            .filter(CourseEnrolled.StudentId == str_student_id)
             .all()
         )
 
-        list_data_subject_grade = []
+        list_data_subjects = []
         
-        for data in data_all_subjects:
-            # Processing data and creating a dictionary
-            section_code = data.Course.CourseCode + ' ' + str(data.Metadata.Year) + '-' + str(data.Class.Section)
-            teacher = data.ClassSubject.FacultyId if data.ClassSubject.FacultyId else ''
+        for subject, class_subject, class_, metadata, course, course_enrolled in data_all_subjects:
+            # Creating a dictionary for each subject
+            teacher = class_subject.FacultyId if class_subject.FacultyId else ''
             subject_data = {
-                'SectionCode': section_code,
-                'SubjectName': data.Subject.Name,
-                'SubjectCode': data.Subject.SubjectCode,
+                'SubjectName': subject.Name,
+                'SubjectCode': subject.SubjectCode,
                 'Teacher': teacher,
-                'Batch': data.Metadata.Batch
+                'Batch': metadata.Batch
             }
 
-            list_data_subject_grade.append(subject_data)
-        return jsonify(list_data_subject_grade)
+            list_data_subjects.append(subject_data)
+
+        return jsonify(list_data_subjects)
     except Exception as e:
         print("ERROR HERE: ", e)
         return None
-        
-
+    
 def get_student_services(student_id):
-    addsubjects_list = AddSubjects.query.filter_by(StudentId=student_id).all()
-    changesubjects_list = ChangeOfSubjects.query.filter_by(StudentId=student_id).all()
+    changesubjects_list = ChangeSubject.query.filter_by(StudentId=student_id).all()
     manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
     certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
     grade_entry_list = GradeEntry.query.filter_by(StudentId=student_id).all()
@@ -474,7 +449,7 @@ def get_student_services(student_id):
 
     # Concatenate all lists into one comprehensive list
     all_services_list = (
-        [subject.to_dict() for subject in addsubjects_list] +
+        # [subject.to_dict() for subject in addsubjects_list] +
         [subject.to_dict() for subject in changesubjects_list] +
         [subject.to_dict() for subject in manual_enrollments_list] +
         [subject.to_dict() for subject in certification_request_list] +

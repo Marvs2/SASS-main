@@ -89,7 +89,6 @@ def faculty_login():
 
 # TESTING AREA
 @faculty_api.route('/profile', methods=['GET'])
-@jwt_required()
 def faculty_profile():
     current_user_id = get_jwt_identity()
     # Debug print statement
@@ -119,7 +118,7 @@ def fetchFacultyDetails():
 
         # Construct and return the JSON response
         return jsonify({
-            "FacultyCode": faculty.FacultyCode,
+            "FacultyType": faculty.FacultyType,
             'FirstName': faculty.FirstName,
             'LastName': faculty.LastName,
             'MiddleName': faculty.MiddleName,

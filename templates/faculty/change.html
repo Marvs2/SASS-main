@@ -22,12 +22,12 @@
     <thead>
         <tr>
             <th>ID</th>
-            <th>Student Number</th>
-            <th>Name</th>
+            <th>FacultyRole</th>
+            <th>SenderName</th>
             <th>Enrollment Type</th>
             <th>ACE Form File</th>
             <th>Created At</th>
-            <th>User Responsible</th>
+            <th>Service Details</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -35,23 +35,23 @@
     <tbody>
         {% for changesubjects in changesubjects %}
             <tr>
-                <td>{{ changesubjects.Changesubject_ID }}</td>
-                <td>{{ changesubjects.StudentNumber }}</td>
-                <td>{{ changesubjects.Name }}</td>
-                <td>{{ changesubjects.enrollment_type }}</td>
+                <td>{{ changesubjects.ChangeSubjectId }}</td>
+                <td>{{ changesubjects.FacultyRole }}</td>
+                <td>{{ changesubjects.SenderName }}</td>
+                <td>{{ changesubjects.FromSubject }}</td>
                 <td>{% if changesubjects.ace_form_data %}
-                    {% set form_data = changesubjects.ace_form_filename[:15] + '...' if changesubjects.ace_form_filename|length > 15 else changesubjects.ace_form_filename %} <a href="{{ url_for('get_change_file', Changesubject_ID=changesubjects.Changesubject_ID) }}" class="btn btn-success" download title="{{changesubjects.ace_form_filename}}">{{ form_data }}</a>
+                    {% set form_data = changesubjects.ace_form_filename[:15] + '...' if changesubjects.ace_form_filename|length > 15 else changesubjects.ace_form_filename %} <a href="{{ url_for('get_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" class="btn btn-success" download title="{{changesubjects.ace_form_filename}}">{{ form_data }}</a>
                 </td>
                 {% else %}
                     <span class="badge badge-warning">No File</span>
                 {% endif %}</td>
                 <td>{{ changesubjects.created_at }}</td>
-                <td>{{ changesubjects.user_responsible }}</td>
-                <td>{{ changesubjects.status }}</td>
-                <td> <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ changesubjects.Changesubject_ID }}">Change Status</button></td>
+                <td>{{ changesubjects.ServiceDetails }}</td>
+                <td>{{ changesubjects.Status }}</td>
+                <td> <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ changesubjects.ChangeSubjectId }}">Change Status</button></td>
             </tr>
             <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ changesubjects.Changesubject_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+            <div class="modal fade" id="statusModal{{ changesubjects.ChangeSubjectId }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -60,7 +60,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="statusForm{{ changesubjects.Changesubject_ID }}" action="{{ url_for('update_change_service_status', Changesubject_ID=changesubjects.Changesubject_ID) }}" method="POST">
+                        <form id="statusForm{{ changesubjects.ChangeSubjectId }}" action="{{ url_for('update_change_service_status', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" method="POST">
                             <div class="modal-body">
                               <select name="status" class="form-select">
                                 <option value="pending">Pending</option>
@@ -73,7 +73,7 @@
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ changesubjects.Changesubject_ID }})">Save changes</button>
+                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ changesubjects.ChangeSubjectId }})">Save changes</button>
                             </div>
                           </form>
                         </div>
@@ -98,8 +98,8 @@
     });
 });
      // Function to update status
-  function updateStatus(Changesubject_ID) {
-    const formId = `statusForm${Changesubject_ID}`;
+  function updateStatus(ChangeSubjectId) {
+    const formId = `statusForm${ChangeSubjectId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

@@ -907,6 +907,89 @@ table th, table td {
 }
 
 
+#reviewHeading, #reviewSubjectsTable {
+	display: none;
+}
+
+  /* Progressbar */
+  .progressbar {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    counter-reset: step;
+    margin: 1rem 2rem 4rem;
+  }
+  
+  .progressbar::before,
+  .progress1 {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 4px;
+    width: 100%;
+    background-color: #dcdcdc;
+    z-index: -1;
+  }
+  
+  .progress1 {
+    background-color: var(--red);
+    width: 0%;
+    transition: 0.3s;
+  }
+  
+  .progress-step {
+    width: 35px;
+    height: 35px;
+    background-color: #dcdcdc;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .progress-step::before {
+    counter-increment: step;
+    content: counter(step);
+  }
+  
+  .progress-step::after {
+    content: attr(data-title);
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    font-size: 0.80rem;
+    color: #666;
+  }
+  
+  .progress-step-active {
+    background-color: var(--red);
+    color: #f3f3f3;
+
+  }
+  
+  .form-step {
+    display: none;
+    transform-origin: top;
+    animation: animate 0.5s;
+  }
+  
+  .form-step-active {
+    display: block;
+  }
+  
+  @keyframes animate {
+    from {
+      transform: scale(1, 0);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1, 1);
+      opacity: 1;
+    }
+  }
+
+
+
 @media screen and (max-width: 768px) {
 	#content {
 		position: relative;
@@ -925,5 +1008,3 @@ table th, table td {
 
 	
 }
-
-

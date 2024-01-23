@@ -1,79 +1,49 @@
-<<<<<<< HEAD
-{% extends "student/layout.html" %} {% block content %}
-<style>
-  .custom-container {
-    display: flex;
-  }
-  table {
-    width: 25%;
-    border-collapse: collapse;
-  }
-  th,
-  td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #f2f2f2;
-  }
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-</style>
-<h2>
-  Student Class Data of
-  <input
-    type="text"
-    class="form-control"
-    name="Name"
-    id="Name"
-    required="required"
-    class="form-control"
-    disabled
-  />
-</h2>
-<div class="custom-container">
-  <div class="col-md-6">
-    <div class="data data1" id="applicationSection">
-      <div class="content-data">
-=======
+
 {% extends "student/layout.html" %}
+
 {% block content %}
-  <div class="data data">
-    <div class="content-data">
->>>>>>> TEST
-        <div class="head">
-          <h3>
-            Course Code: {% if course %}
-            <p>{{ course.CourseCode }}</p>
-            {% endif %}
-          </h3>
+
+  <!-- Progress bar -->
+  <div class="progressbar">
+    <div class="progress1" id="progress1"></div>
+    <div class="progress-step progress-step-active" data-title="Current Subjects"></div>
+    <div class="progress-step" data-title="Add Subject/s"></div>
+    <div class="progress-step" data-title="Payment"></div>
+    <div class="progress-step" data-title="Review Subject"></div>
+  </div>
+
+  <!-- SHOW CURRENT SUBJECT -->
+  <div class="form-step form-step-active">
+    <div class="data data1" id="firstTableContainer">
+      
+      <div class="content-data">
+        <div class="head mb-3">
+          <h3>Current Subjects</h3>
         </div>
 
-<<<<<<< HEAD
-        <form
-          action="{{url_for('submitapplication')}}"
-          method="POST"
-          enctype="multipart/form-data"
-          onsubmit="return validateForm()"
-          class="application-form"
-        >
-          <table
-            id="addingSubject"
-            class="table table-bordered table-condensed"
-          >
-            <thead>
-              <tr>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>Description</th>
-                <th>Units</th>
-              </tr>
-            </thead>
-            <tbody>
-              <!-- Loop through subjects to display -->
-              {% for subject in subject_list %}
+        <div class="row mb-3">
+          <span class="mb-3">  
+            <b>Student:</b>
+            <input type="text" class="form-control" name="Name" title="Name" id="Name" readonly>
+          </input>
+          </span>
+
+          <span>
+            <b>Course:</b> {% if course %} {{ course.CourseCode }} {% endif %}
+          </span>
+        </div>
+
+        <table id="addingSubject" class="table table-bordered table-condensed display">
+          <thead>
+            <tr>
+              <th>Subject Code</th>
+              <th>Subject Name</th>
+              <th>Description</th>
+              <th>Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for subject in subject_list %}
               <tr
                 data-subject-code="{{ subject.SubjectCode }}"
                 data-subject-description="{{ subject.Name }}"
@@ -81,445 +51,350 @@
                 data-Units="{{ subject.Units }}"
                 data-IsNSTP="{{ subject.IsNSTP }}"
               >
-                <td>{{ subject['SubjectCode'] }}</td>
-                <td>{{ subject['Name'] }}</td>
-                <td>{{ subject['Description'] }}</td>
-                <td>{{ subject['Units'] }}</td>
+                <td>{{ subject.SubjectCode }}</td>
+                <td>{{ subject.Name }}</td>
+                <td>{{ subject.Description }}</td>
+                <td>{{ subject.Units }}</td>
               </tr>
-              {% endfor %}
-              <!-- ENDFOR -->
-            </tbody>
-          </table>
-        </form>
+            {% endfor %}
+          </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-primary btn-next">Next</button>
+        </div>
       </div>
-=======
-            <div class="row mb-3">
-                <label for="Name" class="col-sm-3 col-form-label">Name</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="Name" name="Name" readonly>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="SubjectNames" class="col-sm-3 col-form-label">Subjects to Add</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control" id="SubjectNames" name="SubjectNames" required>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="EnrollmentType" class="col-sm-3 col-form-label">Enrollment Type</label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="EnrollmentType" name="EnrollmentType" required>
-                            <option value="">Select Enrollment Type...</option>
-                            <option value="Regular">Regular</option>
-                            <option value="Irregular">Irregular</option>
-                        </select>
-                    </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="filesubject" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
-                <div class="col-sm-8">
-                    <input class="form-control" type="file" name="filesubject" id="filesubject" accept=".pdf" required>
-                  </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
-                            <option value="Director/Head of Academic Program">Director/Head of Academic Program</option>
-            <option value="CDO Cashier/Accounting Office">CDO Cashier/Accounting Office</option>
-            <option value="Registrar's Office">Registrar's Office</option>
-                        </select>
-                    </div>
-            </div>
-
-            <div class="row mb-3" style="display: none;">
-                <label for="Status" class="col-sm-3 col-form-label">Status </label>
-                <div class="col-sm-8">
-                    <select class="custom-select" id="Status" name="Status" required>
-                        <option value="Sent" selected>Sending</option>
-                        <option value="Pending" disabled>Pending</option>
-                        <option value="Approved" disabled>Approved</option>
-                        <option value="Rejected" disabled>Rejected</option>
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-success">Submit Application</button>|||               
-                <a href="{{ url_for('viewaddsubject') }}">View AddSubject</a>
-            </div>
-        </form>       
->>>>>>> TEST
     </div>
   </div>
-  <div class="col-md-6">
-    <div class="data data1" id="futureSubjectSection">
+
+  <!-- SHOW OPTION FOR ADDING OF SUBJECTS  -->
+
+  <div class="form-step">
+    <div class="data data1"  id="reviewHeading">
       <div class="content-data">
-        <div class="head">
-          <h3>
-            My Courses: {% if course %} {{ course.CourseCode }} {% endif %}
-          </h3>
+        <div class="head mb-3">
+          <h3>Review Selected Subjects</h3>
         </div>
 
-        <form
-          action="{{url_for('submitapplication')}}"
-          method="POST"
-          enctype="multipart/form-data"
-          onsubmit="return validateForm()"
-          class="application-form"
-        >
-          <table
-            id="futureSubject1"
-            class="table table-bordered table-condensed"
-          >
+        <!-- Review Table for Selected Subjects -->
+        <table class="table table-bordered table-condensed" id="reviewSubjectsTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Subject Code</th>
+              <th>Subject Name</th>
+              <th>Description</th>
+              <th>Units</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Selected subjects will be added here -->
+          </tbody>
+        </table>
+      </div>
+      </div>
+
+      <div class="data data1">
+        <div class="content-data">
+
+        <div class="head mb-3">
+          <h3>Add Subjects</h3>
+        </div>
+          <!-- Table for Displaying Subjects to Select -->
+          <table id="selectedSubjectsTable" class="table table-bordered table-condensed">
             <thead>
               <tr>
-                <th>Check box</th>
+                <th></th>
                 <th>Subject Code</th>
                 <th>Subject Name</th>
+                <th>Description</th>
                 <th>Units</th>
               </tr>
             </thead>
             <tbody>
-              <!-- Loop through selections to display -->
               {% for selections in selection_list %}
-              <tr
-                data-subject-code="{{ selections.SubjectCode }}"
-                data-subject-description="{{ selections.Name }}"
-                data-Description="{{ selections.Description }}"
-                data-Units="{{ selections.Units }}"
-              >
-                <td>
-                  <div class="custom-control custom-checkbox">
-                    <input
-                      type="checkbox"
-                      class="custom-control-input selections-checkbox"
-                      id="checkbox{{ selections.SubjectId }}"
-                    />
-                    <label
-                      class="custom-control-label"
-                      for="checkbox{{ selections.SubjectId }}"
-                    ></label>
-                  </div>
-                </td>
-                <td>{{ selections['SubjectCode'] }}</td>
-                <td>{{ selections['Name'] }}</td>
-                <td>{{ selections['Units'] }}</td>
-              </tr>
+                <tr
+                  data-subject-code="{{ selections.SubjectCode }}"
+                  data-Description="{{ selections.Description }}"
+                  data-subject-description="{{ selections.Name }}"
+                  data-Units="{{ selections.Units }}"
+                >
+                  <td>
+                    <div class="custom-control custom-checkbox">
+                      <input type="checkbox" name="checkbox" title="checkbox" class="custom-control-input selections-checkbox" id="checkbox{{ selections.SubjectId }}" onclick="handleCheckboxClick(this);"/>
+
+                      <label class="custom-control-label" for="checkbox{{ selections.SubjectId }}"></label>
+                    </div>
+                  </td>
+                  <td>{{ selections.SubjectCode }}</td>
+                  <td>{{ selections.Name }}</td>
+                  <td>{{ selections.Description }}</td>
+                  <td>{{ selections.Units }}</td>
+                </tr>
               {% endfor %}
-              <!-- ENDFOR -->
             </tbody>
           </table>
 
-          <div class="d-flex justify-content-center">
-            <button
-              type="button"
-              id="futureSubjectsButton"
-              class="btn btn-primary"
-              data-toggle="modal"
-              data-target="#subjectModal"
-            >
-              Submit
-            </button>
+          <div class="d-flex justify-content-end mt-3">
+            <button type="button" class="btn btn-primary btn-prev">Previous</button>
+            <button type="button" class="btn btn-primary btn-next ml-2">Next</button>
           </div>
-        </form>
       </div>
     </div>
   </div>
-</div>
-<<<<<<< HEAD
 
-<!-- Modal -->
-<div
-  class="modal fade"
-  id="subjectModal"
-  tabindex="-1"
-  role="dialog"
-  aria-labelledby="subjectModalLabel"
-  aria-hidden="true"
->
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="subjectModalLabel">Request Service</h5>
-        <button
-          type="button"
-          class="close"
-          data-dismiss="modal"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <!-- Form to submit selected subjects and service request -->
-        <form
-          id="serviceRequestForm"
-          action="{{url_for('submitapplication')}}"
-          method="POST"
-          enctype="multipart/form-data"
-        >
-          <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
-          <input
-            type="hidden"
-            name="StudentId"
-            value="{{ session['user_id'] }}"
-          />
+  <!-- PAYMENT-->
+  <div class="form-step">
+    <div class="data data1">
+      <div class="content-data">
+        <div class="head mb-5">
+          <h3 id="user-info">Payment</h3>
+        </div>
 
-          <!-- Dropdown for selecting Faculty -->
-          <div class="form-group">
-            <label for="FacultyId">Select Faculty:</label>
-            <select class="form-control" id="FacultyId" name="FacultyId">
-              <!-- Assuming you have a list of faculties in `faculties` -->
-              <option value="1">Professor</option>
-              <option value="2">CDO</option>
-              <option value="3">Head Academic</option>
-              <option value="4">Director</option>
-              <option value="5">Registrar</option>
-            </select>
+        <form>
+          <div class="row mb-5">
+            <label for="name" class="col-sm-2 col-form-label">Sender Name</label>
+            <div class="col-sm-8">
+            <input type="text" class="form-control" id="name" name="name" required>
+          </div>
           </div>
 
-          <!-- Service Details -->
-          <div class="form-group">
-            <label for="ServiceDetails">Service Details:</label>
-            <textarea
-              class="form-control"
-              id="ServiceDetails"
-              name="ServiceDetails"
-              rows="3"
-            ></textarea>
+          <div class="row mb-5">
+            <label for="MobileNumber" class="col-sm-2 col-form-label">Number</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}">
           </div>
-
-          <!-- File Uploads -->
-          <div class="form-group">
-            <label for="ServicesImg">Upload Image:</label>
-            <input
-              type="file"
-              class="form-control-file"
-              id="ServicesImg"
-              name="ServicesImg"
-              accept="image/jpeg, image/png, image/gif"
-            />
           </div>
-
-          <div class="form-group">
-            <label for="Servicesdata">Upload File:</label>
-            <input
-              type="file"
-              class="form-control-file"
-              id="Servicesdata"
-              name="Servicesdata"
-              accept=".docx, .pdf, .xls, .xlsx"
-            />
+        
+          <div class="row mb-5">
+            <label for="paymentScreenshot" class="col-sm-2 col-form-label">Proof of Payment</label>
+            <div class="col-sm-8">
+              <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" accept="image/*" required>
           </div>
+          </div>
+      
+          <!-- <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input" id="agreeTerms" name="agreeTerms">
+            <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions</label>
+          </div>          -->
+        </form>        
 
-          <!-- Updated Submit button with onclick event -->
-          <button
-            type="button"
-            id="futureSubjectsButton"
-            class="btn btn-primary"
-            data-toggle="modal"
-            data-target="#subjectModal"
-            onclick="logUserDetails()"
-          >
-            Submit
-          </button>
-        </form>
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-primary btn-prev">Previous</button>
+          <button type="button" class="btn btn-primary btn-next ml-2"  onclick="showResponse()">Next</button>
+        </div>
+        
       </div>
     </div>
   </div>
-</div>
-<!-- <div class="modal fade" id="subjectModal" tabindex="-1" role="dialog" aria-labelledby="subjectModalLabel" aria-hidden="true">
-<div class="modal-dialog" role="document">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h5 class="modal-title" id="subjectModalLabel">Selected Subjects</h5>
-      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div>
-    <div class="modal-body">
-      Form to submit selected subjects
-      <form id="subjectForm" action="{{url_for('submitapplication')}}" method="POST" enctype="multipart/form-data">
-        <div id="selectedSubjectsList"></div>
-        <div class="form-group">
-          <label for="FacultyId">Faculty ID:</label>
-          <input type="text" class="form-control" id="FacultyId" name="FacultyId" required>
-        </div>
 
-        Inputs for files and images
-        <div class="form-group">
-          <label for="ServicesImg">Image:</label>
-          <input type="file" class="form-control-file" id="ServicesImg" name="ServicesImg">
-        </div>
+<!-- REVIEW TRANSACTIONS -->
+<div class="form-step">
+  <div class="data data1">
+    <div class="content-data">
+      <div class="head mb-5">
+        <h3>Review Transactions</h3>
+      </div>
 
-        <div class="form-group">
-          <label for="Servicesdata">Document:</label>
-          <input type="file" class="form-control-file" id="Servicesdata" name="Servicesdata">
-        </div>
+      <form id="serviceRequestForm" action="{{url_for('submitapplication')}}" method="POST" enctype="multipart/form-data">
+      <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
+      <input type="hidden" name="StudentId" title="text" value="{{ session['user_id'] }}"/>
+      <input type="hidden" id="selectedSubjects" title="text" name="selectedSubjects" value="">
+      <input type="hidden" id="SenderNameHidden" title="text" name="SenderName" value="">
+      <input type="hidden" id="SenderContactNoHidden" title="text" name="SenderContactNo" value="">
+      <input type="hidden" id="PaymentFileHidden" title="text" name="PaymentFile" value="">
 
-        <div class="form-group">
-          <label for="Servicesname">Service Name:</label>
-          <input type="text" class="form-control" id="Servicesname" name="Servicesname">
-        </div>
 
-        <button type="submit" class="btn btn-primary">Submit Selected Subjects</button>
-      </form>
+
+
+      <div class="row mb-5">
+        <label for="reviewSubjectList" class="col-sm-2 col-form-label">Selected Subjects</label>
+        <div class="col-sm-8">
+        <span id="reviewSubjectList" class="form-control"></span>
+      </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="SenderName" class="col-sm-2 col-form-label">Sender Name</label>
+        <div class="col-sm-8">
+          <span id="SenderName" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="SenderContactNo" class="col-sm-2 col-form-label">Number</label>
+        <div class="col-sm-8">
+          <span id="SenderContactNo" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="PaymentFile" class="col-sm-2 col-form-label">Proof of Payment</label>
+        <div class="col-sm-8">
+          <span id="PaymentFile" class="form-control"></span>
+        </div>
+      </div>
+
+      <div class="row mb-5">
+        <label for="ServiceDetails" class="col-sm-2 col-form-label">Reason/s</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="ServiceDetails" name="ServiceDetails" required>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary btn-prev">Previous</button>
+        <button type="submit" class="btn btn-primary ml-2" onclick="submitForm()">Submit</button>
+      </div>
+    </form>
     </div>
   </div>
 </div>
-</div> -->
+
 
 <script>
-  // Define the maximum number of units allowed
-  var maxUnits = 6;
-  // Object to keep track of selected subjects and their units
-  var selectedSubjects = {};
-  // Variable to keep track of the total units selected
-  var totalUnits = 0;
+  var selectedSubjectIds = [];
 
-  // Function to update the state of checkboxes and the submit button
-  function updateSelectionState() {
-    var remainingUnits = maxUnits - totalUnits;
-    // Update the display for remaining units
-    $("#remainingUnits").text("Remaining Units: " + remainingUnits);
-
-    // Disable all other checkboxes if the limit is reached
-    $(".selections-checkbox").each(function () {
-      var subjectUnits = parseInt($(this).closest("tr").data("units"));
-      if (totalUnits + subjectUnits > maxUnits && !this.checked) {
-        $(this).prop("disabled", true);
-      } else {
-        $(this).prop("disabled", false);
-      }
-    });
-  }
-
-  // Event handler for checkbox changes
-  $(".selections-checkbox").change(function () {
-    var subjectId = $(this).attr("id").replace("checkbox", "");
-    var units = parseInt($(this).closest("tr").data("units"));
-
-    if (this.checked) {
-      selectedSubjects[subjectId] = units;
-      totalUnits += units;
-    } else {
-      totalUnits -= selectedSubjects[subjectId];
-      delete selectedSubjects[subjectId];
+  document.addEventListener('DOMContentLoaded', function () {
+    function handleCheckboxClick(checkbox) {
+      updateCheckboxState();
     }
 
-    updateSelectionState();
+    var checkboxes = document.getElementsByClassName('selections-checkbox');
+    for (var i = 0; i < checkboxes.length; i++) {
+      checkboxes[i].addEventListener('click', function () {
+        handleCheckboxClick(this);
+      });
+    }
 
-    // Update the selected subjects list in the modal
-    updateSelectedSubjectsList();
+    function updateCheckboxState() {
+      var checkboxes = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+      var totalUnits = 0;
+      checkboxes.forEach(function (checkbox) {
+        var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+        totalUnits += units;
+      });
+
+      document.querySelectorAll('#selectedSubjectsTable .selections-checkbox').forEach(function (checkbox) {
+        var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+        if (!checkbox.checked && (totalUnits + units) > 6) {
+          checkbox.disabled = true;
+        } else {
+          checkbox.disabled = false;
+        }
+      });
+    }
+
+    updateCheckboxState();
   });
 
-  // Function to log user details
-  function logUserDetails() {
-    // Access and log form inputs
-    var facultyId = document.getElementById("FacultyId").value;
-    var serviceDetails = document.getElementById("ServiceDetails").value;
-    var servicesImg = document.getElementById("ServicesImg");
-    var servicesdata = document.getElementById("Servicesdata");
-    // Add more inputs as needed
-    const formData = new FormData();
+  function handleCheckboxClick(checkbox) {
+    var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+    var reviewHeading = document.getElementById('reviewHeading');
+    var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+    var tr = checkbox.closest('tr');
 
-    // Append each value to the FormData object
-    formData.append("facultyId", facultyId);
-    formData.append("serviceDetails", serviceDetails);
-    Object.keys(selectedSubjects).forEach((subjectId) => {
-      formData.append("subjectIDs", subjectId);
-    });
+    if (checkbox.checked) {
+      var clonedRow = tr.cloneNode(true);
+      clonedRow.querySelector('input[type="checkbox"]').onclick = function () {
+        handleCheckboxClick(this);
+      };
+      reviewTableBody.appendChild(clonedRow);
+      reviewSubjectsTable.style.display = 'table';
+      tr.style.display = 'none';
 
-    // Assuming servicesImg and servicesdata are file inputs
-    // Append files from these inputs to FormData
-    // Append file inputs to FormData if they exist and are under 3MB
-    if (
-      servicesImg &&
-      servicesImg.files[0] &&
-      servicesImg.files[0].size <= 3145728
-    ) {
-      formData.append("servicesImg", servicesImg.files[0]);
-    } else if (servicesImg && servicesImg.files[0]) {
-      alert("Image file is too large. Please upload an image less than 3MB.");
-      return; // Prevent form submission
-    }
+      reviewHeading.style.display = 'block';
 
-    if (
-      servicesdata &&
-      servicesdata.files[0] &&
-      servicesdata.files[0].size <= 3145728
-    ) {
-      formData.append("servicesdata", servicesdata.files[0]);
-    } else if (servicesdata && servicesdata.files[0]) {
-      alert("Document file is too large. Please upload a file less than 3MB.");
-      return; // Prevent form submission
-    }
+      var subjectId = checkbox.id.replace('checkbox', '');
+      var subjectCode = tr.getAttribute('data-subject-code');
+      var subjectName = tr.getAttribute('data-subject-description');
+      selectedSubjectIds.push(subjectId);
+      document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
 
-    fetch("/student/addingsubject/submitapplication", {
-      method: "POST",
-      body: formData,
-    })
-      .then((data) => {
-        console.log(data);
-        // window.location.href = 'URL_to_redirect_on_success'; // Replace with your redirect URL
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-        if (error.response) {
-          error.response.text().then((text) => {
-            console.log("Server Response:", text);
-          });
+      var reviewSubjectList = document.getElementById('reviewSubjectList');
+      var listItem = document.createElement('li');
+      listItem.textContent = `${subjectCode} - ${subjectName}`;
+      reviewSubjectList.appendChild(listItem);
+    } else {
+      Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+        if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+          reviewTableBody.removeChild(row);
         }
       });
 
-  }
+      tr.style.display = '';
 
-  // Function to update the selected subjects list in the modal
-  function updateSelectedSubjectsList() {
-    var selectedSubjectsList = $("#selectedSubjectsList");
-    selectedSubjectsList.empty();
+      var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
+      if (indexToRemove !== -1) {
+        selectedSubjectIds.splice(indexToRemove, 1);
+        document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+      }
 
-    for (var subjectId in selectedSubjects) {
-      var subjectName = $("#checkbox" + subjectId)
-        .closest("tr")
-        .data("subject-description");
-      selectedSubjectsList.append("<p>" + subjectName + "</p>");
+      var reviewSubjectList = document.getElementById('reviewSubjectList');
+      reviewSubjectList.removeChild(reviewSubjectList.lastChild);
+    }
+
+    updateCheckboxState();
+
+    if (reviewTableBody.getElementsByTagName('tr').length === 0) {
+      reviewSubjectsTable.style.display = 'none';
+      reviewHeading.style.display = 'none';
     }
   }
 
-  // Initialize the remaining units display
-  $(document).ready(function () {
-    var remainingUnitsDisplay = $(
-      "<div id='remainingUnits' style='position: absolute; top: 10px; right: 10px;'>Remaining Units: 6</div>"
-    );
-    $("body").append(remainingUnitsDisplay);
-    updateSelectionState(); // Initial update on page load
-  });
+  function showResponse() {
+    var reviewSubjectList = document.getElementById('reviewSubjectList');
+    var senderName = document.getElementById('name').value;
+    var mobileNumber = document.getElementById('MobileNumber').value;
+    var proofOfPaymentInput = document.getElementById('paymentScreenshot');
+    var proofOfPaymentFileName = proofOfPaymentInput.value.split('\\').pop();
+    var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
 
-  // VIEW ADDING OF SUBJECT MODAL
-  $(document).ready(function () {
-    $("#addingSubject tbody tr").on("click", function () {
-      // Retrieve data from the clicked row
-      var subjectcode = $(this).data("subject-code");
-      var name = $(this).data("subject-description");
-      var section = $(this).data("section");
-      var units = $(this).data("units");
+    document.getElementById('SenderName').textContent = senderName;
+    document.getElementById('SenderContactNo').textContent = mobileNumber;
+    document.getElementById('SenderNameHidden').value = senderName;
+    document.getElementById('SenderContactNoHidden').value = mobileNumber;
+
+    if (proofOfPaymentFilePath) {
+      var proofOfPaymentLink = document.createElement('a');
+      proofOfPaymentLink.textContent = proofOfPaymentFileName;
+      proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
+      proofOfPaymentLink.target = '_blank';
+
+      document.getElementById('PaymentFile').innerHTML = '';
+      document.getElementById('PaymentFile').appendChild(proofOfPaymentLink);
+      document.getElementById('PaymentFileHidden').value = proofOfPaymentFileName;
+    }
+
+    var selectedSubjects = [];
+    document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+      var tr = checkbox.closest('tr');
+      var subjectCode = tr.getAttribute('data-subject-code');
+      var subjectName = tr.getAttribute('data-subject-description');
+      selectedSubjects.push(`${subjectCode} - ${subjectName}`);
     });
-  });
-  // Before submitting the form, append selected subjects data to the form
-  $("#serviceRequestForm").submit(function (e) {
-    var selectedSubjectsInput = $("<input>")
-      .attr("type", "hidden")
-      .attr("name", "selectedSubjects")
-      .val(JSON.stringify(selectedSubjects));
-    $(this).append(selectedSubjectsInput);
-  });
+    document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
+
+    reviewSubjectList.innerHTML = '';
+    document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
+      var tr = checkbox.closest('tr');
+      var subjectCode = tr.getAttribute('data-subject-code');
+      var subjectName = tr.getAttribute('data-subject-description');
+      var listItem = document.createElement('li');
+      listItem.textContent = `${subjectCode} - ${subjectName}`;
+
+      if (index === 0) {
+        listItem.style.marginBottom = '10px';
+      }
+
+      reviewSubjectList.appendChild(listItem);
+    });
+  }
+
 </script>
 
-=======
->>>>>>> TEST
+  
+  
+
 {% endblock content %}
+

@@ -18,7 +18,7 @@
 				<table id="overload" class="table table-bordered table-condensed">
 					<thead>
 						<tr>
-							<th>Application Number</th>														
+							<th>Application Number</th>
 							<th>Subjects to Add</th>
 							<th>Reason/s</th>
 							<th>Status</th>
@@ -26,17 +26,17 @@
 						</tr>
 					</thead>
 					<tbody>
-						{% for overload_applications in services_data.overload_applications_list %}
+						{% for overload_applications in services_data.overload_applicationss_list %}
 						<tr data-overload-application-id="{{ overload_applications.OverloadId }}"
 							data-overload-name="{{ overload_applications.Name }}"
 							data-overload-student-number="{{ overload_applications.StudentNumber }}"
 							data-overload-subjects-to-add="{{ overload_applications.SubjectsToAdd }}"
-							data-overload-Justification="{{ overload_applications.Justification }}"
-							data-overload-file-url="{{ url_for('get_overload_file', OverloadId=overload_applications.OverloadId) }}"
+							data-overload-justification="{{ overload_applications.Justification }}"
+							data-overload-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.OverloadId) }}"
 							data-overload-file-filename="{{ overload_applications.Overloadfilename }}"	
-							data-overload-Status="{{ overload_applications.Status }}">
+							data-overload-status="{{ overload_applications.Status }}">
 							<td class="applicationID">{{ overload_applications.OverloadId }}</td>								
-							<td>{{ overload_applications.SubjectsToAdd }}</td>
+							<td>{{ overload_applications.subjects_to_add }}</td>
 							<td>{{ overload_applications.Justification }}</td>														
 							<td id="Status">{{ overload_applications.Status }}</td>
 							<td>
@@ -73,17 +73,17 @@
 					</thead>
 					<tbody>
 						{% for addsubjects in services_data.addsubjects_list %}
-						<tr data-add-application-id="{{  addsubjects.SubjectId }}"
-							data-add-name="{{ addsubjects.Name}}" 
+						<tr data-add-application-id="{{  addsubjects.StudentId }}"
+							data-add-name="{{ addsubjects.FacultyRole}}" 
 							data-add-student-number="{{ addsubjects.StudentNumber }}"
-							data-add-subjects-to-add="{{ addsubjects.SubjectNames }}"
-							data-add-enrollment-type="{{ addsubjects.EnrollmentType }}"
-							data-add-file-url="{{ url_for('view_subject_file', SubjectId=addsubjects.SubjectId) }}"
+							data-add-subjects-to-add="{{ addsubjects.Subject }}"
+							data-add-enrollment-type="{{ addsubjects.ServiceDetails }}"
+							data-add-file-url="/student/view_payment_file/{{ subject_id }}"
 							data-add-file-filename="{{ addsubjects.AddSubjectFilefilename }}"	
-							data-add-Status="{{ addsubjects.Status }}">
+							data-add-status="{{ addsubjects.Status }}">
 							<td class="applicationID">{{ addsubjects.SubjectId }}</td>								
-							<td>{{ addsubjects.SubjectNames }}</td>
-							<td>{{ addsubjects.EnrollmentType }}</td>														
+							<td>{{ addsubjects.SenderName }}</td>
+							<td>{{ addsubjects.SenderContactNo }}</td>														
 							<td id="Status">{{ addsubjects.Status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal"></button>
@@ -123,8 +123,8 @@
 							data-change-student-number="{{ changesubjects.StudentNumber }}"
 							data-change-enrollment-type="{{ changesubjects.EnrollmentType }}"
 							data-change-file-url="{{ url_for('view_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}"
-							data-change-file-filename="{{ changesubjects.ace_form_filename }}"	
-							data-change-Status="{{ changesubjects.Status  }}">
+							data-change-file-filename="{{ changesubjects.AceFormfilename }}"	
+							data-change-status="{{ changesubjects.Status  }}">
 							<td class="applicationID">{{ changesubjects.ChangeSubjectId }}</td>								
 							<td>{{ changesubjects.EnrollmentType }}</td>														
 							<td id="Status">{{ changesubjects.Status }}</td>
@@ -175,7 +175,7 @@
 							data-correction-file-affidavit="{{ url_for('view_affidavit', GradeEntryId=grade_entry.GradeEntryId) }}"
 							data-correction-affidavit-filename="{{ grade_entry.Affidavitfilename }}"	
 
-							data-correction-Status="{{ grade_entry.Status }}">
+							data-correction-status="{{ grade_entry.Status }}">
 							<td class="applicationID">{{ grade_entry.GradeEntryId }}</td>								
 							<td>{{ grade_entry.ApplicationType }}</td>
 							<td id="Status">{{ grade_entry.Status }}</td>								
@@ -223,7 +223,7 @@
 							data-cross-application-filename="{{ cross_enrollment.ApplicationLetterfilename }}"	
 							data-cross-permit-to-cross-url="{{ url_for('get_permit_to_enroll', CrossEnrollmentId=cross_enrollment.CrossEnrollmentId) }}"
 							data-cross-permit-filename="{{ cross_enrollment.PermitCrossEnrollfilename }}"	
-							data-cross-Status="{{ cross_enrollment.Status }}">
+							data-cross-status="{{ cross_enrollment.Status }}">
 							<td class="applicationID">{{ cross_enrollment.CrossEnrollmentId }}</td>								
 							<td>{{ cross_enrollment.SchoolforCrossEnrollment }}</td>
 							<td>{{ cross_enrollment.TotalNumberofUnits }}</td>
@@ -271,7 +271,7 @@
 							data-shifting-qualification="{{ shifting_applications.Qualifications }}"
 							data-shifting-file-url="{{ url_for('get_shifting_file', ShiftingId=shifting_applications.ShiftingId) }}"
 							data-shifting-file-filename="{{shifting_applications.Shiftingfilename }}"	
-							data-shifting-Status="{{ shifting_applications.Status }}">
+							data-shifting-status="{{ shifting_applications.Status }}">
 							<td class="applicationID">{{ shifting_applications.ShiftingId }}</td>								
 							<td>{{ shifting_applications.CurrentProgram }}</td>
 							<td>{{ shifting_applications.IntendedProgram }}</td>							
@@ -314,10 +314,10 @@
 							data-manual-enrollment-name="{{ manual_enrollments.Name }}"
 							data-manual-enrollment-student-number="{{ manual_enrollments.StudentNumber }}"
 							data-manual-enrollment-type="{{ manual_enrollments.EnrollmentType }}"
-							data-manual-enrollment-Reason="{{ manual_enrollments.Reason }}"
+							data-manual-enrollment-reason="{{ manual_enrollments.Reason }}"
 							data-manual-file-url="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.ManualEnrollmentId) }}"
-							data-manual-file-filename="{{ manual_enrollments.MeFilefilename }}"	
-							data-manual-Status="{{ manual_enrollments.Status }}">
+							data-manual-file-filename="{{ manual_enrollments.me_Overloadfilename }}"	
+							data-manual-status="{{ manual_enrollments.Status }}">
 							<td class="applicationID">{{ manual_enrollments.ManualEnrollmentId }}</td>								
 							<td>{{ manual_enrollments.EnrollmentType }}</td>
 							<td>{{ manual_enrollments.Reason }}</td>	
@@ -363,9 +363,9 @@
 							data-petition-subject-code="{{ petition_requests.SubjectCode }}"
 							data-petition-subject-name="{{ petition_requests.SubjectName }}"
 							data-petition-type="{{ petition_requests.PetitionType }}"
-							data-petition-Reason="{{ petition_requests.RequestReason }}"
-							data-petition-Status="{{ petition_requests.Status }}">
-							<td class="applicationID">{{ petition_requests.PetitionId }}</td>								
+							data-petition-reason="{{ petition_requests.RequestReason }}"
+							data-petition-status="{{ petition_requests.Status }}">
+							<td class="applicationID">{{ petition_requests.petition_request_id }}</td>								
 							<td>{{ petition_requests.SubjectName }}</td>
 							<td>{{ petition_requests.PetitionType }}</td>	
 							<td>{{ petition_requests.RequestReason }}</td>													
@@ -410,9 +410,9 @@
 							data-tutorial-student-number="{{ tutorial_requests.StudentNumber }}"
 							data-tutorial-subject-code="{{ tutorial_requests.SubjectCode }}"
 							data-tutorial-subject-name="{{ tutorial_requests.SubjectName }}"
-							data-tutorial-file-url="{{ url_for('view_tutorial_file', TutorialId=tutorial_requests.TutorialId) }}"
+							data-tutorial-file-url="{{ url_for('view_tutorial_file', tutorial_request_id=tutorial_requests.TutorialId) }}"
 							data-tutorial-file-filename="{{ tutorial_requests.Tutorialfilename }}"	
-							data-tutorial-Status="{{ tutorial_requests.Status }}">
+							data-tutorial-status="{{ tutorial_requests.Status }}">
 							<td class="applicationID">{{ tutorial_requests.TutorialId }}</td>								
 							<td>{{ tutorial_requests.SubjectCode }}</td>
 							<td>{{ tutorial_requests.SubjectName }}</td>	
@@ -460,16 +460,6 @@
 							data-request-url="{{ url_for('get_certification_request_file', CertificationId=certification_request.CertificationId) }}"
 							data-request-filename="{{ certification_request.RequestFormfilename }}"	
 
-<<<<<<< HEAD
-							data-registration-url="{{ url_for('view_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}"
-							data-registration-filename="{{ certification_request.request_form_filename }}"	
-
-							data-authorization-url="{{ url_for('view_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}"
-							data-authorization-filename="{{ certification_request.authorization_letter_filename }}"
-
-							data-representative-url="{{ url_for('get_representative_file', certification_request_id=certification_request.certification_request_id) }}"
-							data-representative-filename="{{ certification_request.representative_filename }}"
-=======
 							data-registration-url="{{ url_for('get_certification_identification_file', CertificationId=certification_request.CertificationId) }}"
 							data-registration-filename="{{ certification_request.IdentificationCardfilename }}"	
 
@@ -478,9 +468,8 @@
 
 							data-representative-url="{{ url_for('get_representative_file', CertificationId=certification_request.CertificationId) }}"
 							data-representative-filename="{{ certification_request.RepresentativeIdfilename }}"
->>>>>>> TEST
 
-							data-certification-Status="{{ certification_request.Status }}">
+							data-certification-status="{{ certification_request.Status }}">
 							<td class="applicationID">{{ certification_request.CertificationId }}</td>								
 							<td>{{ certification_request.CertificationType }}</td>																				
 							<td id="Status">{{ certification_request.Status }}</td>
@@ -545,7 +534,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Reason/s:</label>
 				<div class="col-sm-4">
-					<p id="overload-Justification"></p>
+					<p id="overload-justification"></p>
 				</div>           
 			  </div>
 
@@ -559,7 +548,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="overload-Status"></p>
+					<p id="overload-status"></p>
 				</div>           
 			  </div>
 			
@@ -633,7 +622,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="add-Status"></p>
+					<p id="add-status"></p>
 				</div>           
 			  </div>
 			
@@ -697,7 +686,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="change-Status"></p>
+					<p id="change-status"></p>
 				</div>           
 			  </div>
 			
@@ -775,7 +764,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="correction-Status"></p>
+					<p id="correction-status"></p>
 				</div>           
 			  </div>
 			
@@ -862,7 +851,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="cross-Status"></p>
+					<p id="cross-status"></p>
 				</div>           
 			  </div>
 			
@@ -950,7 +939,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="shifting-Status"></p>
+					<p id="shifting-status"></p>
 				</div>           
 			  </div>
 			
@@ -1009,7 +998,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Reason for Manual Enrollment:</label>
 				<div class="col-sm-4">
-					<p id="manual-enrollment-Reason"></p>
+					<p id="manual-enrollment-reason"></p>
 				</div>           
 			  </div>
 
@@ -1023,7 +1012,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="manual-Status"></p>
+					<p id="manual-status"></p>
 				</div>           
 			  </div>
 
@@ -1097,14 +1086,14 @@
 				  <div class="form-group">
 					<label class="col-sm-4 control-label">Reason/s:</label>
 					<div class="col-sm-4">
-						<p id="petition-Reason"></p>
+						<p id="petition-reason"></p>
 					</div>           
 				  </div>
 
 				  <div class="form-group">
 					<label class="col-sm-4 control-label">Status:</label>
 					<div class="col-sm-4">
-						<p id="petition-Status"></p>
+						<p id="petition-status"></p>
 					</div>           
 				  </div>
 				
@@ -1177,7 +1166,7 @@
 			  <div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
-					<p id="tutorial-Status"></p>
+					<p id="tutorial-status"></p>
 				</div>           
 			  </div>
 			
@@ -1307,17 +1296,17 @@
             var name = $(this).data('overload-name');
             var studentNumber = $(this).data('overload-student-number');
             var subjectsToAdd = $(this).data('overload-subjects-to-add');
-            var Justification = $(this).data('overload-Justification');
+            var Justification = $(this).data('overload-justification');
             var fileUrl = $(this).data('overload-file-url');
             var fileName = $(this).data('overload-file-filename');
-            var Status = $(this).data('overload-Status');
+            var Status = $(this).data('overload-status');
 
             // Populate modal with data
             $('#overload-application-id').text(applicationId);
             $('#overload-application-name').text(name);
             $('#overload-application-studentNumber').text(studentNumber);
             $('#overload-subjects-to-add').text(subjectsToAdd);
-            $('#overload-Justification').text(Justification);
+            $('#overload-justification').text(Justification);
 
             // Generate dynamic file download link
 			if (fileName) {
@@ -1327,7 +1316,7 @@
 				$('#overload-application-file').text('No File');
 			}
 
-			$('#overload-Status').text(Status);
+			$('#overload-status').text(Status);
         });
     });
 
@@ -1342,7 +1331,7 @@
 		var enrollmentType = $(this).data('add-enrollment-type');
 		var fileUrl = $(this).data('add-file-url');
 		var fileName = $(this).data('add-file-filename');
-		var Status = $(this).data('add-Status');
+		var Status = $(this).data('add-status');
 
 		// Populate modal with data
 		$('#add-application-id').text(applicationId);
@@ -1359,7 +1348,7 @@
 				$('#add-certification-file').text('No File');
 			}
 
-		$('#add-Status').text(Status);
+		$('#add-status').text(Status);
 	});
 });
 
@@ -1373,7 +1362,7 @@
 		var enrollmentType = $(this).data('change-enrollment-type');
 		var fileUrl = $(this).data('change-file-url');
 		var fileName = $(this).data('change-file-filename');
-		var Status = $(this).data('change-Status');
+		var Status = $(this).data('change-status');
 
 		// Populate modal with data
 		$('#change-application-id').text(applicationId);
@@ -1389,7 +1378,7 @@
 				$('#change-certification-file').text('No File');
 			}
 
-		$('#change-Status').text(Status);
+		$('#change-status').text(Status);
 	});
 });
 
@@ -1407,7 +1396,7 @@ $(document).ready(function () {
 		var recordFile = $(this).data('correction-record-filename');
 		var affidavit = $(this).data('correction-file-affidavit');
 		var affidavitFile = $(this).data('correction-affidavit-filename');
-		var Status = $(this).data('correction-Status');
+		var Status = $(this).data('correction-status');
 
 		// Populate modal with data
 		$('#correction-application-id').text(applicationId);
@@ -1437,7 +1426,7 @@ $(document).ready(function () {
 				$('#correction-affidavit-file').text('No File');
 			}
 
-		$('#certification-status').text(Status);
+		$('#correction-status').text(Status);
 	});
 });
 
@@ -1455,7 +1444,7 @@ $(document).ready(function () {
             var applicationfileName = $(this).data('cross-application-filename');
 			var permittoCross = $(this).data('cross-permit-to-cross-url');
             var permittoCrossfileName = $(this).data('cross-permit-filename');
-            var Status = $(this).data('cross-Status');
+            var Status = $(this).data('cross-status');
 
             // Populate modal with data
             $('#cross-application-id').text(applicationId);
@@ -1479,7 +1468,7 @@ $(document).ready(function () {
 				$('#cross-permit').text('No File');
 			}
 
-			$('#cross-Status').text(Status);
+			$('#cross-status').text(Status);
         });
     });
 
@@ -1496,7 +1485,7 @@ $(document).ready(function () {
             var qualification = $(this).data('shifting-qualification');
             var fileUrl = $(this).data('shifting-file-url');
             var fileName = $(this).data('shifting-file-filename');
-            var Status = $(this).data('shifting-Status');
+            var Status = $(this).data('shifting-status');
 
             // Populate modal with data
             $('#shifting-application-id').text(applicationId);
@@ -1515,7 +1504,7 @@ $(document).ready(function () {
 				$('#shifting-application-file').text('No File');
 			}
 
-			$('#shifting-Status').text(Status);
+			$('#shifting-status').text(Status);
         });
     });
 
@@ -1527,17 +1516,17 @@ $(document).ready(function () {
             var name = $(this).data('manual-enrollment-name');
             var studentNumber = $(this).data('manual-enrollment-student-number');
             var enrollmentType = $(this).data('manual-enrollment-type');
-			var enrollmentReason = $(this).data('manual-enrollment-Reason');
+			var enrollmentReason = $(this).data('manual-enrollment-reason');
             var manualfileUrl = $(this).data('manual-file-url');
             var manualfileName = $(this).data('manual-file-filename');
-            var Status = $(this).data('manual-Status');
+            var Status = $(this).data('manual-status');
 
             // Populate modal with data
             $('#manual-enrollment-id').text(applicationId);
             $('#manual-enrollment-name').text(name);
             $('#manual-enrollment-student-number').text(studentNumber);
             $('#manual-enrollment-enrollment-type').text(enrollmentType);
-			$('#manual-enrollment-Reason').text(enrollmentReason);
+			$('#manual-enrollment-reason').text(enrollmentReason);
 
             // Generate dynamic file download link
 			if (manualfileName) {
@@ -1547,7 +1536,7 @@ $(document).ready(function () {
 				$('#manual-enrollment-file').text('No File');
 			}
 
-			$('#manual-Status').text(Status);
+			$('#manual-status').text(Status);
         });
     });
 
@@ -1561,8 +1550,8 @@ $(document).ready(function () {
 		var subjectCode = $(this).data('petition-subject-code');
 		var subjectName = $(this).data('petition-subject-name');
 		var petitionType = $(this).data('petition-type');
-		var petitionReason = $(this).data('petition-Reason');
-		var Status = $(this).data('petition-Status');
+		var petitionReason = $(this).data('petition-reason');
+		var Status = $(this).data('petition-status');
 
 		// Populate modal with data
 		$('#petition-application-id').text(applicationId);
@@ -1571,8 +1560,8 @@ $(document).ready(function () {
 		$('#petition-subject-code').text(subjectCode);
 		$('#petition-subject-name').text(subjectName);
 		$('#petition-type').text(petitionType);
-		$('#petition-Reason').text(petitionReason);
-		$('#petition-Status').text(Status);
+		$('#petition-reason').text(petitionReason);
+		$('#petition-status').text(Status);
 	});
 });
  
@@ -1587,7 +1576,7 @@ $(document).ready(function () {
 		var subjectName = $(this).data('tutorial-subject-name');
 		var tutorialfileUrl = $(this).data('tutorial-file-url');
         var tutorialfileName = $(this).data('tutorial-file-filename');
-        var Status = $(this).data('tutorial-Status');
+        var Status = $(this).data('tutorial-status');
 
 		// Populate modal with data
 		$('#tutorial-application-id').text(applicationId);
@@ -1596,7 +1585,7 @@ $(document).ready(function () {
 		$('#tutorial-subject-code').text(subjectCode);
 		$('#tutorial-subject-name').text(subjectName);
 
-		$('#petition-Status').text(Status);
+		$('#petition-status').text(Status);
 	// Generate dynamic file download link
 			if (tutorialfileName) {
 				var fileLink = $('<a>').attr('href', 						tutorialfileUrl).attr('target', '_blank').text(tutorialfileName);
@@ -1605,7 +1594,7 @@ $(document).ready(function () {
 				$('#tutorial-file-data').text('No File');
 			}
 
-			$('#tutorial-Status').text(Status);
+			$('#tutorial-status').text(Status);
         });
     });
 
@@ -1630,7 +1619,7 @@ $(document).ready(function () {
 			var representativeUrl = $(this).data('representative-url');
             var representativeFile = $(this).data('representative-filename');
 
-            var Status = $(this).data('certification-Status');
+            var Status = $(this).data('certification-status');
 
             // Populate modal with data
             $('#certification-application-id').text(applicationId);
@@ -1667,7 +1656,7 @@ $(document).ready(function () {
 				$('#certification-representative-file').text('No File');
 			}
 
-			$('#certification-Status').text(Status);
+			$('#certification-status').text(Status);
         });
     });
 </script>
@@ -1705,6 +1694,10 @@ $(document).ready(function () {
 			$('#deleteModalText').html('Are you sure you want to <strong>Delete</strong> this Application?');
 		});
 	});
+	var proofOfPaymentLink = document.createElement('a');
+      proofOfPaymentLink.textContent = proofOfPaymentFileName;
+      proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
+      proofOfPaymentLink.target = '_blank';
 </script>
 
 

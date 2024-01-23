@@ -1,36 +1,26 @@
 import io
-from operator import and_
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
-from flask_login import login_user
-<<<<<<< HEAD
-# from Api.v1.student.utils import get_student_class_data
-from models import Class, ClassSubject, Course, CourseEnrolled, Metadata, Student, Faculty, StudentClassSubjectGrade, Subject, db, init_db
-=======
+from flask_login import current_user, login_user
 import requests
 from sqlalchemy import and_
 from Api.v1.student.utils import get_student_services
-from models import CertificationRequest, ChangeOfSubjects, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
->>>>>>> TEST
+from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
-<<<<<<< HEAD
-from Api.v1.student.api_routes import create_services_application, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api #getStudentClassSubjectGrade, #, update_student_profile #log_form_submission_to_file
-=======
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_changesubjects_application, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
+from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
 from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
->>>>>>> TEST
 
 import os
 from dotenv import load_dotenv
 
 from flask_jwt_extended import JWTManager
 
-from decorators.auth_decorators import prevent_authenticated, role_required, student_required
+from decorators.auth_decorators import faculty_required, prevent_authenticated, role_required, student_required
 
 
 load_dotenv()  # Load environment variables from .env file
@@ -67,9 +57,11 @@ def custom_context_processor():
         authenticated = True
     return {'authenticated': authenticated}
 
+
 #========================= LANDING PAGE ===================================
 
 @app.route('/')
+@prevent_authenticated
 def index():
     session.permanent = True
     return render_template('main/home.html')
@@ -78,20 +70,22 @@ def index():
 @app.route('/')
 @prevent_authenticated
 def home():
-    session.permanent = True
-    return render_template('main/home.html')
+    if current_user.__class__.__name__ == "student":
+        return render_template('student/dashboard.html')
+    elif current_user.__class__.__name__ == "faculty":
+        return render_template('faculty/dashboard.html')
+    else:
+        return render_template('main/home.html')
 
 #=============================== LOGOUT FUNCTION ====================================
 
 @app.route('/logout')
 def logout():
-    
     session.clear()
     return redirect(url_for('studentLogin'))  
 
 @app.route('/logoutfaculty')
 def logoutfaculty():
-
     session.clear()
     return redirect(url_for('faculty_portal'))
 
@@ -175,128 +169,40 @@ def discipline():
     return render_template("/academic/discipline.html")
 
 #========================================= STUDENT SERVICES ====================================================
-@app.route('/student/addingsubject')
-@student_required
-def studentaddingsubject():
-    current_user = getCurrentUser()
-    student_id = current_user.StudentId
-
-    current_date = datetime.now()
-    
-    result = db.session.query(
-        Metadata.CourseId,
-        Metadata.Year,
-        Metadata.Semester,
-        Metadata.Batch
-    ).join(
-        CourseEnrolled, Metadata.CourseId == CourseEnrolled.CourseId
-    ).filter(
-        and_(
-            CourseEnrolled.StudentId == student_id,
-            CourseEnrolled.DateEnrolled <= current_date,
-    ) & CourseEnrolled.Status.in_([0, 1])
-    ).order_by(
-        Metadata.Year.desc(),  # Assuming you want the most recent entry first
-        Metadata.Semester.desc(),
-        CourseEnrolled.DateEnrolled.desc()
-    ).first()
-
-    courseID, year, semester, batch = result
-    
-    course = db.session.query(Course).filter(Course.CourseId == courseID).first()
-
-    selections = (
-        db.session.query(Subject)
-        .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
-        .join(Class, Class.ClassId == ClassSubject.ClassId)
-        .join(Metadata, Metadata.MetadataId == Class.MetadataId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .filter(Metadata.Semester == semester)  # Add the desired semester filter
-        .filter(Metadata.Batch == batch)  # Add the desired semester filter
-        .all()
-    )
-
-    # Extracting details of each Subject from the result
-    selection_list = [selections.to_dict() for selections in selections]
-
-    subjects = (
-        db.session.query(Subject)
-        .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
-        .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .all()
-    ) 
-
-    # Extracting details of each Subject from the result
-    subject_list = [subject.to_dict() for subject in subjects]
-
-    return render_template("/student/addingsubject.html", selection_list=selection_list, subject_list=subject_list, course=course, student_api_base_url=student_api_base_url)
-
-
-@app.route('/student/addingsubject/submitapplication', methods=['POST'])
-@role_required('student')
-def submitapplication():
-    try:
-        current_StudentId = session.get('user_id')
-        current_FacultyId = request.form.get('facultyId')
-        
-        # Pass StudentId and FacultyId to the function
-        new_service_application = create_services_application(request.form, request.files, current_StudentId, current_FacultyId)
-
-        if new_service_application:
-            flash('Service Request submitted successfully!', 'success')
-            return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
-    finally:
-        db.session.close()
-
-    return render_template('/student/addingsubject.html')
 
 #======================================== STUDENT DASHBOARD ====================================================
 @app.route('/student/dashboard') 
 @student_required
 @role_required('student')
 def student_dashboard():
-    session.permanent = True
+#    # Assuming you have a function to get student services based on their ID
+#     student_id = session.get('user_id')
+#     all_services_list, pending_count, approved_count, denied_count, total_services = get_student_services(student_id)  # Unpack the tuple
 
-   # Assuming you have a function to get student services based on their ID
-    student_id = session.get('user_id')
-    all_services_list, pending_count, approved_count, denied_count, total_services = get_student_services(student_id)  # Unpack the tuple
-
-    # Count the number of services with "Sent" status
-    pending_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-    pending_count = len(pending_services)
+#     # Count the number of services with "Sent" status
+#     pending_services = [service for service in all_services_list if service.get('Status') == 'Sent']
+#     pending_count = len(pending_services)
     
-    approved_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-    approved_count = len(approved_services)
+#     approved_services = [service for service in all_services_list if service.get('Status') == 'Sent']
+#     approved_count = len(approved_services)
 
-    denied_services = [service for service in all_services_list if service.get('Status') == 'Sent']
-    denied_count = len(denied_services)
+#     denied_services = [service for service in all_services_list if service.get('Status') == 'Sent']
+#     denied_count = len(denied_services)
     
 
-    # Calculate the percentage of pending services
-    total_services = len(all_services_list)
-    pending_percentage = f"{(pending_count / total_services) * 100}%"
-    approved_percentage = f"{(approved_count / total_services) * 100}%"
-    denied_percentage = f"{(denied_count / total_services) * 100}%"
+#     # Calculate the percentage of pending services
+#     total_services = len(all_services_list)
+#     pending_percentage = f"{(pending_count / total_services) * 100}%"
+#     approved_percentage = f"{(approved_count / total_services) * 100}%"
+#     denied_percentage = f"{(denied_count / total_services) * 100}%"
 
-    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_percentage=approved_percentage, denied_percentage=denied_percentage)
+    return render_template('/student/dashboard.html') #, pending_count=pending_count, pending_percentage=pending_percentage, approved_percentage=approved_percentage, denied_percentage=denied_percentage)
 
 
 #======================================== STUDENT PROFILE ======================================================
 
-<<<<<<< HEAD
-@app.route('/student/profile', methods=['GET'])
-@student_required
-@role_required('student') 
-=======
 @app.route('/student/profile')
 @student_required
->>>>>>> TEST
 def studentprofile():
     return render_template('/student/profile.html', student_api_base_url=student_api_base_url)
 
@@ -305,16 +211,10 @@ def student_update_profile():
     if request.method == 'POST':
         student_id = request.form.get('student_id')
         
-<<<<<<< HEAD
-        email = request.form.get('Email')
-        mobile_number = request.form.get('MobileNumber')
-        address = request.form.get('address')
-=======
         Email = request.form.get('Email')
         MobileNumber = request.form.get('MobileNumber')
         ResidentialAddress = request.form.get('ResidentialAddress')
 
->>>>>>> TEST
         user_id = getCurrentUser()
 
         if isinstance(user_id, Student):
@@ -341,84 +241,53 @@ def student_update_profile():
     return render_template('/student/profile.html')
 
 
-@app.route('/student/addingsubjects', methods=['GET', 'POST'])
-@role_required('student')
-def student_adding_subjects():
-    if request.method == 'POST':
-        email = request.form.get('Email')
-        mobile_number = request.form.get('MobileNumber')
-        address = request.form.get('address')
-        user_id = getCurrentUser()
-        
-    
-    current_user = getCurrentUser()
-    student_id = current_user.StudentId
+#======================================== STUDENT TRANSACTION HISTORY ===================================================
+@app.route('/student/history', methods=['GET'])
+@student_required
+def student_history():
+    user_id = session.get('user_id')
 
-    current_date = datetime.now()
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
 
-    # Join tables to get the current semester of a student
-    result = db.session.query(
-        Metadata.CourseId,
-        Metadata.Year,
-        Metadata.Semester,
-        Metadata.Batch
-    ).join(
-        CourseEnrolled, Metadata.CourseId == CourseEnrolled.CourseId
-    ).filter(
-        and_(
-            CourseEnrolled.StudentId == student_id,
-            CourseEnrolled.DateEnrolled <= current_date,
-    ) & CourseEnrolled.Status.in_([0, 1])
-    ).order_by(
-        Metadata.Year.desc(),  # Assuming you want the most recent entry first
-        Metadata.Semester.desc(),
-        CourseEnrolled.DateEnrolled.desc()
-    ).first()
+    services_data = {}
 
-    courseID, year, semester, batch = result
-    
-    course = db.session.query(Course).filter(Course.CourseId == courseID).first()
-    print(course.CourseCode)
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
 
-    subjects = (
-        db.session.query(Subject)
-        .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
-        .join(Class, Class.ClassId == ClassSubject.ClassId)
-        .join(Metadata, Metadata.MetadataId == Class.MetadataId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .filter(Metadata.Semester == semester)  # Add the desired semester filter
-        .filter(Metadata.Batch == batch)  # Add the desired semester filter
-        .all()
-    )
+        # Fetch ChangeOfSubjects based on the StudentId foreign key
+        changesubjects = ChangeSubject.query.filter_by(StudentId=student.StudentId).all()
+        services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
 
-    # Extracting details of each Subject from the result
-    subject_details = [subject.to_dict() for subject in subjects]
+        # Fetch ManualEnrollment based on the StudentId foreign key
+        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
 
+        # Fetch CertificationRequest based on the StudentId foreign key
+        certification_request = CertificationRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['certification_request_list'] = [subject.to_dict() for subject in certification_request]
 
-    return render_template('student/addingsubjects.html', subject_details=subject_details, course=course)
-    # else:
-    #     return jsonify(message="No class subject data available"), 400
+        # Fetch GradeEntry based on the StudentId foreign key
+        grade_entry = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
+        services_data['grade_entry_list'] = [subject.to_dict() for subject in grade_entry]
 
-@app.route('/student/certification', methods=['GET'])
-def cetification():
-    return render_template('student/certification.html', student_api_base_url=student_api_base_url)
+        # Fetch CrossEnrollment based on the StudentId foreign key
+        cross_enrollment = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['cross_enrollment_list'] = [subject.to_dict() for subject in cross_enrollment]
 
-@app.route('/student/changeofsubject', methods=['GET'])
-def changeofsubject():
-    current_user_id = session.get('user_id')
-    current_year = request.args.get('year', type=int) or datetime.now().year
-    current_semester = request.args.get('semester', type=int) # You need to define how to determine the current semester
+        # Fetch PetitionRequest based on the StudentId foreign key
+        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
 
-    results = api_student_class_subjects(current_user_id, current_year, current_semester)
-    return jsonify([dict(row) for row in results])
-    return render_template('student/changeofsubject.html')
+        # Fetch ShiftingApplication based on the StudentId foreign key
+        shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
 
-<<<<<<< HEAD
-=======
         # Fetch OverloadApplication based on the StudentId foreign key
-        overload_applicationss = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
-        services_data['overload_applicationss_list'] = [subject.to_dict() for subject in overload_applicationss]
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['overload_applicationss_list'] = [subject.to_dict() for subject in overload_applications]
 
         # Fetch TutorialRequest based on the StudentId foreign key
         tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
@@ -441,14 +310,15 @@ def show_notifications():
 
 #=======================================For Setting=======================================#
 @app.route('/student/setting')
+@student_required
 def studentsetting():
     return render_template('/student/setting.html')
 # Assuming you have the role_required decorator implemented
->>>>>>> TEST
 
 #==================================== STUDENT CHANGE PASSWORD ===========================================================
 
 @app.route('/student/changepassword')
+@student_required
 def studentpassword():
     return render_template('/student/changepassword.html')
 
@@ -504,8 +374,6 @@ def student_change_password():
     return render_template('student/change_password.html')
 
 
-<<<<<<< HEAD
-=======
 
 """# Endpoint to Fetch Programs
 @app.route('/programs', methods=['GET'])
@@ -758,13 +626,12 @@ def add_subjects():
 def submitapplication():
     try:
         current_StudentId = session.get('user_id')
-        current_FacultyId = request.form.get('facultyId')
-        
-        # Pass StudentId and FacultyId to the function
-        new_service_application = create_services_application(request.form, request.files, current_StudentId, current_FacultyId)
+
+# Pass StudentId and FacultyId to the function
+        new_service_application = create_services_application(request.form, request.files, current_StudentId)
 
         if new_service_application:
-            flash('Service Request submitted successfully!', 'success')
+            flash('Service Request submitted successfully!', category='success')
             return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
@@ -774,6 +641,24 @@ def submitapplication():
 
     return render_template('/student/addingsubject.html')
 
+#Edit Addservices in the Faculty
+@app.route('/update_status', methods=['POST'])
+def update_status():
+    data = request.get_json()
+    subject_id = data.get('subjectId')
+    new_status = data.get('status')
+
+    try:
+        subject = AddSubjects.query.filter_by(AddSubjectId=subject_id).first()
+        if subject:
+            subject.Status = new_status
+            db.session.commit()
+            return jsonify({'message': 'Status updated successfully'}), 200
+        else:
+            return jsonify({'message': 'Subject not found'}), 404
+    except Exception as e:
+        return jsonify({'message': str(e)}), 500
+    
 @app.route('/student/viewaddsubject', methods=['GET'])
 @role_required('student')
 def viewaddsubject():
@@ -793,75 +678,106 @@ def viewaddsubject():
 
     return render_template("/student/viewaddsubject.html", addsubjects_list=addsubjects_list)
 
-@app.route('/student/view_subject_file/<int:SubjectId>')
-def view_subject_file(SubjectId):
-    addsubject = AddSubjects.query.get(SubjectId)
+@app.route('/student/view_payment_file/<int:subject_id>')
+def view_payment_file(subject_id):
+    add_subject = AddSubjects.query.get(subject_id)
 
-    if addsubject and addsubject.file_data:
-        file_extension = get_file_extension(addsubject.file_name)
+    if add_subject and add_subject.PaymentFile:
+        file_extension = get_file_extension(add_subject.Subject)  # Assuming the filename is stored in 'Subject'
         mimetype = get_mimetype(file_extension)
 
         return send_file(
-            io.BytesIO(addsubject.file_data),
+            io.BytesIO(add_subject.PaymentFile),
             as_attachment=False,
             mimetype=mimetype
         )
     else:
         abort(404)  # Subject or file not found
 
-def get_file_extension(file_name):
-    return file_name.rsplit('.', 1)[1].lower()
-
-def get_mimetype(file_extension):
-    mimetypes = {
-        'txt': 'text/plain',
-        'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        # Note: Changed 'docs' to 'docx' for the correct MIME type
-        # Add more file types as needed
-    }
-
-    return mimetypes.get(file_extension, 'application/octet-stream')
-
-#============================== CHANGE OF SCHEDULE/SUBJECT ===============================================#
-@app.route('/student/changeofsubject')
-@student_required
-def studentchange():
-    return render_template("/student/changeofsubject.html", student_api_base_url=student_api_base_url)
-
-@app.route('/student/changeofsubject/added', methods=['POST'])
-@role_required('student')
-def change_of_subjects():
-    try: 
-        current_StudentId = session.get('user_id')
-        current_StudentNumber = get_student_number_by_id(current_StudentId)
-        new_changesubjects_application = create_changesubjects_application(request.form, request.files, current_StudentId)
+# The get_file_extension and get_mimetype functions remain the same
         
-        if new_changesubjects_application and current_StudentNumber:
-            db.session.add(new_changesubjects_application)
-            db.session.commit()
+#====================================== CHANGE OF SCHEDULE/SUBJECT ====================================================
+@app.route('/student/changeofsubject')
+@role_required('student')
+def studentchange():
+    
+    current_user = getCurrentUser()
+    student_id = current_user.StudentId
 
-            # Create a notification
-            new_notification = create_notification(
-                StudentId=current_StudentId,
-                StudentNumber=current_StudentNumber,
-                ServiceType="Change Subject Request",
-                UserResponsible=request.form.get('UserResponsible'),
-                Status="Sent",
-                Message="Your Change Subject request has been submitted.",
-            )
-            db.session.add(new_notification)
-            db.session.commit()
+    current_date = datetime.now()
+    
+    result = db.session.query(
+        Metadata.CourseId,
+        Metadata.Year,
+        Metadata.Semester,
+        Metadata.Batch
+    ).join(
+        CourseEnrolled, Metadata.CourseId == CourseEnrolled.CourseId
+    ).filter(
+        and_(
+            CourseEnrolled.StudentId == student_id,
+            CourseEnrolled.DateEnrolled <= current_date,
+    ) & CourseEnrolled.Status.in_([0, 1])
+    ).order_by(
+        Metadata.Year.desc(),  # Assuming you want the most recent entry first
+        Metadata.Semester.desc(),
+        CourseEnrolled.DateEnrolled.desc()
+    ).first()
 
-            flash('Change of subjects created Successfully!', 'success')
-            return redirect(url_for('studentchange'))
+    courseID, year, semester, batch = result
+    
+    course = db.session.query(Course).filter(Course.CourseId == courseID).first()
+
+    selections = (
+        db.session.query(Subject)
+        .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
+        .join(Class, Class.ClassId == ClassSubject.ClassId)
+        .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+        .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
+        .filter(CourseEnrolled.StudentId == student_id)
+        .filter(Metadata.Semester == semester)  # Add the desired semester filter
+        .filter(Metadata.Batch == batch)  # Add the desired semester filter
+        .all()
+    )
+
+    # Extracting details of each Subject from the result
+    selection_list = [selections.to_dict() for selections in selections]
+
+    subjects = (
+        db.session.query(Subject)
+        .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
+        .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+        .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
+        .filter(CourseEnrolled.StudentId == student_id)
+        .all()
+    ) 
+
+    # Extracting details of each Subject from the result
+    subject_list = [subject.to_dict() for subject in subjects]
+
+    return render_template("/student/changeofsubject.html", selection_list=selection_list, subject_list=subject_list, course=course, student_api_base_url=student_api_base_url)
+
+#========================================= CHANGE OF SUBJECT SUBMIT APPLICATION ====================================================
+
+@app.route('/student/changeofsubject/submitapplication', methods=['POST'])
+@role_required('student')
+def changeApplication():
+    try:
+        current_StudentId = session.get('user_id')
+        
+        # Pass StudentId and FacultyId to the function
+        changeApplication = create_change_subject(request.form, request.files, current_StudentId)
+
+        if changeApplication:
+            flash('Service request submitted successfully!', 'success')
+            return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
         flash(f'Error: {str(e)}', 'danger')
     finally:
         db.session.close()
 
-    return render_template('student/changeofsubject.html')
+    return render_template('/student/changeofsubject.html')
 
 
 @app.route('/student/viewchange', methods=['GET'])
@@ -973,22 +889,6 @@ def viewcorrection():
 
     return render_template("/student/viewcorrection.html", grade_entry_list=grade_entry_list)
 
-#viewfile for correction
-"""@app.route('/student/view_completion_form/<int:GradeEntryId>')
-def view_completion_form(GradeEntryId):
-    grade_entry = GradeEntry.query.get(GradeEntryId)
-
-    if grade_entry and grade_entry.completion_form_data:
-        completion_form_extension = get_completion_form_extension(grade_entry.completion_form_filename)
-        mimetype = get_mimetype(completion_form_extension)
-
-        return send_file(
-            io.BytesIO(grade_entry.completion_form_data),
-            as_attachment=False,
-            mimetype=mimetype
-        )
-    else:
-        abort(404)  # File not found"""
 
 @app.route('/student/view_completion_form/<int:GradeEntryId>')
 def view_completion_form(GradeEntryId):
@@ -1330,12 +1230,12 @@ def viewtutorial():
 def view_tutorial_file(tutorial_request_id):
     tutorial_requests = TutorialRequest.query.get(tutorial_request_id)
 
-    if tutorial_requests and tutorial_requests.file_data:
-        tutorial_extension = get_tutorial_extension(tutorial_requests.file_filename)
+    if tutorial_requests and tutorial_requests.Tutorialdata:
+        tutorial_extension = get_tutorial_extension(tutorial_requests.Tutorialfilename)
         mimetype = get_mimetype(tutorial_extension)
 
         return send_file(
-            io.BytesIO(tutorial_requests.file_data),
+            io.BytesIO(tutorial_requests.Tutorialdata),
             as_attachment=False,
             mimetype=mimetype
         )
@@ -1427,7 +1327,7 @@ def facultyadding():
 @role_required('faculty')
 def facultychange():
     session['last_activity'] = datetime.now(timezone.utc)
-    changesubjects = ChangeOfSubjects.query.all()
+    changesubjects = ChangeSubject.query.all()
     return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
 
 #gradeentry table
@@ -1509,7 +1409,6 @@ def check_user_activity():
     # Update the last activity timestamp
     session['last_activity'] = datetime.now(timezone.utc)"""
 
->>>>>>> TEST
 #=====================================================================================================================#
 # ALL STUDENT ROUTES HERE
 @app.route('/student')
@@ -2046,8 +1945,6 @@ def redirect_based_on_login_crossenrollment():
     else:
         return redirect(url_for('portal_crossenrollment'))
 
-<<<<<<< HEAD
-=======
 #========================================================
 
 @app.route('/student/service_service_form')#
@@ -2181,14 +2078,14 @@ def get_change_file(ChangeSubjectId):
 # Download change of subjects file
 @app.route('/faculty/download_change_file/<int:ChangeSubjectId>')
 def download_change_file(ChangeSubjectId):
-    changesubjects = ChangeOfSubjects.query.get(ChangeSubjectId)
+    changesubjects = ChangeSubject.query.get(ChangeSubjectId)
 
-    if changesubjects and changesubjects.ace_form_data:
-        file_extension = get_file_extension(changesubjects.ace_form_filename)
+    if changesubjects and changesubjects.PaymentFile:
+        file_extension = get_file_extension(changesubjects.PaymentFile)
         download_name = f'change_subject_{ChangeSubjectId}.{file_extension}'
 
         return send_file(
-            io.BytesIO(changesubjects.ace_form_data),
+            io.BytesIO(changesubjects.PaymentFile),
             as_attachment=True,
             download_name=download_name,
             mimetype=get_mimetype(file_extension),
@@ -2196,8 +2093,8 @@ def download_change_file(ChangeSubjectId):
     else:
         abort(404)  # Change of subjects application or file not found
 
-def get_file_extension(ace_form_filename):
-    return ace_form_filename.rsplit('.', 1)[1].lower()
+def get_file_extension(PaymentFile):
+    return PaymentFile.rsplit('.', 1)[1].lower()
 
 def get_mimetype(file_extension):
     mimetypes = {
@@ -2777,14 +2674,14 @@ def faculty_portal():
     return render_template('faculty/login.html') #, api_base_url=faculty_base_api_url
 
 @app.route('/dashboard')
-@role_required('faculty')
+@faculty_required
 def faculty_dashboard():
     session.permanent = True
     return render_template('/faculty/dashboard.html', faculty_api_base_url=faculty_api_base_url)
 
 # Faculty profile route
 @app.route('/faculty/profile')
-@role_required('faculty')
+@faculty_required
 def facultyprofile():
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
 
@@ -3066,11 +2963,10 @@ def student_list():
 def admin_portal():
     session.permanent = True
     return render_template('admin/login.html')
->>>>>>> TEST
 # ========================================================================
 # Register the API blueprint
-"""app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
-app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)"""
+app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
+app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)
 app.register_blueprint(student_api, url_prefix=student_api_base_url)
 
 # ========================================================================
