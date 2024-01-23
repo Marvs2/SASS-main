@@ -17,9 +17,47 @@
     <!-- Include the JavaScript file (jQuery is required) -->
 </head>
 <body>
+
+  <!--------------------------------------------- SUCCESS AND ERROR MESSAGE --------------------------------------------->
+<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+      {% for category, message in messages %}
+          {% if category == "error" %}
+              <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="d-flex toast-content">
+                    <div>
+                      <i class="fa-solid fa-xmark wrong"></i>
+                    </div>
+
+                      <div class="toast-body message">
+                          <span class="text text-1">Oh! Snap</span>
+                          <span class="text text-2">{{ message }}</span>
+                      </div>
+                      <i class="fa-solid fa-xmark close"></i>
+                  </div>
+              </div>
+          {% else %}
+              <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="d-flex toast-content">
+                    <div>
+                      <i class="fas fa-solid fa-check check"></i>
+                    </div>
+                      <div class="toast-body message">
+                          <span class="text text-1">Successful</span>
+                        <span class="text text-2">{{ message }}</span>
+                      </div>
+                      <i class="fa-solid fa-xmark close"></i>
+                  </div>
+              </div>
+          {% endif %}
+      {% endfor %}
+  {% endif %}
+{% endwith %}
+
     	<!-- SIDEBAR -->
 	<section id="sidebar">
-		<a href="{{url_for('faculty_dashboard')}}" class="brand"><i class='bx bxs-smile icon'></i>Faculty SASS</a>
+		<a href="{{url_for('faculty_dashboard')}}" class="brand"> <img class="img" src="{{ url_for('static', filename='images/pup.png') }}" alt="">SASS Admin</a>
 		<ul class="side-menu">
 			<li class="divider" data-text="Home">Home</li>
 			<li><a href="{{url_for('faculty_dashboard')}}" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
