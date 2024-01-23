@@ -1,7 +1,6 @@
 import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import current_user, login_user
-import requests
 from sqlalchemy import and_
 from Api.v1.student.utils import get_student_services
 from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
@@ -167,7 +166,6 @@ def discipline():
 #======================================== STUDENT DASHBOARD ====================================================
 @app.route('/student/dashboard') 
 @student_required
-@role_required('student')
 def student_dashboard():
    # Assuming you have a function to get student services based on their ID
     student_id = session.get('user_id')
@@ -1212,7 +1210,7 @@ def submit_certification_request():
                 StudentNumber=current_StudentNumber,
                 ServiceType="Certification Request",
                 UserResponsible=request.form.get('UserResponsible'),
-                Status="Sent",
+                Status="Pending",
                 Message="Your certification request has been submitted.",
                 StudentId=current_StudentId
             )

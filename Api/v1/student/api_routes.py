@@ -730,7 +730,7 @@ def create_services_application(form_data, files, StudentId):
     PaymentFile_data = PaymentFile.read() if PaymentFile else None
 
     # Add additional validations as needed
-    Status = 'Pending'
+    Status = 'pending'
 
     try:
         # Create a new service application
