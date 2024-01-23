@@ -462,7 +462,7 @@ def get_student_services(student_id):
     )
     total_services = len(all_services_list)
     # Count the number of services with status "pending"
-    pending_count = sum(1 for service in all_services_list if service.get('Status') == 'Sent')
+    pending_count = sum(1 for service in all_services_list if service.get('Status') == 'Pending')
     approved_count = sum(1 for service in all_services_list if service.get('Status') == 'Approved')
     denied_count = sum(1 for service in all_services_list if service.get('Status') == 'Rejected')
 
