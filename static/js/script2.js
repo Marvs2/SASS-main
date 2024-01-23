@@ -211,9 +211,9 @@ $(document).ready(function() {
 	$('#overload').DataTable(); // OVERLOAD OF SUBJECTS
 });
 
-// $(document).ready(function() {
-// 	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
-// });
+$(document).ready(function() {
+	 $('#addingSubject').DataTable(); // ADDING OF SUBJECTS
+});
 
 
 $(document).ready(function () {

@@ -472,68 +472,8 @@ def viewoverload():
         overload_applicationss_list = [subject.to_dict() for subject in overload_applicationss]
 
     return render_template("/student/viewoverload.html", overload_applicationss_list=overload_applicationss_list)
-#=======================================================================#
-#================== ADDING OF SUBJECT ==================================#
-@app.route('/student/addingsubjects')
-@student_required
-def studentaddingsubjects():
-    current_user = getCurrentUser()
-    student_id = current_user.StudentId
 
-    current_date = datetime.now()
-    
-    result = db.session.query(
-        Metadata.CourseId,
-        Metadata.Year,
-        Metadata.Semester,
-        Metadata.Batch
-    ).join(
-        CourseEnrolled, Metadata.CourseId == CourseEnrolled.CourseId
-    ).filter(
-        and_(
-            CourseEnrolled.StudentId == student_id,
-            CourseEnrolled.DateEnrolled <= current_date,
-    ) & CourseEnrolled.Status.in_([0, 1])
-    ).order_by(
-        Metadata.Year.desc(),  # Assuming you want the most recent entry first
-        Metadata.Semester.desc(),
-        CourseEnrolled.DateEnrolled.desc()
-    ).first()
-
-    courseID, year, semester, batch = result
-    
-    course = db.session.query(Course).filter(Course.CourseId == courseID).first()
-
-    selections = (
-        db.session.query(Subject)
-        .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
-        .join(Class, Class.ClassId == ClassSubject.ClassId)
-        .join(Metadata, Metadata.MetadataId == Class.MetadataId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .filter(Metadata.Semester == semester)  # Add the desired semester filter
-        .filter(Metadata.Batch == batch)  # Add the desired semester filter
-        .all()
-    )
-
-    # Extracting details of each Subject from the result
-    selection_list = [selections.to_dict() for selections in selections]
-
-    subjects = (
-        db.session.query(Subject)
-        .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
-        .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
-        .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
-        .filter(CourseEnrolled.StudentId == student_id)
-        .all()
-    ) 
-
-    # Extracting details of each Subject from the result
-    subject_list = [subject.to_dict() for subject in subjects]
-
-    return render_template("/student/addingsubjects.html", selection_list=selection_list, subject_list=subject_list, course=course, student_api_base_url=student_api_base_url)
-
-
+# =================================== GET THE STUDENT SUBJECT FOR ADDING OF SUBJECT ================================================
 @app.route('/student/addingsubject')
 @student_required
 def studentaddingsubject():
@@ -555,7 +495,7 @@ def studentaddingsubject():
             CourseEnrolled.DateEnrolled <= current_date,
     ) & CourseEnrolled.Status.in_([0, 1])
     ).order_by(
-        Metadata.Year.desc(),  # Assuming you want the most recent entry first
+        Metadata.Year.desc(),
         Metadata.Semester.desc(),
         CourseEnrolled.DateEnrolled.desc()
     ).first()
@@ -571,8 +511,8 @@ def studentaddingsubject():
         .join(Metadata, Metadata.MetadataId == Class.MetadataId)
         .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
         .filter(CourseEnrolled.StudentId == student_id)
-        .filter(Metadata.Semester == semester)  # Add the desired semester filter
-        .filter(Metadata.Batch == batch)  # Add the desired semester filter
+        .filter(Metadata.Semester == semester)  
+        .filter(Metadata.Batch == batch) 
         .all()
     )
 
@@ -587,12 +527,33 @@ def studentaddingsubject():
         .filter(CourseEnrolled.StudentId == student_id)
         .all()
     ) 
-
-    # Extracting details of each Subject from the result
+    
     subject_list = [subject.to_dict() for subject in subjects]
 
     return render_template("/student/addingsubject.html", selection_list=selection_list, subject_list=subject_list, course=course, student_api_base_url=student_api_base_url)
 
+#====================================== LOGIC FOR ADDING OF SUBJECT ============================================================
+@app.route('/student/addingsubject/submitapplication', methods=['POST'])
+@role_required('student')
+def submitapplication():
+    try:
+        current_StudentId = session.get('user_id')
+
+# Pass StudentId and FacultyId to the function
+        new_service_application = create_services_application(request.form, request.files, current_StudentId)
+
+        if new_service_application:
+            flash('Service Request submitted successfully!', category='success')
+            return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
+
+    return render_template('/student/addingsubject.html')
+
+# ========================================== FOR NOTIFICATION IN ADDING OF SUBJECT ====================================================
 
 @app.route('/student/addingsubject/added', methods=['POST'])
 @role_required('student')
@@ -628,28 +589,7 @@ def add_subjects():
 
     return render_template('student/addingsubject.html') 
 
-#====================================================================
-@app.route('/student/addingsubject/submitapplication', methods=['POST'])
-@role_required('student')
-def submitapplication():
-    try:
-        current_StudentId = session.get('user_id')
-
-# Pass StudentId and FacultyId to the function
-        new_service_application = create_services_application(request.form, request.files, current_StudentId)
-
-        if new_service_application:
-            flash('Service Request submitted successfully!', category='success')
-            return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error: {str(e)}', 'danger')
-    finally:
-        db.session.close()
-
-    return render_template('/student/addingsubject.html')
-
-#Edit Addservices in the Faculty
+#============================================ EDIT ADD SERVICE IN THE FACULTY ==============================================
 @app.route('/update_status', methods=['POST'])
 def update_status():
     data = request.get_json()
@@ -800,7 +740,7 @@ def viewchange():
 
     if student:
         # Fetch AddSubjects based on the StudentId foreign key
-        changesubjects = ChangeOfSubjects.query.filter_by(StudentId=student.StudentId).all()
+        changesubjects = changesubjects_list.query.filter_by(StudentId=student.StudentId).all()
 
         # Convert AddSubjects data to a list of dictionaries
         changesubjects_list = [subject.to_dict() for subject in changesubjects]

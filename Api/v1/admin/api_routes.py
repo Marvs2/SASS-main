@@ -1,7 +1,7 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from Api.v1.student.api_routes import API_KEYS
-from models import Admin, Student
+from models import Student
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity

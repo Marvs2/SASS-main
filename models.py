@@ -169,35 +169,35 @@ class SystemAdmin(db.Model):
     def get_user_id(self):
         return self.SysAdminId
 
-class Admin(db.Model, UserMixin):
-    __tablename__ = 'admins'
+# class Admin(db.Model, UserMixin):
+#     __tablename__ = 'admins'
 
-    adm_Id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # UserID
-    admin_Number = db.Column(db.String(30), unique=True, nullable=False) #AdminNumber
-    name = db.Column(db.String(255), nullable=False)  # Name
-    email = db.Column(db.String(100), unique=True, nullable=False)  # Email
-    password = db.Column(db.String(128), nullable=False)  # Password
-    gender = db.Column(db.Integer)  # Gender
-    dateofBirth = db.Column(db.Date)  # dateofBirth
-    placeofBirth = db.Column(db.String(100))  # placeofBirth
-    mobile_number = db.Column(db.String(11))  # MobileNumber
-    is_active = db.Column(db.Boolean, default=True)
+#     adm_Id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # UserID
+#     admin_Number = db.Column(db.String(30), unique=True, nullable=False) #AdminNumber
+#     name = db.Column(db.String(255), nullable=False)  # Name
+#     email = db.Column(db.String(100), unique=True, nullable=False)  # Email
+#     password = db.Column(db.String(128), nullable=False)  # Password
+#     gender = db.Column(db.Integer)  # Gender
+#     dateofBirth = db.Column(db.Date)  # dateofBirth
+#     placeofBirth = db.Column(db.String(100))  # placeofBirth
+#     mobile_number = db.Column(db.String(11))  # MobileNumber
+#     is_active = db.Column(db.Boolean, default=True)
 
-    def to_dict(self):
-        return {
-            'adm_Id': self.adm_Id,
-            'admin_Number': self.admin_Number,
-            'name': self.name,
-            'email': self.email,
-            'password': self.password,
-            'gender': self.gender,
-            'dateofBirth': self.dateofBirth,
-            'placeofBirth': self.placeofBirth,
-            'mobile_number': self.mobile_number,
-            'is_active': self.is_active
-        }
-    def get_id(self):
-        return str(self.id)  # Convert to string to ensure compatibility
+#     def to_dict(self):
+#         return {
+#             'adm_Id': self.adm_Id,
+#             'admin_Number': self.admin_Number,
+#             'name': self.name,
+#             'email': self.email,
+#             'password': self.password,
+#             'gender': self.gender,
+#             'dateofBirth': self.dateofBirth,
+#             'placeofBirth': self.placeofBirth,
+#             'mobile_number': self.mobile_number,
+#             'is_active': self.is_active
+#         }
+#     def get_id(self):
+#         return str(self.id)  # Convert to string to ensure compatibility
 # Course List
 class Course(db.Model):
     __tablename__ = 'SPSCourse'
@@ -604,7 +604,39 @@ class Announcement(db.Model):
 
 # ==========Services========== #
 # ==========Adding_subject_form========== #
+# class AddSubjects(db.Model, UserMixin):
+#     __tablename__ = 'SASSAddSubjects'
 
+#     SubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+#     StudentNumber = db.Column(db.String(100), nullable=False)
+#     Name = db.Column(db.String(255), nullable=False)  
+#     SubjectNames = db.Column(db.String(255), nullable=False)
+#     EnrollmentType = db.Column(db.String(100))  # 'regular50or 'irregular'
+#     AddSubjectFiledata = db.Column(db.LargeBinary)  # Store binary data for the file
+#     AddSubjectFilefilename = db.Column(db.String(255))  # Store the filename
+#     UserResponsible = db.Column(db.String(255))  # Add user role attribute
+#     Status = db.Column(db.String(100))
+#     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
+#     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+#     def to_dict(self):
+#         return {
+#             'SubjectId': self.SubjectId,
+#             'StudentId': self.StudentId,
+#             'StudentNumber': self.StudentNumber,
+#             'Name': self.Name,
+#             'SubjectNames': self.SubjectNames,
+#             'EnrollmentType': self.EnrollmentType,
+#             'AddSubjectFiledata': self.AddSubjectFiledata,
+#             'AddSubjectFilefilename': self.AddSubjectFilefilename,
+#             'UserResponsible': self.UserResponsible,  # Include user role in the dictionary
+#             'Status': self.Status,
+#         }
+
+#     def get_AddSubjectsID(self):
+#         return str(self.SubjectId)
+    
 # ==========Services========== #
 # ==========Change_of_subjects=========== #
 class ChangeSubject(db.Model):
@@ -616,8 +648,8 @@ class ChangeSubject(db.Model):
     FromSubject = db.Column(db.String(255))
     ToSubject = db.Column(db.String(255))
     ServiceDetails = db.Column(db.String(255))
-    SenderName = db.Column(db.String(50))
-    SenderContactNo = db.Column(db.String(50))
+    SenderName = db.Column(db.String(255))
+    SenderContactNo = db.Column(db.String(255))
     PaymentFile = db.Column(db.LargeBinary)
     Status = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.now)
@@ -724,7 +756,7 @@ class GradeEntry(db.Model, UserMixin):
     __tablename__ = 'SASSGradeEntry'
 
     GradeEntryId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId')) 
 
     StudentNumber =db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
@@ -976,7 +1008,7 @@ def init_db(app):
         # from data.latestBatchSemester import batch_semester_data
 
         def create_sample_data():
-            print('adding')
+            # print('adding')
             # for data in student_data:
             #     student = Student(**data)
             #     db.session.add(student)

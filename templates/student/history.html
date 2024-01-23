@@ -66,24 +66,24 @@
 						<tr>
 							<th>Application Number</th>														
 							<th>Subjects to Add</th>
-							<th>Enrollment Type</th>
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
 					<tbody>
 						{% for addsubjects in services_data.addsubjects_list %}
-						<tr data-add-application-id="{{  addsubjects.StudentId }}"
-							data-add-name="{{ addsubjects.FacultyRole}}" 
-							data-add-student-number="{{ addsubjects.StudentNumber }}"
+						<tr data-add-application-id="{{  addsubjects.AddSubjectId }}"
+							data-add-name="{{ addsubjects.SenderName}}" 
+							data-add-student-number="{{ addsubjects.SenderContactNo }}"
 							data-add-subjects-to-add="{{ addsubjects.Subject }}"
+							data-add-sender-name="{{ addsubjects.SenderName }}"
+							data-add-contact-number="{{ addsubjects.SenderContactNo }}"
 							data-add-enrollment-type="{{ addsubjects.ServiceDetails }}"
 							data-add-file-url="/student/view_payment_file/{{ subject_id }}"
 							data-add-file-filename="{{ addsubjects.AddSubjectFilefilename }}"	
 							data-add-status="{{ addsubjects.Status }}">
-							<td class="applicationID">{{ addsubjects.SubjectId }}</td>								
-							<td>{{ addsubjects.SenderName }}</td>
-							<td>{{ addsubjects.SenderContactNo }}</td>														
+							<td class="applicationID">{{ addsubjects.AddSubjectId }}</td>								
+							<td>{{ addsubjects.Subject }}</td>														
 							<td id="Status">{{ addsubjects.Status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal"></button>
@@ -111,7 +111,8 @@
 					<thead>
 						<tr>
 							<th>Application Number</th>														
-							<th>Enrollment Type</th>
+							<th>Current Subject</th>
+							<th>To Subject</th>
 							<th>Status</th>
 							<th>Action</th> 
 						</tr>
@@ -119,14 +120,18 @@
 					<tbody>
 						{% for changesubjects in services_data.changesubjects_list %}
 						<tr data-change-application-id="{{  changesubjects.ChangeSubjectId }}"
-							data-change-name="{{ changesubjects.Name }}"
-							data-change-student-number="{{ changesubjects.StudentNumber }}"
+							data-change-current="{{ changesubjects.FromSubject }}"
+							data-change-to="{{ changesubjects.ToSubject }}"
+							data-change-reason="{{ changesubjects.ServiceDetails }}"
+							data-change-name="{{ changesubjects.SenderName }}"
+							data-change-contact-number="{{ changesubjects.SenderContactNo }}"
 							data-change-enrollment-type="{{ changesubjects.EnrollmentType }}"
 							data-change-file-url="{{ url_for('view_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}"
 							data-change-file-filename="{{ changesubjects.AceFormfilename }}"	
 							data-change-status="{{ changesubjects.Status  }}">
 							<td class="applicationID">{{ changesubjects.ChangeSubjectId }}</td>								
-							<td>{{ changesubjects.EnrollmentType }}</td>														
+							<td>{{ changesubjects.FromSubject }}</td>	
+							<td>{{ changesubjects.ToSubject }}</td>														
 							<td id="Status">{{ changesubjects.Status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewChangeModal"></button>
@@ -431,7 +436,7 @@
         </div>
     </div>
 
-	<!------------------------------------------------- ONLINE REQUEST FOR CERTIFICATION --------------------------------------------------->
+	<!---------------------------------------------- ONLINE REQUEST FOR CERTIFICATION --------------------------------------------------->
 	<div class="accordion-item">
         <h2 class="accordion-header">
             <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
@@ -486,7 +491,7 @@
     </div>
 </div>
 
-<!------------------------------------------------- OVERLOAD VIEW MODAL  --------------------------------------------------->
+<!---------------------------------------------- OVERLOAD VIEW MODAL  --------------------------------------------------->
   <div class="modal fade" id="viewoverloadModal" tabindex="-1" role="dialog" aria-labelledby="viewoverloadModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content">
@@ -578,10 +583,23 @@
 					<p id="add-application-id"></p>
 				</div>          
 			  </div>
-			  
 
 			  <div class="form-group">
-				<label class="col-sm-4 control-label">Name:</label>
+				<label class="col-sm-4 control-label">Subject/s to Add:</label>
+				<div class="col-sm-5">
+					<p id="add-subjects-to-add"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Reason/s:</label>
+				<div class="col-sm-4">
+					<p id="add-enrollment-type"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Sender Name:</label>
 				<div class="col-sm-4">
 					<p id="add-application-name"></p>
 					
@@ -590,30 +608,14 @@
 			 
 
 			  <div class="form-group">
-				<label class="col-sm-4 control-label">Student Number:</label>
+				<label class="col-sm-4 control-label">Contact Number:</label>
 				<div class="col-sm-4">
 					<p id="add-application-studentNumber"></p>
 
 				</div>           
 			  </div>
-			 
-
 			  <div class="form-group">
-				<label class="col-sm-4 control-label">Subject/s to Add:</label>
-				<div class="col-sm-4">
-					<p id="add-subjects-to-add"></p>
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Enrollment Type:</label>
-				<div class="col-sm-4">
-					<p id="add-enrollment-type"></p>
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Certificate of Registration:</label>
+				<label class="col-sm-4 control-label">Proof of Payment:</label>
 				<div class="col-sm-4">
 					<p id="add-certification-file"></p>
 				</div>
@@ -634,7 +636,7 @@
 	</div>
   </div>
   
-<!------------------------------------------------- CHANGE OF SCHEDULE/SUBJECTS VIEW MODAL --------------------------------------------------->
+<!---------------------------------------------- CHANGE OF SCHEDULE/SUBJECTS VIEW MODAL --------------------------------------------------->
   <div class="modal fade" id="viewChangeModal" tabindex="-1" role="dialog" aria-labelledby="viewChangeModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content">
@@ -648,47 +650,59 @@
 
 			<div class="form-group">
 				<label class="col-sm-4 control-label">Application Number:</label>
-				<div class="col-sm-4">
+				<div class="col-sm-5">
 					<p id="change-application-id"></p>
-				</div>          
-			  </div>
-			  
+				</div>
+			</div>
 
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Name:</label>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Current Subject:</label>
+				<div class="col-sm-5">
+					<p id="change-current-subject"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">To Subject:</label>
 				<div class="col-sm-4">
-					<p id="change-application-name"></p>				
-				</div>           
-			  </div>
-			 
+					<p id="change-to-subject"></p>
+				</div>
+			</div>
 
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Student Number:</label>
-				<div class="col-sm-4">
-					<p id="change-application-studentNumber"></p>
-				</div>           
-			  </div>
-
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Enrollment Type:</label>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Reason/s:</label>
 				<div class="col-sm-4">
 					<p id="change-enrollment-type"></p>
-				</div>           
-			  </div>
+				</div>
+			</div>
 
-			  <div class="form-group">
-				<label class="col-sm-4 control-label">Certificate of Registration:</label>
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Sender Name:</label>
+				<div class="col-sm-4">
+					<p id="change-application-name"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Contact Number:</label>
+				<div class="col-sm-4">
+					<p id="change-application-studentNumber"></p>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Proof of Payment:</label>
 				<div class="col-sm-4">
 					<p id="change-certification-file"></p>
 				</div>
 			</div>
 
-			  <div class="form-group">
+			<div class="form-group">
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
 					<p id="change-status"></p>
-				</div>           
-			  </div>
+				</div>
+			</div>
 			
 		</div>
 		<div class="modal-footer">
@@ -698,7 +712,7 @@
 	</div>
   </div>
 
-  <!------------------------------------------------- CORRECTION OF GRADE ENTRY VIEW MODAL --------------------------------------------------->
+  <!------------------------------------------------- CORRECTION OF GRADE ENTRY VIEW MODAL ---------------------------------------->
   <div class="modal fade" id="viewCorrectionModal" tabindex="-1" role="dialog" aria-labelledby="viewCorrectionModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content">
@@ -951,7 +965,7 @@
 	</div>
   </div>
 
-  <!------------------------------------------- APPLICATION FOR MANUAL ENROLLMENT VIEW MODAL  --------------------------------------------------->
+  <!------------------------------------------- APPLICATION FOR MANUAL ENROLLMENT VIEW MODAL --------------------------------------------->
   <div class="modal fade" id="viewManualModal" tabindex="-1" role="dialog" aria-labelledby="viewManualModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content">
@@ -1105,7 +1119,7 @@
 		</div>
 	  </div>
 
-	  <!-------------------------------------- Tutorial REQUEST FOR TUTORIAL VIEW MODAL  --------------------------------------------------->
+	  <!-------------------------------------- TUTORIAL REQUEST FOR  VIEW MODAL  --------------------------------------------------->
   <div class="modal fade" id="viewtutorialModal" tabindex="-1" role="dialog" aria-labelledby="viewtutorialModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 	  <div class="modal-content">
@@ -1286,7 +1300,6 @@
 	</div>
 </div>
 
-
 <script>
 		// VIEW OVERLOAD MODAL
         $(document).ready(function () {
@@ -1352,35 +1365,40 @@
 	});
 });
 
-	// VIEW CHANGE OF SCHEDULE/SUBJECT MODAL
-	$(document).ready(function () {
-	$('#changeofSchedule tbody tr').on('click', function () {
-		// Retrieve data from the clicked row
-		var applicationId = $(this).data('change-application-id');
-		var name = $(this).data('change-name');
-		var studentNumber = $(this).data('change-student-number');
-		var enrollmentType = $(this).data('change-enrollment-type');
-		var fileUrl = $(this).data('change-file-url');
-		var fileName = $(this).data('change-file-filename');
-		var Status = $(this).data('change-status');
+// VIEW CHANGE OF SCHEDULE/SUBJECT MODAL
+$(document).ready(function () {
+    $('#changeofSchedule tbody tr').on('click', function () {
+        // Retrieve data from the clicked row
+        var applicationId = $(this).data('change-application-id');
+        var currentSubject = $(this).data('change-current');
+        var toSubject = $(this).data('change-to');
+        var enrollmentType = $(this).data('change-reason');
+        var name = $(this).data('change-name');
+        var studentNumber = $(this).data('change-contact-number');
+        var fileUrl = $(this).data('change-file-url');
+        var fileName = $(this).data('change-file-filename');
+        var Status = $(this).data('change-status');
 
-		// Populate modal with data
-		$('#change-application-id').text(applicationId);
-		$('#change-application-name').text(name);
-		$('#change-application-studentNumber').text(studentNumber);
-		$('#change-enrollment-type').text(enrollmentType);
+        // Populate modal with data
+        $('#change-application-id').text(applicationId);
+        $('#change-current-subject').text(currentSubject);
+        $('#change-to-subject').text(toSubject);
+        $('#change-enrollment-type').text(enrollmentType);
+        $('#change-application-name').text(name);
+        $('#change-application-studentNumber').text(studentNumber);
 
-		// Generate dynamic file download link
-		if (fileName) {
-				var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
-				$('#change-certification-file').empty().append(fileLink);
-			} else {
-				$('#change-certification-file').text('No File');
-			}
+        // Generate dynamic file download link
+        if (fileName) {
+            var fileLink = $('<a>').attr('href', fileUrl).attr('target', '_blank').text(fileName);
+            $('#change-certification-file').empty().append(fileLink);
+        } else {
+            $('#change-certification-file').text('No File');
+        }
 
-		$('#change-status').text(Status);
-	});
+        $('#change-status').text(Status);
+    });
 });
+
 
 // VIEW CORRECTION OF GRADE ENTRY
 $(document).ready(function () {
@@ -1588,7 +1606,8 @@ $(document).ready(function () {
 		$('#petition-status').text(Status);
 	// Generate dynamic file download link
 			if (tutorialfileName) {
-				var fileLink = $('<a>').attr('href', 						tutorialfileUrl).attr('target', '_blank').text(tutorialfileName);
+				var fileLink = $('<a>').attr('href', 						
+				tutorialfileUrl).attr('target', '_blank').text(tutorialfileName);
 				$('#tutorial-file-data').empty().append(fileLink);
 			} else {
 				$('#tutorial-file-data').text('No File');
@@ -1672,15 +1691,17 @@ $(document).ready(function () {
 			var deleteButton = $('#deleteModalButton');
 
 			// Check if the Status is 'Pending' or 'Process'
-			if (Status === 'pending') {
-				modalText.html('Deletion for your application is not allowed because it is now in <strong>pending</strong>.');
-				// Disable the delete button
-				deleteButton.prop('disabled', true);
-			} else if (Status === 'processing') {
+			if (Status === 'Approved') {
 				modalText.html('Deletion for your application is not allowed because it is now in <strong>process</strong>.');
 				// Disable the delete button
 				deleteButton.prop('disabled', true);
-			} else {
+			} 
+			// else if (Status === 'processing') {
+			// 	modalText.html('Deletion for your application is not allowed because it is now in <strong>process</strong>.');
+			// 	// Disable the delete button
+			// 	deleteButton.prop('disabled', true);
+			// }
+			 else {
 				// Reset the modal body text
 				modalText.html('Are you sure you want to <strong>Delete</strong> this Application?');
 				// Enable the delete button
@@ -1698,15 +1719,9 @@ $(document).ready(function () {
       proofOfPaymentLink.textContent = proofOfPaymentFileName;
       proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
       proofOfPaymentLink.target = '_blank';
+	  
 </script>
-
-
- 
 {% endblock %}
-
-
-
-
 
 
 
