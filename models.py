@@ -519,7 +519,35 @@ class CourseGrade(db.Model):
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
+# SassSubject
+class AddSubjects(db.Model):
+    __tablename__ = 'SASSAddSubjects'
+    
+    AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
+    FacultyRole =db.Column(db. String(50))
+    Subject = db.Column(db.String(255))
+    ServiceDetails = db.Column(db.String(255))
+    SenderName = db.Column(db.String(50))
+    SenderContactNo = db.Column(db.String(50))
+    PaymentFile = db.Column(db.LargeBinary)
+    Status = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    def to_dict(self):
+        return {
+            'AddSubjectId': self.AddSubjectId,
+            'StudentId': self.StudentId,
+            'FacultyRole': self.FacultyRole,
+            'SubjectId': self.Subject,
+            'ServiceDetails': self.ServiceDetails,
+            'SenderName': self.SenderName,
+            'SenderContactNo': self.SenderContactNo,
+            'PaymentFile': self.PaymentFile,
+            'Status': self.Status,
 
+        }
 #Notification
 class Notification(db.Model, UserMixin):
     __tablename__ = 'SASSNotifications'
@@ -609,35 +637,8 @@ class Announcement(db.Model):
 #     def get_AddSubjectsID(self):
 #         return str(self.SubjectId)
     
-class AddSubjects(db.Model):
-    __tablename__ = 'SASSAddSubjects'
-    
-    AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
-    FacultyRole =db.Column(db. String(50))
-    Subject = db.Column(db.String(255))
-    ServiceDetails = db.Column(db.String(255))
-    SenderName = db.Column(db.String(50))
-    SenderContactNo = db.Column(db.String(50))
-    PaymentFile = db.Column(db.LargeBinary)
-    Status = db.Column(db.String(20))
-    created_at = db.Column(db.DateTime, default=datetime.now)
-    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    
-    def to_dict(self):
-        return {
-            'AddSubjectId': self.AddSubjectId,
-            'StudentId': self.StudentId,
-            'FacultyRole': self.FacultyRole,
-            'Subject': self.Subject,
-            'ServiceDetails': self.ServiceDetails,
-            'SenderName': self.SenderName,
-            'SenderContactNo': self.SenderContactNo,
-            'PaymentFile': self.PaymentFile,
-            'Status': self.Status,
-
-        }
-        
+# ==========Services========== #
+# ==========Change_of_subjects=========== #
 class ChangeSubject(db.Model):
     __tablename__ = 'SASSChangeSubjects'
     

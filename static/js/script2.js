@@ -179,7 +179,30 @@ tooltip: {
 var chart = new ApexCharts(document.querySelector("#chart"), options);
 chart.render();
 
-
+// ApexCharts Pie Chart
+// var options = {
+// 	series: [44, 55, 13, 43, 22], // Example data for the pie chart
+// 	chart: {
+// 	  width: 500,
+// 	  type: 'pie',
+// 	},
+// 	labels: ['Pending', 'Approved','Reject', 'Total'], // Labels for each slice
+// 	responsive: [{
+// 	  breakpoint: 480,
+// 	  options: {
+// 		chart: {
+// 		  width: 200
+// 		},
+// 		legend: {
+// 		  position: 'bottom'
+// 		}
+// 	  }
+// 	}]
+//   };
+  
+//   var chart = new ApexCharts(document.querySelector("#chart1"), options);
+//   chart.render();
+  
  
 
 

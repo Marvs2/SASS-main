@@ -1,5 +1,11 @@
 {% extends "student/layout.html" %} {% block content %}
-
+<style>
+  .chart1 {
+    display: flex;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically if you have a specific height */ /* Optional: Adjust as per your requirement */
+  }
+</style>
 <!-- MAIN -->
 <main>
   <h1 class="title">Dashboard</h1>
@@ -48,7 +54,7 @@
     <div class="card">
       <div class="head">
         <div>
-          <h2>{{ total_count }}</h2>
+          <h2>{{ total_services }}</h2>
           <p>Total Services</p>
         </div>
         <i class="bx bx-trending-up icon"></i>
@@ -77,25 +83,54 @@
     </div>
 
     <div class="content-data">
-      <div class="head">
-        <h3>Service Report</h3>
-        <div class="menu">
-          <i class="bx bx-dots-horizontal-rounded icon"></i>
-          <ul class="menu-link">
-            <li><a href="#">Edit</a></li>
-            <li><a href="#">Save</a></li>
-            <li><a href="#">Remove</a></li>
-          </ul>
-        </div>
-      </div>
+      <!-- ... your existing HTML ... -->
       <div class="chart">
-        <div id="chart"></div>
+          <div id="chart1" style="width: 100%; max-width: 600px; height: 400px"></div>
       </div>
-    </div>
+  
+      <!-- Hidden elements to store data for JavaScript -->
+      <div id="chartData" 
+           data-pending="{{ pending_percentage }}" 
+           data-approved="{{ approved_percentage }}"
+           data-rejected="{{ denied_percentage }}"
+           style="display: none;">
+      </div>
+  </div>
   </div>
 </main>
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    var chartDataElement = document.getElementById('chartData');
+
+    var pending = parseFloat(chartDataElement.getAttribute('data-pending'));
+    var approved = parseFloat(chartDataElement.getAttribute('data-approved'));
+    var rejected = parseFloat(chartDataElement.getAttribute('data-rejected'));
+
+    var options = {
+      series: [pending, approved, rejected],
+      chart: {
+        width: 500,
+        type: 'pie',
+      },
+      labels: ['Pending', 'Approved', 'Rejected'],
+      responsive: [{
+        breakpoint: 480,
+        options: {
+          chart: {
+            width: 200
+          },
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }]
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart1"), options);
+    chart.render();
+  });
+
   $(document).ready(function () {
     // Fetch data from the endpoint
     $.ajax({
