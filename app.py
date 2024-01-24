@@ -4,7 +4,7 @@ from flask_login import current_user, login_user
 from sqlalchemy import and_
 from Api.v1.faculty.utils import get_all_services
 from Api.v1.student.utils import get_student_services
-from models import Announcements, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import Post, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -64,8 +64,9 @@ def custom_context_processor():
 @prevent_authenticated
 def index():
     announcements = ESISAnnouncement.query.all()
-    announcements_data = Announcements.query.all()
-    return render_template('main/home.html', announcements=announcements, announcements_data=announcements_data)
+    posts = Post.query.all()
+    combined_data = announcements + posts
+    return render_template('main/home.html', announcements=announcements, posts=posts, combined_data=combined_data)
 
 #===========================================================================
 @app.route('/')

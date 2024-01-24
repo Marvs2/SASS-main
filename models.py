@@ -621,16 +621,16 @@ class ESISAnnouncement(db.Model):
     ProjectId = db.Column(db.Integer)  # Modify as needed if it references another table
 
 #hayme table
-class Announcements(db.Model):
-    __tablename__ = 'APMSAnnouncement' 
+class Post(db.Model):
+    __tablename__ = 'APMSPost' 
     id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-    created_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-    updated_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-    deleted_at = db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
-    title = db.Column('Title', db.String)
-    content = db.Column('Content', db.Text)
-    post_type = db.Column('PostType', db.String)  # Discriminator column
-    img_link = db.Column('ImgLink', db.String)
+    # created_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+    # updated_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+    # deleted_at = db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
+    Title = db.Column(db.String(255))
+    Content = db.Column(db.Text)
+    PostType = db.Column(db.String(255))  # Discriminator column
+    ImgLink = db.Column(db.String(255))
     # uploader_id = db.Column('UploaderId', db.UUID(as_uuid=True), db.ForeignKey('APMSUser.id', ondelete="CASCADE"))
 
 #======================================================#       
