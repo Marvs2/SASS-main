@@ -2,8 +2,9 @@ import io
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
 from flask_login import current_user, login_user
 from sqlalchemy import and_
+from Api.v1.faculty.utils import get_all_services
 from Api.v1.student.utils import get_student_services
-from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import Announcements, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -62,25 +63,31 @@ def custom_context_processor():
 @app.route('/')
 @prevent_authenticated
 def index():
-    return render_template('main/home.html')
+    announcements = ESISAnnouncement.query.all()
+    announcements_data = Announcements.query.all()
+    return render_template('main/home.html', announcements=announcements, announcements_data=announcements_data)
 
 #===========================================================================
 @app.route('/')
-@prevent_authenticated
 def home():
-    return render_template('main/home.html')
+    if current_user.__class__.__name__ == "FISFaculty":
+        return redirect(url_for('app.faculty_dashboard'))
+    elif current_user.__class__.__name__ == "SASSStudent":
+        return redirect(url_for('app.student_dashboard'))
+    else:
+        return render_template('base.html')
 
 #=============================== LOGOUT FUNCTION ====================================
 
 @app.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('studentLogin'))  
+    return redirect(url_for('home'))  
 
 @app.route('/logoutfaculty')
 def logoutfaculty():
     session.clear()
-    return redirect(url_for('faculty_portal'))
+    return redirect(url_for('home'))
 
 #========================================================================
 #downloads
@@ -559,10 +566,10 @@ def add_subjects():
     try: 
         current_StudentId = session.get('user_id')
         current_StudentNumber = get_student_number_by_id(current_StudentId)
-        new_addsubjects_application = create_addsubjects_application(request.form, request.files, current_StudentId)
+        created_service_id = create_addsubjects_application(request.form, request.files, current_StudentId)
         
-        if new_addsubjects_application and current_StudentNumber:
-            db.session.add(new_addsubjects_application)
+        if created_service_id and current_StudentNumber:
+            db.session.add(created_service_id)
             db.session.commit()
 
             # Create a notification
@@ -1049,10 +1056,25 @@ def viewmanual():
     return render_template("/student/viewmanual.html", manual_enrollments_list=manual_enrollments_list)
 #===================================== ONLINE PETITION OF SUBJECTS =====================================================
 
+# Flask route for rendering the initial page
 @app.route('/student/onlinepetitionofsubject')
 @student_required
 def studentpetition():
-    return render_template("/student/petition.html", student_api_base_url=student_api_base_url)
+    subject_codes = Subject.query.with_entities(Subject.SubjectCode).all()
+    return render_template("/student/petition.html", subject_codes=subject_codes, student_api_base_url=student_api_base_url)
+
+# Flask route to handle AJAX request for getting subject names based on the selected code
+@app.route('/get_subject_names', methods=['POST'])
+def get_subject_names():
+    selected_code = request.form.get('selectedCode')
+
+    # Query the database to get subject names based on the selected code
+    subject_names = Subject.query.filter_by(SubjectCode=selected_code).with_entities(Subject.Name).all()
+
+    # Extract names from the query result
+    subject_names = [name[0] for name in subject_names]
+
+    return jsonify(success=True, message="Subject names retrieved successfully.", data=subject_names)
 
 @app.route('/student/onlinepetitionofsubject/submit_petition', methods=['POST'])
 @role_required('student')
@@ -1114,7 +1136,8 @@ def viewpetition():
 @app.route('/student/tutorial')#
 @student_required
 def studenttutorial():
-    return render_template("/student/tutorial.html", student_api_base_url=student_api_base_url)#
+    subject_codes = Subject.query.with_entities(Subject.SubjectCode).all()
+    return render_template("/student/tutorial.html", subject_codes=subject_codes, student_api_base_url=student_api_base_url)
 
 @app.route('/student/tutorial/submit', methods=['POST'])
 @role_required('student')
@@ -1360,6 +1383,7 @@ def check_user_activity():
 @app.route('/student')
 @prevent_authenticated
 def studentLogin():
+    session.permanent=True
     return render_template("student/login.html")
 
 #foroverload
@@ -2341,9 +2365,9 @@ def get_mimetype(shifting_file_extension):
     return mimetypes.get(shifting_file_extension, 'application/octet-stream')
 #=====================================================================
 # Student - Overload View File
-@app.route('/student/overload/view_overload_file/<int:Overload_Id>')
-def view_overload_file(Overload_Id):
-    overload_application = OverloadApplication.query.get(Overload_Id)
+@app.route('/student/overload/view_overload_file/<int:OverloadId>')
+def view_overload_file(OverloadId):
+    overload_application = OverloadApplication.query.get(OverloadId)
 
     if overload_application and overload_application.Overloaddata:
         overloadfile_extension = get_overloadfile_extension(overload_application.Overloadfilename)
@@ -2371,12 +2395,12 @@ def get_mimetype(overloadfile_extension):
 #=====================================================================
 # Overload - Faculty
 #=====================================================================
-@app.route('/update-overload-service-Status/<int:Overload_Id>', methods=['POST'])
-def update_overload_service_status(Overload_Id):
+@app.route('/update-overload-service-Status/<int:OverloadId>', methods=['POST'])
+def update_overload_service_status(OverloadId):
     session['last_activity'] = datetime.now(timezone.utc)
 
     # Find the specific OverloadApplication record
-    overload_applications = OverloadApplication.query.get_or_404(Overload_Id)
+    overload_applications = OverloadApplication.query.get_or_404(OverloadId)
 
     # Get the new Status from the form data
     new_Status = request.form.get('Status')
@@ -2400,14 +2424,14 @@ def get_overload_file(overload_application_id):
 
 @app.route('/faculty/download_overload_file/<int:overload_application_id>')
 def download_overload_file(overload_application_id):
-    overload_application = OverloadApplication.query.get(overload_application_id)
+    overload_applications = OverloadApplication.query.get(overload_application_id)
 
-    if overload_application and overload_application.Overloaddata:
-        overload_file_extension = get_overload_file_extension(overload_application.Overloadfilename)
+    if overload_applications and overload_applications.Overloaddata:
+        overload_file_extension = get_overload_file_extension(overload_applications.Overloadfilename)
         download_name = f'overload_{overload_application_id}.{overload_file_extension}'
 
         return send_file(
-            io.BytesIO(overload_application.Overloaddata),
+            io.BytesIO(overload_applications.Overloaddata),
             as_attachment=True,
             download_name=download_name,
             mimetype=get_mimetype(overload_file_extension),
@@ -2621,43 +2645,37 @@ def faculty_portal():
 @app.route('/dashboard')
 @faculty_required
 def faculty_dashboard():
-    session.permanent = True
-    return render_template('/faculty/dashboard.html', faculty_api_base_url=faculty_api_base_url)
+    # Replace the get_student_services function with get_all_services
+    all_services_list, total_services, pending_count, approved_count, denied_count = get_all_services()
+
+    # You can remove the manual count of pending, approved, and denied services
+    # as these are already counted in get_all_services()
+    total_services = len(all_services_list)
+    # Calculate percentages
+    if total_services > 0:
+        pending_percentage = "{:.2f}%".format((pending_count / total_services) * 100)
+        approved_percentage = "{:.2f}%".format((approved_count / total_services) * 100)
+        denied_percentage = "{:.2f}%".format((denied_count / total_services) * 100)
+        total_percentage = "100.00%"  # Total is always 100%
+    else:
+        pending_percentage = "0.00%"
+        approved_percentage = "0.00%"
+        denied_percentage = "0.00%"
+        total_percentage = "0.00%"
+
+    data = {
+        'series': [pending_percentage, approved_percentage, denied_percentage, total_percentage],
+        'labels': ['Pending', 'Approved', 'Rejected', 'Total']
+    }
+
+    print(data)
+
+    return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
 
 # Faculty profile route
 @app.route('/faculty/profile')
 @faculty_required
 def facultyprofile():
-    return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
-
-@app.route('/faculty/profile/updated', methods=['GET', 'POST'])
-def faculty_update_profile():
-    if request.method == 'POST':
-        # Retrieve the current logged-in faculty member
-        current_faculty = get_current_faculty_user()
-
-        if not current_faculty:
-            flash('No faculty user logged in.', 'danger')
-            return redirect(url_for('faculty_login'))
-
-        # Get the updated information from the form
-        email = request.form.get('email')
-        mobile_number = request.form.get('mobile_number')
-        address = request.form.get('address')
-
-        # Update the faculty member's details
-        current_faculty.email = email
-        current_faculty.mobile_number = mobile_number
-        current_faculty.address = address
-
-        # Commit the changes to the database
-        db.session.commit()
-        flash('Profile Updated Successfully!', 'success')
-
-        # Redirect to the faculty profile page
-        return redirect(url_for('facultyprofile'))
-
-    # Render the profile update page
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
 
 

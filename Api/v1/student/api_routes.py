@@ -1,6 +1,6 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  failingradeperbatch, get_student_services, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
+from Api.v1.student.utils import  failingradeperbatch, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
@@ -461,35 +461,6 @@ def check_user_activity():
     # Update the last activity timestamp
     session['last_activity'] = datetime.now(timezone.utc)"""
 
-#=====================================================================#
-#Chartjs sample
-# def get_student_services(student_id):
-#     addsubjects_list = AddSubjects.query.filter_by(StudentId=student_id).all()
-#     changesubjects_list = ChangeOfSubjects.query.filter_by(StudentId=student_id).all()
-#     manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
-#     certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
-#     grade_entry_list = GradeEntry.query.filter_by(StudentId=student_id).all()
-#     cross_enrollment_list = CrossEnrollment.query.filter_by(StudentId=student_id).all()
-#     petition_requests_list = PetitionRequest.query.filter_by(StudentId=student_id).all()
-#     shifting_applications_list = ShiftingApplication.query.filter_by(StudentId=student_id).all()
-#     overload_applications_list = OverloadApplication.query.filter_by(StudentId=student_id).all()
-#     tutorial_requests_list = TutorialRequest.query.filter_by(StudentId=student_id).all()
-
-#     services_data = {
-#         'addsubjects_list': [subject.to_dict() for subject in addsubjects_list],
-#         'changesubjects_list': [subject.to_dict() for subject in changesubjects_list],
-#         'manual_enrollments_list': [subject.to_dict() for subject in manual_enrollments_list],
-#         'certification_request_list': [subject.to_dict() for subject in certification_request_list],
-#         'grade_entry_list': [subject.to_dict() for subject in grade_entry_list],
-#         'cross_enrollment_list': [subject.to_dict() for subject in cross_enrollment_list],
-#         'petition_requests_list': [subject.to_dict() for subject in petition_requests_list],
-#         'shifting_applications_list': [subject.to_dict() for subject in shifting_applications_list],
-#         'overload_applications_list': [subject.to_dict() for subject in overload_applications_list],
-#         'tutorial_requests_list': [subject.to_dict() for subject in tutorial_requests_list],
-#     }
-
-#     return services_data
-#Concatinated all the services
 @student_api.route('/check_student_services', methods=['GET'])
 def check_student_services():
     # Assuming you have access to the student ID (you may need to retrieve it based on your authentication mechanism)
@@ -616,7 +587,6 @@ def allstudent():
 
 # Getting the subjects grades
 @student_api.route('/grades', methods=['GET'])
-@role_required('student')
 def subjectsGrade():
     student = getCurrentUser()
     print('STUDEINT ID: ', student.StudentId)
@@ -631,7 +601,6 @@ def subjectsGrade():
     
 
 @student_api.route('/currentsubject', methods=['GET'])
-@role_required('student')
 def currentsubject():
     student = getCurrentUser()
     print('STUDEINT ID: ', student.StudentId)
@@ -646,7 +615,6 @@ def currentsubject():
     
 #For 3rd sem only 
 @student_api.route('/studentsubject', methods=['GET'])
-@role_required('student')
 def subjectsstudent():
     student = getCurrentUser()
     print('STUDEINT ID: ', student.StudentId)
@@ -661,7 +629,6 @@ def subjectsstudent():
     
 # for 3rd eyar becasue all the grades are finalized
 @student_api.route('/futuresubject', methods=['GET'])
-@role_required('student')
 def subjectsfuture():
     student = getCurrentUser()
     print('STUDEINT ID: ', student.StudentId)
@@ -688,19 +655,19 @@ def subjectsall():
     else:
         return render_template('404.html'), 404
     
-@student_api.route('/failuregrades', methods=['GET'])
-@role_required('student')
-def failuregrades():
-    student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
-    if student:
-        json_subjects_grade = totalfailure(student.StudentId)
-        if json_subjects_grade:
-            return (json_subjects_grade)
-        else:
-            return jsonify(error="No data available")
-    else:
-        return render_template('404.html'), 404
+# @student_api.route('/failuregrades', methods=['GET'])
+# @role_required('student')
+# def failuregrades():
+#     student = getCurrentUser()
+#     print('STUDEINT ID: ', student.StudentId)
+#     if student:
+#         json_subjects_grade = totalfailure(student.StudentId)
+#         if json_subjects_grade:
+#             return (json_subjects_grade)
+#         else:
+#             return jsonify(error="No data available")
+#     else:
+#         return render_template('404.html'), 404
 
 @student_api.route('/failureperbatch', methods=['GET'])
 @role_required('student')
@@ -715,7 +682,19 @@ def failureperbatch():
     else:
         return render_template('404.html'), 404
 
+@student_api.route('/get_allsubjects', methods=['GET'])
+def all_student_services():
+    # Assuming you have access to the student ID (you may need to retrieve it based on your authentication mechanism)
+    subject_data = get_subject_name_by_code()
+
+    print(subject_data)
+
+    if subject_data[0]:  # Check if the first element of the tuple (all_services_list) has data
+        return jsonify(success=True, message="All student services data retrieved successfully.", data=subject_data)
+    else:
+        return jsonify(success=False, message="No data available or data is invalid.")
     
+
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):
     FacultyRole = 'Academic Head'
@@ -726,8 +705,9 @@ def create_services_application(form_data, files, StudentId):
     selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
     ServiceDetails = form_data.get('ServiceDetails', '')
 
-    PaymentFile = files.get('PaymentFile')  # Adjust the key based on your form
-    PaymentFile_data = PaymentFile.read() if PaymentFile else None
+    payment_file = request.files.get('PaymentFile')
+    payment_file_binary = payment_file.read() if payment_file else None
+
 
     # Add additional validations as needed
     Status = 'pending'
@@ -739,7 +719,7 @@ def create_services_application(form_data, files, StudentId):
             FacultyRole=FacultyRole,
             Subject=selectedSubjects,  # Use the modified field name
             ServiceDetails=ServiceDetails,
-            PaymentFile=PaymentFile_data,
+            PaymentFile=payment_file_binary,
             SenderName=SenderName,
             SenderContactNo=SenderContactNo,
             Status=Status,
@@ -971,50 +951,56 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
     return new_manual_enrollment
 
 #========================================Change of Subjects============================#
-
 def create_addsubjects_application(form_data, files, StudentId):
-    StudentNumber = form_data['StudentNumber']
-    Name = form_data['Name']
-    SubjectNames = form_data['SubjectNames']
-    EnrollmentType = form_data['EnrollmentType']
-    UserResponsible = form_data['UserResponsible']
-    Status = form_data['Status']
+    FacultyRole = 'Academic Head'
 
-    if 'filesubject' not in files:
-        flash('Please provide the Subjects file.', 'danger')
-        return None
+    # Extract individual form data
+    SenderName = form_data.get('SenderName', '')
+    SenderContactNo = form_data.get('SenderContactNo', '')
+    selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
+    ServiceDetails = form_data.get('ServiceDetails', '')
 
-    filesubject = files['filesubject']
-
-    if filesubject.filename == '':
-        flash('No selected file', 'danger')
-        return None
+    # Access the file from request.files
+    payment_file = files.get('paymentScreenshot')
     
-    AddSubjectFiledata = filesubject.read()  # Read the file data
-    AddSubjectFilefilename = secure_filename(filesubject.filename) 
-    # Check if other inputs are provided
+    # Check if a file was provided
+    if payment_file:
+        # Read the file content
+        PaymentFile = payment_file.read()
+    else:
+        PaymentFile = None
 
-    if not StudentNumber or not Name or not SubjectNames or not EnrollmentType:
-        flash('Please fill out all fields and provide valid values.', 'danger')
-        return None  # Replace 'add_subjects' with the actual route
+    # Add additional validations as needed
+    Status = 'pending'
 
-    # Log the form submission
-    #log_form_submission_to_file(form_data)
-    # Additional validation logic can be added here
+    try:
+        # Create a new service application
+        new_service_application = AddSubjects(
+            StudentId=StudentId,
+            FacultyRole=FacultyRole,
+            Subject=selectedSubjects,  # Use the modified field name
+            ServiceDetails=ServiceDetails,
+            PaymentFile=PaymentFile,
+            SenderName=SenderName,
+            SenderContactNo=SenderContactNo,
+            Status=Status,
+        )
 
-    new_addsubjects_application = AddSubjects(
-        StudentId=StudentId,
-        StudentNumber=StudentNumber,
-        Name=Name,
-        SubjectNames=SubjectNames,
-        EnrollmentType=EnrollmentType,
-        AddSubjectFiledata=AddSubjectFiledata,
-        AddSubjectFilefilename=AddSubjectFilefilename,
-        UserResponsible=UserResponsible,
-        Status=Status,
-    )
-    
-    return new_addsubjects_application
+        db.session.add(new_service_application)
+        db.session.commit()
+        db.session.refresh(new_service_application)
+
+        created_service_id = new_service_application.AddSubjectId
+
+    except Exception as e:
+        # Rollback the transaction in case of an error
+        db.session.rollback()
+        print(f'An error occurred: {e}')
+        # Optionally, re-raise the exception if you want it to be handled further up the call stack
+        raise e
+
+    return created_service_id
+
     
 #=========================================================#
 

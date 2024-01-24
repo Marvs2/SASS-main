@@ -12,48 +12,51 @@
 			</ul>
 			<div class="info-data">
 				<div class="card">
-					<div class="head">
-						<div>
-							<h2>20</h2>
-							<p>Pending</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
+				  <div class="head">
+					<div>
+					  <h2>{{ pending_count }}</h2>
+					  <p>Pending</p>
 					</div>
-					<span class="progress" data-value="40%"></span>
-					<span class="label">40%</span>
+					<i class="bx bx-trending-down icon down"></i>
+				  </div>
+				  <span class="progress" data-value="{{ pending_percentage }}"></span>
+				  <span class="label">{{ pending_percentage }}</span>
 				</div>
+			
 				<div class="card">
-					<div class="head">
-						<div>
-							<h2>10</h2>
-							<p>In Progress</p>
-						</div>
-						<i class='bx bx-trending-down icon down' ></i>
+				  <div class="head">
+					<div>
+					  <h2>{{ approved_count }}</h2>
+					  <p>Approved</p>
 					</div>
-					<span class="progress" data-value="60%"></span>
-					<span class="label">60%</span>
+					<i class="bx bx-trending-up icon"></i>
+				  </div>
+				  <span class="progress" data-value="{{ approved_percentage }}"></span>
+				  <span class="label">{{ approved_percentage }}</span>
 				</div>
+			
 				<div class="card">
-					<div class="head">
-						<div>
-							<h2>10</h2>
-							<p>Closed</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
+				  <div class="head">
+					<div>
+					  <h2>{{ denied_count }}</h2>
+					  <p>Denied</p>
 					</div>
-					<span class="progress" data-value="30%"></span>
-					<span class="label">30%</span>
+					<i class="bx bx-trending-up icon"></i>
+				  </div>
+				  <span class="progress" data-value="{{ denied_percentage }}"></span>
+				  <span class="label">{{ denied_percentage }}</span>
 				</div>
+			
 				<div class="card">
-					<div class="head">
-						<div>
-							<h2>40</h2>
-							<p>Total Services</p>
-						</div>
-						<i class='bx bx-trending-up icon' ></i>
+				  <div class="head">
+					<div>
+					  <h2>{{ total_services }}</h2>
+					  <p>Total Services</p>
 					</div>
-					<span class="progress" data-value="80%"></span>
-					<span class="label">80%</span>
+					<i class="bx bx-trending-up icon"></i>
+				  </div>
+				  <span class="progress" data-value="{{ total_percentage }}"></span>
+				  <span class="label">{{ total_percentage }}</span>
 				</div>
 			</div>
 			<div class="data">
@@ -75,23 +78,110 @@
 				</div>
 
 				<div class="content-data">
-					<div class="head">
-						<h3>Service Report</h3>
-						<div class="menu">
-							<i class='bx bx-dots-horizontal-rounded icon'></i>
-							<ul class="menu-link">
-								<li><a href="#">Edit</a></li>
-								<li><a href="#">Save</a></li>
-								<li><a href="#">Remove</a></li>
-							</ul>
-						</div>
-					</div>
+					<!-- ... your existing HTML ... -->
 					<div class="chart">
-						<div id="chart"></div>
+						<div id="chart1" style="width: 100%; max-width: 600px; height: 400px"></div>
+					</div>
+				
+					<!-- Hidden elements to store data for JavaScript -->
+					<div id="chartData" 
+						 data-pending="{{ pending_percentage }}" 
+						 data-approved="{{ approved_percentage }}"
+						 data-rejected="{{ denied_percentage }}"
+						 style="display: none;">
 					</div>
 				</div>
 				
 			</div>
 		</main>
-
+		<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var chartDataElement = document.getElementById('chartData');
+		
+			var pending = parseFloat(chartDataElement.getAttribute('data-pending'));
+			var approved = parseFloat(chartDataElement.getAttribute('data-approved'));
+			var rejected = parseFloat(chartDataElement.getAttribute('data-rejected'));
+		
+			var options = {
+			  series: [pending, approved, rejected],
+			  chart: {
+				width: 500,
+				type: 'pie',
+			  },
+			  labels: ['Pending', 'Approved', 'Rejected'],
+			  responsive: [{
+				breakpoint: 480,
+				options: {
+				  chart: {
+					width: 200
+				  },
+				  legend: {
+					position: 'bottom'
+				  }
+				}
+			  }]
+			};
+		
+			var chart = new ApexCharts(document.querySelector("#chart1"), options);
+			chart.render();
+		  });
+		
+		  $(document).ready(function () {
+			// Fetch data from the endpoint
+			$.ajax({
+			  url: "/faculty/dashboard",
+			  type: "GET",
+			  dataType: "json",
+			  success: function (response) {
+				if (response.success) {
+				  // Calculate total percentage based on the total count
+				  var total_percentage =
+					100 -
+					response.pending_percentage -
+					response.approved_percentage -
+					response.denied_percentage;
+		
+				  // Update the HTML with the received data
+				  updateCard(
+					"Pending",
+					response.pending_count,
+					response.pending_percentage
+				  );
+				  updateCard(
+					"Approved",
+					response.approved_count,
+					response.approved_percentage
+				  );
+				  updateCard(
+					"Denied",
+					response.denied_count,
+					response.denied_percentage
+				  );
+				  updateCard("Total Services", response.total_count, total_percentage);
+				} else {
+				  console.error(response.message);
+				}
+			  },
+			  error: function (error) {
+				console.error("Error fetching data:", error);
+			  },
+			});
+		
+			// Function to update the card based on the count and percentage
+			function updateCard(status, count, percentage) {
+			  var $card = $('.card:contains("' + status + '")');
+			  var $h2 = $card.find("h2");
+			  var $p = $card.find("p");
+			  var $progress = $card.find(".progress");
+			  var $label = $card.find(".label");
+		
+			  // Update HTML elements
+			  $h2.text(count || 0); // Display 0 if count is undefined or null
+			  $p.text(status);
+			  $progress.attr("data-value", percentage + "%");
+			  $label.text(percentage + "%");
+			}
+		  });
+		</script>
 {% endblock %}

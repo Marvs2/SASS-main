@@ -1,6 +1,8 @@
 # api/api_routes.py
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
+from Api.v1.faculty.utils import get_all_services
+from Api.v1.student.api_routes import API_KEYS
 from models import Faculty
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -108,33 +110,53 @@ def get_gender_string(gender_code):
         return 'Undefined'  # Handle any other values
 
 @faculty_api.route('/faculty-details', methods=['GET'])
+@role_required('faculty')
 def fetchFacultyDetails():
-    faculty = get_current_faculty_user()
+    user_id = session.get('user_id')
+
+    faculty = Faculty.query.get(user_id)
 
     if faculty:
         # Convert userImg to base64 string if it exists
-        user_img_base64 = base64.b64encode(faculty.userImg).decode('utf-8') if faculty.userImg else None
+        user_img_base64 = base64.b64encode(faculty.ProfilePic).decode('utf-8') if faculty.ProfilePic else None
         gender_string = get_gender_string(faculty.Gender)  # Ensure get_gender_string() is defined
 
         # Construct and return the JSON response
         return jsonify({
-            "FacultyType": faculty.FacultyType,
+            'FacultyType': faculty.FacultyType,
             'FirstName': faculty.FirstName,
             'LastName': faculty.LastName,
             'MiddleName': faculty.MiddleName,
-            "Email": faculty.Email,
-            "ResidentialAddress": faculty.ResidentialAddress,
-            "Gender": gender_string,
-            "BirthDate": faculty.BirthDate.strftime('%Y-%m-%d') if faculty.BirthDate else None,
-            "MobileNumber": faculty.MobileNumber,
-            "ProfilePic": user_img_base64,
+            'Email': faculty.Email,
+            'ResidentialAddress': faculty.ResidentialAddress,
+            'Gender': gender_string,
+            'BirthDate': faculty.BirthDate.strftime('%Y-%m-%d') if faculty.BirthDate else None,
+            'MobileNumber': faculty.MobileNumber,
+            'ProfilePic': user_img_base64,
         })
     else:
-        # For API, it's better to return a JSON response instead of using flash and redirect
-        return jsonify({"error": "User not found"}), 404
+        flash('User not found', 'danger')
+        return redirect(url_for('faculty_api.faculty_login'))
 
 
 def get_gender_string(gender_code):
     # Implement this function based on how you store gender information
     gender_dict = {1: "Male", 2: "Female", 3: "Other"}
     return gender_dict.get(gender_code, "Unknown")
+
+
+#=====================================API====================================#
+
+@faculty_api.route('/student_services', methods=['GET'])
+def all_student_services():
+    # Assuming you have access to the student ID (you may need to retrieve it based on your authentication mechanism)
+    services_data = get_all_services()
+
+    if services_data[0]:  # Check if the first element of the tuple (all_services_list) has data
+        return jsonify(success=True, message="All student services data retrieved successfully.", data=services_data)
+    else:
+        return jsonify(success=False, message="No data available or data is invalid.")
+    
+
+
+

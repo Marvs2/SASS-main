@@ -1,54 +1,3 @@
-<<<<<<< HEAD
-{% extends "student/layout.html" %}
-{% block content %}
-<style>
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-    }
-    th {
-        background-color: #f2f2f2;
-    }
-    tr:nth-child(even) {
-        background-color: #f9f9f9;
-    }
-</style>
-<h2>Student Class Data</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <td>Course Code: </td>
-            <td colspan="5">{% if course %} <p>{{ course.CourseCode }}</p>{% endif %}</td>
-        </tr>
-        <tr>
-            <th>Subject ID</th>
-            <th>Subject Code</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Units</th>
-            <th>Is NSTP</th>
-        </tr>
-    </thead>
-    <tbody>
-        <br>
-        {% for subject in subject_details %}
-            <tr>
-                <td>{{ subject['SubjectId'] }}</td>
-                <td>{{ subject['SubjectCode'] }}</td>
-                <td>{{ subject['Name'] }}</td>
-                <td>{{ subject['Description'] }}</td>
-                <td>{{ subject['Units'] }}</td>
-                <td>{{ subject['IsNSTP'] }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-=======
 {% extends "student/layout.html" %} {% block content %}
 <style>
   .custom-container {
@@ -512,6 +461,5 @@
     </div>
   </div>
 </div>
->>>>>>> TEST
 
 {% endblock content %}
