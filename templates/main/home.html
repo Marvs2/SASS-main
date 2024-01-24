@@ -1,95 +1,77 @@
-<!-- HOME PAGE WITH ANNOUNCEMENTS AND EVENTS -->
-
-{% extends "main/base.html" %}
+{% extends "main/base.html" %} 
 
 {% block content %}
 
-    <div class="Box">
-        <div class="box1"> 
-            <h1 class="header animate__bounceIn">Announcements</h1> 
-            <div id="carouselExampleCaptions" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                </div>
-                <div class="carousel-inner">
-                  <div class="carousel-item active" data-bs-interval="5000">
-                    <img src="/static/images/2023-11-09-pup-makes-it-to-the-qs-world-university-rankings-2024.jpg" class="d-block w-100 h-50" alt="...">
-<!----                       <div class="carousel-caption d-none d-md-block">
-                      <h5>First slide label</h5>
-                      <p>Some representative placeholder content for the first slide.</p>
-                    </div> -->
-                  </div>
-                  <div class="carousel-item" data-bs-interval="5000">
-                    <img src="/static/images/2023-11-21-empowering-future-entrepreneurs-ecovip-training-of-trainers-module-1-focuses-on-entrepren.jpg" class="d-block w-100 h-50" alt="...">
-            <!---        <div class="carousel-caption d-none d-md-block">
-                      <h5>Second slide label</h5>
-                      <p>Some representative placeholder content for the second slide.</p>
-                    </div> -->
-                  </div>
-                  <div class="carousel-item" data-bs-interval="5000">
-                    <img src="/static/images/2023-12-07-collab-sympo-explores-adv-of-continuing-professional-dev-progs-1.jpg" class="d-block w-100 h-50" alt="...">
-          <!----          <div class="carousel-caption d-none d-md-block">
-                      <h5>Third slide label</h5>
-                      <p>Some representative placeholder content for the third slide.</p>
-                    </div> -->
-                  </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Next</span>
-                </button>
-              </div>   
-            
-            <div>
-
-             <p>
-              The Polytechnic University of the Philippines (PUP) makes it to the top 16 universities in the Philippines according to the Quacquarelli Symonds (QS) World University Rankings in Asia for 2024. This recognition reflects PUP’s commitment to providing quality and high-impact education at par with global standards.
-              University President Dr. Manuel M. Muhi expresses his heartfelt appreciation to those who contributed to this remarkable achievement, “Nagpapasalamat ako sa mga tumulong at nagpursige para maabot natin ang karangalan na ito na makapasok sa QS World University Rankings in Asia for 2024. Bihira po ang makapasok dito sa prestigious (QS) World University Rankings. Asahan po ninyo na we will continue to work hard and adhere to international quality education standards para sa mga estudyante at sa bayan.”
-
-              This is the first time PUP entered the world rankings alongside the University of San Carlos (USC) in Cebu, Far Eastern University (FEU), and Mindanao State University (MSU). Among the 16 universities included in the list, PUP is at top 7, securing a global rank within #551-600.
-              Early this year, PUP received a Three-Star rating from the QS Stars Rating System, recognizing its potential in achieving international education standards, conducting complex research activities, and implementing innovative pedagogical teaching. The University’s strengths and areas of expertise include excellent in employability and online learning; very good in teaching, academic development, and inclusiveness; and good in social responsibility. The Bachelor of Science in Nutrition and Dietetics (BSND) program received a specialist criteria rating.
-             </p>
-                                   
+<div class="Box">
+  <div class="box1">
+    <h1 class="header header animate__bounceIn">Announcements</h1>
+    <div>
+        <div id="carouselExampleCaptions" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for announcement in announcements %}
+                    <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="{{ loop.index0 }}" {% if loop.first %}class="active" aria-current="true"{% endif %} aria-label="Slide {{ loop.index }}"></button>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner">
+                {% for announcement in announcements %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}" data-bs-interval="3000">
+                        {% if announcement.ImageUrl %}
+                            <img src="{{ announcement.ImageUrl }}" class="d-block w-100 h-20" alt="...">
+                        {% endif %}
+                        <div class="carousel-caption d-none d-md-block">
+                            <h5>{{ announcement.Title }}</h5>
+                            <p>{{ announcement.Content }}</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <p>No announcements available.</p>
+                {% endfor %}
             </div>
         </div>
-        <div class="box1">
-            <h1 class="header header animate__bounceIn">Events</h1> 
-            <div>
-              <div id="carouselExampleCaptions" class="carousel slide carousel-fade" data-bs-ride="carousel">
-                <div class="carousel-indicators">
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                  <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2" aria-label="Slide 3"></button>
-                </div>
-                <div class="carousel-inner">
-                  <div class="carousel-item active" data-bs-interval="5000">
-                    <img src="/static/images/National Human Rights.jpg" class="d-block w-100 h-20" alt="...">
-<!----                       <div class="carousel-caption d-none d-md-block">
-                      <h5>First slide label</h5>
-                      <p>Some representative placeholder content for the first slide.</p>
-                    </div> -->
+    </div>
+</div>
+
+<!-- Your existing HTML code -->
+
+<div class="box1">
+  <h1 class="header header animate__bounceIn">Events</h1>
+  <div>
+      <div id="carouselExampleCaptions" class="carousel slide carousel-fade" data-bs-ride="carousel">
+          <div class="carousel-indicators">
+              <!-- Carousel indicators dynamically generated based on the number of announcements -->
+              {% for index, announcements_data in announcements_data %}
+                  <button
+                      type="button"
+                      data-bs-target="#carouselExampleCaptions"
+                      data-bs-slide-to="{{ index }}"
+                      {% if index == 0 %}class="active"{% endif %}
+                      aria-label="Slide {{ index + 1 }}"
+                  ></button>
+              {% endfor %}
+          </div>
+          <div class="carousel-inner">
+              <!-- Carousel items dynamically generated based on announcements -->
+              {% for index, announcements_data in announcements_data %}
+                  <div class="carousel-item {% if index == 0 %}active{% endif %}" data-bs-interval="5000">
+                      <img
+                          src="{{ announcements_data.img_link }}"
+                          class="d-block w-100 h-20"
+                          alt="{{ announcements_data.title }}"
+                      />
+                      <div class="carousel-caption d-none d-md-block">
+                          <h5>{{ announcements_data.title }}</h5>
+                          <p>{{ announcements_data.content }}</p>
+                          <small>Posted on {{ announcements_data.created_at }}</small>
+                      </div>
                   </div>
-              </div>   
-          
-            </div>
-        </div> 
-    </div> 
+              {% endfor %}
+          </div>
+      </div>
+  </div>
+</div>
+
+<!-- Your existing HTML code -->
 
 
-{% endblock %}
-
-    
-
-  
-
-
-
-
-
-
+  {% endblock %}
+</div>

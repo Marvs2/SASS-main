@@ -1,5 +1,6 @@
 from datetime import datetime
-from sqlalchemy import DateTime
+import uuid
+from sqlalchemy import DateTime, text
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import TIMESTAMP, inspect
 from werkzeug.security import generate_password_hash
@@ -601,6 +602,38 @@ class Announcement(db.Model):
             'DatePosted': self.DatePosted,
             'AnnouncementFile': self.AnnouncementFile,
         }   
+
+
+#angela data table
+class ESISAnnouncement(db.Model):
+    __tablename__ = 'ESISAnnouncement'
+
+    # Assuming AnnouncementId is the primary key
+    AnnouncementId = db.Column(db.Integer, primary_key=True)
+    Title = db.Column(db.String(255), nullable=False)
+    Content = db.Column(db.Text, nullable=False)
+    CreatorId = db.Column(db.Integer, nullable=False)  # Assuming this references another table
+    IsLive = db.Column(db.Boolean, default=False)
+    Slug = db.Column(db.String(255), unique=True)
+    Created = db.Column(db.DateTime, default=datetime.now)
+    Updated = db.Column(db.DateTime, onupdate=datetime.now)
+    Recipient = db.Column(db.String(255))  # Modify as needed based on recipient structure
+    ImageUrl = db.Column(db.String(255))
+    ImageId = db.Column(db.Integer)  # Modify as needed if it references another table
+    ProjectId = db.Column(db.Integer)  # Modify as needed if it references another table
+
+#hayme table
+class Announcements(db.Model):
+    __tablename__ = 'APMSAnnouncement' 
+    id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+    created_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+    updated_at = db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+    deleted_at = db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
+    title = db.Column('Title', db.String)
+    content = db.Column('Content', db.Text)
+    post_type = db.Column('PostType', db.String)  # Discriminator column
+    img_link = db.Column('ImgLink', db.String)
+    # uploader_id = db.Column('UploaderId', db.UUID(as_uuid=True), db.ForeignKey('APMSUser.id', ondelete="CASCADE"))
 
 #======================================================#       
 

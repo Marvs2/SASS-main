@@ -120,17 +120,74 @@
                       </div>          
                     </div>
 
-                    <div class="form-group">
-                      <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
-                      <div class="col-sm-10">
-                        <textarea type="text" class="form-control" id="remarks"></textarea>
-                      </div>          
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="submitStatus()">Save changes</button>
-                </div>
+<div id="overloadTableContainer">
+    <h1>Overload Applications</h1>
+    <table id="overloadTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Student Number</th>
+                <th>Program/Course</th>
+                <th>Semester</th>
+                <th>Subjects to Add</th>
+                <th>Justification</th>
+                <th>Files</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace with your Flask template logic to populate rows -->
+            {% for overload_applications in overload_applications %}
+                <tr>
+                    <td>{{ overload_applications.OverloadId }}</td>
+                    <td>{{ overload_applications.Name }}</td>
+                    <td>{{ overload_applications.StudentNumber }}</td>
+                    <td>{{ overload_applications.ProgramCourse }}</td>
+                    <td>{{ overload_applications.Semester }}</td>
+                    <td>{{ overload_applications.SubjectsToAdd }}</td>
+                    <td>{{ overload_applications.Justification }}</td>
+                    <td>
+                        {% if overload_applications.Overloaddata %}
+                            {% set truncated_overload_name = overload_applications.Overloadfilename[:15] + '...' if overload_applications.Overloadfilename|length > 15 else overload_applications.Overloadfilename %}
+                        <a href="{{ url_for('get_overload_file', overload_application_id=overload_applications.OverloadId) }}" class="btn btn-success" download title="{{ overload_applications.Overloadfilename }}">{{ truncated_overload_name }}</a>
+                        {% else %}
+                        <span class="badge badge-warning">No File</span>
+                        {% endif %}
+                      </td>
+                    <td>{{ overload_applications.UserResponsible }}</td>
+                    <td>{{ overload_applications.Status }}</td>
+                    <td>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_applications.OverloadId }}">Change Status</button>
+                      </td>
+                </tr>
+                <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ overload_applications.OverloadId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ overload_applications.Name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="statusForm{{ overload_applications.OverloadId }}" action="{{ url_for('update_overload_service_status', OverloadId=overload_applications.OverloadId) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_applications.OverloadId }})">Save Status</button>
+
+              </div>
             </form>
         </div>
     </div>
@@ -243,7 +300,6 @@
           console.error('Error:', error);
         });
     }
-  </script>
-  
+</script>
 {% endblock %}
    

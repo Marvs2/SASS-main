@@ -42,45 +42,45 @@
     <tbody>
         {% for cross_enrollments in cross_enrollments %}
             <tr>
-                <td>{{ cross_enrollments.cross_enrollment_id }}</td>
+                <td>{{ cross_enrollments.CrossEnrollmentId }}</td>
                 <td>{{ cross_enrollments.StudentNumber }}</td>
                 <td>{{ cross_enrollments.Name }}</td>
-                <td>{{ cross_enrollments.school_for_cross_enrollments }}</td>
-                <td>{{ cross_enrollments.total_number_of_units }}</td>
-                <td>{{ cross_enrollments.authorized_subjects_to_take }}</td>
+                <td>{{ cross_enrollments.SchoolforCrossEnrollment }}</td>
+                <td>{{ cross_enrollments.TotalNumberofUnits }}</td>
+                <td>{{ cross_enrollments.AuthorizedSubjectstoTake }}</td>
                 <td>
-                    {% if cross_enrollments.application_letter_data %}
-                        <a href="{{ url_for('download_application_letter', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}">Download</a>
+                    {% if cross_enrollments.ApplicationLetterdata %}
+                        <a href="{{ url_for('download_application_letter', CrossEnrollmentId=cross_enrollments.CrossEnrollmentId) }}">Download</a>
                     {% else %}
                         No file
                     {% endif %}
                 </td>
                 <td>
-                    {% if cross_enrollments.permit_to_cross_enroll_data %}
-                        <a href="{{ url_for('download_permit_to_enroll', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}">Download</a>
+                    {% if cross_enrollments.PermitCrossEnrolldata %}
+                        <a href="{{ url_for('download_permit_to_enroll', CrossEnrollmentId=cross_enrollments.CrossEnrollmentId) }}">Download</a>
                     {% else %}
                         No file
                     {% endif %}
                 </td>
                 <td>{{ cross_enrollments.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ cross_enrollments.user_responsible }}</td>
-                <td>{{ cross_enrollments.status }}</td>
+                <td>{{ cross_enrollments.UserResponsible }}</td>
+                <td>{{ cross_enrollments.Status }}</td>
                 <td>{{ cross_enrollments.StudentId }}</td>
                 <td>
                     <!-- Action Buttons -->
                     <!-- You can customize these buttons according to your requirements -->
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ cross_enrollments.cross_enrollment_id }}">Change Status</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ cross_enrollments.CrossEnrollmentId }}">Change Status</button>
                 </td>
             </tr>
              <!-- Modal for Changing Status -->
-      <div class="modal fade" id="statusModal{{ cross_enrollments.cross_enrollment_id }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+      <div class="modal fade" id="statusModal{{ cross_enrollments.CrossEnrollmentId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
               <h5 class="modal-title" id="statusModalLabel">Change Status for {{ cross_enrollments.Name }}</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="statusForm{{ cross_enrollments.cross_enrollment_id }}" action="{{ url_for('update_crossenrollment_service_status', cross_enrollment_id=cross_enrollments.cross_enrollment_id) }}" method="POST">
+            <form id="statusForm{{ cross_enrollments.CrossEnrollmentId }}" action="{{ url_for('update_crossenrollment_service_status', CrossEnrollmentId=cross_enrollments.CrossEnrollmentId) }}" method="POST">
               <div class="modal-body">
                 <select name="status" class="form-select">
                   <option value="pending">Pending</option>
@@ -93,7 +93,7 @@
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ cross_enrollments.cross_enrollment_id }})">Save changes</button>
+                <button type="submit" class="btn btn-primary" onclick="updateStatus({{ cross_enrollments.CrossEnrollmentId }})">Save changes</button>
               </div>
             </form>
           </div>
@@ -116,8 +116,8 @@
         });
     });
      // Function to update status
-  function updateStatus(cross_enrollment_id) {
-    const formId = `statusForm${cross_enrollment_id}`;
+  function updateStatus(CrossEnrollmentId) {
+    const formId = `statusForm${CrossEnrollmentId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

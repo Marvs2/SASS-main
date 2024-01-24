@@ -1,6 +1,6 @@
 
-from models import AddSubjects, CertificationRequest, ChangeSubject, Class, Course, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassGrade, LatestBatchSemester, StudentClassSubjectGrade, ClassSubject, Student, Subject, TutorialRequest, db, CourseEnrolled, Curriculum
-from sqlalchemy import desc, func, and_
+from models import AddSubjects, Announcements, CertificationRequest, ChangeSubject, Class, Course, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassGrade, LatestBatchSemester, StudentClassSubjectGrade, ClassSubject, Student, Subject, TutorialRequest, db, CourseEnrolled, Curriculum
+from sqlalchemy import AliasedReturnsRows, desc, func, and_
 import re
 from collections import defaultdict
 
@@ -163,6 +163,7 @@ def getCurrentSubjectFaculty(str_student_id):
             dict_class_subject = {
                 "Subject Code": classofstudent.Subject.SubjectCode,
                 "Subject Name": classofstudent.Subject.Name,
+                "Subject Description": classofstudent.Subject.Description,
                 "Section": classofstudent.Section,
                 "Year": classofstudent.Meta.data.Year,
                 "Semester": classofstudent.Course.Course.Semester,
@@ -208,6 +209,7 @@ def getCurrentSubject(str_student_id):
             dict_class_subject = {
                 "Subject Code": classofstudent.Subject.SubjectCode,
                 "Subject Name": classofstudent.Subject.Name,
+                "Subject Description": classofstudent.Subject.Description,
             }
 
 
@@ -467,14 +469,94 @@ def get_student_services(student_id):
     approved_count = sum(1 for service in all_services_list if service.get('Status') == 'Approved')
     denied_count = sum(1 for service in all_services_list if service.get('Status') == 'Rejected')
 
-    print(f"Number of services with status 'pending': {pending_count}")
-    print(f"Number of services with status 'approved': {approved_count}")
-    print(f"Number of services with status 'rejected': {denied_count}")
-    print(total_services)
+    # print(f"Number of services with status 'pending': {pending_count}")
+    # print(f"Number of services with status 'approved': {approved_count}")
+    # print(f"Number of services with status 'rejected': {denied_count}")
+    # print(total_services)
     
     return all_services_list, total_services, pending_count, approved_count, denied_count
 
- 
+#=================================================== to get all the status from different services given=====================================================#
+#  def get_all_student_services():
+#     addsubject_list = AddSubjects.query.all()
+#     changesubjects_list = ChangeSubject.query.all()
+#     manual_enrollments_list = ManualEnrollment.query.all()
+#     certification_request_list = CertificationRequest.query.all()
+#     grade_entry_list = GradeEntry.query.all()
+#     cross_enrollment_list = CrossEnrollment.query.all()
+#     petition_requests_list = PetitionRequest.query.all()
+#     shifting_applications_list = ShiftingApplication.query.all()
+#     overload_applications_list = OverloadApplication.query.all()
+#     tutorial_requests_list = TutorialRequest.query.all()
+
+#     # Concatenate all lists into one comprehensive list
+#     all_services_list = (
+#         [subject.to_dict() for subject in addsubject_list] +
+#         [subject.to_dict() for subject in changesubjects_list] +
+#         [subject.to_dict() for subject in manual_enrollments_list] +
+#         [subject.to_dict() for subject in certification_request_list] +
+#         [subject.to_dict() for subject in grade_entry_list] +
+#         [subject.to_dict() for subject in cross_enrollment_list] +
+#         [subject.to_dict() for subject in petition_requests_list] +
+#         [subject.to_dict() for subject in shifting_applications_list] +
+#         [subject.to_dict() for subject in overload_applications_list] +
+#         [subject.to_dict() for subject in tutorial_requests_list]
+#     )
+
+#     total_services = len(all_services_list)
+#     # Count the number of services with different statuses
+#     pending_count = sum(1 for service in all_services_list if service.get('Status') == 'Pending')
+#     approved_count = sum(1 for service in all_services_list if service.get('Status') == 'Approved')
+#     denied_count = sum(1 for service in all_services_list if service.get('Status') == 'Rejected')
+
+#     print(f"Number of services with status 'pending': {pending_count}")
+#     print(f"Number of services with status 'approved': {approved_count}")
+#     print(f"Number of services with status 'rejected': {denied_count}")
+#     print(f"Total number of services: {total_services}")
+    
+#     return all_services_list, total_services, pending_count, approved_count, denied_count
+
+#========================================get all te status that can filter based on the course=================================#
+# def get_all_student_services(course_id):
+#     addsubject_list = AddSubjects.query.filter_by(CourseId=course_id).all()
+#     changesubjects_list = ChangeSubject.query.filter_by(CourseId=course_id).all()
+#     manual_enrollments_list = ManualEnrollment.query.filter_by(CourseId=course_id).all()
+#     certification_request_list = CertificationRequest.query.filter_by(CourseId=course_id).all()
+#     grade_entry_list = GradeEntry.query.filter_by(CourseId=course_id).all()
+#     cross_enrollment_list = CrossEnrollment.query.filter_by(CourseId=course_id).all()
+#     petition_requests_list = PetitionRequest.query.filter_by(CourseId=course_id).all()
+#     shifting_applications_list = ShiftingApplication.query.filter_by(CourseId=course_id).all()
+#     overload_applications_list = OverloadApplication.query.filter_by(CourseId=course_id).all()
+#     tutorial_requests_list = TutorialRequest.query.filter_by(CourseId=course_id).all()
+
+#     # Concatenate all lists into one comprehensive list
+#     all_services_list = (
+#         [subject.to_dict() for subject in addsubject_list] +
+#         [subject.to_dict() for subject in changesubjects_list] +
+#         [subject.to_dict() for subject in manual_enrollments_list] +
+#         [subject.to_dict() for subject in certification_request_list] +
+#         [subject.to_dict() for subject in grade_entry_list] +
+#         [subject.to_dict() for subject in cross_enrollment_list] +
+#         [subject.to_dict() for subject in petition_requests_list] +
+#         [subject.to_dict() for subject in shifting_applications_list] +
+#         [subject.to_dict() for subject in overload_applications_list] +
+#         [subject.to_dict() for subject in tutorial_requests_list]
+#     )
+
+#     total_services = len(all_services_list)
+#     # Count the number of services with different statuses
+#     pending_count = sum(1 for service in all_services_list if service.get('Status') == 'Pending')
+#     approved_count = sum(1 for service in all_services_list if service.get('Status') == 'Approved')
+#     denied_count = sum(1 for service in all_services_list if service.get('Status') == 'Rejected')
+
+#     print(f"Number of services with status 'pending': {pending_count}")
+#     print(f"Number of services with status 'approved': {approved_count}")
+#     print(f"Number of services with status 'rejected': {denied_count}")
+#     print(f"Total number of services: {total_services}")
+    
+#     return all_services_list, total_services, pending_count, approved_count, denied_count
+#===============================================================================================================
+
 # def totalfailure(student_id=None):
 #     try:
 #         # Query to fetch student grades, join with CourseEnrolled and Metadata to get course and year level
@@ -550,3 +632,38 @@ def failingradeperbatch():
     except Exception as e:
         print("ERROR HERE: ", e)
         return None
+    
+def get_subject_name_by_code(subject_code):
+    subject = Subject.query.filter_by(SubjectCode=subject_code).first()
+    print(subject)
+    return subject.Name if subject else None
+
+
+def haymeannouncement():
+    try:
+        uploader_user = AliasedReturnsRows(APMSUser)
+
+        # Query to retrieve data from the Announcements table
+        announcements_data = db.session.query(
+            Announcements.id,
+            Announcements.created_at,
+            Announcements.updated_at,
+            Announcements.deleted_at,
+            Announcements.title,
+            Announcements.content,
+            Announcements.post_type,
+            Announcements.img_link,
+            uploader_user.username.label('uploader_username')  # Assuming 'username' is a field in APMSUser
+        ).join(
+            uploader_user,
+            Announcements.uploader_id == uploader_user.id
+        ).all()
+
+        # Printing the result (you can use this data in your HTML template)
+        for announcement in announcements_data:
+            print(announcement)
+    
+    except Exception as e:
+        print("ERROR HERE: ", e)
+        return None
+    

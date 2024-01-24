@@ -3,12 +3,15 @@
 {% block content %}
 
 <div class="data data1">
-   
     <div class="content-data">
         <div class="head">
             <h3>Faculty Profile</h3>           
         </div>
-        <form action="{{ url_for('faculty_update_profile') }}" id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
+        <!-- Profile Form -->
+        <form id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
+            <!-- Other form fields... -->
+
+            <!-- Faculty Type and BirthDate -->
             <div class="form-group">
                 <label for="FacultyType" class="col-sm-2 control-label">Faculty Type</label>
                 <div class="col-sm-4">
@@ -20,6 +23,7 @@
                 </div>
             </div>
 
+            <!-- Name and Residential Address -->
             <div class="form-group">
                 <label for="Name" class="col-sm-2 control-label">Name</label>
                 <div class="col-sm-4">
@@ -31,6 +35,7 @@
                 </div>
             </div>
 
+            <!-- Gender and Email -->
             <div class="form-group">
                 <label for="Gender" class="col-sm-2 control-label">Gender</label>
                 <div class="col-sm-4">
@@ -52,6 +57,7 @@
                 </div>               
             </div>
 
+            <!-- Mobile Number -->
             <div class="form-group">
                 <div class="col-sm-11 text-center">
                     <div class="pt-3 pl-4">
@@ -68,3 +74,4 @@
 </div>
 
 {% endblock %}
+

@@ -39,30 +39,30 @@
 	<tbody>
 		{% for certification_request in certification_request %}
 			<tr>
-				<td>{{ certification_request.certification_request_id }}</td>
+				<td>{{ certification_request.CertificationId }}</td>
 				<td>{{ certification_request.StudentNumber }}</td>
 				<td>{{ certification_request.Name }}</td>
 				<td>{{ certification_request.certification_type }}</td>
 				<td>        {% if certification_request.request_form_data %}
-					<a href="{{ url_for('get_certification_request_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success">{{ certification_request.request_form_filename }}</a>
+					<a href="{{ url_for('get_certification_request_file', CertificationId=certification_request.CertificationId) }}" class="btn btn-success">{{ certification_request.request_form_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
 				,
 				{% if certification_request.identification_card_data %}
-					<a href="{{ url_for('view_certification_identification_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success">{{ certification_request.identification_card_filename }}</a>
+					<a href="{{ url_for('view_certification_identification_file', CertificationId=certification_request.CertificationId) }}" class="btn btn-success">{{ certification_request.identification_card_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
 				,
 				{% if certification_request.authorization_letter_data %}
-					<a href="{{ url_for('view_certification_authorization_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success">{{ certification_request.authorization_letter_filename }}</a>
+					<a href="{{ url_for('view_certification_authorization_file', CertificationId=certification_request.CertificationId) }}" class="btn btn-success">{{ certification_request.authorization_letter_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
 				,
 				{% if certification_request.representative_data %}
-					<a href="{{ url_for('get_representative_file', certification_request_id=certification_request.certification_request_id) }}" class="btn btn-success">{{ certification_request.representative_filename }}</a>
+					<a href="{{ url_for('get_representative_file', CertificationId=certification_request.CertificationId) }}" class="btn btn-success">{{ certification_request.representative_filename }}</a>
 				{% else %}
 					<span class="badge badge-warning">No File</span>
 				{% endif %}
@@ -71,11 +71,11 @@
 				<td>{{ certification_request.status }}</td>
 				<td>{{ certification_request.StudentId }}</td>
 				<td>
-					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ certification_request.certification_request_id }}">Change Status</button>
+					<button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ certification_request.CertificationId }}">Change Status</button>
 				  </td>
 				</tr>
 				  <!-- Modal for Changing Status -->
-				  <div class="modal fade" id="statusModal{{ certification_request.certification_request_id }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+				  <div class="modal fade" id="statusModal{{ certification_request.CertificationId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
 					<div class="modal-dialog">
 					  <div class="modal-content">
 						<div class="modal-header">
@@ -83,7 +83,7 @@
 						  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
 							<span aria-hidden="true">&times;</span></button>
 						</div>
-						<form id="statusForm{{ certification_request.certification_request_id }}" action="{{ url_for('update_certification_service_status', certification_request_id=certification_request.certification_request_id) }}" method="POST">
+						<form id="statusForm{{ certification_request.CertificationId }}" action="{{ url_for('update_certification_service_status', CertificationId=certification_request.CertificationId) }}" method="POST">
 						  <div class="modal-body">
 							<select name="status" class="form-select">
 							  <option value="pending">Pending</option>
@@ -96,7 +96,7 @@
 						  </div>
 						  <div class="modal-footer">
 							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-							<button type="submit" class="btn btn-primary" onclick="updateStatus({{ certification_request.certification_request_id }})">Save changes</button>
+							<button type="submit" class="btn btn-primary" onclick="updateStatus({{ certification_request.CertificationId }})">Save changes</button>
 						  </div>
 						</form>
 					  </div>
@@ -120,8 +120,8 @@
 });
 
   // Function to update status
-  function updateStatus(certification_request_id) {
-    const formId = `statusForm${certification_request_id}`;
+  function updateStatus(CertificationId) {
+    const formId = `statusForm${CertificationId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

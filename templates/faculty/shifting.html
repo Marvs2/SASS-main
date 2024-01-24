@@ -130,53 +130,6 @@
         console.error('Error updating status:', error);
       });
   }
-  var lastActivity = new Date().getTime();
-
-  // Function to update the activity timestamp
-  function updateActivity() {
-      lastActivity = new Date().getTime();
-  }
-
-  // Function to handle user activity events
-  function handleUserActivity() {
-        updateActivity();
-
-        // Make an AJAX request to the server to notify about user activity
-        // Adjust the URL as needed
-        fetch('/notify_activity_shifting', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({}),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Handle the server's response if needed
-            console.log('Server notified about user activity');
-        })
-        .catch(error => {
-            console.error('Error notifying server:', error);
-        });
-    }
-
-
-  // Set up an interval to check for inactivity
-  setInterval(function () {
-      var now = new Date().getTime();
-      var inactiveTime = now - lastActivity;
-
-      // If inactive for more than 5 minutes (adjust as needed)
-      if (inactiveTime > 300000) {
-          // Redirect to the logout or login page
-          window.location.href = "/logout";  // Adjust the URL as needed
-      }
-  }, 60000);  // Check every minute (adjust as needed)
-
-  // Event listeners for user activity
-  document.addEventListener("mousemove", handleUserActivity);
-  document.addEventListener("mousedown", handleUserActivity);
-  document.addEventListener("keydown", handleUserActivity);
 </script>
 
 {% endblock %}

@@ -271,7 +271,6 @@
   //FAculty API
 	const api_base_url = '{{ faculty_api_base_url | default("") }}';
 	console.log('api_base_url: ', api_base_url)
-  // var lastActivity = new Date().getTime();
 
 
     // Function to close the notification card
@@ -313,56 +312,8 @@
 
 	{% block script %}
   <script>
-
-  //     // Function to update the activity timestamp
-  // function updateActivity() {
-  //     lastActivity = new Date().getTime();
-  // }
-
-  // // Function to handle user activity events
-  // function handleUserActivity() {
-  //       updateActivity();
-
-  //       // Make an AJAX request to the server to notify about user activity
-  //       // Adjust the URL as needed
-  //       fetch('/notify_activity', {
-  //           method: 'POST',
-  //           headers: {
-  //               'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({}),
-  //       })
-  //       .then(response => response.json())
-  //       .then(data => {
-  //           // Handle the server's response if needed
-  //           console.log('Server notified about user activity');
-  //       })
-  //       .catch(error => {
-  //           console.error('Error notifying server:', error);
-  //       });
-  //   }
-
-
-  // // Set up an interval to check for inactivity
-  // setInterval(function () {
-  //     var now = new Date().getTime();
-  //     var inactiveTime = now - lastActivity;
-
-  //     // If inactive for more than 5 minutes (adjust as needed)
-      
-  //     if (inactiveTime > 300000) {
-  //         // Redirect to the logout or login page
-  //         window.location.href = "/logoutfaculty";  // Adjust the URL as needed
-  //     }
-  // }, 60000);  // Check every minute (adjust as needed)
-
-  // // Event listeners for user activity
-  // document.addEventListener("mousemove", handleUserActivity);
-  // document.addEventListener("mousedown", handleUserActivity);
-  // document.addEventListener("keydown", handleUserActivity);
-
-      // FETCHING FACULTY DETAILS
-      async function fetchFacultyDetails() {
+  
+  async function fetchFacultyDetails() {
     try {
         const response = await fetch(`${api_base_url}/faculty-details`);
 
@@ -370,49 +321,38 @@
             throw new Error(`Failed to fetch data. Server returned ${response.status}`);
         }
 
-        const data_student_details = await response.json();
+        const data_faculty_details = await response.json();
         console.log('data_faculty_details:', data_faculty_details);
-        displayDetails(data_faculty_details);
+        displayFacultyDetails(data_faculty_details);
     } catch (error) {
-        console.error('Error fetching faculty details:', error.message);
+        console.error('Error fetching student details:', error.message);
     }
 }
-  fetchFacultyDetails();
-      function displayDetails(data){
-        // Concatenate the first name, middle name, and last name to form the full name
-    const fullName = `${data.FirstName} ${data.MiddleName ? data.MiddleName + ' ' : ''}${data.LastName}`;
+  fetchFacultyDetails()
+  function displayFacultyDetails(data) {
+      document.getElementById('FacultyType').value = data.FacultyType;
+      const DateOfBirthInput = document.getElementById("DateOfBirth");
 
-// Select the Name input and set the value to the full name
-document.getElementById("Name").value = fullName;
+      // Format the date to display only the birthday
+      const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      });
+      document.getElementById('Name').value = [data.FirstName, data.MiddleName, data.LastName].filter(Boolean).join(' ');
+      document.getElementById('ResidentialAddress').value = data.ResidentialAddress;
+      document.getElementById('Gender').value = data.Gender;
+      document.getElementById('Email').value = data.Email;
+      document.getElementById('MobileNumber').value = data.MobileNumber;
 
-// ... (other code remains unchanged)
-// Update label to display full name
-// document.getElementById('name-label').innerText = fullName;
-
-        // Select the StudentNumber and set the value to data.StudentNumber
-        document.getElementById("FacultyType").value = data.FacultyType;
-        document.getElementById("Email").value = data.Email;
-        // Select the Email and set the value to data.Email
-        document.getElementById("Gender").value = data.Gender;
-         // Format the date to display only the birthday
-const formattedBirthDate = new Date(data.BirthDate).toLocaleDateString('en-US', {
-  month: 'long',
-  day: 'numeric',
-  year: 'numeric'
-});
-// Set the formatted date to the BirthDate input
-BirthDateInput.value = formattedBirthDate;
-
-        document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
-        // Select the DateOfBirth and set the value to data.DateOfBirth
-        document.getElementById("MobileNumber").value = data.MobileNumber;
-
-        // Select the PlaceOfBirth and set the value to data.PlaceOfBirth
-        document.getElementById("PlaceOfBirth").value = data.PlaceOfBirth;
+      if (data.ProfilePic) {
+          let profilePic = document.getElementById('profilePic');
+          profilePic.src = 'data:image/png;base64,' + data.ProfilePic;
+          profilePic.hidden = false;
       }
-         
-      // DATEPICKER FUNCTION
-        document.addEventListener("DOMContentLoaded", function () {
+  }
+  // DATEPICKER FUNCTION
+  document.addEventListener("DOMContentLoaded", function () {
         // Initialize flatpickr
         flatpickr("#date", {
             dateFormat: 'm-d-Y', // Set the date format
