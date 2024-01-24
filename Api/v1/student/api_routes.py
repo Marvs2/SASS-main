@@ -437,7 +437,7 @@ def login():
             return redirect(url_for('student_dashboard'))
 
         else:
-            flash('Invalid Email or Password', 'danger')
+            flash('Invalid Email or Password', category='danger')
 
     return redirect(url_for('studentLogin'))
 
@@ -705,21 +705,23 @@ def create_services_application(form_data, files, StudentId):
     selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
     ServiceDetails = form_data.get('ServiceDetails', '')
 
-    payment_file = request.files.get('PaymentFile')
-    payment_file_binary = payment_file.read() if payment_file else None
-
+    PaymentFile = files.get('paymentScreenshot')  # Ensure the key matches your form field
+    PaymentFile_data = PaymentFile.read() if PaymentFile else None
 
     # Add additional validations as needed
-    Status = 'pending'
+    Status = 'Pending'
 
     try:
+        # Print the contents of PaymentFile_data for testing
+        print(f'PaymentFile_data: {PaymentFile_data}')
+
         # Create a new service application
         new_service_application = AddSubjects(
             StudentId=StudentId,
             FacultyRole=FacultyRole,
-            Subject=selectedSubjects,  # Use the modified field name
+            Subject=selectedSubjects,  
             ServiceDetails=ServiceDetails,
-            PaymentFile=payment_file_binary,
+            PaymentFile=PaymentFile_data,
             SenderName=SenderName,
             SenderContactNo=SenderContactNo,
             Status=Status,
@@ -758,7 +760,7 @@ def create_change_subject(form_data, files, StudentId):
 
 
     # Add additional validations as needed
-    Status = 'pending'
+    Status = 'Pending'
 
     try:
         # Create a new service application
@@ -951,56 +953,50 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
     return new_manual_enrollment
 
 #========================================Change of Subjects============================#
-def create_addsubjects_application(form_data, files, StudentId):
-    FacultyRole = 'Academic Head'
 
-    # Extract individual form data
-    SenderName = form_data.get('SenderName', '')
-    SenderContactNo = form_data.get('SenderContactNo', '')
-    selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
-    ServiceDetails = form_data.get('ServiceDetails', '')
+# def create_addsubjects_application(form_data, files, StudentId):
+#     StudentNumber = form_data['StudentNumber']
+#     Name = form_data['Name']
+#     SubjectNames = form_data['SubjectNames']
+#     EnrollmentType = form_data['EnrollmentType']
+#     UserResponsible = form_data['UserResponsible']
+#     Status = form_data['Status']
 
-    # Access the file from request.files
-    payment_file = files.get('paymentScreenshot')
+#     if 'filesubject' not in files:
+#         flash('Please provide the Subjects file.', 'danger')
+#         return None
+
+#     filesubject = files['filesubject']
+
+#     if filesubject.filename == '':
+#         flash('No selected file', 'danger')
+#         return None
     
-    # Check if a file was provided
-    if payment_file:
-        # Read the file content
-        PaymentFile = payment_file.read()
-    else:
-        PaymentFile = None
+#     AddSubjectFiledata = filesubject.read()  # Read the file data
+#     AddSubjectFilefilename = secure_filename(filesubject.filename) 
+#     # Check if other inputs are provided
 
-    # Add additional validations as needed
-    Status = 'pending'
+#     if not StudentNumber or not Name or not SubjectNames or not EnrollmentType:
+#         flash('Please fill out all fields and provide valid values.', 'danger')
+#         return None  # Replace 'add_subjects' with the actual route
 
-    try:
-        # Create a new service application
-        new_service_application = AddSubjects(
-            StudentId=StudentId,
-            FacultyRole=FacultyRole,
-            Subject=selectedSubjects,  # Use the modified field name
-            ServiceDetails=ServiceDetails,
-            PaymentFile=PaymentFile,
-            SenderName=SenderName,
-            SenderContactNo=SenderContactNo,
-            Status=Status,
-        )
+#     # Log the form submission
+#     #log_form_submission_to_file(form_data)
+#     # Additional validation logic can be added here
 
-        db.session.add(new_service_application)
-        db.session.commit()
-        db.session.refresh(new_service_application)
-
-        created_service_id = new_service_application.AddSubjectId
-
-    except Exception as e:
-        # Rollback the transaction in case of an error
-        db.session.rollback()
-        print(f'An error occurred: {e}')
-        # Optionally, re-raise the exception if you want it to be handled further up the call stack
-        raise e
-
-    return created_service_id
-
+#     new_addsubjects_application = AddSubjects(
+#         StudentId=StudentId,
+#         StudentNumber=StudentNumber,
+#         Name=Name,
+#         SubjectNames=SubjectNames,
+#         EnrollmentType=EnrollmentType,
+#         AddSubjectFiledata=AddSubjectFiledata,
+#         AddSubjectFilefilename=AddSubjectFilefilename,
+#         UserResponsible=UserResponsible,
+#         Status=Status,
+#     )
+    
+#     return new_addsubjects_application
     
 #=========================================================#
 

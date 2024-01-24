@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Academic Support System</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
+	<link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+
+	<link href="{{url_for('static', filename='css/style.css')}}" rel="stylesheet"/>
+
+  <!-- Add this in the <head> section of your HTML -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <!-- Include the JavaScript file (jQuery is required) -->
+</head>
+<body>
+
+  <!--------------------------------------------- SUCCESS AND ERROR MESSAGE --------------------------------------------->
+<div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+      {% for category, message in messages %}
+          {% if category == "error" %}
+              <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="d-flex toast-content">
+                    <div>
+                      <i class="fa-solid fa-xmark wrong"></i>
+                    </div>
+
+                      <div class="toast-body message">
+                          <span class="text text-1">Oh! Snap</span>
+                          <span class="text text-2">{{ message }}</span>
+                      </div>
+                      <i class="fa-solid fa-xmark close"></i>
+                  </div>
+              </div>
+          {% else %}
+              <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                  <div class="d-flex toast-content">
+                    <div>
+                      <i class="fas fa-solid fa-check check"></i>
+                    </div>
+                      <div class="toast-body message">
+                          <span class="text text-1">Successful</span>
+                        <span class="text text-2">{{ message }}</span>
+                      </div>
+                      <i class="fa-solid fa-xmark close"></i>
+                  </div>
+              </div>
+          {% endif %}
+      {% endfor %}
+  {% endif %}
+{% endwith %}
+
+    		<!---------------------------------------------------- SIDE NAVIGATION BAR ------------------------------------------------------>
+	<section id="sidebar">
+		<a href="{{url_for('faculty_dashboard')}}" class="brand"><i class='bx bxs-smile icon'></i>Faculty SASS</a>
+		<ul class="side-menu">
+			<li class="divider" data-text="Home">Home</li>
+			<li><a href="{{url_for('faculty_dashboard')}}" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
+			<li class="divider" data-text="Services">Services</li>
+			<li>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
+				<ul class="side-dropdown">
+					<li><a href="{{url_for('facultyoverload')}}">Overload of Subjects</a></li>
+					<li><a href="{{ url_for('facultyadding')}}">Adding of Subjects</a></li>
+					<li><a href="{{url_for('facultychange')}}">Change of Schedule/Subjects</a></li>
+					<li><a href="{{url_for('facultycorrection')}}">Correction of Grade Entry</a></li>
+					<li><a href="{{url_for('facultycrossenrollment')}}">Cross-Enrollment</a></li>
+					<li><a href="{{url_for('facultyshifting')}}">Application for Shifting</a></li>
+					<li><a href="{{url_for('facultyenrollment')}}">Manual Enrollment</a></li>
+					<li><a href="{{url_for('facultypetition')}}"> Online Petition of Subjects</a></li>
+					<li><a href="{{url_for('facultytutorial')}}">Online Request for Tutorial</a></li>
+					<li><a href="{{url_for('facultycertification')}}">Request for Certification</a></li>
+
+				</ul>
+			</li>
+		</ul>
+	</section>
+    <!-- NAVBAR -->
+	<section id="content">
+    
+		<!-- NAVBAR -->
+		<nav>
+			<i class='bx bx-menu toggle-sidebar' ></i>
+      			<form action="#">
+			<!----	<div class="form-group">
+					<input type="text" placeholder="Search...">
+					<i class='bx bx-search icon' ></i>
+				</div> -->
+			</form>
+			<a href="#" class="nav-link" data-bs-toggle="dropdown" tabindex="-1" title="Notifications" aria-label="Show notifications" id="notification-icon">
+				<i class='bx bxs-bell icon'></i>
+				<span class="badge">4</span>
+			</a>
+                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
+                  <div class="card"> 
+                    <div class="list-group list-group-flush list-group-hoverable">
+                      <div class="list-group-item">
+                        <div class="row align-items-center">                          
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 1</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Change deprecated html tags to text decoration classes (#29604)
+                            </div>
+                          </div>
+                          <div class="col-auto">                           
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 2</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              justify-content:between ⇒ justify-content:space-between (#29734)
+                            </div>
+                          </div>
+                          <div class="col-auto">                           
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 3</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Update change-version.js (#29736)
+                            </div>
+                          </div>
+                          <div class="col-auto">                          
+                          </div>
+                        </div>
+                      </div>
+                      <div class="list-group-item">
+                        <div class="row align-items-center">
+                          <div class="col text-truncate">
+                            <a href="#" class="text-body d-block">Example 4</a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                              Regenerate package-lock.json (#29730)
+                            </div>
+                          </div>                         
+                        </div>
+                      </div>
+                      <div class="col-auto">  
+                        <div class="text-right mt-2 mb-1">
+                          <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
+                      </div>                          
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+			
+		<!----	<a href="#" class="nav-link">
+				<i class='bx bxs-message-square-dots icon'></i>
+				<span class="badge">8</span> 
+			</a> -->
+			<span class="divider"></span>
+
+			<div class="profile">
+				<img src="/static/images/user.png" alt="" title="My Profile">
+				<ul class="profile-link">
+					<li><a href="{{url_for('facultyprofile')}}"><i class='bx bxs-user-circle icon' ></i> Profile</a></li>
+					<li><a href="{{url_for('logoutfaculty')}}"><i class='bx bxs-log-out-circle' ></i> Logout</a></li>
+				</ul>
+			</div>
+		</nav>
+		<!-- NAVBAR -->
+
+		<main>
+			{% block content %} {% endblock %}
+		</main>
+	</section>
+
+<script>
+            //FAculty API
+	const api_base_url = '{{ faculty_api_base_url | default("") }}';
+	console.log('api_base_url: ', api_base_url)
+  var lastActivity = new Date().getTime();
+
+        // Function to close the notification card
+    function closeNotificationCard() {
+        var notificationCard = document.getElementById('notification-card');
+        if (notificationCard.classList.contains('show')) {
+            notificationCard.classList.remove('show');
+        }
+    }
+
+    // Add event listener to the notification icon
+    document.getElementById('notification-icon').addEventListener('click', function (event) {
+        // Prevent the click event from propagating to the document body
+        event.stopPropagation();
+        
+        // Toggle the visibility of the notification card
+        document.getElementById('notification-card').classList.toggle('show');
+    });
+
+    // Add event listener to the document body to close the notification card on any click outside of it
+    document.body.addEventListener('click', closeNotificationCard);
+
+    // Add event listener to prevent the notification card from closing when clicking inside it
+    document.getElementById('notification-card').addEventListener('click', function (event) {
+        event.stopPropagation();
+    });
+
+      // JavaScript to show all notifications when "See All Notifications" is clicked
+      document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+          // Prevent the link from navigating (you may adjust this behavior as needed)
+          event.preventDefault();
+
+          // Show all notifications by removing the 'd-none' class
+          var notificationList = document.getElementById('notification-list');
+          notificationList.classList.remove('d-none');
+      });
+	</script>
+
+	{% block script %}
+  <script>
+    // Function to update the activity timestamp
+  function updateActivity() {
+      lastActivity = new Date().getTime();
+  }
+
+  // Function to handle user activity events
+  function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', error);
+        });
+    }
+
+
+  // Set up an interval to check for inactivity
+  setInterval(function () {
+      var now = new Date().getTime();
+      var inactiveTime = now - lastActivity;
+
+      // If inactive for more than 5 minutes (adjust as needed)
+      
+      if (inactiveTime > 300000) {
+          // Redirect to the logout or login page
+          window.location.href = "/logoutfaculty";  // Adjust the URL as needed
+      }
+  }, 60000);  // Check every minute (adjust as needed)
+
+  // Event listeners for user activity
+  document.addEventListener("mousemove", handleUserActivity);
+  document.addEventListener("mousedown", handleUserActivity);
+  document.addEventListener("keydown", handleUserActivity);
+  </script>
+  {% endblock script %}
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
+</body>
+</html>
+
+
+<!-- ------------------------------------------------- FACULTY OVERLOAD OF SUBJECT ---------------------------------------------->
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+    /* Adjust styling for DataTable container*/ 
+    #overloadTableContainer {
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
+        max-width: 80%; /* Adjust the maximum width as needed */
+    }
+
+    /* Add DataTables styles */
+    table {
+        width: 70%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<title>Overload Applications</title>
+    <!-- Add any necessary CSS -->
+    <style>
+        /* Adjust styling for DataTable container*/ 
+        #overloadTableContainer {
+            margin-top: 20px;
+            margin-left: 50px;
+            margin-right: 50px;
+            margin-bottom: 50px;
+            max-width: 80%; /* Adjust the maximum width as needed */
+        }
+
+        /* Add DataTables styles */
+        table {
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div id="overloadTableContainer">
+    <h1>Overload Applications</h1>
+    <table id="overloadTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Student Number</th>
+                <th>Program/Course</th>
+                <th>Semester</th>
+                <th>Subjects to Add</th>
+                <th>Justification</th>
+                <th>Files</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace with your Flask template logic to populate rows -->
+            {% for overload_application in overload_application %}
+                <tr>
+                    <td>{{ overload_application.OverloadId }}</td>
+                    <td>{{ overload_application.Name }}</td>
+                    <td>{{ overload_application.StudentNumber }}</td>
+                    <td>{{ overload_application.ProgramCourse }}</td>
+                    <td>{{ overload_application.Semester }}</td>
+                    <td>{{ overload_application.SubjectsToAdd }}</td>
+                    <td>{{ overload_application.Justification }}</td>
+                    <td>
+                        {% if overload_application.Overloaddata %}
+                            {% set truncated_overload_name = overload_application.Overloadfilename[:15] + '...' if overload_application.Overloadfilename|length > 15 else overload_application.Overloadfilename %}
+                        <a href="{{ url_for('get_overload_file', OverloadId=overload_application.OverloadId) }}" class="btn btn-success" download title="{{ overload_application.Overloadfilename }}">{{ truncated_overload_name }}</a>
+                        {% else %}
+                        <span class="badge badge-warning">No File</span>
+                        {% endif %}
+                      </td>
+                    <td>{{ overload_application.UserResponsible }}</td>
+                    <td>{{ overload_application.Status }}</td>
+                    <td>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_application.OverloadId }}">Change Status</button>
+                      </td>
+                </tr>
+                <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ overload_application.OverloadId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ overload_application.Name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="statusForm{{ overload_application.OverloadId }}" action="{{ url_for('update_overload_service_status', OverloadId=overload_application.OverloadId) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_application.OverloadId }})">Save Status</button>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<script>
+    // Initialize DataTable
+    $(document).ready(function() {
+    $('#overloadTable').DataTable({
+        "pageLength": 5
+    });
+});
+         // Function to update status
+        function updateStatus(OverloadId) {
+        const formId = `statusForm${OverloadId}`;
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+
+        fetch(`/faculty/overload`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // Show success/error message from the server
+            location.reload(); // Reload the page after successful update
+        })
+        .catch(error => {
+            console.error('Error updating status:', category='error');
+        });
+    }
+  var lastActivity = new Date().getTime();
+
+    // Function to update the activity timestamp
+    function updateActivity() {
+        lastActivity = new Date().getTime();
+    }
+
+    // Function to handle user activity events
+    function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity_overload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', category='error');
+        });
+    }
+
+
+    // Set up an interval to check for inactivity
+    setInterval(function () {
+        var now = new Date().getTime();
+        var inactiveTime = now - lastActivity;
+
+        // If inactive for more than 5 minutes (adjust as needed)
+        if (inactiveTime > 120000) {
+            // Redirect to the logout or login page
+            window.location.href = "/logoutfaculty";  // Adjust the URL as needed
+        }
+    }, 60000);  // Check every minute (adjust as needed)
+
+    // Event listeners for user activity
+    document.addEventListener("mousemove", handleUserActivity);
+    document.addEventListener("mousedown", handleUserActivity);
+    document.addEventListener("keydown", handleUserActivity);
+</script>
+{% endblock %}

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Academic Support System</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
   
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
@@ -24,56 +24,58 @@
  <!---- <link rel="stylesheet" href="{{url_for('static', filename='css/tabler.min.css?1692870487')}}"> -->
 
  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <!-- Include the JavaScript file (jQuery is required) -->
+
+	<title>Student Academic Support System</title>
 </head>
 <body>
 
-  <!--------------------------------------------- SUCCESS AND ERROR MESSAGE --------------------------------------------->
+<!--------------------------------------------- SUCCESS AND ERROR MESSAGE --------------------------------------------->
 <div class="progress progress-bar progress-bar-indeterminate bg-green"></div> 
-{% with messages = get_flashed_messages(with_categories=true) %}
-  {% if messages %}
-      {% for category, message in messages %}
-          {% if category == "error" %}
-              <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                  <div class="d-flex toast-content">
-                    <div>
-                      <i class="fa-solid fa-xmark wrong"></i>
-                    </div>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            {% if category == "error" %}
+                <div class="toast toast-error align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                      <div>
+                        <i class="fa-solid fa-xmark wrong"></i>
+                      </div>
 
-                      <div class="toast-body message">
-                          <span class="text text-1">Oh! Snap</span>
-                          <span class="text text-2">{{ message }}</span>
-                      </div>
-                      <i class="fa-solid fa-xmark close"></i>
-                  </div>
-              </div>
-          {% else %}
-              <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
-                  <div class="d-flex toast-content">
-                    <div>
-                      <i class="fas fa-solid fa-check check"></i>
+                        <div class="toast-body message">
+                            <span class="text text-1">Oh! Snap</span>
+                            <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
                     </div>
-                      <div class="toast-body message">
-                          <span class="text text-1">Successful</span>
-                        <span class="text text-2">{{ message }}</span>
+                </div>
+            {% else %}
+                <div class="toast toast-success align-items-end justify-content-end text-bg-light position-fixed top-20 end-0 m-3 fade show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex toast-content">
+                      <div>
+                        <i class="fas fa-solid fa-check check"></i>
                       </div>
-                      <i class="fa-solid fa-xmark close"></i>
-                  </div>
-              </div>
-          {% endif %}
-      {% endfor %}
-  {% endif %}
+                        <div class="toast-body message">
+                            <span class="text text-1">Successful</span>
+                          <span class="text text-2">{{ message }}</span>
+                        </div>
+                        <i class="fa-solid fa-xmark close"></i>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
 {% endwith %}
 
-    	<!-- SIDEBAR -->
+  
+	<!---------------------------------------------------- SIDE NAVIGATION BAR ------------------------------------------------------>
 	<section id="sidebar">
-		<a href="{{url_for('faculty_dashboard')}}" class="brand"> <img class="img" src="{{ url_for('static', filename='images/pup.png') }}" alt="">SASS Admin</a>
+		<a href="{{url_for('student_dashboard')}}" class="brand"> <img class="img" src="{{ url_for('static', filename='images/pup.png') }}" alt="">SASS Admin</a>
 		<ul class="side-menu">
-			<li class="divider" data-text="Home">Home</li>
+      <li class="divider" data-text="Home">Home</li>
 			<li><a href="{{url_for('faculty_dashboard')}}" class="active"><i class='bx bxs-dashboard icon' ></i> Dashboard</a></li>
 			<li class="divider" data-text="Services">Services</li>
 			<li>
-				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> Manage Services <i class='bx bx-chevron-right icon-right' ></i></a>
 				<ul class="side-dropdown">
 					<li><a href="{{url_for('facultyoverload')}}">Overload of Subjects</a></li>
 					<li><a href="{{ url_for('facultyadding')}}">Adding of Subjects</a></li>
@@ -87,90 +89,168 @@
 					<li><a href="{{url_for('facultycertification')}}">Request for Certification</a></li>
 
 				</ul>
-			</li>
+
+		<!--	<li class="divider" data-text="Complaints">Complaints</li>
+			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
+			<li><a href="#"><i class='bx bxs-widget icon' ></i> Manage Complaint</a></li>-->
 		</ul>
 	</section>
-    <!-- NAVBAR -->
+
 	<section id="content">
-    
-		<!-- NAVBAR -->
 		<nav>
-			<i class='bx bx-menu toggle-sidebar' ></i>
+      <!---------------------------------------------- TOGGLE SIDEBAR MENU BUTTON ------------------------------------------->
+      <i class='bx bx-menu toggle-sidebar' ></i>
       			<form action="#">
 			<!----	<div class="form-group">
 					<input type="text" placeholder="Search...">
 					<i class='bx bx-search icon' ></i>
 				</div> -->
 			</form>
+
+      <!------------------------------------------------ NOTIFICATION BUTTON ------------------------------------------------>
 			<a href="#" class="nav-link" data-bs-toggle="dropdown" tabindex="-1" title="Notifications" aria-label="Show notifications" id="notification-icon">
-				<i class='bx bxs-bell icon'></i>
-				<span class="badge">4</span>
+          <i class='bx bxs-bell icon'></i>
+          <span class="badge">4</span>
 			</a>
-                <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
-                  <div class="card"> 
-                    <div class="list-group list-group-flush list-group-hoverable">
-                      <div class="list-group-item">
-                        <div class="row align-items-center">                          
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 1</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Change deprecated html tags to text decoration classes (#29604)
-                            </div>
-                          </div>
-                          <div class="col-auto">                           
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 2</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              justify-content:between ⇒ justify-content:space-between (#29734)
-                            </div>
-                          </div>
-                          <div class="col-auto">                           
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 3</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Update change-version.js (#29736)
-                            </div>
-                          </div>
-                          <div class="col-auto">                          
-                          </div>
-                        </div>
-                      </div>
-                      <div class="list-group-item">
-                        <div class="row align-items-center">
-                          <div class="col text-truncate">
-                            <a href="#" class="text-body d-block">Example 4</a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
-                              Regenerate package-lock.json (#29730)
-                            </div>
-                          </div>                         
-                        </div>
-                      </div>
-                      <div class="col-auto">  
-                        <div class="text-right mt-2 mb-1">
-                          <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
-                      </div>                          
-                      </div>
+        <div class="dropdown-menu dropdown-menu-arrow dropdown-menu-end dropdown-menu-card" id="notification-card">
+          <div class="card">             
+            <div class="list-group list-group-flush list-group-hoverable">
+              <div class="list-group-item">
+                <div class="row align-items-center">                          
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 1</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Change deprecated html tags to text decoration classes (#29604)
                     </div>
+                  </div>
+                  <div class="col-auto">                           
                   </div>
                 </div>
               </div>
+
+              <div class="list-group-item">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 2</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      justify-content:between ⇒ justify-content:space-between (#29734)
+                    </div>
+                  </div>
+                  <div class="col-auto">                           
+                  </div>
+                </div>
+              </div>
+
+              <div class="list-group-item">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 3</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Update change-version.js (#29736)
+                    </div>
+                  </div>
+                  <div class="col-auto">                          
+                  </div>
+                </div>
+              </div>
+
+              <div class="list-group-item">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="list-group-item d-none">
+                <div class="row align-items-center">
+                  <div class="col text-truncate">
+                    <a href="#" class="text-body d-block">Example 4</a>
+                    <div class="d-block text-secondary text-truncate mt-n1">
+                      Regenerate package-lock.json (#29730)
+                    </div>
+                  </div>                         
+                </div>
+              </div>
+              <div class="col-auto">  
+                <div class="text-right mt-2 mb-1">
+                  <a href="#" class="text-right" id="see-all-notifications">See All Notifications</a>
+              </div>                          
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 			
 		<!----	<a href="#" class="nav-link">
 				<i class='bx bxs-message-square-dots icon'></i>
 				<span class="badge">8</span> 
 			</a> -->
 			<span class="divider"></span>
-
 			<div class="profile">
 				<img src="/static/images/user.png" alt="" title="My Profile">
 				<ul class="profile-link">
@@ -179,53 +259,56 @@
 				</ul>
 			</div>
 		</nav>
-		<!-- NAVBAR -->
 
 		<main>
-			{% block content %} {% endblock %}
+			{% block content %} 
+      
+      {% endblock content %}
 		</main>
 	</section>
 
-<script>
-            //FAculty API
+  <script>
+  //FAculty API
 	const api_base_url = '{{ faculty_api_base_url | default("") }}';
 	console.log('api_base_url: ', api_base_url)
 
-        // Function to close the notification card
-    function closeNotificationCard() {
-        var notificationCard = document.getElementById('notification-card');
-        if (notificationCard.classList.contains('show')) {
-            notificationCard.classList.remove('show');
-        }
-    }
 
+    // Function to close the notification card
+    function closeNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      if (notificationCard.classList.contains('show')) {
+        notificationCard.classList.remove('show');
+      }
+    }
+  
     // Add event listener to the notification icon
     document.getElementById('notification-icon').addEventListener('click', function (event) {
-        // Prevent the click event from propagating to the document body
-        event.stopPropagation();
-        
-        // Toggle the visibility of the notification card
-        document.getElementById('notification-card').classList.toggle('show');
+      // Prevent the click event from propagating to the document body
+      event.stopPropagation();
+  
+      // Toggle the visibility of the notification card
+      document.getElementById('notification-card').classList.toggle('show');
     });
-
+  
     // Add event listener to the document body to close the notification card on any click outside of it
     document.body.addEventListener('click', closeNotificationCard);
-
+  
     // Add event listener to prevent the notification card from closing when clicking inside it
     document.getElementById('notification-card').addEventListener('click', function (event) {
-        event.stopPropagation();
+      event.stopPropagation();
     });
+  
+    // JavaScript to show all notifications when "See All Notifications" is clicked
+    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+      // Prevent the link from navigating (you may adjust this behavior as needed)
+      event.preventDefault();
+  
+      // Show all notifications by removing the 'd-none' class
+      var notificationList = document.getElementById('notification-card');
+      notificationList.classList.toggle('show');
+    });
+    </script>
 
-      // JavaScript to show all notifications when "See All Notifications" is clicked
-      document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-          // Prevent the link from navigating (you may adjust this behavior as needed)
-          event.preventDefault();
-
-          // Show all notifications by removing the 'd-none' class
-          var notificationList = document.getElementById('notification-list');
-          notificationList.classList.remove('d-none');
-      });
-	</script>
 
 	{% block script %}
   <script>
@@ -282,20 +365,106 @@
             }
         });
     });
-  </script>
+    // NOTIFICATION ICON
+    var showAllNotifications = false;
+  
+    // Function to close the notification card
+    function closeNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      if (notificationCard.classList.contains('show')) {
+        notificationCard.classList.remove('show');
+      }
+    }
+  
+    // Function to toggle the visibility of the notification card
+    function toggleNotificationCard() {
+      var notificationCard = document.getElementById('notification-card');
+      notificationCard.classList.toggle('show');
+  
+      // If not showing all notifications, only display the first four
+      if (!showAllNotifications) {
+        showFirstFourNotifications();
+      }
+    }
+      
+    // Function to show only the first four notifications
+    function showFirstFourNotifications() {
+      var allNotifications = document.querySelectorAll('#notification-card .list-group-item');
+      allNotifications.forEach(function (item, index) {
+        if (index < 4) {
+          item.classList.remove('d-none');
+        } else {
+          item.classList.add('d-none');
+        }
+      });
+    }
+  
+    // Add event listener to the notification icon
+    document.getElementById('notification-icon').addEventListener('click', function (event) {
+      // Prevent the click event from propagating to the document body
+      event.stopPropagation();
+  
+      // If notification card is already visible, close it; otherwise, show the first four notifications
+      if (document.getElementById('notification-card').classList.contains('show')) {
+        closeNotificationCard();
+      } else {
+        showFirstFourNotifications();
+        toggleNotificationCard();
+      }
+    });
+  
+    // Add event listener to the document body to close the notification card on any click outside of it
+    document.body.addEventListener('click', closeNotificationCard);
+  
+    // Add event listener to prevent the notification card from closing when clicking inside it
+    document.getElementById('notification-card').addEventListener('click', function (event) {
+      event.stopPropagation();
+    });
+  
+    // JavaScript to show all or only the first four notifications when "See All Notifications" is clicked
+    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+      // Prevent the link from navigating (you may adjust this behavior as needed)
+      event.preventDefault();
+  
+      // Toggle between showing all and displaying only the first four notifications
+      showAllNotifications = !showAllNotifications;
+  
+      if (showAllNotifications) {
+        // Show all hidden notifications by removing the 'd-none' class
+        var hiddenItems = document.querySelectorAll('#notification-card .list-group-item.d-none');
+        hiddenItems.forEach(function (item) {
+          item.classList.remove('d-none');
+        });
+      } else {
+        // Show only the first four notifications
+        showFirstFourNotifications();
+      }
+  
+      // Toggle the visibility of the notification card
+      toggleNotificationCard();
+    });
+  
+    // Show only the first four notifications initially
+    showFirstFourNotifications();
+</script>
+  
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/script2.js')}}"></script>
+    <script src="{{ url_for('static', filename='js/messages.js')}}"></script>
+
+    <!----  <script src="{{ url_for('static', filename='js/history.js')}}"></script> -->
+  
   {% endblock script %}
 
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-
-  <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>

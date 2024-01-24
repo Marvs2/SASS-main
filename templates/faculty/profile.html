@@ -2,8 +2,6 @@
 
 {% block content %}
 
-<!-- Existing HTML Content ... -->
-
 <div class="data data1">
     <div class="content-data">
         <div class="head">
@@ -15,53 +13,62 @@
 
             <!-- Faculty Type and BirthDate -->
             <div class="form-group">
-              <!-- Faculty Type -->
-              <label for="FacultyType" class="col-sm-2 control-label">Faculty Type</label>
-              <div class="col-sm-4">
-                <input type="text" id="FacultyType" name="FacultyType" required="required" class="form-control" disabled>
-              </div>
-              <!-- BirthDate -->
-              <label for="BirthDate" class="col-sm-2 control-label">Date of Birth</label>
-              <div class="col-sm-4">
-                <input type="text" name="BirthDate" id="BirthDate" required="required" class="form-control" disabled>
-              </div>
+                <label for="FacultyType" class="col-sm-2 control-label">Faculty Type</label>
+                <div class="col-sm-4">
+                    <input type="text" id="FacultyType" name="FacultyType" required="required" class="form-control" disabled>
+                </div>
+                <label for="BirthDate" class="col-sm-2 control-label">Date of Birth</label>
+                <div class="col-sm-4">
+                    <input type="text" name="BirthDate" id="BirthDate" required="required" class="form-control" disabled>
+                </div>
             </div>
 
             <!-- Name and Residential Address -->
             <div class="form-group">
-              <!-- Name -->
-              <label for="Name" class="col-sm-2 control-label">Name</label>
-              <div class="col-sm-4">
-                <input type="text" name="Name" id="Name" required="required" class="form-control" disabled>
-              </div>   
-              <!-- Residential Address -->
-              <label for="ResidentialAddress" class="col-sm-2 control-label">Residential Address</label>
-              <div class="col-sm-4">
-                <input type="text" name="ResidentialAddress" id="ResidentialAddress" required="required" class="form-control" disabled>
-              </div>
+                <label for="Name" class="col-sm-2 control-label">Name</label>
+                <div class="col-sm-4">
+                    <input type="text" name="Name" id="Name" required="required" class="form-control" disabled>
+                </div>   
+                <label for="ResidentialAddress" class="col-sm-2 control-label">Place of Birth</label>
+                <div class="col-sm-4">
+                    <input type="text" name="ResidentialAddress" id="ResidentialAddress" required="required" class="form-control" disabled>
+                </div>
             </div>
 
             <!-- Gender and Email -->
             <div class="form-group">
-              <!-- Gender -->
-              <label for="Gender" class="col-sm-2 control-label">Gender</label>
-              <div class="col-sm-4">
-               <input type="text" name="Gender" id="Gender" required="required" class="form-control" disabled> 
-              </div>
-              <!-- Email -->
-              <label for="Email" class="col-sm-2 control-label">Email Address</label>
-              <div class="col-sm-4">
-                <input type="Email" name="Email" id="Email" required="required" class="form-control">
-              </div>
+                <label for="Gender" class="col-sm-2 control-label">Gender</label>
+                <div class="col-sm-4">
+                    <input type="text" name="Gender" id="Gender" required="required" class="form-control" disabled> 
+                </div>
+                <label for="Email" class="col-sm-2 control-label">Email Address</label>
+                <div class="col-sm-4">
+                    <input type="email" name="Email" id="Email" required="required" class="form-control">
+                </div>
+            </div>          
+            <div class="form-group">
+                <label for="MobileNumber" class="col-sm-2 control-label">Contact Number</label>
+                <div class="col-sm-4">
+                    <input type="text"  name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}" class="form-control">
+                </div>
+                <label for="address" class="col-sm-2 control-label">Address</label>
+                <div class="col-sm-4">
+                    <input  name="address" id="address" required="required" class="form-control">
+                </div>               
             </div>
 
             <!-- Mobile Number -->
             <div class="form-group">
-              <label for="MobileNumber" class="col-sm-2 control-label">Contact Number</label>
-              <div class="col-sm-4">
-                <input type="text"  name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}" class="form-control">
-              </div>
-            </div>  
+                <div class="col-sm-11 text-center">
+                    <div class="pt-3 pl-4">
+                        <!-- <span><i>I hereby Certify that all the information provided are true and correct to the best of my knowledge.</i></span> -->
+                    </div>
+              
+                    <div class="col-sm-13 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-success">Save Profile</button>
+                    </div>
+                </div>
+            </div>       
         </form>
     </div>
 </div>
