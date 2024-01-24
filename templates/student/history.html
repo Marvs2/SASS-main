@@ -75,7 +75,7 @@
 						<tr data-add-application-id="{{  addsubjects.AddSubjectId }}"
 							data-add-name="{{ addsubjects.SenderName}}" 
 							data-add-student-number="{{ addsubjects.SenderContactNo }}"
-							data-add-subjects-to-add="{{ addsubjects.Subject }}"
+							data-add-subjects-to-add="{{ addsubjects.SubjectId }}"
 							data-add-sender-name="{{ addsubjects.SenderName }}"
 							data-add-contact-number="{{ addsubjects.SenderContactNo }}"
 							data-add-enrollment-type="{{ addsubjects.ServiceDetails }}"
@@ -83,7 +83,7 @@
 							data-add-file-filename="{{ addsubjects.AddSubjectFilefilename }}"	
 							data-add-status="{{ addsubjects.Status }}">
 							<td class="applicationID">{{ addsubjects.AddSubjectId }}</td>								
-							<td>{{ addsubjects.Subject }}</td>														
+							<td>{{ addsubjects.SubjectId }}</td>														
 							<td id="Status">{{ addsubjects.Status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal"></button>
@@ -1722,6 +1722,3 @@ $(document).ready(function () {
 	  
 </script>
 {% endblock %}
-
-
-

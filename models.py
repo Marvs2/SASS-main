@@ -532,6 +532,7 @@ class AddSubjects(db.Model):
     SenderContactNo = db.Column(db.String(50))
     PaymentFile = db.Column(db.LargeBinary)
     Status = db.Column(db.String(20))
+    Remarks =db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
@@ -546,6 +547,7 @@ class AddSubjects(db.Model):
             'SenderContactNo': self.SenderContactNo,
             'PaymentFile': self.PaymentFile,
             'Status': self.Status,
+            'Remarks': self.Remarks
 
         }
 #Notification
