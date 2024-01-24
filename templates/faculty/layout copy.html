@@ -276,3 +276,226 @@
 	<script src="{{ url_for('static', filename='js/script2.js')}}"></script>
 </body>
 </html>
+
+
+<!-- ------------------------------------------------- FACULTY OVERLOAD OF SUBJECT ---------------------------------------------->
+{% extends "faculty/layout.html" %}
+
+{% block content %}
+<style>
+    /* Adjust styling for DataTable container*/ 
+    #overloadTableContainer {
+        margin-top: 20px;
+        margin-left: 50px;
+        margin-right: 50px;
+        margin-bottom: 50px;
+        max-width: 80%; /* Adjust the maximum width as needed */
+    }
+
+    /* Add DataTables styles */
+    table {
+        width: 70%;
+        border: 1px solid #ddd;
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+</style>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div id="successAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="handleAlertClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+
+<title>Overload Applications</title>
+    <!-- Add any necessary CSS -->
+    <style>
+        /* Adjust styling for DataTable container*/ 
+        #overloadTableContainer {
+            margin-top: 20px;
+            margin-left: 50px;
+            margin-right: 50px;
+            margin-bottom: 50px;
+            max-width: 80%; /* Adjust the maximum width as needed */
+        }
+
+        /* Add DataTables styles */
+        table {
+            width: 100%;
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+<div id="overloadTableContainer">
+    <h1>Overload Applications</h1>
+    <table id="overloadTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Student Number</th>
+                <th>Program/Course</th>
+                <th>Semester</th>
+                <th>Subjects to Add</th>
+                <th>Justification</th>
+                <th>Files</th>
+                <th>User Responsible</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Replace with your Flask template logic to populate rows -->
+            {% for overload_application in overload_application %}
+                <tr>
+                    <td>{{ overload_application.OverloadId }}</td>
+                    <td>{{ overload_application.Name }}</td>
+                    <td>{{ overload_application.StudentNumber }}</td>
+                    <td>{{ overload_application.ProgramCourse }}</td>
+                    <td>{{ overload_application.Semester }}</td>
+                    <td>{{ overload_application.SubjectsToAdd }}</td>
+                    <td>{{ overload_application.Justification }}</td>
+                    <td>
+                        {% if overload_application.Overloaddata %}
+                            {% set truncated_overload_name = overload_application.Overloadfilename[:15] + '...' if overload_application.Overloadfilename|length > 15 else overload_application.Overloadfilename %}
+                        <a href="{{ url_for('get_overload_file', OverloadId=overload_application.OverloadId) }}" class="btn btn-success" download title="{{ overload_application.Overloadfilename }}">{{ truncated_overload_name }}</a>
+                        {% else %}
+                        <span class="badge badge-warning">No File</span>
+                        {% endif %}
+                      </td>
+                    <td>{{ overload_application.UserResponsible }}</td>
+                    <td>{{ overload_application.Status }}</td>
+                    <td>
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ overload_application.OverloadId }}">Change Status</button>
+                      </td>
+                </tr>
+                <!-- Modal for Changing Status -->
+      <div class="modal fade" id="statusModal{{ overload_application.OverloadId }}" tabindex="-1" aria-labelledby="statusModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="statusModalLabel">Change Status for {{ overload_application.Name }}</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span></button>
+            </div>
+            <form id="statusForm{{ overload_application.OverloadId }}" action="{{ url_for('update_overload_service_status', OverloadId=overload_application.OverloadId) }}" method="POST">
+              <div class="modal-body">
+                <select name="status" class="form-select">
+                  <option value="pending">Pending</option>
+                  <option value="processing">Processing</option>
+                  <option value="approved">Approved</option>
+                  <option value="finish">Finish</option>
+                  <option value="rejected">Rejected</option>
+                  <!-- Add other statuses as needed -->
+                </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button  type="submit" class="btn btn-primary" onclick="updateStatus({{ overload_application.OverloadId }})">Save Status</button>
+
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+<script>
+    // Initialize DataTable
+    $(document).ready(function() {
+    $('#overloadTable').DataTable({
+        "pageLength": 5
+    });
+});
+         // Function to update status
+        function updateStatus(OverloadId) {
+        const formId = `statusForm${OverloadId}`;
+        const form = document.getElementById(formId);
+        const formData = new FormData(form);
+
+        fetch(`/faculty/overload`, {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message); // Show success/error message from the server
+            location.reload(); // Reload the page after successful update
+        })
+        .catch(error => {
+            console.error('Error updating status:', category='error');
+        });
+    }
+  var lastActivity = new Date().getTime();
+
+    // Function to update the activity timestamp
+    function updateActivity() {
+        lastActivity = new Date().getTime();
+    }
+
+    // Function to handle user activity events
+    function handleUserActivity() {
+        updateActivity();
+
+        // Make an AJAX request to the server to notify about user activity
+        // Adjust the URL as needed
+        fetch('/notify_activity_overload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the server's response if needed
+            console.log('Server notified about user activity');
+        })
+        .catch(error => {
+            console.error('Error notifying server:', category='error');
+        });
+    }
+
+
+    // Set up an interval to check for inactivity
+    setInterval(function () {
+        var now = new Date().getTime();
+        var inactiveTime = now - lastActivity;
+
+        // If inactive for more than 5 minutes (adjust as needed)
+        if (inactiveTime > 120000) {
+            // Redirect to the logout or login page
+            window.location.href = "/logoutfaculty";  // Adjust the URL as needed
+        }
+    }, 60000);  // Check every minute (adjust as needed)
+
+    // Event listeners for user activity
+    document.addEventListener("mousemove", handleUserActivity);
+    document.addEventListener("mousedown", handleUserActivity);
+    document.addEventListener("keydown", handleUserActivity);
+</script>
+{% endblock %}

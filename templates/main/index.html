@@ -28,13 +28,22 @@
                                <a href="../Student/forgotpassword">Forgot Password?</a>
                             </p>
                             <input class="sign-btn btn btn-danger" id="btn" type="submit" name="submit" value="Sign-in">
-                            {% with messages = get_flashed_messages() %} {% if messages %}
-                            <ul class="messages text-red-500">
-                                {% for message in messages %}
-                                <li>{{ message }}</li>
-                                {% endfor %}
-                              </ul>
-                              {% endif %} {% endwith %}
+                            {% with messages = get_flashed_messages() %}
+                            {% if messages %}
+                              <div class="flash-messages">
+                                <div class="alert alert-danger">
+                                  <span class="badge badge-danger">Danger</span>
+                                  <ul class="messages">
+                                    {% for message in messages %}
+                                      <li>{{ message }}</li>
+                                    {% endfor %}
+                                  </ul>
+                                </div>
+                              </div>
+                            {% endif %}
+                          {% endwith %}
+                          
+                          
                             <p class="text">
                                 By signing up, I agree to the PUP Online Services
                                 <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Services</a> and

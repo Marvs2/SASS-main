@@ -32,11 +32,11 @@
 							data-overload-student-number="{{ overload_applications.StudentNumber }}"
 							data-overload-subjects-to-add="{{ overload_applications.SubjectsToAdd }}"
 							data-overload-justification="{{ overload_applications.Justification }}"
-							data-overload-file-url="{{ url_for('get_overload_file', overload_application_id=overload_applications.OverloadId) }}"
+							data-overload-file-url="{{ overload_applications.Overloaddata}}"
 							data-overload-file-filename="{{ overload_applications.Overloadfilename }}"	
 							data-overload-status="{{ overload_applications.Status }}">
 							<td class="applicationID">{{ overload_applications.OverloadId }}</td>								
-							<td>{{ overload_applications.subjects_to_add }}</td>
+							<td>{{ overload_applications.SubjectsToAdd }}</td>
 							<td>{{ overload_applications.Justification }}</td>														
 							<td id="Status">{{ overload_applications.Status }}</td>
 							<td>
@@ -67,6 +67,7 @@
 							<th>Application Number</th>														
 							<th>Subjects to Add</th>
 							<th>Status</th>
+							<th>Remarks</th>
 							<th>Action</th> 
 						</tr>
 					</thead>
@@ -81,10 +82,12 @@
 							data-add-enrollment-type="{{ addsubjects.ServiceDetails }}"
 							data-add-file-url="/student/view_payment_file/{{ subject_id }}"
 							data-add-file-filename="{{ addsubjects.AddSubjectFilefilename }}"	
-							data-add-status="{{ addsubjects.Status }}">
+							data-add-status="{{ addsubjects.Status }}"
+							data-add-remarks="{{ addsubjects.Remarks }}">
 							<td class="applicationID">{{ addsubjects.AddSubjectId }}</td>								
 							<td>{{ addsubjects.SubjectId }}</td>														
 							<td id="Status">{{ addsubjects.Status }}</td>
+							<td id="Status">{{ addsubjects.Remarks }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
@@ -625,6 +628,13 @@
 				<label class="col-sm-4 control-label">Status:</label>
 				<div class="col-sm-4">
 					<p id="add-status"></p>
+				</div>           
+			  </div>
+
+			  <div class="form-group">
+				<label class="col-sm-4 control-label">Remarks:</label>
+				<div class="col-sm-4">
+					<p id="add-remarks"></p>
 				</div>           
 			  </div>
 			
@@ -1345,6 +1355,7 @@
 		var fileUrl = $(this).data('add-file-url');
 		var fileName = $(this).data('add-file-filename');
 		var Status = $(this).data('add-status');
+		var Remarks = $(this).data('add-remarks');
 
 		// Populate modal with data
 		$('#add-application-id').text(applicationId);
@@ -1362,6 +1373,7 @@
 			}
 
 		$('#add-status').text(Status);
+		$('#add-remarks').text(Remarks);
 	});
 });
 

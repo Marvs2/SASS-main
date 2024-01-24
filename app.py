@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
-from Api.v1.student.api_routes import create_addsubjects_application, create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
+from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
 from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
@@ -537,11 +537,10 @@ def submitapplication():
     try:
         current_StudentId = session.get('user_id')
 
-# Pass StudentId and FacultyId to the function
         new_service_application = create_services_application(request.form, request.files, current_StudentId)
 
         if new_service_application:
-            flash('Service Request submitted successfully!', category='success')
+            flash('Service request submitted successfully!', category='success')
             return redirect(url_for('studentaddingsubject'))  # Redirect to the appropriate route
     except Exception as e:
         db.session.rollback()
@@ -593,18 +592,25 @@ def update_status():
     data = request.get_json()
     subject_id = data.get('subjectId')
     new_status = data.get('status')
+    remarks = data.get('remarks')  # Get remarks from the request
 
     try:
         subject = AddSubjects.query.filter_by(AddSubjectId=subject_id).first()
         if subject:
             subject.Status = new_status
+            subject.Remarks = remarks  # Set the remarks field
             db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
             return jsonify({'message': 'Status updated successfully'}), 200
         else:
+            flash('Subject not found', 'danger')  # Flash error message
             return jsonify({'message': 'Subject not found'}), 404
     except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
         return jsonify({'message': str(e)}), 500
-    
+
+
+ #=========================================================================================================   
 @app.route('/student/viewaddsubject', methods=['GET'])
 @role_required('student')
 def viewaddsubject():
@@ -1267,7 +1273,13 @@ def facultyoverload():
 def facultyadding():
     session['last_activity'] = datetime.now(timezone.utc)
     addsubjects = AddSubjects.query.all()
-    return render_template("/faculty/adding.html", addsubjects=addsubjects) # addsubjects in addsubjects
+    students = []
+    for subject in addsubjects:
+        student = Student.query.filter_by(StudentId=subject.StudentId).first()
+        students.append(student)
+    combined_data = zip(addsubjects, students)
+
+    return render_template("/faculty/adding.html", combined_data=combined_data) # addsubjects in addsubjects
 
 @app.route('/faculty/change')
 @role_required('faculty')
@@ -2624,7 +2636,7 @@ def faculty_dashboard():
     session.permanent = True
     return render_template('/faculty/dashboard.html', faculty_api_base_url=faculty_api_base_url)
 
-# Faculty profile route
+#======================================== FACULTY PROFILE ======================================================
 @app.route('/faculty/profile')
 @faculty_required
 def facultyprofile():
@@ -2659,6 +2671,7 @@ def faculty_update_profile():
 
     # Render the profile update page
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
+
 
 
 # ======================Faculty Downloads========================== #

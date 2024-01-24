@@ -437,7 +437,7 @@ def login():
             return redirect(url_for('student_dashboard'))
 
         else:
-            flash('Invalid Email or Password', 'danger')
+            flash('Invalid Email or Password', category='danger')
 
     return redirect(url_for('studentLogin'))
 
@@ -726,18 +726,21 @@ def create_services_application(form_data, files, StudentId):
     selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
     ServiceDetails = form_data.get('ServiceDetails', '')
 
-    PaymentFile = files.get('PaymentFile')  # Adjust the key based on your form
+    PaymentFile = files.get('paymentScreenshot')  # Ensure the key matches your form field
     PaymentFile_data = PaymentFile.read() if PaymentFile else None
 
     # Add additional validations as needed
     Status = 'Pending'
 
     try:
+        # Print the contents of PaymentFile_data for testing
+        print(f'PaymentFile_data: {PaymentFile_data}')
+
         # Create a new service application
         new_service_application = AddSubjects(
             StudentId=StudentId,
             FacultyRole=FacultyRole,
-            Subject=selectedSubjects,  # Use the modified field name
+            Subject=selectedSubjects,  
             ServiceDetails=ServiceDetails,
             PaymentFile=PaymentFile_data,
             SenderName=SenderName,
@@ -778,7 +781,7 @@ def create_change_subject(form_data, files, StudentId):
 
 
     # Add additional validations as needed
-    Status = 'pending'
+    Status = 'Pending'
 
     try:
         # Create a new service application
@@ -972,49 +975,49 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
 
 #========================================Change of Subjects============================#
 
-def create_addsubjects_application(form_data, files, StudentId):
-    StudentNumber = form_data['StudentNumber']
-    Name = form_data['Name']
-    SubjectNames = form_data['SubjectNames']
-    EnrollmentType = form_data['EnrollmentType']
-    UserResponsible = form_data['UserResponsible']
-    Status = form_data['Status']
+# def create_addsubjects_application(form_data, files, StudentId):
+#     StudentNumber = form_data['StudentNumber']
+#     Name = form_data['Name']
+#     SubjectNames = form_data['SubjectNames']
+#     EnrollmentType = form_data['EnrollmentType']
+#     UserResponsible = form_data['UserResponsible']
+#     Status = form_data['Status']
 
-    if 'filesubject' not in files:
-        flash('Please provide the Subjects file.', 'danger')
-        return None
+#     if 'filesubject' not in files:
+#         flash('Please provide the Subjects file.', 'danger')
+#         return None
 
-    filesubject = files['filesubject']
+#     filesubject = files['filesubject']
 
-    if filesubject.filename == '':
-        flash('No selected file', 'danger')
-        return None
+#     if filesubject.filename == '':
+#         flash('No selected file', 'danger')
+#         return None
     
-    AddSubjectFiledata = filesubject.read()  # Read the file data
-    AddSubjectFilefilename = secure_filename(filesubject.filename) 
-    # Check if other inputs are provided
+#     AddSubjectFiledata = filesubject.read()  # Read the file data
+#     AddSubjectFilefilename = secure_filename(filesubject.filename) 
+#     # Check if other inputs are provided
 
-    if not StudentNumber or not Name or not SubjectNames or not EnrollmentType:
-        flash('Please fill out all fields and provide valid values.', 'danger')
-        return None  # Replace 'add_subjects' with the actual route
+#     if not StudentNumber or not Name or not SubjectNames or not EnrollmentType:
+#         flash('Please fill out all fields and provide valid values.', 'danger')
+#         return None  # Replace 'add_subjects' with the actual route
 
-    # Log the form submission
-    #log_form_submission_to_file(form_data)
-    # Additional validation logic can be added here
+#     # Log the form submission
+#     #log_form_submission_to_file(form_data)
+#     # Additional validation logic can be added here
 
-    new_addsubjects_application = AddSubjects(
-        StudentId=StudentId,
-        StudentNumber=StudentNumber,
-        Name=Name,
-        SubjectNames=SubjectNames,
-        EnrollmentType=EnrollmentType,
-        AddSubjectFiledata=AddSubjectFiledata,
-        AddSubjectFilefilename=AddSubjectFilefilename,
-        UserResponsible=UserResponsible,
-        Status=Status,
-    )
+#     new_addsubjects_application = AddSubjects(
+#         StudentId=StudentId,
+#         StudentNumber=StudentNumber,
+#         Name=Name,
+#         SubjectNames=SubjectNames,
+#         EnrollmentType=EnrollmentType,
+#         AddSubjectFiledata=AddSubjectFiledata,
+#         AddSubjectFilefilename=AddSubjectFilefilename,
+#         UserResponsible=UserResponsible,
+#         Status=Status,
+#     )
     
-    return new_addsubjects_application
+#     return new_addsubjects_application
     
 #=========================================================#
 
