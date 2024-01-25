@@ -5,11 +5,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" script="width=device-width, initial-scale=1.0">
-    <title>Student Academic Services System</title>   
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>    
+    <title>Student Academic Support System</title>   
+    
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"> 
+      
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <script script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
@@ -20,13 +26,14 @@
    
 
   <header>
-    <a href="{{ url_for('index') }}" class="logo">Student Academic Support System</a>
+    <a href="{{ url_for('index') }}" class="logo">Student Academic Services System</a>
     <div class="navigation">
         <ul class="menu">      
           <li class="close-btn"></li>  
 
         <!----------------------------------------------------- HOME ----------------------------------------------------->
-            <li class="menu-item"><a href="{{ url_for('index') }}"><i class="fa-solid fa-house nav-img"></i>Home</a></li>
+            <li class="menu-item"><a href="{{ url_for('index') }}"><i class="fa-solid fa-house nav-img"></i>Announcement</a></li>
+            <li class="menu-item"><a href="{{ url_for('index') }}"><i class="fa-solid fa-house nav-img"></i>Events</a></li>
             
         <!-------------------------------------------------- SERVICES ----------------------------------------------------->
             <li class="menu-item"></i>
@@ -68,15 +75,15 @@
                 </ul>
             </li>
            
-         <!---   <li class="menu-item">
-                <a class="sub-btn" href="#"><i class="fa-solid fa-handshake-angle nav-img"></i>Accessibility</a>
+            <!-- <li class="menu-item">
+                <a class="sub-btn" href="#"><i class="fa-solid fa-handshake-angle nav-img"></i>Announcement</a>
                 <ul class="sub-menu">
                     <li class="sub-item"> <a href="#">1</a></li>
                     <li class="sub-item"> <a href="#">2</a></li>
                     <li class="sub-item"> <a href="#">3</a></li>   
                 </ul>
-            </li> -->
-         
+            </li>
+          -->
           <!----  <li class="menu-item">
                 <a class="sub-btn" href="#"><i class="fa-solid fa-calendar-days nav-img"></i> Programs</a>
                 <ul class="sub-menu">
