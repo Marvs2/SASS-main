@@ -1,5 +1,6 @@
 from datetime import datetime
 import uuid
+# from click import UUID
 from sqlalchemy import DateTime, text
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import TIMESTAMP, inspect
@@ -589,7 +590,7 @@ class Announcement(db.Model):
     FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     SystemAdminId = db.Column(db.Integer, db.ForeignKey('SPSSystemAdmin.SysAdminId'))
     AnnouncementType = db.Column(db.String(255))
-    AnnouncementDetails = db.Column(db.Text)  # Fixing typo in column name
+    AnnouncementDetails = db.Column(db.Text)  # Fixing typo indb.column name
     DatePosted = db.Column(db.DateTime)
     AnnouncementFile = db.Column(db.String(50))
 
@@ -631,7 +632,7 @@ class Post(db.Model):
     # deleted_at = db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
     Title = db.Column(db.String(255))
     Content = db.Column(db.Text)
-    PostType = db.Column(db.String(255))  # Discriminator column
+    PostType = db.Column(db.String(255))  # Discriminatordb.column
     ImgLink = db.Column(db.String(255))
     # uploader_id = db.Column('UploaderId', db.UUID(as_uuid=True), db.ForeignKey('APMSUser.id', ondelete="CASCADE"))
 
@@ -1008,6 +1009,57 @@ class TutorialRequest(db.Model, UserMixin):
             'Status': self.Status,
         }
 
+
+# class Job(db.Model):
+#     _tablename_ = 'APMSJob'
+
+#     id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+#     created_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+#     updated_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+#     deleted_at =db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
+#     name =db.Column(db.String(255), nullable=False, index=True)
+#     employment = db.relationship("Employment", back_populates="job")
+#     classifications = db.relationship("Classification", secondary="APMSJobClassification", back_populates="jobs", overlaps="job_classifications")
+#     job_classifications = db.relationship("JobClassification", back_populates="job", overlaps="classifications")
+
+# class Classification(db.Model):
+#     _tablename_ = 'APMSClassification'
+
+#     id =db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
+#     created_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+#     updated_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
+#     deleted_at =db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
+#     name =db.Column(db.String(255), nullable=False, index=True)
+#     code =db.Column(db.String(255), nullable=False, index=True, unique=True)
+#     courses = db.relationship("Course", secondary="APMSCourseClassification", back_populates="classifications", overlaps="course_classifications")
+#     jobs = db.relationship("Job", secondary="APMSJobClassification", back_populates="classifications", overlaps="job_classifications")
+#     national_certifications = db.relationship("NationalCertification", secondary="APMSNationalCertificationClassification", back_populates="classifications", overlaps="national_certification_classifications")
+#     course_classifications = db.relationship("CourseClassification", back_populates="classification", overlaps="courses")
+#     job_classifications = db.relationship("JobClassification", back_populates="classification", overlaps="jobs")
+#     national_certification_classifications = db.relationship("NationalCertificationClassification", back_populates="classification", overlaps="national_certifications")
+
+# class CourseClassification(db.Model):
+#     _tablename_ = "APMSCourseClassification"
+#     course_id =db.Column(db.Integer, db.ForeignKey('SPSCourse.CourseId', ondelete="CASCADE"), primary_key=True)
+#     classification_id =db.Column('ClassificationId', db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
+#     course = db.relationship("Course", back_populates="course_classifications", overlaps="classifications,courses")
+#     classification = db.relationship("Classification", back_populates="course_classifications", overlaps="classifications,courses")
+
+# class JobClassification(db.Model):
+#     _tablename_ = "APMSJobClassification"
+
+#     job_id =db.Column('JobId',db.UUID(as_uuid=True), db.ForeignKey('APMSJob.id', ondelete="CASCADE"), primary_key=True)
+#     classification_id =db.Column('ClassificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
+#     job = db.relationship("Job", back_populates="job_classifications", overlaps="classifications,jobs")
+#     classification = db.relationship("Classification", back_populates="job_classifications", overlaps="job_classifications,classifications,jobs")
+
+# class NationalCertificationClassification(db.Model):
+#     _tablename_ = "APMSNationalCertificationClassification"
+
+#     national_certification_id =db.Column('NationalCertificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSNationalCertification.id', ondelete="CASCADE"), primary_key=True)
+#     classification_id =db.Column('ClassificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
+#     national_certification = db.relationship("NationalCertification", back_populates="national_certification_classifications", overlaps="classifications,national_certifications")
+#     classification = db.relationship("Classification", back_populates="national_certification_classifications", overlaps="national_certification_classifications,classifications,national_certifications")
 # ------------------------------------------------
 # List of Faculty that is being called in the services needed
 # FacultyList

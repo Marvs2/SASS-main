@@ -27,7 +27,6 @@ from sqlalchemy import func
 # DOING HERE
 def getStudentClassSubjectData(classSubjectId, skip, top, order_by, filter):
     try:
-        print('skip, top, order_by, filter: ', skip, top, order_by, filter)
         data_class_details = db.session.query(ClassSubject).filter_by(ClassSubjectId = classSubjectId).first()
         
         # Get the StudentClassSubjectGrade
@@ -53,7 +52,6 @@ def getStudentClassSubjectData(classSubjectId, skip, top, order_by, filter):
                         column_name = part.split("(")[3].split("),'")[0]
                         value = part.split("'")[1]
                         # print column name and value
-                        print('column_name, value: ', column_name, value)
                         column_str = None
                         if column_name.strip() == 'StudentNumber':
                             column_str = getattr(Student, 'StudentNumber')
@@ -71,10 +69,7 @@ def getStudentClassSubjectData(classSubjectId, skip, top, order_by, filter):
                         # column_name = part[0][1:]  # Remove the opening '('
                         column_name, value = [x.strip() for x in part[:-1].split("eq")]
                         column_name = column_name[1:]
-                        
-                        # print column name and value
-                        print('column_name, value: ', column_name, value)
-                        
+                                                
                         column_num = None
                         int_value = value.strip(')')
                 
@@ -140,9 +135,7 @@ def getStudentClassSubjectData(classSubjectId, skip, top, order_by, filter):
 
 #none in apiroutes
 def getCurrentSubjectFaculty(str_student_id):
-    try:
-        print("Hello from current subject str_student_id: ", str_student_id)
-        
+    try:        
         # Get the Class of student that the IsGradeFinalized is False
         # Metadata =  Year, Semester, BAtch
         # Class = Section
@@ -154,8 +147,6 @@ def getCurrentSubjectFaculty(str_student_id):
         .join(StudentClassSubjectGrade, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)\
         .filter(StudentClassGrade, StudentClassGrade.StudentId == StudentClassGrade.StudentId)\
         .all()
-
-        print(class_of_students)
 
         lists = []
 
@@ -174,8 +165,6 @@ def getCurrentSubjectFaculty(str_student_id):
 
         # Using that class get all class subject along with StudenClassSubjectGrade that has the same studentidFilter
 
-        # dict 
-        print(lists)
       
         return jsonify(lists)
     except Exception as e:
@@ -185,9 +174,7 @@ def getCurrentSubjectFaculty(str_student_id):
 
 #1 - confirm
 def getCurrentSubject(str_student_id):
-    try:
-        print("Hello from current subject str_student_id: ", str_student_id)
-        
+    try:        
         # Get the Class of student that the IsGradeFinalized is False
         # Metadata =  Year, Semester, BAtch
         # Class = Section
@@ -200,8 +187,6 @@ def getCurrentSubject(str_student_id):
         .join(Subject, Subject.SubjectId == ClassSubject.ClassSubjectId)\
         .filter(Class.IsGradeFinalized == True, StudentClassSubjectGrade.StudentId == str_student_id)\
         .all()
-
-        print(class_of_students)
 
         list = []
 
@@ -217,9 +202,7 @@ def getCurrentSubject(str_student_id):
 
         # Using that class get all class subject along with StudenClassSubjectGrade that has the same studentidFilter
 
-        # dict 
-        print(list)
-      
+        # dict       
         return jsonify(list)
     except Exception as e:
         # Handle exceptions appropriately
@@ -240,9 +223,7 @@ def getSubjectsGrade(str_student_id):
             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
             .all()
         )
-        
-        # print('data_student_class_subject_grade: '. )
-        
+                
         if data_student_class_subject_grade:
             class_combinations = set()
             dict_class_group = {}
@@ -364,7 +345,6 @@ def getSubjectFuture(str_student_id):
                 .filter(Class.IsGradeFinalized == False, StudentClassGrade.StudentId == str_student_id)
                 .all()
             )
-        print(no_list_subject)
         return jsonify(no_list_subject)
     except Exception as e:
         print("ERROR HERE: ", e)
@@ -602,7 +582,6 @@ def totalfailure(student_id=None):
             Grade, year = record
             year_level_counts[year] = year_level_counts.get(year, 0) + 1
 
-        print(record)
         return jsonify(year_level_counts)
 
     except Exception as e:
@@ -639,31 +618,91 @@ def get_subject_name_by_code(subject_code):
     return subject.Name if subject else None
 
 
-def haymeannouncement():
-    try:
-        uploader_user = AliasedReturnsRows(APMSUser)
+# def haymeannouncement():
+#     try:
+#         uploader_user = AliasedReturnsRows(APMSUser)
 
-        # Query to retrieve data from the Announcements table
-        announcements_data = db.session.query(
-            Announcements.id,
-            Announcements.created_at,
-            Announcements.updated_at,
-            Announcements.deleted_at,
-            Announcements.title,
-            Announcements.content,
-            Announcements.post_type,
-            Announcements.img_link,
-            uploader_user.username.label('uploader_username')  # Assuming 'username' is a field in APMSUser
-        ).join(
-            uploader_user,
-            Announcements.uploader_id == uploader_user.id
-        ).all()
+#         # Query to retrieve data from the Announcements table
+#         announcements_data = db.session.query(
+#             Announcements.id,
+#             Announcements.created_at,
+#             Announcements.updated_at,
+#             Announcements.deleted_at,
+#             Announcements.title,
+#             Announcements.content,
+#             Announcements.post_type,
+#             Announcements.img_link,
+#             uploader_user.username.label('uploader_username')  # Assuming 'username' is a field in APMSUser
+#         ).join(
+#             uploader_user,
+#             Announcements.uploader_id == uploader_user.id
+#         ).all()
 
-        # Printing the result (you can use this data in your HTML template)
-        for announcement in announcements_data:
-            print(announcement)
+#         # Printing the result (you can use this data in your HTML template)
+#         for announcement in announcements_data:
+#             print(announcement)
     
-    except Exception as e:
-        print("ERROR HERE: ", e)
-        return None
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         return None
     
+
+
+def get_student_history_services(student_id):
+
+    services_data = {}
+
+    # Fetch AddSubjects based on the StudentId foreign key
+    addsubjects = AddSubjects.query.filter_by(StudentId=student_id).all()
+    services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
+
+    # Fetch ChangeOfSubjects based on the StudentId foreign key
+    changesubjects = ChangeSubject.query.filter_by(StudentId=student_id).all()
+    services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
+
+    # Fetch ManualEnrollment based on the StudentId foreign key
+    manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student_id).all()
+    services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
+
+     # Fetch CertificationRequest based on the StudentId foreign key
+    certification_request = CertificationRequest.query.filter_by(StudentId=student_id).all()
+    services_data['certification_request_list'] = [subject.to_dict() for subject in certification_request]
+
+        # Fetch GradeEntry based on the StudentId foreign key
+    grade_entry = GradeEntry.query.filter_by(StudentId=student_id).all()
+    services_data['grade_entry_list'] = [subject.to_dict() for subject in grade_entry]
+
+        # Fetch CrossEnrollment based on the StudentId foreign key
+    cross_enrollment = CrossEnrollment.query.filter_by(StudentId=student_id).all()
+    services_data['cross_enrollment_list'] = [subject.to_dict() for subject in cross_enrollment]
+
+        # Fetch PetitionRequest based on the StudentId foreign key
+    petition_requests = PetitionRequest.query.filter_by(StudentId=student_id).all()
+    services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
+
+        # Fetch ShiftingApplication based on the StudentId foreign key
+    shifting_applications = ShiftingApplication.query.filter_by(StudentId=student_id).all()
+    services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
+
+        # Fetch OverloadApplication based on the StudentId foreign key
+    overload_applications = OverloadApplication.query.filter_by(StudentId=student_id).all()
+    services_data['overload_applicationss_list'] = [subject.to_dict() for subject in overload_applications]
+
+        # Fetch TutorialRequest based on the StudentId foreign key
+    tutorial_requests = TutorialRequest.query.filter_by(StudentId=student_id).all()
+    services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
+
+    service_counts = {
+        'Add Subjects': len(services_data.get('addsubjects_list', [])),
+        'Change of Subjects': len(services_data.get('changesubjects_list', [])),
+        'Manual Enrollments': len(services_data.get('manual_enrollments_list', [])),
+        'Certification Requests': len(services_data.get('certification_request_list', [])),
+        'Grade Entries': len(services_data.get('grade_entry_list', [])),
+        'Cross Enrollments': len(services_data.get('cross_enrollment_list', [])),
+        'Petition Requests': len(services_data.get('petition_requests_list', [])),
+        'Shifting Applications': len(services_data.get('shifting_applications_list', [])),
+        'Overload Applications': len(services_data.get('overload_applicationss_list', [])),
+        'Tutorial Requests': len(services_data.get('tutorial_requests_list', []))
+    }
+
+    return services_data

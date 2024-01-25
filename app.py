@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
-from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
+from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api, student_history_services
 from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
@@ -63,7 +63,7 @@ def custom_context_processor():
 @app.route('/')
 @prevent_authenticated
 def index():
-    announcements = ESISAnnouncement.query.all()
+    announcements = ESISAnnouncement.query.filter_by(IsLive=True).all()
     posts = Post.query.all()
     combined_data = announcements + posts
     return render_template('main/home.html', announcements=announcements, posts=posts, combined_data=combined_data)
@@ -177,7 +177,7 @@ def discipline():
 def student_dashboard():
    # Assuming you have a function to get student services based on their ID
     student_id = session.get('user_id')
-    all_services_list, total_services, pending_count, approved_count, denied_count = get_student_services(student_id)  
+    all_services_list, total_services, pending_count, approved_count,        denied_count = get_student_services(student_id)  
   # Unpack the tuple
 
     # Count the number of services with "Sent" status
@@ -207,10 +207,14 @@ def student_dashboard():
         'series': [pending_percentage, approved_percentage, denied_percentage, 100],  # Assuming 'Total' is always 100%
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
-
-    print(data)
     
-    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
+    services_data = {}
+
+        # Call the reusable function to get services data
+    services_data = student_history_services(student_id)
+
+    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data,     services_data=services_data
+)
 
 
 #======================================== STUDENT PROFILE ======================================================
@@ -2407,7 +2411,7 @@ def get_mimetype(overloadfile_extension):
 
 #=====================================================================
 # Overload - Faculty
-#=====================================================================
+#===================================================================== # ERROR SOMETHING ABOUT ID
 @app.route('/update-overload-service-Status/<int:OverloadId>', methods=['POST'])
 def update_overload_service_status(OverloadId):
     session['last_activity'] = datetime.now(timezone.utc)
@@ -2429,6 +2433,7 @@ def update_overload_service_status(OverloadId):
         flash('No Status provided.', 'danger')
 
     return redirect(url_for('facultyoverload'))
+
 
 # Overload HTML page
 @app.route('/faculty/overload/get_overload_file/<int:overload_application_id>')
@@ -2487,12 +2492,12 @@ def update_petition_service_status(petition_request_id):
     return redirect(url_for('facultypetition'))
 #=====================================================================
 #enrollement
-@app.route('/update-manual-service-Status/<int:m_enrollment_ID>', methods=['POST'])
-def update_manual_service_status(m_enrollment_ID):
+@app.route('/update-manual-service-Status/<int:ManualEnrollmentId>', methods=['POST'])
+def update_manual_service_status(ManualEnrollmentId):
     session['last_activity'] = datetime.now(timezone.utc)
 
     # Find the specific AddSubjects record
-    manual_enrollments = ManualEnrollment.query.get_or_404(m_enrollment_ID)
+    manual_enrollments = ManualEnrollment.query.get_or_404(ManualEnrollmentId)
 
     # Get the new Status from the form data
     new_Status = request.form.get('Status')
@@ -2681,7 +2686,6 @@ def faculty_dashboard():
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
 
-    print(data)
 
     return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
 

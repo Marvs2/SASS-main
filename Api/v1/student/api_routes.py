@@ -1,6 +1,6 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  failingradeperbatch, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
+from Api.v1.student.utils import  failingradeperbatch, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
@@ -589,7 +589,7 @@ def allstudent():
 @student_api.route('/grades', methods=['GET'])
 def subjectsGrade():
     student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
+    # print('STUDEINT ID: ', student.StudentId)
     if student:
         json_subjects_grade = getSubjectsGrade(student.StudentId)
         if json_subjects_grade:
@@ -603,7 +603,7 @@ def subjectsGrade():
 @student_api.route('/currentsubject', methods=['GET'])
 def currentsubject():
     student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
+    # print('STUDEINT ID: ', student.StudentId)
     if student:
         json_current_subject = getCurrentSubject(student.StudentId)
         if json_current_subject:
@@ -617,7 +617,7 @@ def currentsubject():
 @student_api.route('/studentsubject', methods=['GET'])
 def subjectsstudent():
     student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
+    # print('STUDEINT ID: ', student.StudentId)
     if student:
         json_subjects_grade = getStudentClassSGrade(student.StudentId)
         if json_subjects_grade:
@@ -631,7 +631,7 @@ def subjectsstudent():
 @student_api.route('/futuresubject', methods=['GET'])
 def subjectsfuture():
     student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
+    # print('STUDEINT ID: ', student.StudentId)
     if student:
         json_subjects_grade = getSubjectFuture(student.StudentId)
         if json_subjects_grade:
@@ -645,7 +645,7 @@ def subjectsfuture():
 @role_required('student')
 def subjectsall():
     student = getCurrentUser()
-    print('STUDEINT ID: ', student.StudentId)
+    # print('STUDEINT ID: ', student.StudentId)
     if student:
         json_subjects_grade = getAllSubjects(student.StudentId)
         if json_subjects_grade:
@@ -687,13 +687,22 @@ def all_student_services():
     # Assuming you have access to the student ID (you may need to retrieve it based on your authentication mechanism)
     subject_data = get_subject_name_by_code()
 
-    print(subject_data)
+    # print(subject_data)
 
     if subject_data[0]:  # Check if the first element of the tuple (all_services_list) has data
         return jsonify(success=True, message="All student services data retrieved successfully.", data=subject_data)
     else:
         return jsonify(success=False, message="No data available or data is invalid.")
     
+@student_api.route('/studenthistory', methods=['GET'])
+@role_required('student')
+def student_history_services(student_id):
+    student_history_data = get_student_history_services(session.get('user_id'))
+    if student_history_data:
+        return student_history_data
+    else:
+        return jsonify(error="No data available"), 404
+
 
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):
@@ -705,7 +714,7 @@ def create_services_application(form_data, files, StudentId):
     selectedSubjects = form_data.get('selectedSubjects', '')  # Assuming this field holds the selected subjects
     ServiceDetails = form_data.get('ServiceDetails', '')
 
-    PaymentFile = files.get('paymentScreenshot')  # Ensure the key matches your form field
+    PaymentFile = files.get('PaymentFile')  # Ensure the key matches your form field
     PaymentFile_data = PaymentFile.read() if PaymentFile else None
 
     # Add additional validations as needed
@@ -713,7 +722,7 @@ def create_services_application(form_data, files, StudentId):
 
     try:
         # Print the contents of PaymentFile_data for testing
-        print(f'PaymentFile_data: {PaymentFile_data}')
+        # print(f'PaymentFile_data: {PaymentFile_data}')
 
         # Create a new service application
         new_service_application = AddSubjects(
@@ -918,15 +927,15 @@ def create_crossenrollment_form(form_data, files, current_StudentId):
 def create_manualenrollment_form(form_data, files, current_StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']
-    EnrollmentType = form_data['enrollmentType']
+    EnrollmentType = form_data['EnrollmentType']
     Reason = form_data['Reason']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
 
 
-    me_file = files['me_file']
+    MeFiledata = files['MeFiledata']
 
-    if me_file.filename == '':
+    if MeFiledata.filename == '':
         flash('No Selected File', 'danger')
         return None
     
@@ -934,8 +943,8 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
     #     flash('Please fill out all fields and provide valid values.', category='danger')
     #     return None
     
-    MeFilefilename = secure_filename(me_file.filename)
-    MeFiledata = me_file.read()
+    MeFilefilename = secure_filename(MeFiledata.filename)
+    MeFiledata = MeFiledata.read()
 
     new_manual_enrollment = ManualEnrollment(
         StudentId=current_StudentId,

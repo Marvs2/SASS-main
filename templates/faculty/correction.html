@@ -40,35 +40,35 @@
     <tbody>
         {% for grade_entry in grade_entry %}
             <tr>
-                <td>{{ grade_entry.grade_entry_id }}</td>
+                <td>{{ grade_entry.GradeEntryId }}</td>
                 <td>{{ grade_entry.StudentNumber }}</td>
                 <td>{{ grade_entry.Name }}</td>
-                <td>{{ grade_entry.application_type }}</td>
+                <td>{{ grade_entry.ApplicationType }}</td>
                 <td>
                     <!-- File Links -->
-                    {% if grade_entry.completion_form_data %}
-                        <a href="{{ url_for('get_completion_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.completion_form_filename }}</a>
+                    {% if grade_entry.CompletionFormdata %}
+                        <a href="{{ url_for('get_completion_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.CompletionFormfilename }}</a>
                     {% else %}
                         <span class="badge badge-warning">No File</span>
                     {% endif %}
-                    {% if grade_entry.class_record_data %}
-                        <a href="{{ url_for('get_grade_class_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.class_record_filename }}</a>
+                    {% if grade_entry.ClassRecorddata %}
+                        <a href="{{ url_for('get_grade_class_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.ClassRecordfilename }}</a>
                     {% else %}
                         <span class="badge badge-warning">No File</span>
                     {% endif %}
-                    {% if grade_entry.affidavit_data %}
-                        <a href="{{ url_for('get_grade_affidavit_file', grade_entry_id=grade_entry.grade_entry_id) }}" class="btn btn-success" download>{{ grade_entry.affidavit_filename }}</a>
+                    {% if grade_entry.Affidavitdata %}
+                        <a href="{{ url_for('get_grade_affidavit_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.Affidavitfilename }}</a>
                     {% else %}
                         <span class="badge badge-warning">No File</span>
                     {% endif %}
                 </td>
                 <td>{{ grade_entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ grade_entry.user_responsible }}</td>
-                <td>{{ grade_entry.status }}</td>
+                <td>{{ grade_entry.UserResponsible }}</td>
+                <td>{{ grade_entry.Status }}</td>
                 <td>{{ grade_entry.StudentId }}</td>
                 <td>
                     <!-- Action Buttons -->
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entry.grade_entry_id }}">View Status</button>
+                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entry.GradeEntryId }}">View Status</button>
                     <!-- Additional action buttons can be added here -->
                 </td>
             </tr>
@@ -90,8 +90,8 @@
 });
 
   // Function to update status
-  function updateStatus(grade_entry_id) {
-    const formId = `statusForm${grade_entry_id}`;
+  function updateStatus(GradeEntryId) {
+    const formId = `statusForm${GradeEntryId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

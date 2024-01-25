@@ -22,16 +22,16 @@
         <tbody>
             {% for request in petition_requests %}
             <tr>
-                <td>{{ request.petition_request_id }}</td>
+                <td>{{ request.PetitionId }}</td>
                 <td>{{ request.StudentNumber }}</td>
                 <td>{{ request.Name }}</td>
-                <td>{{ request.subject_code }}</td>
-                <td>{{ request.subject_name }}</td>
-                <td>{{ request.petition_type }}</td>
-                <td>{{ request.request_reason }}</td>
+                <td>{{ request.SubjectCode }}</td>
+                <td>{{ request.SubjectName }}</td>
+                <td>{{ request.PetitionType }}</td>
+                <td>{{ request.RequestReason }}</td>
                 <td>{{ request.created_at }}</td>
-                <td>{{ request.user_responsible }}</td>
-                <td>{{ request.status }}</td>
+                <td>{{ request.UserResponsible }}</td>
+                <td>{{ request.Status }}</td>
                 <td>
                     <!-- Action buttons like edit or update status -->
                 </td>
@@ -53,8 +53,8 @@ $(document).ready(function() {
 });
 
   // Function to update status
-  function updateStatus(petition_request_id) {
-    const formId = `statusForm${petition_request_id}`;
+  function updateStatus(PetitionId) {
+    const formId = `statusForm${PetitionId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

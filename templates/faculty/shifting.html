@@ -46,22 +46,22 @@
       <tr>
         <td>{{ shifting_applications.StudentNumber }}</td>
         <td>{{ shifting_applications.Name }}</td>
-        <td>{{ shifting_applications.current_program }}</td>
-        <td>{{ shifting_applications.residency_year }}</td>
-        <td>{{ shifting_applications.intended_program }}</td>
-        <td>{{ shifting_applications.qualifications }}</td>
+        <td>{{ shifting_applications.CurrentProgram }}</td>
+        <td>{{ shifting_applications.ResidencyYear }}</td>
+        <td>{{ shifting_applications.IntendedProgram }}</td>
+        <td>{{ shifting_applications.Qualifications }}</td>
         <td>
-            {% if shifting_applications.file_data %}
-                {% set shiftingfile = shifting_applications.file_filename[:15] + '...' if shifting_applications.file_filename|length > 15 else shifting_applications.file_filename %}
-                <a href="{{ url_for('get_shifting_file', shifting_application_id=shifting_applications.shifting_application_id) }}" class="btn btn-success" download title="{{ shifting_applications.file_filename }}">{{ shiftingfile }}</a>
+            {% if shifting_applications.Shiftingdata %}
+                {% set shiftingfile = shifting_applications.Shiftingfilename[:15] + '...' if shifting_applications.Shiftingfilename|length > 15 else shifting_applications.Shiftingfilename %}
+                <a href="{{ url_for('get_shifting_file', ShiftingId=shifting_applications.ShiftingId) }}" class="btn btn-success" download title="{{ shifting_applications.Shiftingfilename }}">{{ shiftingfile }}</a>
             {% else %}
                 <span class="badge badge-warning">No File</span>
             {% endif %}
         </td>
-        <td>{{ shifting_applications.user_responsible }}</td>
-        <td>{{ shifting_applications.status }}</td>
+        <td>{{ shifting_applications.UserResponsible }}</td>
+        <td>{{ shifting_applications.Status }}</td>
         <td>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ shifting_applications.shifting_application_id }}">Change Status</button>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ shifting_applications.ShiftingId }}">Change Status</button>
         </td>
       </tr>
     {% endfor %}
@@ -70,7 +70,7 @@
 </div>
 <!-- Modal for Change Status -->
 {% for shifting_applications in shifting_applications %}
-<div class="modal fade" id="statusModal{{ shifting_applications.shifting_application_id }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+<div class="modal fade" id="statusModal{{ shifting_applications.ShiftingId }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -80,8 +80,8 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="statusForm{{ shifting_applications.shifting_application_id }}">
-          <input type="hidden" name="subject_id" value="{{ shifting_applications.shifting_application_id }}">
+        <form id="statusForm{{ shifting_applications.ShiftingId }}">
+          <input type="hidden" name="subject_id" value="{{ shifting_applications.ShiftingId }}">
           <div class="form-group">
             <label for="newStatus">New Status:</label>
             <input type="text" class="form-control" id="newStatus" name="new_status" value="{{ shifting_applications.status }}" required>
@@ -90,7 +90,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" onclick="updateStatus('{{ shifting_applications.shifting_application_id }}')">Save changes</button>
+        <button type="button" class="btn btn-primary" onclick="updateStatus('{{ shifting_applications.ShiftingId }}')">Save changes</button>
       </div>
     </div>
   </div>
@@ -112,8 +112,8 @@
 });
 
   // Function to update status
-  function updateStatus(shifting_application_id) {
-    const formId = `statusForm${shifting_application_id}`;
+  function updateStatus(ShiftingId) {
+    const formId = `statusForm${ShiftingId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

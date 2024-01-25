@@ -5,7 +5,6 @@
   .carousel-caption .card-title,
   .carousel-caption .text-muted {
     color: black;
-    background-color: beige;
   }
 </style>
 
@@ -61,7 +60,7 @@
         </div>
     </div>
     {% for post in posts %}
-                <div class="carousel-caption d-none d-md-block" style="background-color: bisque;">
+                <div class="carousel-caption d-none d-md-block">
                   <h5 class="card-title" id="postTitle{{ loop.index }}">{{ post.Title }}</h5>
                   <p class="card-text" id="postContent{{ loop.index }}">{{ post.Content }}</p>
                   <p class="card-text"><small class="text-muted">Post Type: {{ post.PostType }}</small></p>
