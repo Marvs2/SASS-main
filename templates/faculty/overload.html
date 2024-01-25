@@ -140,7 +140,7 @@
         </thead>
         <tbody>
             <!-- Replace with your Flask template logic to populate rows -->
-            {% for overload_applications in overload_applications %}
+            {% for overload_applications in overload_applicationss %}
                 <tr>
                     <td>{{ overload_applications.OverloadId }}</td>
                     <td>{{ overload_applications.Name }}</td>
@@ -189,6 +189,7 @@
 
               </div>
             </form>
+            {% endfor %}
         </div>
     </div>
   </div>
