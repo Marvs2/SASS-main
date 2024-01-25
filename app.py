@@ -63,7 +63,7 @@ def custom_context_processor():
 @app.route('/')
 @prevent_authenticated
 def index():
-    announcements = ESISAnnouncement.query.all()
+    announcements = ESISAnnouncement.query.filter_by(IsLive=True).all()
     posts = Post.query.all()
     combined_data = announcements + posts
     return render_template('main/home.html', announcements=announcements, posts=posts, combined_data=combined_data)

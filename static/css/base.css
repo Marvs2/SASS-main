@@ -12,6 +12,76 @@ body {
 
 /********************************************** HOME AND LANDING PAGE ***************************************************************/
 
+.img-wrapper {
+  max-width: 100%;
+  height: 65vw;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+img {
+  width: auto; 
+  max-height: 300px;
+  object-fit: cover;
+}
+@media screen and (min-width: 576px) {
+  .carousel-inner {
+    display: flex;
+  }
+  .carousel-item {
+    display: block;
+    margin-right: 0;
+    flex: 0 0 calc(100% / 3);
+  }
+  .img-wrapper {
+    height: 21vw;
+  }
+}
+.carousel-inner {
+  padding: 1em;
+}
+.card {
+  margin: 12px 5px;
+  border-radius: 10px;
+  box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
+  font-size: 0.9em;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 6vh;
+  height: 6vh;
+  background-color: #e1e1e1;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.5;
+}
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+  opacity: 0.8;
+}
+
+.learn-more-btn {
+  margin-left: auto;
+  display: block; /* Ensures the button takes the full width available */
+  background-color: #800000;
+  color: white;
+}
+
+.learn-more-btn:hover {
+  background-color: #ad1212;
+  color: white;
+}
+
+
+
+
+.text-muted {
+  padding-left: 40vh;
+  font-size: 15px;
+}
+
 header {
     z-index: 999;
     position: fixed;
@@ -208,7 +278,7 @@ main {
 .Box {
     position: relative;
     display: grid; 
-    grid-template-columns: 4fr 2fr;
+
     grid-gap: 15px;      
     padding-left: 3vh;
     padding-bottom: 10vh;
@@ -227,7 +297,7 @@ main {
 .Box .box1 .header {
   text-align: center;
   font-weight: 800;
-  letter-spacing: 4px;
+  letter-spacing: 2px;
   padding-top: 5px;
 }
 
@@ -325,6 +395,7 @@ footer a:hover {
 .accordion-body {
   line-height: 1.5;
 }
+
 
 @media (max-width:1100px) {
     header .navigation .menu {
@@ -474,10 +545,8 @@ footer a:hover {
 
 .d-block {
   border-radius: 10px;
-  height: 60vh;
+  height: 6 0vh;
 }
-
-
 
 
 /*section {

@@ -1,0 +1,56 @@
+{% extends "main/base.html" %} 
+
+{% block content %}
+<style>
+  .carousel-caption .card-title,
+  .carousel-caption .text-muted {
+    color: black;
+  }
+</style>
+
+<div class="Box">
+
+
+<div class="box1">
+    <h1 class="header header animate__bounceIn">Announcements</h1>
+    <div>
+        <div id="carouselExampleCaptionsPosts" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                {% for post in posts %}
+                    <h5 class="card-title">{{ post.Title }}</h5>
+                {% endfor %}
+            </div>
+            <div class="carousel-inner" id="postCarouselInner">
+                {% for post in posts %}
+                    <div class="carousel-item {% if loop.first %}active{% endif %}" data-bs-interval="3000">
+                        {% if post.ImgLink %}
+                            <img src="{{ post.ImgLink }}" class="card-img-top" alt="{{ post.Title }}">
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p>No announcements available.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% for post in posts %}
+                <div class="carousel-caption d-none d-md-block">
+                  <h5 class="card-title" id="postTitle{{ loop.index }}">{{ post.Title }}</h5>
+                  <p class="card-text" id="postContent{{ loop.index }}">{{ post.Content }}</p>
+                  <p class="card-text"><small class="text-muted">Post Type: {{ post.PostType }}</small></p>
+                </div>
+    {% endfor %}
+</div>
+
+<script>
+    // JavaScript code to set innerHTML dynamically for post carousel
+    var postCarouselInner = document.getElementById('postCarouselInner');
+    {% for post in posts %}
+        document.getElementById('postTitle{{ loop.index }}').innerHTML = '{{ post.Title }}';
+        document.getElementById('postContent{{ loop.index }}').innerHTML = '{{ post.Content }}';
+    {% endfor %}
+</script>
+
+<!-- Your existing HTML code -->
+
+{% endblock %}
