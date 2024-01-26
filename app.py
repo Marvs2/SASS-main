@@ -785,7 +785,7 @@ def viewchange():
 #view_change_file
 @app.route('/student/view_change_file/<int:ChangeSubjectId>')
 def view_change_file(ChangeSubjectId):
-    changesubjects = ChangeOfSubjects.query.get(ChangeSubjectId)
+    changesubjects = ChangeSubject.query.get(ChangeSubjectId)
 
     if changesubjects and changesubjects.ace_form_data:
         file_extension = get_file_extension(changesubjects.ace_form_filename)
@@ -2106,7 +2106,7 @@ def update_change_service_status(ChangeSubjectId):
     session['last_activity'] = datetime.now(timezone.utc)
 
     # Find the specific AddSubjects record
-    changesubjects = ChangeOfSubjects.query.get_or_404(ChangeSubjectId)
+    changesubjects = ChangeSubject.query.get_or_404(ChangeSubjectId)
 
     # Get the new Status from the form data
     new_Status = request.form.get('Status')
