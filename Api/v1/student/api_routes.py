@@ -437,7 +437,7 @@ def login():
             return redirect(url_for('student_dashboard'))
 
         else:
-            flash('Invalid Email or Password', category='danger')
+            flash('Invalid Student Number or Password', category='danger')
 
     return redirect(url_for('studentLogin'))
 
