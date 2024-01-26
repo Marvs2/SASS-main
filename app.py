@@ -82,7 +82,7 @@ def index():
 @app.route('/events')
 @prevent_authenticated
 def events():
-    posts = Post.query.filter_by(PostType='event').all()  
+    posts = Post.query.filter_by(PostType='announcement').all()  
     return render_template('main/events.html', posts=posts)
 
 #===========================================================================
