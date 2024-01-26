@@ -1,120 +1,264 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-<style>
-    /* Add DataTables styles */
-    table {
-        width: 90%;
-        border: 1px;
-        margin-top: 20px;
-    }
-
-    th, td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-</style>
-<!--Done-->
-<h1>Change of Subjects changesubjectss</h1>
-
-<table id="changeOfSubjectsTable" class="table table-bordered">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>FacultyRole</th>
-            <th>SenderName</th>
-            <th>Enrollment Type</th>
-            <th>ACE Form File</th>
-            <th>Created At</th>
-            <th>Service Details</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for changesubjects in changesubjects %}
+<!-- SHOW CURRENT REQUESTS -->
+<div class="form-step form-step-active">
+    <div class="data data1" id="firstTableContainer">
+      <div class="content-data">
+        <div class="head mb-3">
+          <h3>Current Requests</h3>
+        </div>
+  
+        <table id="changeSubjects" class="table table-bordered table-condensed display">
+          <thead>
             <tr>
+              <th>Application Number</th>
+              <th>Student Number</th>
+              <th>Student Name</th>
+              <th>Subject</th>
+              <th>Subject to change</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for changesubjects, student in combined_data %}
+              <tr data-change-name="{{ student.FirstName }} {{ student.LastName }}"
+                  data-change-student-number="{{ student.StudentNumber }}"
+                  data-change-change="{{ changesubjects.FromSubject }}"
+                  data-change-subject="{{ changesubjects.ToSubject }}"
+                  data-change-reason="{{ changesubjects.ServiceDetails }}"
+                  data-change-status="{{ changesubjects.Status }}">
                 <td>{{ changesubjects.ChangeSubjectId }}</td>
-                <td>{{ changesubjects.FacultyRole }}</td>
-                <td>{{ changesubjects.SenderName }}</td>
+                <td>{{ student.StudentNumber }}</td>
+                <td>{{ student.FirstName }} {{ student.LastName }}</td>
                 <td>{{ changesubjects.FromSubject }}</td>
-                <td>{% if changesubjects.ace_form_data %}
-                    {% set form_data = changesubjects.ace_form_filename[:15] + '...' if changesubjects.ace_form_filename|length > 15 else changesubjects.ace_form_filename %} <a href="{{ url_for('get_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" class="btn btn-success" download title="{{changesubjects.ace_form_filename}}">{{ form_data }}</a>
-                </td>
-                {% else %}
-                    <span class="badge badge-warning">No File</span>
-                {% endif %}</td>
-                <td>{{ changesubjects.created_at }}</td>
+                <td>{{ changesubjects.ToSubject }}</td>
                 <td>{{ changesubjects.ServiceDetails }}</td>
                 <td>{{ changesubjects.Status }}</td>
-                <td> <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ changesubjects.ChangeSubjectId }}">Change Status</button></td>
-            </tr>
-            <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ changesubjects.ChangeSubjectId }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="statusModalLabel">Change Status for {{ changesubjects.Name }}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form id="statusForm{{ changesubjects.ChangeSubjectId }}" action="{{ url_for('update_change_service_status', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" method="POST">
-                            <div class="modal-body">
-                              <select name="status" class="form-select">
-                                <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="approved">Approved</option>
-                                <option value="finish">Finish</option>
-                                <option value="rejected">Rejected</option>
-                                <!-- Add other statuses as needed -->
-                              </select>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ changesubjects.ChangeSubjectId }})">Save changes</button>
-                            </div>
-                          </form>
-                        </div>
-                    </div>
+                <td>
+                  <button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewChangeModal" onclick="openEditModal('{{ changesubjects.ChangeSubjectId }}', '{{ changesubjects.Status }}')"></button>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Status Edit Modal -->
+  <!-- Include the modal content here... -->
+  <!-- Status Edit Modal -->
+<div class="modal fade" id="viewChangeModal" tabindex="-1" role="dialog" aria-labelledby="viewChangeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-white" id="viewChangeModalLabel">Update Application Status</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+  
+        <form id="statusForm">
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Name:</label>
+              <div class="col-sm-4">
+                <p id="changing-name"></p>
+              </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Student Number:</label>
+                <div class="col-sm-4">
+                  <p id="changing-student-number"></p>
                 </div>
             </div>
-        {% endfor %}
-    </tbody>
-</table>
+            
 
-<!-- Include DataTables script -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">Subject to Change:</label>
+                <div class="col-sm-6">
+                  <p id="changing-change-subject"></p>
+                </div>
+            </div>
 
-<script>
-    // Initialize DataTable
-    // Initialize DataTable
-    $(document).ready(function() {
-    $('#changeOfSubjectsTable').DataTable({
-        "pageLength": 5
-    });
-});
-     // Function to update status
-  function updateStatus(ChangeSubjectId) {
-    const formId = `statusForm${ChangeSubjectId}`;
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Subject to Change:</label>
+              <div class="col-sm-6">
+                <p id="changing-student-subject"></p>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Reason/s:</label>
+              <div class="col-sm-4">
+                <p id="changing-student-reason"></p>
+              </div>
+            </div>
+  
 
-    fetch('/faculty/change', {
-      method: 'POST',
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        alert(data.message);
-        location.reload(); // Reload the page after successful update
-      })
-      .catch(error => {
-        console.error('Error updating status:', error);
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Sender Name:</label>
+              <div class="col-sm-4">
+                <p id="changing-sender-name"></p>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Sender Contact Number:</label>
+              <div class="col-sm-4">
+                <p id="changing-sender-contact"></p>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Payment file:</label>
+              <div class="col-sm-4">
+                <p id="changing-file-attachment"></p>
+              </div>
+            </div>
+  
+            <div class="form-group">
+              <label class="col-sm-3 control-label">Status:</label>
+              <div class="col-sm-4">
+                <input type="hidden" id="changeSubjectIdInput" name="changesubjectsId">
+                <select id="changeStatusSelect" name="status" class="form-control">
+                  <option value="pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Completed">Completed</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+            </div>
+  
+            <!-- <div class="form-group">
+              <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
+              <div class="col-sm-10">
+                <textarea type="text" class="form-control" id="changeRemarks"></textarea>
+              </div>
+            </div> -->
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-success" onclick="submitChangeStatus()">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    $(document).ready(function () {
+      $('#changeSubjects tbody tr').on('click', function () {
+        // Retrieve data from the clicked row
+        var name = $(this).data('change-name');
+        var studentNumber = $(this).data('change-student-number');
+        var fromsubject = $(this).data('change-change');
+        var subject = $(this).data('change-subject');
+        var reason = $(this).data('change-reason');
+        var sender = $(this).data('change-sender');
+        var contact = $(this).data('change-contact');
+        var fileAttachment = $(this).data('change-file');
+        var status = $(this).data('change-status'); // Add this line to get the status
+  
+        // Populate modal with data
+        $('#changing-name').text(name);
+        $('#changing-student-number').text(studentNumber);
+        $('#changing-change-subject').text(fromsubject);
+        $('#changing-student-subject').text(subject);
+        $('#changing-student-reason').text(reason);
+        $('#changing-sender-name').text(sender);
+        $('#changing-sender-contact').text(contact);
+        $('#changing-file-attachment').text(fileAttachment);
+  
+        // Additional logic for handling status-related changes
+        handleChangeStatusChange(status);
       });
-  }
-</script>
+    });
+  
+    function handleChangeStatusChange(currentStatus) {
+      var statusDropdown = $('#changeStatusSelect');
+      var updateButton = $('#updateChangeBtn');
+  
+      // Enable/disable options based on the selected status
+      statusDropdown.find('option').prop('disabled', false);
+  
+      switch (currentStatus) {
+        case 'pending':
+          // Admin can only change to 'Approved'
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="Completed"]').prop('disabled', true);
+          break;
+        case 'Approved':
+          // Admin can change to 'Completed'
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="Approved"]').prop('disabled', true);
+          break;
+        case 'Completed':
+          // Disable all options when status is 'Completed'
+          statusDropdown.find('option').prop('disabled', true);
+          break;
+        case 'Rejected':
+          // Admin cannot change to any other status
+          statusDropdown.find('option').prop('disabled', true);
+          break;
+        default:
+          break;
+      }
+  
+      // Set the current status as selected
+      statusDropdown.val(currentStatus);
+  
+      // Enable/disable "Update" button based on the selected status
+      updateButton.prop('disabled', true);
+  
+      // Bind an event handler to the status dropdown to check for changes
+      statusDropdown.on('change', function () {
+        updateButton.prop('disabled', false);
+      });
+  
+      if (currentStatus === 'Closed') {
+        statusDropdown.prop('disabled', true);
+      } else {
+        statusDropdown.prop('disabled', false);
+      }
+    }
+  
+    function openChangeModal(changesubjectsId, currentStatus) {
+      $('#changeSubjectIdInput').val(changesubjectsId);
+      handleChangeStatusChange(currentStatus);
+    }
+  
+    function submitChangeStatus() {
+      const changesubjectsId = $('#changeSubjectIdInput').val();
+      const newStatus = $('#changeStatusSelect').val();
+    //   const remarks = $('#changeRemarks').val(); // Get remarks value
+  
+      // AJAX request to Flask backend
+      fetch('/update_change_status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          changesubjectsId: changesubjectsId,
+          status: newStatus
+        //   remarks: remarks, // Include remarks in the request
+        })
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Success:', data);
+          $('#viewChangeModal').modal('hide');
+          location.reload(); // Reload the page to see the changes
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    }
+  </script>
+  
 {% endblock %}

@@ -707,7 +707,7 @@ def student_history_services(student_id):
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):
     FacultyRole = 'Academic Head'
-
+    FacultyId = '10018'
     # Extract individual form data
     SenderName = form_data.get('SenderName', '')
     SenderContactNo = form_data.get('SenderContactNo', '')
@@ -728,6 +728,7 @@ def create_services_application(form_data, files, StudentId):
         new_service_application = AddSubjects(
             StudentId=StudentId,
             FacultyRole=FacultyRole,
+            FacultyId=FacultyId,
             Subject=selectedSubjects,  
             ServiceDetails=ServiceDetails,
             PaymentFile=PaymentFile_data,
@@ -755,6 +756,7 @@ def create_services_application(form_data, files, StudentId):
 
 def create_change_subject(form_data, files, StudentId):
     FacultyRole = 'Academic Head'
+    FacultyId = '10018'
 
     # Extract individual form data
     FromSubject = form_data.get('fromSubjects', '')
@@ -776,6 +778,7 @@ def create_change_subject(form_data, files, StudentId):
         changeApplication = ChangeSubject(
             StudentId=StudentId,
             FacultyRole=FacultyRole,
+            FacultyId=FacultyId,
             FromSubject=FromSubject, 
             ToSubject=ToSubject, 
             ServiceDetails=ServiceDetails,
@@ -815,6 +818,7 @@ def create_overload_application(form_data, files, current_StudentId):
     Justification = form_data['Justification']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
+    FacultyId = '10017'
 
     # Check if a file is provided
     if 'fileoverload' not in files:
@@ -841,6 +845,7 @@ def create_overload_application(form_data, files, current_StudentId):
         StudentId=current_StudentId,
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         ProgramCourse=ProgramCourse,
         Semester=Semester,
         SubjectsToAdd=SubjectsToAdd,
@@ -865,6 +870,7 @@ def create_crossenrollment_form(form_data, files, current_StudentId):
     AuthorizedSubjectstoTake = form_data['AuthorizedSubjectstoTake']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
+    FacultyId = '10018'
 
     if not StudentNumber or not Name or not SchoolforCrossEnrollment or not AuthorizedSubjectstoTake:
         flash('Please fill out all fields and provide valid values.', 'danger')
@@ -908,6 +914,7 @@ def create_crossenrollment_form(form_data, files, current_StudentId):
         StudentId=current_StudentId,  # Pass the StudentId from the login
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         SchoolforCrossEnrollment=SchoolforCrossEnrollment,
         TotalNumberofUnits=TotalNumberofUnits,
         AuthorizedSubjectstoTake=AuthorizedSubjectstoTake,
@@ -931,7 +938,7 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
     Reason = form_data['Reason']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
-
+    FacultyId = '1'
 
     MeFiledata = files['MeFiledata']
 
@@ -950,6 +957,7 @@ def create_manualenrollment_form(form_data, files, current_StudentId):
         StudentId=current_StudentId,
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         EnrollmentType=EnrollmentType,
         Reason=Reason,
         MeFilefilename=MeFilefilename,
@@ -1049,7 +1057,7 @@ def create_gradeentry_application(form_data, files, StudentId):
     ApplicationType = form_data['ApplicationType']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
-
+    FacultyId = '1'
     files = request.files
      # Check if a file is provided
     if 'completion_form' not in files:
@@ -1107,6 +1115,7 @@ def create_gradeentry_application(form_data, files, StudentId):
         StudentNumber=StudentNumber,
         Name=Name,
         ApplicationType=ApplicationType,
+        FacultyId=FacultyId,
         CompletionFormfilename=CompletionFormfilename,
         CompletionFormdata=CompletionFormdata,
         ClassRecordfilename=ClassRecordfilename,
@@ -1132,6 +1141,7 @@ def create_certification_request(form_data, files, StudentId):
     CertificationType = form_data['CertificationType']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
+    FacultyId = '1'
 
     # Required file checks
     for field_name in ['request_form', 'identification_card']:
@@ -1175,6 +1185,7 @@ def create_certification_request(form_data, files, StudentId):
     new_certification_request = CertificationRequest(
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         CertificationType=CertificationType,
         RequestFormfilename=RequestFormfilename,
         RequestFormdata=RequestFormdata,
@@ -1204,6 +1215,7 @@ def create_shifting_application(form_data, files, StudentId):
     Qualifications = form_data['Qualifications']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
+    FacultyId = '10017'
 
     if 'fileshifting' not in files:
         flash('Please provide the shifitng file.', 'danger')
@@ -1229,6 +1241,7 @@ def create_shifting_application(form_data, files, StudentId):
         StudentId=StudentId,
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         CurrentProgram=CurrentProgram,
         ResidencyYear=ResidencyYear,
         IntendedProgram=IntendedProgram,
@@ -1251,6 +1264,7 @@ def create_tutorial_request(form_data, files, StudentId):
     SubjectName = form_data['SubjectName']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
+    FacultyId = '10017'
 
     if 'fileTutorial' not in files:
         flash('Please provide the tutorial file.', 'danger')
@@ -1276,6 +1290,7 @@ def create_tutorial_request(form_data, files, StudentId):
         StudentId=StudentId,
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         SubjectCode=SubjectCode,
         SubjectName=SubjectName,
         Tutorialfilename=Tutorialfilename,

@@ -2,11 +2,10 @@
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from Api.v1.faculty.utils import get_all_services
-from Api.v1.student.api_routes import API_KEYS
 from models import Faculty
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from flask_login import  login_user
+from flask_login import  current_user, login_user
 from decorators.auth_decorators import faculty_required, role_required
 
 faculty_api = Blueprint('faculty_api', __name__)
@@ -15,8 +14,10 @@ faculty_api = Blueprint('faculty_api', __name__)
 
 def get_current_faculty_user():
     current_faculty_id = session.get('user_id')
+    
     if current_faculty_id:
         faculty = Faculty.query.get(current_faculty_id)
+        print(faculty)
         if faculty:
             return faculty
         else:
@@ -28,7 +29,13 @@ def get_current_faculty_user():
         print("No user_id found in session.")
         return None
 
-
+# get the Current userID
+def get_current_faculty_id():
+    if current_user.is_authenticated:
+        return current_user.FacultyId
+    else:
+        # Handle the case where the user is not authenticated or doesn't have a FacultyId
+        return None
 
 """faculty_api_url = 'https://pupqcfis-com.onrender.com/api/all/Faculty_Profile'
 api_key = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJrZXkiOiIzM2Y0ZWI4NWNjNDQ0MTQzOWFkMzMwYWUzMzJiNmYwYyJ9.5pjwXdaIIZf6Jm9zb26YueCPQhj6Tc18bbZ0vnX4S9M'  # Replace with your actual API key
@@ -145,15 +152,46 @@ def get_gender_string(gender_code):
     return gender_dict.get(gender_code, "Unknown")
 
 
+@faculty_api.route('/update-faculty-details', methods=['POST'])
+def updatefetchFacultyDetails():
+    user_id = session.get('user_id')
+
+    faculty = Faculty.query.get(user_id)
+
+    if faculty:
+        flash('User not found', 'danger')
+        return jsonify({'Message': 'User not found'}), 404
+
+        # user_img_base64 = base64.b64encode(faculty.ProfilePic).decode('utf-8') if faculty.ProfilePic else None
+        gender_string = get_gender_string(faculty.Gender)  # Ensure get_gender_string() is defined
+    if request.is_json:
+        faculty.Email = request.json.get('Email', faculty.Email)
+        faculty.MobileNumber = request.json.get('MobileNumber', faculty.MobileNumber)
+        faculty.address = request.json.get('address', faculty.address)
+    else:
+        # Update from form data
+        faculty.Email = request.form.get('Email', faculty.Email)
+        faculty.MobileNumber = request.form.get('MobileNumber', faculty.MobileNumber)
+        faculty.address = request.form.get('address', faculty.address)
+    
+    # Check if Email and MobileNumber are not None or empty
+    if faculty.Email is not None and faculty.MobileNumber is not None:
+        # db.session.commit()
+        return jsonify({'Message': 'Faculty details updated successfully'})
+    else:
+        flash('Email and MobileNumber cannot be empty', 'danger')
+        return jsonify({'Message': 'Email and MobileNumber cannot be empty'}), 400
+
+
 #=====================================API====================================#
 
 @faculty_api.route('/student_services', methods=['GET'])
 def all_student_services():
-    # Assuming you have access to the student ID (you may need to retrieve it based on your authentication mechanism)
+    # Assuming you have access to the faculty ID (you may need to retrieve it based on your authentication mechanism)
     services_data = get_all_services()
 
     if services_data[0]:  # Check if the first element of the tuple (all_services_list) has data
-        return jsonify(success=True, message="All student services data retrieved successfully.", data=services_data)
+        return jsonify(success=True, message="All faculty services data retrieved successfully.", data=services_data)
     else:
         return jsonify(success=False, message="No data available or data is invalid.")
     

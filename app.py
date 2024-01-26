@@ -11,7 +11,7 @@ from datetime import datetime, timezone #, timedelta,
 #from models import Services
 #from models import init_db
 from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api, student_history_services
-from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
+from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_id, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
 
@@ -638,7 +638,27 @@ def update_status():
         flash('Error updating status', 'danger')  # Flash error message
         return jsonify({'message': str(e)}), 500
 
+@app.route('/update_change_status', methods=['POST'])
+def update_change_status():
+    data = request.get_json()
+    changesubjects_id = data.get('changesubjectsId')
+    new_status = data.get('status')
+    #remarks = data.get('remarks')  # Get remarks from the request
 
+    try:
+        changesubjects = ChangeSubject.query.filter_by(ChangeSubjectId=changesubjects_id).first()
+        if changesubjects:
+            changesubjects.Status = new_status
+            #changesubjects.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Status updated successfully'}), 200
+        else:
+            flash('Subject not found', 'danger')  # Flash error message
+            return jsonify({'message': 'Subject not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500
  #=========================================================================================================   
 @app.route('/student/viewaddsubject', methods=['GET'])
 @role_required('student')
@@ -1308,82 +1328,129 @@ def refresh_session():
 # ========================================================================
 #SERVICES
 @app.route('/faculty/overload')
-@role_required('faculty')
+@faculty_required
 def facultyoverload():
-    overload_applications = OverloadApplication.query.all()
-    return render_template("/faculty/overload.html", overload_applications=overload_applications)  #overload_applications in overload_applications
+     # Get the FacultyId of the currently logged-in faculty
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty is not None:
+        # Filter AddSubjects based on facultyId and FacultyRole
+        overload_applications = (
+            OverloadApplication.query
+            .filter(OverloadApplication.FacultyId == current_faculty.FacultyId)
+            .all()
+        )
+        students = []
+        for subject in overload_applications:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+        
+        combined_data = zip(overload_applications, students)
+
+    return render_template("/faculty/overload.html", overload_applications=overload_applications, combined_data=combined_data)  #overload_applications in overload_applications
 
 @app.route('/faculty/adding')
-@role_required('faculty')
+@faculty_required
 def facultyadding():
-    session['last_activity'] = datetime.now(timezone.utc)
-    addsubjects = AddSubjects.query.all()
-    students = []
-    for subject in addsubjects:
-        student = Student.query.filter_by(StudentId=subject.StudentId).first()
-        students.append(student)
-    combined_data = zip(addsubjects, students)
 
-    return render_template("/faculty/adding.html", combined_data=combined_data) # addsubjects in addsubjects
+    # Get the FacultyId of the currently logged-in faculty
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty is not None:
+        # Filter AddSubjects based on facultyId and FacultyRole
+        addsubjects = (
+            AddSubjects.query
+            .filter(AddSubjects.FacultyId == current_faculty.FacultyId)
+            .all()
+        )
+
+        students = []
+        for subject in addsubjects:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+        
+        combined_data = zip(addsubjects, students)
+
+        return render_template("/faculty/adding.html", combined_data=combined_data)
+    else:
+    # If the FacultyId is not found or doesn't match, render a different template
+        return render_template("/faculty/adding.html", combined_data=[])  # Adjust the template name as needed
 
 @app.route('/faculty/change')
-@role_required('faculty')
+@faculty_required
 def facultychange():
-    session['last_activity'] = datetime.now(timezone.utc)
-    changesubjects = ChangeSubject.query.all()
-    return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
+    # Get the FacultyId of the currently logged-in faculty
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty is not None:
+        # Filter AddSubjects based on facultyId and FacultyRole
+        changesubjects = (
+            ChangeSubject.query
+            .filter(ChangeSubject.FacultyId == current_faculty.FacultyId)
+            .all()
+        )
+        students = []
+        for subject in changesubjects:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+        
+        combined_data = zip(changesubjects, students)
+
+        return render_template("/faculty/change.html", combined_data=combined_data)
+    else:
+        return render_template("/faculty/change.html", combined_data=[]) #changesubjects in changesubjects
 
 #gradeentry table
 @app.route('/faculty/correction')
-@role_required('faculty')
+@faculty_required
 def facultycorrection():
     session['last_activity'] = datetime.now(timezone.utc) # none
     grade_entry = GradeEntry.query.all()
     return render_template("/faculty/correction.html", grade_entry=grade_entry) # for grade_entries in grade_entries
 
 @app.route('/faculty/crossenrollment')
-@role_required('faculty')
+@faculty_required
 def facultycrossenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
     cross_enrollments = CrossEnrollment.query.all()
     return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments)
 
 @app.route('/faculty/shifting')
-@role_required('faculty')
+@faculty_required
 def facultyshifting():
     session['last_activity'] = datetime.now(timezone.utc) # none
     shifting_applications = ShiftingApplication.query.all()
     return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
 
 @app.route('/faculty/manualenrollment')
-@role_required('faculty')
+@faculty_required
 def facultyenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
     manual_enrollments = ManualEnrollment.query.all()
     return render_template("/faculty/enrollment.html", manual_enrollments=manual_enrollments)
 
 @app.route('/faculty/onlinepetitionofsubject')
-@role_required('faculty')
+@faculty_required
 def facultypetition():
     session['last_activity'] = datetime.now(timezone.utc) #none
     petition_requests = PetitionRequest.query.all()
     return render_template("/faculty/petition.html", petition_requests=petition_requests)
 
 @app.route('/faculty/requestfortutorialofsubjects')
-@role_required('faculty')
+@faculty_required
 def faculty_view_tutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
     return render_template("/faculty/view_tutorial.html")
 
 @app.route('/faculty/certification')
-@role_required('faculty')
+@faculty_required
 def facultycertification():
     session['last_activity'] = datetime.now(timezone.utc) #none
     certification_request = CertificationRequest.query.all()
     return render_template("/faculty/certification.html", certification_request=certification_request)
 
 @app.route('/faculty/tutorial')
-@role_required('faculty')
+@faculty_required
 def facultytutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
     tutorial_requests = TutorialRequest.query.all()
@@ -2713,7 +2780,39 @@ def facultyprofile():
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
 
 
+@app.route('/faculty/profile/updated', methods=['GET', 'POST'])
+def faculty_update_profile():
+    if request.method == 'POST':
+        faculty_id = request.form.get('faculty_id')
 
+        Email = request.form.get('Email')
+        MobileNumber = request.form.get('MobileNumber')
+        ResidentialAddress = request.form.get('ResidentialAddress')
+
+        user_id = get_current_faculty_user()
+
+        if isinstance(user_id, Faculty):
+            user_id = user_id.FacultyId
+
+        faculty = Faculty.query.get(user_id)
+
+        if faculty:
+            try:
+                faculty.Email = Email
+                faculty.MobileNumber = MobileNumber
+                faculty.ResidentialAddress = ResidentialAddress
+
+                db.session.commit()
+                flash('Profile Updated Successfully!', category='success')
+                return redirect(url_for('facultyprofile'))
+            except Exception as e:
+                # Handle the specific exception or log the error
+                flash(f'Error updating profile: {str(e)}', category='error')
+                db.session.rollback()  # Rollback changes in case of an error
+        else:
+            flash('Faculty not found. Please try again!', category='error')
+
+    return render_template('/faculty/profile.html')
 # ======================Faculty Downloads========================== #
 # =======================Downloads File============================ #
 
