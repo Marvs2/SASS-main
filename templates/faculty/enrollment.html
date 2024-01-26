@@ -22,30 +22,30 @@
         <tbody>
             {% for manual_enrollments in manual_enrollments %}
             <tr>
-                <td>{{ manual_enrollments.m_enrollment_ID }}</td>
+                <td>{{ manual_enrollments.ManualEnrollmentId }}</td>
                 <td>{{ manual_enrollments.StudentNumber }}</td>
                 <td>{{ manual_enrollments.Name }}</td>
-                <td>{{ manual_enrollments.enrollment_type }}</td>
-                <td>{{ manual_enrollments.reason }}</td>
+                <td>{{ manual_enrollments.EnrollmentType }}</td>
+                <td>{{ manual_enrollments.Reason }}</td>
                 <td>
-                  {% if manual_enrollments.me_file_data %}
-                  {% set manualfile = manual_enrollments.me_file_filename[:15] + '...' if manual_enrollments.me_file_filename|length > 15 else manual_enrollments.me_file_filename %}
-                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.m_enrollment_ID) }}" class="btn btn-success" download title="{{ manual_enrollments.me_file_filename }}">{{ manualfile }}</a>
+                  {% if manual_enrollments.MeFiledata %}
+                  {% set manualfile = manual_enrollments.MeFilefilename[:15] + '...' if manual_enrollments.MeFilefilename|length > 15 else manual_enrollments.MeFilefilename %}
+                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.ManualEnrollmentId) }}" class="btn btn-success" download title="{{ manual_enrollments.MeFilefilename }}">{{ manualfile }}</a>
               {% else %}
                   <span class="badge badge-warning">No File</span>
               {% endif %}
                 </td>
                 <td>{{ manual_enrollments.created_at }}</td>
                 <td>{{ manual_enrollments.updated_at }}</td>
-                <td>{{ manual_enrollments.user_responsible }}</td>
-                <td>{{ manual_enrollments.status }}</td>
+                <td>{{ manual_enrollments.UserResponsible }}</td>
+                <td>{{ manual_enrollments.Status }}</td>
                 <td>
                      <!-- Button to trigger the modal form -->
-                     <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ manual_enrollments.m_enrollment_ID }}">Change Status</button>
+                     <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ manual_enrollments.ManualEnrollmentId }}">Change Status</button>
                 </td>
             </tr>
             <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ manual_enrollments.m_enrollment_ID }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
+            <div class="modal fade" id="statusModal{{ manual_enrollments.ManualEnrollmentId }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -54,20 +54,18 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="statusForm{{ manual_enrollments.m_enrollment_ID }}" action="{{ url_for('update_manual_service_status', m_enrollment_ID=manual_enrollments.m_enrollment_ID) }}" method="POST">
+                        <form id="statusForm{{ manual_enrollments.ManualEnrollmentId }}" action="{{ url_for('update_manual_service_status', ManualEnrollmentId=manual_enrollments.ManualEnrollmentId) }}" method="POST">
                             <div class="modal-body">
                               <select name="status" class="form-select">
                                 <option value="pending">Pending</option>
-                                <option value="processing">Processing</option>
-                                <option value="approved">Approved</option>
-                                <option value="finish">Finish</option>
-                                <option value="rejected">Rejected</option>
+                                <option value="Approved">Approved</option>
+                                <option value="Rejected">Rejected</option>
                                 <!-- Add other statuses as needed -->
                               </select>
                             </div>
                             <div class="modal-footer">
                               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ manual_enrollments.m_enrollment_ID }})">Save changes</button>
+                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ manual_enrollments.ManualEnrollmentId }})">Save changes</button>
                             </div>
                           </form>
                         </div>
@@ -90,8 +88,8 @@
         "pageLength": 5
     });
 });
-function updateStatus(m_enrollment_ID) {
-    const formId = `statusForm${m_enrollment_ID}`;
+function updateStatus(ManualEnrollmentId) {
+    const formId = `statusForm${ManualEnrollmentId}`;
     const form = document.getElementById(formId);
     const formData = new FormData(form);
 

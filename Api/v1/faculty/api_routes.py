@@ -117,8 +117,8 @@ def fetchFacultyDetails():
     faculty = Faculty.query.get(user_id)
 
     if faculty:
-        # Convert userImg to base64 string if it exists
-        user_img_base64 = base64.b64encode(faculty.ProfilePic).decode('utf-8') if faculty.ProfilePic else None
+        # # Convert userImg to base64 string if it exists
+        # user_img_base64 = base64.b64encode(faculty.ProfilePic).decode('utf-8') if faculty.ProfilePic else None
         gender_string = get_gender_string(faculty.Gender)  # Ensure get_gender_string() is defined
 
         # Construct and return the JSON response
@@ -132,7 +132,7 @@ def fetchFacultyDetails():
             'Gender': gender_string,
             'BirthDate': faculty.BirthDate.strftime('%Y-%m-%d') if faculty.BirthDate else None,
             'MobileNumber': faculty.MobileNumber,
-            'ProfilePic': user_img_base64,
+            # 'ProfilePic': user_img_base64,
         })
     else:
         flash('User not found', 'danger')
