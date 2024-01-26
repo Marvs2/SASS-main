@@ -74,6 +74,19 @@ img {
   color: white;
 }
 
+.card-title{
+  justify-content: center;
+  font-weight: 600;
+  font-size: 23px;
+  padding-top: 5px;
+  line-height: 1.5;
+}
+
+.announcementCard {
+  text-align: justify;
+  margin: auto;
+}
+
 
 
 
