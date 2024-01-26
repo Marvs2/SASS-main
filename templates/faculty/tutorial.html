@@ -1,10 +1,15 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-<div>
-    <h1>Tutorial Requests</h1>
-    <table class="table">
-        <thead>
+
+<div class="form-step form-step-active">
+    <div class="data data1" id="firstTableContainer">
+      <div class="content-data">
+        <div class="head mb-3">
+            <h2>tutorial Request</h2>
+        </div>
+        <table id="changeSubjects" class="table table-bordered table-condensed display">
+    <thead>
             <tr>
                 <th>ID</th>
                 <th>Student Number</th>

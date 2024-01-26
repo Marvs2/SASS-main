@@ -13,15 +13,13 @@ body {
 /********************************************** HOME AND LANDING PAGE ***************************************************************/
 
 .img-wrapper {
-  max-width: auto;
-  height: 65vw;
   display: flex;
   justify-content: center;
   align-items: flex-start;
 }
 img {
   width: auto; 
-  max-height: 300px;
+  height: 300px;
   object-fit: cover;
 }
 @media screen and (min-width: 576px) {

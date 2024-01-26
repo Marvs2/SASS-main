@@ -1,28 +1,15 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-<style>
-    /* Add DataTables styles */
-    table {
-        width: 90%;
-        border: 1px;
-        margin-top: 20px;
-        margin-left: 50px;
-        margin-right: 50px;
-        margin-bottom: 50px;
-    }
 
-    th, td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-</style>
-
-<!-- Cross Enrollment Table -->
-<h2>Cross Enrollment Records</h2>
-<table id="crossEnrollmentTable" class="table table-bordered" style="width:80%">
-    <thead>
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+          <h2>Cross Enrollment</h2>
+      </div>
+      <table id="changeSubjects" class="table table-bordered table-condensed display">
+  <thead>
         <tr>
             <th>ID</th>
             <th>Student Number</th>
