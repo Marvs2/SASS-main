@@ -2810,31 +2810,33 @@ def faculty_update_profile():
 # =======================Downloads File============================ #
 
 #certification
-@app.route('/faculty/certification/get_certification_request_file/<int:CertificationId>')
-def get_certification_request_file(CertificationId):
-    return redirect(url_for('download_certification_request_file', CertificationId=CertificationId))
+@app.route('/student/get_certification_request_file/<int:certification_request_Id>')
+def get_certification_request_file(certification_request_Id):
+    return redirect(url_for('download_certification_request_file', certification_request_Id=certification_request_Id))
 
-@app.route('/faculty/download_certification_request_file/<int:CertificationId>')
-def download_certification_request_file(CertificationId):
-    certification_request = CertificationRequest.query.get(CertificationId)
+@app.route('/student/download_certification_request_file/<int:certification_request_Id>')
+def download_certification_request_file(certification_request_Id):
+    student_id = getCurrentUser('user_id') 
+    certification_request = CertificationRequest.query.get(certification_request_Id, student_id)
 
-    if certification_request and certification_request.request_form_data:
-        certification_request_extension = get_certification_request_extension(certification_request.request_form_filename)
-        download_name = f'certification_request_{CertificationId}.{certification_request_extension}'
+    if certification_request and certification_request.RequestFormdata:
+        extension = get_file_extension(certification_request.RequestFormfilename)
+        download_name = f'certification_request_{certification_request_Id}.{extension}'
 
         return send_file(
-            io.BytesIO(certification_request.request_form_data),
+            io.BytesIO(certification_request.RequestFormdata),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(certification_request_extension),
+            mimetype=get_mimetype(extension),
         )
     else:
         abort(404)  # Certification request or file not found
 
-def get_certification_request_extension(request_form_filename):
-    return request_form_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(certification_request_extension):
+def get_certification_request_extension(RequestFormfilename):
+    return RequestFormfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -2842,33 +2844,33 @@ def get_mimetype(certification_request_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(certification_request_extension, 'application/octet-stream')
+    return mimetypes.get(extension, 'application/octet-stream')
 #===================================================================================================================================
-@app.route('/faculty/certification/get_certification_identification_file/<int:CertificationId>')
-def get_certification_identification_file(CertificationId):
-    return redirect(url_for('download_certification_identification_file', CertificationId=CertificationId))
+@app.route('/student/get_certification_identification_file/<int:certification_request_Id>')
+def get_certification_identification_file(certification_request_Id):
+    return redirect(url_for('download_certification_identification_file', certification_request_Id=certification_request_Id))
 
-@app.route('/faculty/download_certification_identification_file/<int:CertificationId>')
-def download_certification_identification_file(CertificationId):
-    certification_request = CertificationRequest.query.get(CertificationId)
+@app.route('/student/download_certification_identification_file/<int:certification_request_Id>')
+def download_certification_identification_file(certification_request_Id):
+    certification_request = CertificationRequest.query.get(certification_request_Id)
 
-    if certification_request and certification_request.identification_card_data:
-        identification_file_extension = get_identification_file_extension(certification_request.identification_card_filename)
-        download_name = f'certification_identification_{CertificationId}.{identification_file_extension}'
+    if certification_request and certification_request.IdentificationCarddata:
+        extension = get_file_extension(certification_request.IdentificationCardfilename)
+        download_name = f'certification_identification_{certification_request_Id}.{extension}'
 
         return send_file(
-            io.BytesIO(certification_request.identification_card_data),
+            io.BytesIO(certification_request.IdentificationCarddata),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(identification_file_extension),
+            mimetype=get_mimetype(extension),
         )
     else:
-        abort(404)  # Certification request or file not found
+        abort(404) # Certification request or file not found
 
-def get_identification_file_extension(identification_card_filename):
-    return identification_card_filename.rsplit('.', 1)[1].lower()
+def get_identification_file_extension(IdentificationCardfilename):
+    return IdentificationCardfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(identification_file_extension):
+def get_mimetype(extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -2876,33 +2878,34 @@ def get_mimetype(identification_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(identification_file_extension, 'application/octet-stream')
+    return mimetypes.get(extension, 'application/octet-stream')
 #=========================================================================================================================
-@app.route('/faculty/certification/get_certification_authorization_file/<int:CertificationId>')
-def get_certification_authorization_file(CertificationId):
-    return redirect(url_for('download_certification_authorization_file', CertificationId=CertificationId))
+@app.route('/student/get_certification_authorization_file/<int:certification_request_Id>')
+def get_certification_authorization_file(certification_request_Id):
+    return redirect(url_for('download_certification_authorization_file', certification_request_Id=certification_request_Id))
 
-@app.route('/faculty/download_certification_authorization_file/<int:CertificationId>')
-def download_certification_authorization_file(CertificationId):
-    certification_request = CertificationRequest.query.get(CertificationId)
+@app.route('/student/download_certification_authorization_file/<int:certification_request_Id>')
+def download_certification_authorization_file(certification_request_Id):
+    certification_request = CertificationRequest.query.get(certification_request_Id)
 
-    if certification_request and certification_request.authorization_letter_data:
-        authorization_file_extension = get_authorization_file_extension(certification_request.authorization_letter_filename)
-        download_name = f'certification_authorization_{CertificationId}.{authorization_file_extension}'
+    if certification_request and certification_request.AuthorizationLetterdata:
+        extension = get_file_extension(certification_request.AuthorizationLetterfilename)
+        download_name = f'certification_authorization_{certification_request_Id}.{extension}'
 
         return send_file(
-            io.BytesIO(certification_request.authorization_letter_data),
+            io.BytesIO(certification_request.AuthorizationLetterdata),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(authorization_file_extension),
+            mimetype=get_mimetype(extension),
         )
     else:
         abort(404)  # Certification request or file not found
+ # Certification request or file not found
 
-def get_authorization_file_extension(authorization_letter_filename):
-    return authorization_letter_filename.rsplit('.', 1)[1].lower()
+def get_authorization_file_extension(AuthorizationLetterfilename):
+    return AuthorizationLetterfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(authorization_file_extension):
+def get_mimetype(extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
@@ -2910,22 +2913,22 @@ def get_mimetype(authorization_file_extension):
         # Add more file types as needed
     }
 
-    return mimetypes.get(authorization_file_extension, 'application/octet-stream')
+    return mimetypes.get(extension, 'application/octet-stream')
 #=============================================================================================================================
-@app.route('/faculty/certification/get_representative_file/<int:CertificationId>')
-def get_representative_file(CertificationId):
-    return redirect(url_for('download_representative_file', CertificationId=CertificationId))
+@app.route('/student/certification/get_representative_file/<int:certification_request_Id>')
+def get_representative_file(certification_request_Id):
+    return redirect(url_for('download_representative_file', certification_request_Id=certification_request_Id))
 
-@app.route('/faculty/download_representative_file/<int:CertificationId>')
-def download_representative_file(CertificationId):
-    certification_request = CertificationRequest.query.get(CertificationId)
+@app.route('/student/download_representative_file/<int:certification_request_Id>')
+def download_representative_file(certification_request_Id):
+    certification_request = CertificationRequest.query.get(certification_request_Id)
 
-    if certification_request and certification_request.representative_id_data:
-        representative_extension = get_representative_extension(certification_request.representative_id_filename)
-        download_name = f'certification_representative_{CertificationId}.{representative_extension}'
+    if certification_request and certification_request.RepresentativeIddata:
+        representative_extension = get_representative_extension(certification_request.RepresentativeIdfilename)
+        download_name = f'certification_representative_{certification_request_Id}.{representative_extension}'
 
         return send_file(
-            io.BytesIO(certification_request.representative_id_data),
+            io.BytesIO(certification_request.RepresentativeIddata),
             as_attachment=True,
             download_name=download_name,
             mimetype=get_mimetype(representative_extension),
@@ -2933,8 +2936,8 @@ def download_representative_file(CertificationId):
     else:
         abort(404)  # Certification request or file not found
 
-def get_representative_extension(representative_id_filename):
-    return representative_id_filename.rsplit('.', 1)[1].lower()
+def get_representative_extension(RepresentativeIdfilename):
+    return RepresentativeIdfilename.rsplit('.', 1)[1].lower()
 
 def get_mimetype(representative_extension):
     mimetypes = {

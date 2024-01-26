@@ -465,16 +465,16 @@
 							data-certification-student-number="{{ certification_request.StudentNumber }}"
 							data-certification-type="{{ certification_request.CertificationType }}"
 
-							data-request-url="{{ url_for('get_certification_request_file', CertificationId=certification_request.CertificationId) }}"
+							data-request-url="{{ url_for('get_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
 							data-request-filename="{{ certification_request.RequestFormfilename }}"	
 
-							data-registration-url="{{ url_for('get_certification_identification_file', CertificationId=certification_request.CertificationId) }}"
+							data-registration-url="{{ url_for('download_certification_identification_file', certification_request_Id=certification_request.CertificationId) }}"
 							data-registration-filename="{{ certification_request.IdentificationCardfilename }}"	
 
-							data-authorization-url="{{ url_for('get_certification_authorization_file', CertificationId=certification_request.CertificationId) }}"
+							data-authorization-url="{{ url_for('download_certification_authorization_file', certification_request_Id=certification_request.CertificationId) }}"
 							data-authorization-filename="{{ certification_request.AuthorizationLetterfilename }}"
 
-							data-representative-url="{{ url_for('get_representative_file', CertificationId=certification_request.CertificationId) }}"
+							data-representative-url="{{ url_for('download_representative_file', certification_request_Id=certification_request.CertificationId) }}"
 							data-representative-filename="{{ certification_request.RepresentativeIdfilename }}"
 
 							data-certification-status="{{ certification_request.Status }}">
