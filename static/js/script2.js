@@ -204,6 +204,12 @@ chart.render();
 //   chart.render();
   
  
+changeSubjects
+
+$(document).ready(function() {
+	$('#changeSubjects').DataTable(); // OVERLOAD OF SUBJECTS
+});
+
 
 
 // DATA TABLES IN TRANSACTION HISTORY

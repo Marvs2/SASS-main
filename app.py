@@ -4,14 +4,14 @@ from flask_login import current_user, login_user
 from sqlalchemy import and_
 from Api.v1.faculty.utils import get_all_services
 from Api.v1.student.utils import get_student_services
-from models import Post, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
-from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api, student_history_services
-from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_id, get_current_faculty_user
+from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
+from Api.v1.faculty.api_routes import faculty_api, get_current_faculty_user
 from Api.v1.admin.api_routes import admin_api, create_student
 # Assuming your Flask app is created as 'app'
 
@@ -60,6 +60,13 @@ def custom_context_processor():
 
 #========================= LANDING PAGE ===================================
 
+# @app.route('/')
+# @prevent_authenticated
+# def index():
+#     announcements = ESISAnnouncement.query.filter_by(IsLive=True).all()
+#     announcements = announcements 
+#     return render_template('main/home.html', announcements=announcements)
+
 @app.route('/')
 @prevent_authenticated
 def index():
@@ -75,7 +82,7 @@ def index():
 @app.route('/events')
 @prevent_authenticated
 def events():
-    posts = Post.query.filter_by(PostType='event').all()  # Corrected the filter_by method
+    posts = Post.query.filter_by(PostType='event').all()  
     return render_template('main/events.html', posts=posts)
 
 #===========================================================================
@@ -187,7 +194,7 @@ def discipline():
 def student_dashboard():
    # Assuming you have a function to get student services based on their ID
     student_id = session.get('user_id')
-    all_services_list, total_services, pending_count, approved_count,        denied_count = get_student_services(student_id)  
+    all_services_list, total_services, pending_count, approved_count, denied_count = get_student_services(student_id)  
   # Unpack the tuple
 
     # Count the number of services with "Sent" status
@@ -217,14 +224,10 @@ def student_dashboard():
         'series': [pending_percentage, approved_percentage, denied_percentage, 100],  # Assuming 'Total' is always 100%
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
+
+    print(data)
     
-    services_data = {}
-
-        # Call the reusable function to get services data
-    services_data = student_history_services(student_id)
-
-    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data,     services_data=services_data
-)
+    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
 
 
 #======================================== STUDENT PROFILE ======================================================
@@ -631,27 +634,7 @@ def update_status():
         flash('Error updating status', 'danger')  # Flash error message
         return jsonify({'message': str(e)}), 500
 
-@app.route('/update_change_status', methods=['POST'])
-def update_change_status():
-    data = request.get_json()
-    changesubjects_id = data.get('changesubjectsId')
-    new_status = data.get('status')
-    #remarks = data.get('remarks')  # Get remarks from the request
 
-    try:
-        changesubjects = ChangeSubject.query.filter_by(ChangeSubjectId=changesubjects_id).first()
-        if changesubjects:
-            changesubjects.Status = new_status
-            #changesubjects.Remarks = remarks  # Set the remarks field
-            db.session.commit()
-            flash('Status updated successfully', 'success')  # Flash success message
-            return jsonify({'message': 'Status updated successfully'}), 200
-        else:
-            flash('Subject not found', 'danger')  # Flash error message
-            return jsonify({'message': 'Subject not found'}), 404
-    except Exception as e:
-        flash('Error updating status', 'danger')  # Flash error message
-        return jsonify({'message': str(e)}), 500
  #=========================================================================================================   
 @app.route('/student/viewaddsubject', methods=['GET'])
 @role_required('student')
@@ -1321,129 +1304,90 @@ def refresh_session():
 # ========================================================================
 #SERVICES
 @app.route('/faculty/overload')
-@faculty_required
+@role_required('faculty')
 def facultyoverload():
-     # Get the FacultyId of the currently logged-in faculty
-    current_faculty = get_current_faculty_user()
-
-    if current_faculty is not None:
-        # Filter AddSubjects based on facultyId and FacultyRole
-        overload_applications = (
-            OverloadApplication.query
-            .filter(OverloadApplication.FacultyId == current_faculty.FacultyId)
-            .all()
-        )
-        students = []
-        for subject in overload_applications:
-            student = Student.query.filter_by(StudentId=subject.StudentId).first()
-            students.append(student)
-        
-        combined_data = zip(overload_applications, students)
-
-    return render_template("/faculty/overload.html", overload_applications=overload_applications, )  #overload_applications in overload_applications
+    overload_applications = OverloadApplication.query.all()
+    return render_template("/faculty/overload.html", overload_applications=overload_applications)  #overload_applications in overload_applications
 
 @app.route('/faculty/adding')
-@faculty_required
+@role_required('faculty')
 def facultyadding():
+    session['last_activity'] = datetime.now(timezone.utc)
+    addsubjects = AddSubjects.query.all()
+    students = []
+    for subject in addsubjects:
+        student = Student.query.filter_by(StudentId=subject.StudentId).first()
+        students.append(student)
+    combined_data = zip(addsubjects, students)
 
-    # Get the FacultyId of the currently logged-in faculty
-    current_faculty = get_current_faculty_user()
-
-    if current_faculty is not None:
-        # Filter AddSubjects based on facultyId and FacultyRole
-        addsubjects = (
-            AddSubjects.query
-            .filter(AddSubjects.FacultyId == current_faculty.FacultyId)
-            .all()
-        )
-
-        students = []
-        for subject in addsubjects:
-            student = Student.query.filter_by(StudentId=subject.StudentId).first()
-            students.append(student)
-        
-        combined_data = zip(addsubjects, students)
-
-        return render_template("/faculty/adding.html", combined_data=combined_data)
-    else:
-    # If the FacultyId is not found or doesn't match, render a different template
-        return render_template("/faculty/adding.html", combined_data=[])  # Adjust the template name as needed
+    return render_template("/faculty/adding.html", combined_data=combined_data) # addsubjects in addsubjects
 
 @app.route('/faculty/change')
-@faculty_required
+@role_required('faculty')
 def facultychange():
-    # Get the FacultyId of the currently logged-in faculty
-    current_faculty = get_current_faculty_user()
+    session['last_activity'] = datetime.now(timezone.utc)
+    changesubjects = ChangeSubject.query.all()
+    return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
 
-    if current_faculty is not None:
-        # Filter AddSubjects based on facultyId and FacultyRole
-        changesubjects = (
-            ChangeSubject.query
-            .filter(ChangeSubject.FacultyId == current_faculty.FacultyId)
-            .all()
-        )
-        students = []
-        for subject in changesubjects:
-            student = Student.query.filter_by(StudentId=subject.StudentId).first()
-            students.append(student)
-        
-        combined_data = zip(changesubjects, students)
-
-        return render_template("/faculty/change.html", combined_data=combined_data)
-    else:
-        return render_template("/faculty/change.html", combined_data=[]) #changesubjects in changesubjects
-
-#gradeentry table
 @app.route('/faculty/correction')
-@faculty_required
+@role_required('faculty')
 def facultycorrection():
-    session['last_activity'] = datetime.now(timezone.utc) # none
+    session['last_activity'] = datetime.now(timezone.utc)
     grade_entry = GradeEntry.query.all()
-    return render_template("/faculty/correction.html", grade_entry=grade_entry) # for grade_entries in grade_entries
+    
+    students = []
+    for entry in grade_entry:
+        student = Student.query.filter_by(StudentId=entry.StudentId).first()
+        students.append(student)
+    
+    combined_data = zip(grade_entry, students)
+
+    return render_template("/faculty/correction.html", combined_data=combined_data)
+
 
 @app.route('/faculty/crossenrollment')
-@faculty_required
+@role_required('faculty')
 def facultycrossenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
     cross_enrollments = CrossEnrollment.query.all()
     return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments)
 
 @app.route('/faculty/shifting')
-@faculty_required
+@role_required('faculty')
 def facultyshifting():
     session['last_activity'] = datetime.now(timezone.utc) # none
     shifting_applications = ShiftingApplication.query.all()
     return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
 
 @app.route('/faculty/manualenrollment')
-@faculty_required
+@role_required('faculty')
 def facultyenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
     manual_enrollments = ManualEnrollment.query.all()
     return render_template("/faculty/enrollment.html", manual_enrollments=manual_enrollments)
 
 @app.route('/faculty/onlinepetitionofsubject')
-@faculty_required
+@role_required('faculty')
 def facultypetition():
     session['last_activity'] = datetime.now(timezone.utc) #none
     petition_requests = PetitionRequest.query.all()
     return render_template("/faculty/petition.html", petition_requests=petition_requests)
 
 @app.route('/faculty/requestfortutorialofsubjects')
-@faculty_required
+@role_required('faculty')
 def faculty_view_tutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
     return render_template("/faculty/view_tutorial.html")
 
 @app.route('/faculty/certification')
-@faculty_required
+@role_required('faculty')
 def facultycertification():
     session['last_activity'] = datetime.now(timezone.utc) #none
     certification_request = CertificationRequest.query.all()
     return render_template("/faculty/certification.html", certification_request=certification_request)
 
 @app.route('/faculty/tutorial')
-@faculty_required
+@role_required('faculty')
 def facultytutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
     tutorial_requests = TutorialRequest.query.all()
@@ -2488,7 +2432,7 @@ def get_mimetype(overloadfile_extension):
 
 #=====================================================================
 # Overload - Faculty
-#===================================================================== # ERROR SOMETHING ABOUT ID
+#=====================================================================
 @app.route('/update-overload-service-Status/<int:OverloadId>', methods=['POST'])
 def update_overload_service_status(OverloadId):
     session['last_activity'] = datetime.now(timezone.utc)
@@ -2510,7 +2454,6 @@ def update_overload_service_status(OverloadId):
         flash('No Status provided.', 'danger')
 
     return redirect(url_for('facultyoverload'))
-
 
 # Overload HTML page
 @app.route('/faculty/overload/get_overload_file/<int:overload_application_id>')
@@ -2569,12 +2512,12 @@ def update_petition_service_status(petition_request_id):
     return redirect(url_for('facultypetition'))
 #=====================================================================
 #enrollement
-@app.route('/update-manual-service-Status/<int:ManualEnrollmentId>', methods=['POST'])
-def update_manual_service_status(ManualEnrollmentId):
+@app.route('/update-manual-service-Status/<int:m_enrollment_ID>', methods=['POST'])
+def update_manual_service_status(m_enrollment_ID):
     session['last_activity'] = datetime.now(timezone.utc)
 
     # Find the specific AddSubjects record
-    manual_enrollments = ManualEnrollment.query.get_or_404(ManualEnrollmentId)
+    manual_enrollments = ManualEnrollment.query.get_or_404(m_enrollment_ID)
 
     # Get the new Status from the form data
     new_Status = request.form.get('Status')
@@ -2763,6 +2706,7 @@ def faculty_dashboard():
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
 
+    print(data)
 
     return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
 
@@ -2773,39 +2717,7 @@ def facultyprofile():
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
 
 
-@app.route('/faculty/profile/updated', methods=['GET', 'POST'])
-def faculty_update_profile():
-    if request.method == 'POST':
-        faculty_id = request.form.get('faculty_id')
 
-        Email = request.form.get('Email')
-        MobileNumber = request.form.get('MobileNumber')
-        ResidentialAddress = request.form.get('ResidentialAddress')
-
-        user_id = get_current_faculty_user()
-
-        if isinstance(user_id, Faculty):
-            user_id = user_id.FacultyId
-
-        faculty = Faculty.query.get(user_id)
-
-        if faculty:
-            try:
-                faculty.Email = Email
-                faculty.MobileNumber = MobileNumber
-                faculty.ResidentialAddress = ResidentialAddress
-
-                db.session.commit()
-                flash('Profile Updated Successfully!', category='success')
-                return redirect(url_for('facultyprofile'))
-            except Exception as e:
-                # Handle the specific exception or log the error
-                flash(f'Error updating profile: {str(e)}', category='error')
-                db.session.rollback()  # Rollback changes in case of an error
-        else:
-            flash('Faculty not found. Please try again!', category='error')
-
-    return render_template('/faculty/profile.html')
 # ======================Faculty Downloads========================== #
 # =======================Downloads File============================ #
 

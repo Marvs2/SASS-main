@@ -1,32 +1,14 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-<style>
- /* Adjusted DataTables styles */
- #shiftingTableContainer {
-        margin-top: 20px;
-        margin-left: 70px;
-        margin-right: 70px;
-        margin-bottom: 70px;
-        max-width: 60%; /* Adjust the maximum width as needed */
-    }
 
-    table {
-        width: 70%;
-        border: 1px solid #ddd;
-    }
-
-    th, td {
-        padding: 10px; /* Reduced padding for smaller cells */
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-</style>
-<!--Done-->
-<!-- DataTable HTML -->
-<h1>Accreditation for Shifting and Regular</h1>
-<div id="shiftingTableContainer">
-<table id="shiftingTable" class="table table-bordered">
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+          <h2>Application for Shifting</h2>
+      </div>
+      <table id="changeSubjects" class="table table-bordered table-condensed display">
   <thead>
     <tr>
       <th>Student Number</th>
