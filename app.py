@@ -4,7 +4,7 @@ from flask_login import current_user, login_user
 from sqlalchemy import and_
 from Api.v1.faculty.utils import get_all_services
 from Api.v1.student.utils import get_student_services
-from models import Post, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import Post, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -1330,7 +1330,7 @@ def facultyoverload():
         
         combined_data = zip(overload_applications, students)
 
-    return render_template("/faculty/overload.html", overload_applications=overload_applications, combined_data=combined_data)  #overload_applications in overload_applications
+    return render_template("/faculty/overload.html", overload_applications=overload_applications, )  #overload_applications in overload_applications
 
 @app.route('/faculty/adding')
 @faculty_required
