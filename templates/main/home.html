@@ -84,7 +84,7 @@
             element.classList.remove("show");
             // Change "See Less" to "Learn More" when collapsing
             const currentIndex = element.id.replace(collapseElementId, "");
-            document.querySelector(`[data-target="#${collapseElementId}${currentIndex}"]`).innerHTML = "Learn More";
+            document.querySelector(`[data-target="#${collapseElementId}${currentIndex}"]`).innerHTML = "Read More";
         });
 
         if (!isCollapsed) {
