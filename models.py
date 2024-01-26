@@ -552,8 +552,8 @@ class AddSubjects(db.Model):
             'PaymentFile': self.PaymentFile,
             'Status': self.Status,
             'Remarks': self.Remarks
-
         }
+        
 #Notification
 class Notification(db.Model, UserMixin):
     __tablename__ = 'SASSNotifications'

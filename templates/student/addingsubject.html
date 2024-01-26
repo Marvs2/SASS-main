@@ -15,7 +15,7 @@
   <div class="form-step form-step-active">
     <div class="data data1" id="firstTableContainer">
       
-      <div class="content-data">
+      <div class="content-data">  
         <div class="head mb-3">
           <h3>Current Subjects</h3>
         </div>
@@ -167,9 +167,10 @@
           <div class="row mb-5">
             <label for="paymentScreenshot" class="col-sm-2 col-form-label">Proof of Payment</label>
             <div class="col-sm-8">
-              <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" required>
-          </div>
-          </div>
+                <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" accept=".jpg" required>
+            </div>
+        </div>
+        
       
           <!-- <div class="mb-3 form-check">
             <input type="checkbox" class="form-check-input" id="agreeTerms" name="agreeTerms">
@@ -392,7 +393,4 @@
 
 </script>
 {% endblock content %}
-
-
-
 

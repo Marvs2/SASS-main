@@ -171,14 +171,14 @@
       statusDropdown.find('option').prop('disabled', false);
   
       switch (currentStatus) {
-        case 'Pending':
+        case 'pending':
           // Admin can only change to 'Approved'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
           statusDropdown.find('option[value="Completed"]').prop('disabled', true);
           break;
         case 'Approved':
           // Admin can change to 'Completed'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
           statusDropdown.find('option[value="Approved"]').prop('disabled', true);
           break;
         case 'Completed':
