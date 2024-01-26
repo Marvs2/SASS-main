@@ -13,7 +13,7 @@ body {
 /********************************************** HOME AND LANDING PAGE ***************************************************************/
 
 .img-wrapper {
-  max-width: 100%;
+  max-width: auto;
   height: 65vw;
   display: flex;
   justify-content: center;
