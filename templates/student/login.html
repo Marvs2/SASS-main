@@ -2,9 +2,112 @@
 
 {% block content %}
 
-<link rel="stylesheet" href="{{ url_for ('static', filename='/css/portal.css')}}">
+            <section>           
+                <div class="forms-wrap">
+                    <div class="wrapper bg-white">
+                        <div class="h2 text-center">Student Portal</div>
+                       
+                        <!-- <div class="h4">Enter your login details</div> -->
+                
+                        <form  action="{{ url_for('student_api.login') }}" name="form" method="POST" autocomplete="off" class="pt-3 
+                        sign-in-form">
 
-    <section>           
+                        <div class="form-group py-2">
+                            <div class="input-field"> 
+                                <span class="fas fa-user p-2"></span> 
+                                <input type="text" placeholder="Enter your Student Number" id="StudentNumber" name="StudentNumber" maxlength="15" oninput="formatStudentNumber()" required>
+                            </div>
+                        </div>
+                
+                            <div class="form-group py-1 pb-2">
+                                <div class="input-field">
+                                    <span class="fas fa-lock p-2"></span>
+                                    <input type="password" id="Password" maxlength="20" name="Password" placeholder="Enter your Password" required>
+                                  
+                                </div>
+                            </div>
+                            
+                
+                            <!-- <div class="d-flex align-items-start">
+                                <div class="remember"> <label class="option text-muted"> Remember me <input type="radio" name="radio"> <span class="checkmark"></span> </label> </div>
+                                <div class="ml-auto"> <a href="#" id="forgot">Forgot Password?</a> </div>
+                            </div>  -->
+                            
+                            <button class="sign-btn btn btn-block text-center my-3" type="submit" name="submit">Log in</button>
+                           
+                            <!-- <p class="text text-Password">
+                                <a href="../Student/forgotPassword">Forgot Password?</a>
+                             </p> -->
+
+                            {% with messages = get_flashed_messages() %} {% if messages %}
+                            <ul class="messages text-red-500">
+                                {% for message in messages %}
+                                <li>{{ message }}</li>
+                                {% endfor %}
+                              </ul>
+                              {% endif %} {% endwith %}
+
+                              <p class="text terms">
+                                By signing up, I agree to the PUP Online Services
+                                <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Services</a> and
+                                <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+                            </p>
+                           
+                        </form>
+                    </div>
+                </div>
+              <!----  <div class="carousel">
+                    <div class="images-wrapper">
+                        <img src=".//img/complaint1.png" class="image img-1 show" alt="">
+                        <img src=".//img/complaints.jpg" class="image img-2" alt="">
+                        <img src=".//img/PUP.jpg" class="image img-3" alt="">
+                    </div>
+                </div> -->
+            </div>
+        </div>
+    </section>  
+
+    <script>
+        function formatStudentNumber() {
+            // Get the input element by its ID
+            let input = document.getElementById('StudentNumber');
+    
+            // Remove hyphens from the input value
+            let value = input.value.replace(/-/g, '');
+    
+            // Format the input as per the specified pattern
+    
+            // If the length is greater than 4, insert a hyphen after the 4th character
+            if (value.length > 4) {
+                value = value.substring(0, 4) + '-' + value.substring(4);
+            }
+    
+            // If the length is greater than 10, insert a hyphen after the 10th character
+            if (value.length > 10) {
+                value = value.substring(0, 10) + '-' + value.substring(10);
+            }
+    
+            // If the length is greater than 13 and the substring from 13 to 16 is not '-CM-', insert '-CM-'
+            if (value.length > 13) {
+                value = value.substring(0, 13) + '-' + value.substring(13);
+            }
+    
+            // If the length is greater than 17, insert a hyphen after the 17th character
+            if (value.length > 17) {
+                value = value.substring(0, 17) + '-' + value.substring(17);
+            }
+    
+            // Set the formatted value back to the input element
+            input.value = value;
+        }
+    </script>
+    
+    {% endblock %}
+
+<!-- 
+    <link rel="stylesheet" href="{{ url_for ('static', filename='/css/portal.css')}}"> -->
+
+    <!-- <section>           
         <div class="box">   
             <div class="inner-box">    
                 <div class="forms-wrap">
@@ -41,15 +144,15 @@
                         </div>
                     </form>
                 </div>
-              <!----  <div class="carousel">
+              ---  <div class="carousel">
                     <div class="images-wrapper">
                         <img src=".//img/complaint1.png" class="image img-1 show" alt="">
                         <img src=".//img/complaints.jpg" class="image img-2" alt="">
                         <img src=".//img/PUP.jpg" class="image img-3" alt="">
                     </div>
-                </div> -->
+                </div> 
             </div>
         </div>
-    </section>  
+    </section>   -->
 
-    {% endblock %}
+

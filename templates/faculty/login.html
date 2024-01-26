@@ -2,6 +2,70 @@
 
 {% block content %}
 
+<section>           
+    <div class="forms-wrap">
+        <div class="wrapper bg-white">
+            <div class="h2 text-center">Admin Portal</div>
+           
+            <!-- <div class="h4">Enter your login details</div> -->
+    
+            <form  action="{{ url_for('faculty_api.faculty_login') }}" name="form" method="POST" autocomplete="off" class="sign-in-form">
+               
+                <div class="form-group py-2">
+                    <div class="input-field"> <span class="fas fa-user p-2"></span> <input type="email" placeholder="Enter your Email Address" id="Email" name="Email" required> </div>
+                </div>
+    
+                <div class="form-group py-1 pb-2">
+                    <div class="input-field">
+                        <span class="fas fa-lock p-2"></span>
+                        <input type="password" id="Password" maxlength="20" name="Password" placeholder="Enter your Password" required>
+                      
+                    </div>
+                </div>
+                
+    
+                <!-- <div class="d-flex align-items-start">
+                    <div class="remember"> <label class="option text-muted"> Remember me <input type="radio" name="radio"> <span class="checkmark"></span> </label> </div>
+                    <div class="ml-auto"> <a href="#" id="forgot">Forgot Password?</a> </div>
+                </div>  -->
+                
+                <button class="sign-btn btn btn-block text-center my-3" type="submit" name="submit">Log in</button>
+               
+                <!-- <p class="text text-Password">
+                    <a href="../Student/forgotPassword">Forgot Password?</a>
+                 </p> -->
+
+                {% with messages = get_flashed_messages() %} {% if messages %}
+                <ul class="messages text-red-500">
+                    {% for message in messages %}
+                    <li>{{ message }}</li>
+                    {% endfor %}
+                  </ul>
+                  {% endif %} {% endwith %}
+
+                  <p class="text terms">
+                    By signing up, I agree to the PUP Online Services
+                    <a href="https://www.pup.edu.ph/terms/" target="_blank" rel="noopener noreferrer">Terms of Services</a> and
+                    <a href="https://www.pup.edu.ph/privacy/" target="_blank" rel="noopener noreferrer">Privacy Statement</a>
+                </p>
+               
+            </form>
+        </div>
+    </div>
+  <!----  <div class="carousel">
+        <div class="images-wrapper">
+            <img src=".//img/complaint1.png" class="image img-1 show" alt="">
+            <img src=".//img/complaints.jpg" class="image img-2" alt="">
+            <img src=".//img/PUP.jpg" class="image img-3" alt="">
+        </div>
+    </div> -->
+</div>
+</div>
+</section>  
+
+{% endblock %}
+
+<!-- 
 <link rel="stylesheet" href="{{ url_for ('static', filename='/css/portal.css')}}">
 
 <section>           
@@ -55,11 +119,7 @@
                 </div>
             </div>
         </div>
-</section>    
+</section>     -->
    
-{% endblock %}
 
 
-{% block script %}
-  
-{% endblock script %}

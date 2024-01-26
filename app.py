@@ -4,7 +4,7 @@ from flask_login import current_user, login_user
 from sqlalchemy import and_
 from Api.v1.faculty.utils import get_all_services
 from Api.v1.student.utils import get_student_services
-from models import Post, CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
 from datetime import datetime, timezone #, timedelta, 
@@ -60,13 +60,30 @@ def custom_context_processor():
 
 #========================= LANDING PAGE ===================================
 
+# @app.route('/')
+# @prevent_authenticated
+# def index():
+#     announcements = ESISAnnouncement.query.filter_by(IsLive=True).all()
+#     announcements = announcements 
+#     return render_template('main/home.html', announcements=announcements)
+
 @app.route('/')
 @prevent_authenticated
 def index():
-    announcements = ESISAnnouncement.query.filter_by(IsLive=True).all()
-    posts = Post.query.all()
-    combined_data = announcements + posts
-    return render_template('main/home.html', announcements=announcements, posts=posts, combined_data=combined_data)
+    # Fetch announcements from both tables
+    announcements_esis = ESISAnnouncement.query.filter_by(IsLive=True).all()
+    announcements_posts = Post.query.filter_by(PostType='announcement').all()
+
+    # Combine data from both tables
+    combined_data = announcements_esis + announcements_posts
+
+    return render_template('main/home.html', items=combined_data)
+
+@app.route('/events')
+@prevent_authenticated
+def events():
+    posts = Post.query.filter_by(PostType='event').all()  # Corrected the filter_by method
+    return render_template('main/events.html', posts=posts)
 
 #===========================================================================
 @app.route('/')
