@@ -1,19 +1,23 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-<div>
-    <h1>Manual Enrollments</h1>
-    <table id="manualTable" class="table table-bordered">
-        <thead>
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+          <h2>Petition Request</h2>
+      </div>
+      <table id="changeSubjects" class="table table-bordered table-condensed display">
+  <thead>
             <tr>
-                <th>ID</th>
+                <th>Application ID</th>
                 <th>Student Number</th>
                 <th>Name</th>
                 <th>Enrollment Type</th>
                 <th>Reason</th>
                 <th>File</th>
-                <th>Created At</th>
-                <th>Updated At</th>
+                <!-- <th>Created At</th>
+                <th>Updated At</th> -->
                 <th>User Responsible</th>
                 <th>Status</th>
                 <th>Action</th>
@@ -35,8 +39,8 @@
                   <span class="badge badge-warning">No File</span>
               {% endif %}
                 </td>
-                <td>{{ manual_enrollments.created_at }}</td>
-                <td>{{ manual_enrollments.updated_at }}</td>
+                <!-- <td>{{ manual_enrollments.created_at }}</td>
+                <td>{{ manual_enrollments.updated_at }}</td> -->
                 <td>{{ manual_enrollments.UserResponsible }}</td>
                 <td>{{ manual_enrollments.Status }}</td>
                 <td>
@@ -54,7 +58,7 @@
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-                        <form id="statusForm{{ manual_enrollments.ManualEnrollmentId }}" action="{{ url_for('update_manual_service_status', ManualEnrollmentId=manual_enrollments.ManualEnrollmentId) }}" method="POST">
+                        <form id="statusForm{{ manual_enrollments.ManualEnrollmentId }}" action="{{ url_for('update_manual_service_status', m_enrollment_ID=manual_enrollments.ManualEnrollmentId) }}" method="POST">
                             <div class="modal-body">
                               <select name="status" class="form-select">
                                 <option value="pending">Pending</option>

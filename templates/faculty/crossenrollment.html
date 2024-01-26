@@ -11,7 +11,7 @@
       <table id="changeSubjects" class="table table-bordered table-condensed display">
   <thead>
         <tr>
-            <th>ID</th>
+            <!-- <th>ID</th> -->
             <th>Student Number</th>
             <th>Name</th>
             <th>School for Cross Enrollment</th>
@@ -19,17 +19,17 @@
             <th>Authorized Subjects</th>
             <th>Application Letter</th>
             <th>Permit to Cross Enroll</th>
-            <th>Created At</th>
+            <!-- <th>Created At</th> -->
             <th>User Responsible</th>
             <th>Status</th>
-            <th>Student ID</th>
+            <!-- <th>Student ID</th> -->
             <th>Action</th>
         </tr>
     </thead>
     <tbody>
         {% for cross_enrollments in cross_enrollments %}
             <tr>
-                <td>{{ cross_enrollments.CrossEnrollmentId }}</td>
+                <!-- <td>{{ cross_enrollments.CrossEnrollmentId }}</td> -->
                 <td>{{ cross_enrollments.StudentNumber }}</td>
                 <td>{{ cross_enrollments.Name }}</td>
                 <td>{{ cross_enrollments.SchoolforCrossEnrollment }}</td>
@@ -49,10 +49,10 @@
                         No file
                     {% endif %}
                 </td>
-                <td>{{ cross_enrollments.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <!-- <td>{{ cross_enrollments.created_at.strftime('%Y-%m-%d %H:%M') }}</td> -->
                 <td>{{ cross_enrollments.UserResponsible }}</td>
                 <td>{{ cross_enrollments.Status }}</td>
-                <td>{{ cross_enrollments.StudentId }}</td>
+                <!-- <td>{{ cross_enrollments.StudentId }}</td> -->
                 <td>
                     <!-- Action Buttons -->
                     <!-- You can customize these buttons according to your requirements -->

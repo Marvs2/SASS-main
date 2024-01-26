@@ -2512,7 +2512,7 @@ def update_petition_service_status(petition_request_id):
     return redirect(url_for('facultypetition'))
 #=====================================================================
 #enrollement
-@app.route('/update-manual-service-Status/<int:m_enrollment_ID>', methods=['POST'])
+@app.route('/update_manual_service_status/<int:m_enrollment_ID>', methods=['POST'])
 def update_manual_service_status(m_enrollment_ID):
     session['last_activity'] = datetime.now(timezone.utc)
 
@@ -2716,7 +2716,39 @@ def faculty_dashboard():
 def facultyprofile():
     return render_template('/faculty/profile.html', faculty_api_base_url=faculty_api_base_url)
 
+@app.route('/faculty/profile/updated', methods=['GET', 'POST'])
+def faculty_update_profile():
+    if request.method == 'POST':
+        faculty_id = request.form.get('faculty_id')
 
+        Email = request.form.get('Email')
+        MobileNumber = request.form.get('MobileNumber')
+        ResidentialAddress = request.form.get('ResidentialAddress')
+
+        user_id = get_current_faculty_user()
+
+        if isinstance(user_id, Faculty):
+            user_id = user_id.FacultyId
+
+        faculty = Faculty.query.get(user_id)
+
+        if faculty:
+            try:
+                faculty.Email = Email
+                faculty.MobileNumber = MobileNumber
+                faculty.ResidentialAddress = ResidentialAddress
+
+                db.session.commit()
+                flash('Profile Updated Successfully!', category='success')
+                return redirect(url_for('facultyprofile'))
+            except Exception as e:
+                # Handle the specific exception or log the error
+                flash(f'Error updating profile: {str(e)}', category='error')
+                db.session.rollback()  # Rollback changes in case of an error
+        else:
+            flash('Faculty not found. Please try again!', category='error')
+
+    return render_template('/faculty/profile.html')
 
 # ======================Faculty Downloads========================== #
 # =======================Downloads File============================ #

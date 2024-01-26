@@ -10,17 +10,17 @@
       <table id="changeSubjects" class="table table-bordered table-condensed display">
   <thead>
             <tr>
-                <th>ID</th>
+                <th>Application ID</th>
                 <th>Student Number</th>
                 <th>Name</th>
                 <th>Subject Code</th>
                 <th>Subject Name</th>
                 <th>Petition Type</th>
                 <th>Request Reason</th>
-                <th>Created At</th>
+                <!-- <th>Created At</th> -->
                 <th>User Responsible</th>
                 <th>Status</th>
-                <th>Action</th>
+                <!-- <th>Action</th> -->
             </tr>
         </thead>
         <tbody>
@@ -33,12 +33,10 @@
                 <td>{{ request.SubjectName }}</td>
                 <td>{{ request.PetitionType }}</td>
                 <td>{{ request.RequestReason }}</td>
-                <td>{{ request.created_at }}</td>
+                <!-- <td>{{ request.created_at }}</td> -->
                 <td>{{ request.UserResponsible }}</td>
                 <td>{{ request.Status }}</td>
-                <td>
-                    <!-- Action buttons like edit or update status -->
-                </td>
+                <!-- <td>Action buttons like edit or update status</td> -->
             </tr>
             {% endfor %}
         </tbody>
