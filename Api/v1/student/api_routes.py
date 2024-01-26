@@ -1029,7 +1029,7 @@ def create_petitionrequest_form(form_data, StudentId):
     RequestReason = form_data['RequestReason']
     UserResponsible = form_data['UserResponsible']
     Status = form_data['Status']
-
+    FacultyId = '10017'
     if not StudentNumber or not Name or not SubjectCode or not SubjectName or not PetitionType or not RequestReason:
         flash('Please fill out all fields and provide valid values.', 'danger')
         return None
@@ -1038,6 +1038,7 @@ def create_petitionrequest_form(form_data, StudentId):
         StudentId=StudentId,
         StudentNumber=StudentNumber,
         Name=Name,
+        FacultyId=FacultyId,
         SubjectCode=SubjectCode,
         SubjectName=SubjectName,
         PetitionType=PetitionType,
