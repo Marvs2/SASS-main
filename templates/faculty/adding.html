@@ -112,7 +112,7 @@
                       <div class="col-sm-4">
                         <input type="hidden" id="subjectIdInput" name="subjectId">
                           <select id="statusSelect" name="status" class="form-control">
-                              <option value="Pending">Pending</option>
+                              <option value="pending">pending</option>
                               <option value="Approved">Approved</option>
                               <option value="Completed">Completed</option>
                               <option value="Rejected">Rejected</option>
@@ -171,14 +171,14 @@
       statusDropdown.find('option').prop('disabled', false);
   
       switch (currentStatus) {
-        case 'Pending':
+        case 'pending':
           // Admin can only change to 'Approved'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
           statusDropdown.find('option[value="Completed"]').prop('disabled', true);
           break;
         case 'Approved':
           // Admin can change to 'Completed'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+          statusDropdown.find('option[value="pending"]').prop('disabled', true);
           statusDropdown.find('option[value="Approved"]').prop('disabled', true);
           break;
         case 'Completed':
