@@ -22,30 +22,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for subject, student in combined_data %}
-              <tr data-add-name="{{ student.FirstName }} {{ student.LastName }}"
-
-                  data-add-student-Number="{{ student.StudentNumber }}"
-                  data-add-subject="{{ subject.Subject }}"
-                  data-add-reason="{{ subject.ServiceDetails }}"
-                  data-add-sender="{{ subject.SenderName }}"
-                  data-add-contact="{{ subject.SenderContactNo }}"
-                  data-add-file="{{ subject.PaymentFile }}"
-                  data-add-status="{{ subject.Status }}">
-                 <td>{{ subject.AddSubjectId }}</td>
-                 <td>{{ student.StudentNumber }}</td>
-                 <td>{{ student.FirstName }} {{ student.LastName }}</td>
-                <td>{{ subject.Subject }}</td>
-                <!-- <td>{{ subject.ServiceDetails }}</td> -->
-                <!-- <td>{{ subject.SenderName }}</td>
-                <td>{{ subject.SenderContactNo }}</td> -->
-                <td>{{ subject.Status }}</td>
-                <td>
-                  <button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ subject.AddSubjectId }}', '{{ subject.Status }}')"></button>
-                  <!-- <button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button> -->
-                </td>
-              </tr>
-            {% endfor %}
+            <!--Nothing-->
           </tbody>
         </table>
       </div>
@@ -112,7 +89,7 @@
                       <div class="col-sm-4">
                         <input type="hidden" id="subjectIdInput" name="subjectId">
                           <select id="statusSelect" name="status" class="form-control">
-                              <option value="pending">pending</option>
+                              <option value="Pending">Pending</option>
                               <option value="Approved">Approved</option>
                               <option value="Completed">Completed</option>
                               <option value="Rejected">Rejected</option>
@@ -136,7 +113,7 @@
     </div>
   </div>
 
-  <script>
+  <!-- <script>
     $(document).ready(function () {
       $('#addingSubject tbody tr').on('click', function () {
         // Retrieve data from the clicked row
@@ -243,7 +220,7 @@
           console.error('Error:', error);
         });
     }
-  </script>
+  </script> -->
   
 {% endblock %}
    

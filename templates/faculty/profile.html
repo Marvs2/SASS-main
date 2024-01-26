@@ -8,7 +8,7 @@
             <h3>Faculty Profile</h3>           
         </div>
         <!-- Profile Form -->
-        <form id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
+        <form action="{{ url_for('faculty_update_profile') }}" id="profileForm" method="POST" onsubmit="updateFacultyProfile(event)">
             <!-- Other form fields... -->
 
             <!-- Faculty Type and BirthDate -->

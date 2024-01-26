@@ -526,7 +526,8 @@ class AddSubjects(db.Model):
     __tablename__ = 'SASSAddSubjects'
     
     AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
+    StudentId =db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     FacultyRole =db.Column(db. String(50))
     Subject = db.Column(db.String(255))
     ServiceDetails = db.Column(db.String(255))
@@ -542,6 +543,7 @@ class AddSubjects(db.Model):
         return {
             'AddSubjectId': self.AddSubjectId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'FacultyRole': self.FacultyRole,
             'SubjectId': self.Subject,
             'ServiceDetails': self.ServiceDetails,
@@ -680,6 +682,7 @@ class ChangeSubject(db.Model):
     
     ChangeSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     FacultyRole =db.Column(db. String(50))
     FromSubject = db.Column(db.String(255))
     ToSubject = db.Column(db.String(255))
@@ -695,6 +698,7 @@ class ChangeSubject(db.Model):
         return {
             'ChangeSubjectId': self.ChangeSubjectId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'FacultyRole': self.FacultyRole,
             'FromSubject': self.FromSubject,
             'ToSubject': self.ToSubject,
@@ -713,6 +717,7 @@ class ManualEnrollment(db.Model, UserMixin):
 
     ManualEnrollmentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     StudentNumber = db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     EnrollmentType = db.Column(db.String(100), nullable=False)
@@ -748,7 +753,8 @@ class CertificationRequest(db.Model, UserMixin):
     __tablename__ = 'SASSCertification'
 
     CertificationId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId')) 
     StudentNumber = db.Column(db.String(255), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     CertificationType = db.Column(db.String(100), nullable=False)
@@ -771,6 +777,7 @@ class CertificationRequest(db.Model, UserMixin):
         return {
             'CertificationId': self.CertificationId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'StudentNumber': self.StudentNumber,
             'Name': self.Name,
             'CertificationType': self.CertificationType,
@@ -793,7 +800,7 @@ class GradeEntry(db.Model, UserMixin):
 
     GradeEntryId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId')) 
-
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     StudentNumber =db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     ApplicationType = db.Column(db.String(150), nullable=False)
@@ -812,6 +819,7 @@ class GradeEntry(db.Model, UserMixin):
         return {
             'GradeEntryId': self.GradeEntryId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'StudentNumber': self.StudentNumber,
             'Name': self.Name,
             'ApplicationType': self.ApplicationType,
@@ -832,7 +840,8 @@ class CrossEnrollment(db.Model, UserMixin):
     __tablename__ = 'SASSCrossEnrollment'
 
     CrossEnrollmentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)  
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))  
     StudentNumber = db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     SchoolforCrossEnrollment = db.Column(db.String(255), nullable=False)
@@ -852,6 +861,7 @@ class CrossEnrollment(db.Model, UserMixin):
         return {
             'CrossEnrollmentId': self.CrossEnrollmentId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'StudentNumber': self.StudentNumber,
             'Name': self.Name,
             'SchoolforCrossEnrollment': self.SchoolforCrossEnrollment,
@@ -874,6 +884,7 @@ class PetitionRequest(db.Model, UserMixin):
     PetitionId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
     StudentNumber = db.Column(db.String(100), nullable=False)#/Student number dpat ito/
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     Name = db.Column(db.String(255), nullable=False)
     SubjectCode = db.Column(db.String(100), nullable=False)
     SubjectName = db.Column(db.String(255), nullable=False)
@@ -890,6 +901,7 @@ class PetitionRequest(db.Model, UserMixin):
             'PetitionId': self.PetitionId,
             'StudentId': self.StudentId,
             'StudentNumber':self.StudentNumber,
+            'FacultyId': self.FacultyId,
             'Name': self.Name,
             'SubjectCode': self.SubjectCode,
             'SubjectName': self.SubjectName,
@@ -907,6 +919,7 @@ class ShiftingApplication(db.Model, UserMixin):
 
     ShiftingId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     StudentNumber = db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     CurrentProgram = db.Column(db.String(255), nullable=False)
@@ -924,6 +937,7 @@ class ShiftingApplication(db.Model, UserMixin):
         return {
             'ShiftingId': self.ShiftingId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'StudentNumber': self.StudentNumber,
             'Name': self.Name,
             'CurrentProgram': self.CurrentProgram,
@@ -942,7 +956,8 @@ class OverloadApplication(db.Model, UserMixin):
     __tablename__ = 'SASSOverloadApplication'
 
     OverloadId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True) 
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId')) 
     Name = db.Column(db.String(255), nullable=False)
     StudentNumber = db.Column(db.String(100), nullable=False)
     ProgramCourse = db.Column(db.String(255), nullable=False)
@@ -960,6 +975,7 @@ class OverloadApplication(db.Model, UserMixin):
         return {
             'OverloadId':  self.OverloadId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'Name': self.Name,
             'StudentNumber': self.StudentNumber,
             'ProgramCourse':self.ProgramCourse,
@@ -980,6 +996,7 @@ class TutorialRequest(db.Model, UserMixin):
 
     TutorialId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId')) 
     StudentNumber = db.Column(db.String(100), nullable=False)
     Name = db.Column(db.String(255), nullable=False)
     SubjectCode = db.Column(db.String(100), nullable=False)
@@ -998,6 +1015,7 @@ class TutorialRequest(db.Model, UserMixin):
         return {
             'TutorialId': self.TutorialId,
             'StudentId': self.StudentId,
+            'FacultyId': self.FacultyId,
             'StudentNumber': self.StudentNumber,
             'Name': self.Name,
             'SubjectCode': self.SubjectCode,
