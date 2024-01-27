@@ -203,8 +203,6 @@ chart.render();
 //   var chart = new ApexCharts(document.querySelector("#chart1"), options);
 //   chart.render();
   
- 
-changeSubjects
 
 $(document).ready(function() {
 	$('#changeSubjects').DataTable(); // OVERLOAD OF SUBJECTS
