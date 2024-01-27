@@ -9,7 +9,7 @@
           <h3>Current Request</h3>
         </div>
 
-        <table id="changeSubjects" class="table table-bordered table-condensed display">
+        <table id="addingSubject" class="table table-bordered table-condensed display">
           <thead>
             <tr>
               <th>Application Number</th>
@@ -25,32 +25,32 @@
             {% for subject, student in combined_data %}
               <tr data-add-name="{{ student.FirstName }} {{ student.LastName }}"
 
-                  data-add-student-Number="{{ student.StudentNumber }}"
-                  data-add-subject="{{ subject.Subject }}"
-                  data-add-reason="{{ subject.ServiceDetails }}"
-                  data-add-sender="{{ subject.SenderName }}"
-                  data-add-contact="{{ subject.SenderContactNo }}"
-                  data-add-file="{{ subject.PaymentFile }}"
-                  data-add-status="{{ subject.Status }}">
-                 <td>{{ subject.AddSubjectId }}</td>
-                 <td>{{ student.StudentNumber }}</td>
-                 <td>{{ student.FirstName }} {{ student.LastName }}</td>
-                <td>{{ subject.Subject }}</td>
-                <!-- <td>{{ subject.ServiceDetails }}</td> -->
-                <!-- <td>{{ subject.SenderName }}</td>
-                <td>{{ subject.SenderContactNo }}</td> -->
-                <td>{{ subject.Status }}</td>
-                <td>
-                  <button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ subject.AddSubjectId }}', '{{ subject.Status }}')"></button>
-                  <!-- <button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button> -->
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+              data-add-student-Number="{{ student.StudentNumber }}"
+              data-add-subject="{{ subject.Subject }}"
+              data-add-reason="{{ subject.ServiceDetails }}"
+              data-add-sender="{{ subject.SenderName }}"
+              data-add-contact="{{ subject.SenderContactNo }}"
+              data-add-file="{{ subject.PaymentFile }}"
+              data-add-status="{{ subject.Status }}">
+             <td>{{ subject.AddSubjectId }}</td>
+             <td>{{ student.StudentNumber }}</td>
+             <td>{{ student.FirstName }} {{ student.LastName }}</td>
+            <td>{{ subject.Subject }}</td>
+            <!-- <td>{{ subject.ServiceDetails }}</td> -->
+            <!-- <td>{{ subject.SenderName }}</td>
+            <td>{{ subject.SenderContactNo }}</td> -->
+            <td>{{ subject.Status }}</td>
+            <td>
+              <button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ subject.AddSubjectId }}', '{{ subject.Status }}')"></button>
+              <!-- <button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button> -->
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
+</div>
+</div>
 
   <!-- Status Edit Modal -->
   <div class="modal fade" id="viewAddModal" tabindex="-1" role="dialog" aria-labelledby="viewAddModalLabel" aria-hidden="true">
@@ -64,186 +64,185 @@
             </div>
 
             <form id="statusForm">
-                <div class="modal-body">
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Name:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-name"></p>
-                      </div>          
-                    </div>
+              <div class="modal-body">
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Name:</label>
+                    <div class="col-sm-4">
+                      <p id="adding-name"></p>
+                    </div>          
+                  </div>
 
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Subject to Add:</label>
-                      <div class="col-sm-6">
-                        <p id="adding-student-subject"></p>
-                      </div>          
-                    </div>
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Subject to Add:</label>
+                    <div class="col-sm-6">
+                      <p id="adding-student-subject"></p>
+                    </div>          
+                  </div>
 
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Reason/s:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-student-reason"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Sender Name:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-sender-name"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Sender Contact Number:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-sender-contact"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Payment file:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-file-attachment"></p>
-                      </div>          
-                    </div>
-                            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Status:</label>
-                      <div class="col-sm-4">
-                        <input type="hidden" id="subjectIdInput" name="subjectId">
-                          <select id="statusSelect" name="status" class="form-control">
-                              <option value="pending">pending</option>
-                              <option value="Approved">Approved</option>
-                              <option value="Completed">Completed</option>
-                              <option value="Rejected">Rejected</option>
-                          </select>
-                      </div>          
-                    </div>
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Reason/s:</label>
+                    <div class="col-sm-4">
+                      <p id="adding-student-reason"></p>
+                    </div>          
+                  </div>
 
-                    <div class="form-group">
-                      <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
-                      <div class="col-sm-10">
-                        <textarea type="text" class="form-control" id="remarks"></textarea>
-                      </div>          
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="submitStatus()">Save changes</button>
-                </div>
-            </form>
-        </div>
-    </div>
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Sender Name:</label>
+                    <div class="col-sm-4">
+                      <p id="adding-sender-name"></p>
+                    </div>          
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Sender Contact Number:</label>
+                    <div class="col-sm-4">
+                      <p id="adding-sender-contact"></p>
+                    </div>          
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Payment file:</label>
+                    <div class="col-sm-4">
+                      <p id="adding-file-attachment"></p>
+                    </div>          
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-3 control-label">Status:</label>
+                    <div class="col-sm-4">
+                      <input type="hidden" id="subjectIdInput" name="subjectId">
+                        <select id="statusSelect" name="status" class="form-control">
+                            <option value="Pending">Pending</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>          
+                  </div>
+
+                  <div class="form-group">
+                    <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
+                    <div class="col-sm-10">
+                      <textarea type="text" class="form-control" id="remarks"></textarea>
+                    </div>          
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-success" onclick="submitStatus()">Save changes</button>
+              </div>
+          </form>
+      </div>
   </div>
+</div>
 
-  <script>
-    $(document).ready(function () {
-      $('#addingSubject tbody tr').on('click', function () {
-        // Retrieve data from the clicked row
-        var name = $(this).data('add-name');
-        var studentNumber = $(this).data('add-student-Number');
-        var subject = $(this).data('add-subject'); 
-        var reason = $(this).data('add-reason'); 
-        var sender = $(this).data('add-sender'); 
-        var contact = $(this).data('add-contact'); 
-        var fileAttachment = $(this).data('add-file');
-        var status = $(this).data('add-status'); // Add this line to get the status
-  
-        // Populate modal with data
-        $('#adding-name').text(name);
-        $('#adding-student-number').text(studentNumber);
-        $('#adding-student-subject').text(subject);
-        $('#adding-student-reason').text(reason);
-        $('#adding-sender-name').text(sender);
-        $('#adding-sender-contact').text(contact);
-        $('#adding-file-attachment').text(fileAttachment);
-  
-        // Additional logic for handling status-related changes
-        handleStatusChange(status);
-      });
+<script>
+  $(document).ready(function () {
+    $('#addingSubject tbody tr').on('click', function () {
+      // Retrieve data from the clicked row
+      var name = $(this).data('add-name');
+      var studentNumber = $(this).data('add-student-Number');
+      var subject = $(this).data('add-subject'); 
+      var reason = $(this).data('add-reason'); 
+      var sender = $(this).data('add-sender'); 
+      var contact = $(this).data('add-contact'); 
+      var fileAttachment = $(this).data('add-file');
+      var status = $(this).data('add-status'); // Add this line to get the status
+
+      // Populate modal with data
+      $('#adding-name').text(name);
+      $('#adding-student-number').text(studentNumber);
+      $('#adding-student-subject').text(subject);
+      $('#adding-student-reason').text(reason);
+      $('#adding-sender-name').text(sender);
+      $('#adding-sender-contact').text(contact);
+      $('#adding-file-attachment').text(fileAttachment);
+
+      // Additional logic for handling status-related changes
+      handleStatusChange(status);
     });
-  
-    function handleStatusChange(currentStatus) {
-      var statusDropdown = $('#statusSelect');
-      var updateButton = $('#updateBtn');
-  
-      // Enable/disable options based on the selected status
-      statusDropdown.find('option').prop('disabled', false);
-  
-      switch (currentStatus) {
-        case 'pending':
-          // Admin can only change to 'Approved'
-          statusDropdown.find('option[value="pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Completed"]').prop('disabled', true);
-          break;
-        case 'Approved':
-          // Admin can change to 'Completed'
-          statusDropdown.find('option[value="pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Approved"]').prop('disabled', true);
-          break;
-        case 'Completed':
-          // Disable all options when status is 'Completed'
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        case 'Rejected':
-          // Admin cannot change to any other status
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        default:
-          break;
-      }
-  
-      // Set the current status as selected
-      statusDropdown.val(currentStatus);
-  
-      // Enable/disable "Update" button based on the selected status
-      updateButton.prop('disabled', true);
-  
-      // Bind an event handler to the status dropdown to check for changes
-      statusDropdown.on('change', function () {
-        updateButton.prop('disabled', false);
-      });
-  
-      if (currentStatus === 'Closed') {
-        statusDropdown.prop('disabled', true);
-      } else {
-        statusDropdown.prop('disabled', false);
-      }
+  });
+
+  function handleStatusChange(currentStatus) {
+    var statusDropdown = $('#statusSelect');
+    var updateButton = $('#updateBtn');
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find('option').prop('disabled', false);
+
+    switch (currentStatus) {
+      case 'Pending':
+        // Admin can only change to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+        statusDropdown.find('option[value="Completed"]').prop('disabled', true);
+        break;
+      case 'Approved':
+        // Admin can change to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop('disabled', true);
+        statusDropdown.find('option[value="Approved"]').prop('disabled', true);
+        break;
+      case 'Completed':
+        // Disable all options when status is 'Completed'
+        statusDropdown.find('option').prop('disabled', true);
+        break;
+      case 'Rejected':
+        // Admin cannot change to any other status
+        statusDropdown.find('option').prop('disabled', true);
+        break;
+      default:
+        break;
     }
-  
-    function openEditModal(subjectId, currentStatus) {
-      $('#subjectIdInput').val(subjectId);
-      handleStatusChange(currentStatus);
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop('disabled', true);
+
+    // Bind an event handler to the status dropdown to check for changes
+    statusDropdown.on('change', function () {
+      updateButton.prop('disabled', false);
+    });
+
+    if (currentStatus === 'Closed') {
+      statusDropdown.prop('disabled', true);
+    } else {
+      statusDropdown.prop('disabled', false);
     }
-  
-    function submitStatus() {
-      const subjectId = $('#subjectIdInput').val();
-      const newStatus = $('#statusSelect').val();
-      const remarks = $('#remarks').val(); // Get remarks value
-  
-      // AJAX request to Flask backend
-      fetch('/update_status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subjectId: subjectId,
-          status: newStatus,
-          remarks: remarks, // Include remarks in the request
-        })
+  }
+
+  function openEditModal(subjectId, currentStatus) {
+    $('#subjectIdInput').val(subjectId);
+    handleStatusChange(currentStatus);
+  }
+
+  function submitStatus() {
+    const subjectId = $('#subjectIdInput').val();
+    const newStatus = $('#statusSelect').val();
+    const remarks = $('#remarks').val(); // Get remarks value
+
+    // AJAX request to Flask backend
+    fetch('/update_status', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        subjectId: subjectId,
+        status: newStatus,
+        remarks: remarks, // Include remarks in the request
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Success:', data);
-          $('#viewAddModal').modal('hide');
-          location.reload(); // Reload the page to see the changes
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    }
-  </script>
-  
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        $('#viewAddModal').modal('hide');
+        location.reload(); // Reload the page to see the changes
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }
+</script>
+
 {% endblock %}
-   
