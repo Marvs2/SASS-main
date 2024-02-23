@@ -6,7 +6,7 @@
     <div class="data data1" id="firstTableContainer">
       <div class="content-data">
         <div class="head mb-3">
-          <h3>Current Requests</h3>
+          <h3>Current Requests for Overload</h3>
         </div>
   
         <table id="changeSubjects" class="table table-bordered table-condensed display">
@@ -53,7 +53,7 @@
     <div class="modal-dialog modal-lg" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title text-white" id="viewChangeModalLabel">Update Application Status</h5>
+          <h5 class="modal-title text-white" id="viewChangeModalLabel">Update Overload Application Status</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -130,6 +130,19 @@
               </div>
             </div>
           </div>
+          <div class="form-group">
+            <label for="recipient-name" class="col-sm-2 control-label"
+              >Remarks:</label
+            >
+            <div class="col-sm-10">
+              <textarea
+                type="text"
+                class="form-control"
+                id="remarks"
+              ></textarea>
+            </div>
+          </div>
+        </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             <button type="button" class="btn btn-success" onclick="submitChangeStatus()">Save changes</button>

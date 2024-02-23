@@ -1,6 +1,6 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  failingradeperbatch, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
+from Api.v1.student.utils import  failingradeperbatch, get_incomplete_subjects, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getFirstSemSubjectsGrade, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
@@ -598,14 +598,13 @@ def subjectsGrade():
             return jsonify(error="No data available")
     else:
         return render_template('404.html'), 404
-    
 
 @student_api.route('/currentsubject', methods=['GET'])
 def currentsubject():
     student = getCurrentUser()
     # print('STUDEINT ID: ', student.StudentId)
     if student:
-        json_current_subject = getCurrentSubject(student.StudentId)
+        json_current_subject = getSubjectsGrade(student.StudentId) # getCurrentSubject # getFirstSemSubjectsGrade #get_incomplete_subjects #All subjectgrade = getSubjectsGrade
         if json_current_subject:
             return (json_current_subject)
         else:

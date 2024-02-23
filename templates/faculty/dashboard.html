@@ -1,187 +1,747 @@
-{% extends "faculty/layout.html" %}
-
-{% block content %}
+{% extends "faculty/layout.html" %} {% block content %}
 
 <!-- MAIN -->
-		<main>
-			<h1 class="title">Dashboard</h1>
-			<ul class="breadcrumbs">
-				<li><a href="#">Home</a></li>
-				<li class="divider">/</li>
-				<li><a href="#" class="active">Dashboard</a></li>
-			</ul>
-			<div class="info-data">
-				<div class="card">
-				  <div class="head">
-					<div>
-					  <h2>{{ pending_count }}</h2>
-					  <p>Pending</p>
-					</div>
-					<i class="bx bx-trending-down icon down"></i>
-				  </div>
-				  <span class="progress" data-value="{{ pending_percentage }}"></span>
-				  <span class="label">{{ pending_percentage }}</span>
-				</div>
-			
-				<div class="card">
-				  <div class="head">
-					<div>
-					  <h2>{{ approved_count }}</h2>
-					  <p>Approved</p>
-					</div>
-					<i class="bx bx-trending-up icon"></i>
-				  </div>
-				  <span class="progress" data-value="{{ approved_percentage }}"></span>
-				  <span class="label">{{ approved_percentage }}</span>
-				</div>
-			
-				<div class="card">
-				  <div class="head">
-					<div>
-					  <h2>{{ denied_count }}</h2>
-					  <p>Denied</p>
-					</div>
-					<i class="bx bx-trending-up icon"></i>
-				  </div>
-				  <span class="progress" data-value="{{ denied_percentage }}"></span>
-				  <span class="label">{{ denied_percentage }}</span>
-				</div>
-			
-				<div class="card">
-				  <div class="head">
-					<div>
-					  <h2>{{ total_services }}</h2>
-					  <p>Total Services</p>
-					</div>
-					<i class="bx bx-trending-up icon"></i>
-				  </div>
-				  <span class="progress" data-value="{{ total_percentage }}"></span>
-				  <span class="label">{{ total_percentage }}</span>
-				</div>
-			</div>
-			<div class="data">
-				<div class="content-data">
-					<div class="head">
-						<h3>Service Report</h3>
-						<div class="menu">
-							<i class='bx bx-dots-horizontal-rounded icon'></i>
-							<ul class="menu-link">
-								<li><a href="#">Edit</a></li>
-								<li><a href="#">Save</a></li>
-								<li><a href="#">Remove</a></li>
-							</ul>
-						</div>
-					</div>
-					<div class="chart">
-						<div id="chart"></div>
-					</div>
-				</div>
+<main>
+  <h1 class="title">Dashboard</h1>
+  <ul class="breadcrumbs">
+    <li><a href="#">Home</a></li>
+    <li class="divider">/</li>
+    <li><a href="#" class="active">Dashboard</a></li>
+  </ul>
+  <div class="info-data">
+    <!-- ... (your existing code) ... -->
+    <div class="card" id="pendingCard">
+      <div class="head">
+        <div>
+          <h2>
+            <a
+              href="#"
+              class="card-number"
+              data-toggle="modal"
+              data-target="#pendingModal"
+              >{{ pending_count }}</a
+            >
+          </h2>
+          <p><strong>Pending</strong></p>
+        </div>
+        <i class="bx bx-trending-down icon down"></i>
+      </div>
+      <span class="progress" data-value="{{ pending_percentage }}"></span>
+      <span class="label">{{ pending_percentage }}</span>
+    </div>
 
-				<div class="content-data">
-					<!-- ... your existing HTML ... -->
-					<div class="chart">
-						<div id="chart1" style="width: 100%; max-width: 600px; height: 400px"></div>
-					</div>
-				
-					<!-- Hidden elements to store data for JavaScript -->
-					<div id="chartData" 
-						 data-pending="{{ pending_percentage }}" 
-						 data-approved="{{ approved_percentage }}"
-						 data-rejected="{{ denied_percentage }}"
-						 style="display: none;">
-					</div>
-				</div>
-				
-			</div>
-		</main>
-		<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-		<script>
-		document.addEventListener('DOMContentLoaded', function() {
-			var chartDataElement = document.getElementById('chartData');
-		
-			var pending = parseFloat(chartDataElement.getAttribute('data-pending'));
-			var approved = parseFloat(chartDataElement.getAttribute('data-approved'));
-			var rejected = parseFloat(chartDataElement.getAttribute('data-rejected'));
-		
-			var options = {
-			  series: [pending, approved, rejected],
-			  chart: {
-				width: 500,
-				type: 'pie',
-			  },
-			  labels: ['Pending', 'Approved', 'Rejected'],
-			  responsive: [{
-				breakpoint: 480,
-				options: {
-				  chart: {
-					width: 200
-				  },
-				  legend: {
-					position: 'bottom'
-				  }
-				}
-			  }]
-			};
-		
-			var chart = new ApexCharts(document.querySelector("#chart1"), options);
-			chart.render();
-		  });
-		
-		  $(document).ready(function () {
-			// Fetch data from the endpoint
-			$.ajax({
-			  url: "/faculty/dashboard",
-			  type: "GET",
-			  dataType: "json",
-			  success: function (response) {
-				if (response.success) {
-				  // Calculate total percentage based on the total count
-				  var total_percentage =
-					100 -
-					response.pending_percentage -
-					response.approved_percentage -
-					response.denied_percentage;
-		
-				  // Update the HTML with the received data
-				  updateCard(
-					"Pending",
-					response.pending_count,
-					response.pending_percentage
-				  );
-				  updateCard(
-					"Approved",
-					response.approved_count,
-					response.approved_percentage
-				  );
-				  updateCard(
-					"Denied",
-					response.denied_count,
-					response.denied_percentage
-				  );
-				  updateCard("Total Services", response.total_count, total_percentage);
-				} else {
-				  console.error(response.message);
-				}
-			  },
-			  error: function (error) {
-				console.error("Error fetching data:", error);
-			  },
-			});
-		
-			// Function to update the card based on the count and percentage
-			function updateCard(status, count, percentage) {
-			  var $card = $('.card:contains("' + status + '")');
-			  var $h2 = $card.find("h2");
-			  var $p = $card.find("p");
-			  var $progress = $card.find(".progress");
-			  var $label = $card.find(".label");
-		
-			  // Update HTML elements
-			  $h2.text(count || 0); // Display 0 if count is undefined or null
-			  $p.text(status);
-			  $progress.attr("data-value", percentage + "%");
-			  $label.text(percentage + "%");
-			}
-		  });
-		</script>
+    <!-- Modal for Pending -->
+    <div
+      class="modal fade"
+      id="pendingModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="pendingModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="pendingModalLabel">
+              Pending Services Details
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="pendingModalBody">
+            <!-- Display the counts for each service type -->
+            <!-- Counts will be dynamically updated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Approved Card-->
+    <div class="card" id="approvedCard">
+      <div class="head">
+        <div>
+          <h2>
+            <a
+              href="#"
+              class="card-number"
+              data-toggle="modal"
+              data-target="#approvedModal"
+            >
+              {{ approved_count }}
+            </a>
+          </h2>
+          <p><strong>Approved</strong></p>
+        </div>
+        <i class="bx bx-trending-down icon down"></i>
+      </div>
+      <span class="progress" data-value="{{ approved_percentage }}"></span>
+      <span class="label">{{ approved_percentage }}</span>
+    </div>
+    <!--Modal for Approved-->
+    <div
+      class="modal fade"
+      id="approvedModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="approvedModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="approvedModalLabel">
+              Approved Services Details
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="approvedModalBody">
+            <!-- Display the counts for each service type -->
+            <!-- Counts will be dynamically updated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!--Denied Card-->
+
+    <div class="card" id="deniedCard">
+      <div class="head">
+        <div>
+          <h2>
+            <a
+              href="#"
+              class="card-number"
+              data-toggle="modal"
+              data-target="#deniedModal"
+              >{{ denied_count }}</a
+            >
+          </h2>
+          <p><strong>Denied</strong></p>
+        </div>
+        <i class="bx bx-trending-down icon down"></i>
+      </div>
+      <span class="progress" data-value="{{ denied_percentage }}"></span>
+      <span class="label">{{ denied_percentage }}</span>
+    </div>
+    <!--Modal for Denied-->
+    <div
+      class="modal fade"
+      id="deniedModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="deniedModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deniedModalLabel">
+              Denied Services Details
+            </h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="deniedModalBody">
+            <!-- Display the counts for each service type -->
+            <!-- Counts will be dynamically updated here -->
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--Modal for Denied-->
+    <div class="card" id="totalCard">
+      <div class="head">
+        <div>
+          <h2>{{ total_services }}</h2>
+          <p>Total Services</p>
+        </div>
+        <i class="bx bx-trending-up icon"></i>
+      </div>
+      <span class="progress" data-value="{{ total_percentage }}"></span>
+      <span class="label">{{ total_percentage }}</span>
+    </div>
+  </div>
+  <div class="data">
+    <div class="content-data">
+      <div class="head">
+        <h3>Service Report</h3>
+        <div class="menu">
+          <i class="bx bx-dots-horizontal-rounded icon"></i>
+          <ul class="menu-link">
+            <li><a href="#">Edit</a></li>
+            <li><a href="#">Save</a></li>
+            <li><a href="#">Remove</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="chart">
+        <div id="chart"></div>
+      </div>
+    </div>
+
+    <div class="content-data">
+      <!-- ... your existing HTML ... -->
+      <div class="chart">
+        <div
+          id="chart1"
+          style="width: 100%; max-width: 600px; height: 400px"
+        ></div>
+      </div>
+
+      <!-- Hidden elements to store data for JavaScript -->
+      <div
+        id="chartData"
+        data-pending="{{ pending_percentage }}"
+        data-approved="{{ approved_percentage }}"
+        data-rejected="{{ denied_percentage }}"
+        style="display: none"
+      ></div>
+    </div>
+  </div>
+  <div class="data">
+    <div class="content-data">
+      <!-- Hidden elements to store data for JavaScript -->
+      <canvas id="servicesBarGraph" width="400" height="200"></canvas>
+
+      <!-- Display the data as text -->
+      <div id="serviceDataDetails"></div>
+    </div>
+  </div>
+</main>
+<!-- Include ApexCharts library -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var chartDataElement = document.getElementById("chartData");
+
+    var pending = parseFloat(chartDataElement.getAttribute("data-pending"));
+    var approved = parseFloat(chartDataElement.getAttribute("data-approved"));
+    var rejected = parseFloat(chartDataElement.getAttribute("data-rejected"));
+
+    var options = {
+      series: [pending, approved, rejected],
+      chart: {
+        width: 500,
+        type: "pie",
+      },
+      labels: ["Pending", "Approved", "Rejected"],
+      responsive: [
+        {
+          breakpoint: 480,
+          options: {
+            chart: {
+              width: 200,
+            },
+            legend: {
+              position: "bottom",
+            },
+          },
+        },
+      ],
+    };
+
+    var chart = new ApexCharts(document.querySelector("#chart1"), options);
+    chart.render();
+
+    // Click event for each card number
+    $(".card h2").on("click", function () {
+      var status = $(this).closest(".card").find("p").text();
+      fetchDataForService(status);
+    });
+  });
+
+  $(document).ready(function () {
+    // Fetch initial data from the endpoint
+    fetchDataFromEndpoint();
+
+    // Click event for each card number
+    $(".card h2").on("click", function () {
+      var status = $(this).closest(".card").find("p").text();
+      fetchDataForService(status);
+    });
+  });
+
+  // Function to fetch data from the endpoint
+  function fetchDataFromEndpoint() {
+    $.ajax({
+      url: "/faculty/dashboard",
+      type: "GET",
+      dataType: "json",
+      success: function (response) {
+        if (response.success) {
+          // Calculate total percentage based on the total count
+          var total_percentage =
+            100 -
+            response.pending_percentage -
+            response.approved_percentage -
+            response.denied_percentage;
+
+          // Update the HTML with the received data
+          updateCard(
+            "Pending",
+            response.pending_count,
+            response.pending_percentage
+          );
+          updateCard(
+            "Approved",
+            response.approved_count,
+            response.approved_percentage
+          );
+          updateCard(
+            "Denied",
+            response.denied_count,
+            response.denied_percentage
+          );
+          updateCard("Total Services", response.total_count, total_percentage);
+        } else {
+          console.error(response.message);
+        }
+      },
+      error: function (error) {
+        console.error("Error fetching data:", error);
+      },
+    });
+  }
+</script>
+<!-- Modify the JavaScript to update the modal content -->
+<script>
+  function updateServiceCounts() {
+    // Fetch the detailed counts from the /requestall endpoint
+    fetch("/requestall")
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.success && data.data) {
+          // Assuming data.data is an array of objects where each object has a model name and counts
+          data.data.forEach((serviceCount) => {
+            const modelName = Object.keys(serviceCount)[0]; // Get model name
+            const counts = serviceCount[modelName];
+
+            // Update the modal content based on the model name and counts
+            if (modelName === "AddSubjects") {
+              document.getElementById("pendingAddSubjectsCount").innerText =
+                counts.pending || 0;
+              // Similarly, update approved and denied counts if needed
+            } else if (modelName === "ChangeSubject") {
+              document.getElementById("pendingChangeSubjectsCount").innerText =
+                counts.pending || 0;
+              // And so on for other models...
+            }
+            // Extend this if-else block or switch-case to handle other service types
+          });
+        }
+      })
+      .catch((error) => console.error("Error fetching service counts:", error));
+  }
+
+  // Call the function when the modal is shown
+  $("#pendingModal").on("shown.bs.modal", function () {
+    updateServiceCounts(); // Call the function to fetch and update counts
+  });
+</script>
+<!-- Add the JavaScript code to fetch data and generate the bar graph -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Fetch data from the server using an API endpoint
+    fetch('/api/v1/faculty/requestall', { method: 'GET' })
+      .then(response => response.json())
+      .then(data => {
+        // Extract model names and statuses
+        const modelNames = data.data.map(entry => Object.keys(entry)[0]);
+        const statusLabels = ['Total', 'Pending', 'Approved', 'Rejected'];
+
+        // Process the data for the bar graph
+        const datasets = statusLabels.map((status, statusIndex) => ({
+          label: status,
+          data: modelNames.map(modelName => {
+            const entry = data.data.find(item => Object.keys(item)[0] === modelName);
+            return entry[modelName][status.toLowerCase()] || 0;
+          }),
+          backgroundColor: getRandomColor(statusIndex),
+        }));
+
+        // Create the grouped bar graph
+        const ctx = document.getElementById('servicesBarGraph').getContext('2d');
+        const barGraph = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: modelNames,
+            datasets: datasets,
+          },
+          options: {
+            scales: {
+              x: {
+                stacked: false, // Disable stacking for grouped bar chart
+              },
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  });
+
+  // Function to generate a random color
+  function getRandomColor(index) {
+    const colors = ['#FF5733', '#33FF57', '#3366FF', '#FF3366']; // Add more colors if needed
+    return colors[index % colors.length];
+  }
+</script>
+<!--This is the script for the bar graph-->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Fetch data from the server using an API endpoint
+    fetch('/api/v1/faculty/requestall', { method: 'GET' })
+      .then(response => response.json())
+      .then(data => {
+        // Process the data for the bar graph
+        const datasets = data.data.map(entry => {
+          const modelName = Object.keys(entry)[0];
+          const statusCounts = entry[modelName];
+          return {
+            label: modelName,
+            data: [statusCounts.approved, statusCounts.pending, statusCounts.rejected],
+            backgroundColor: getRandomColor(), // Function to generate random colors
+          };
+        });
+
+        // Create the bar graph
+        const ctx = document.getElementById('servicesBarGraph').getContext('2d');
+        const barGraph = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['Approved', 'Pending', 'Rejected'],
+            datasets: datasets,
+          },
+          options: {
+            scales: {
+              x: {
+                stacked: true,
+              },
+              y: {
+                beginAtZero: true,
+              },
+            },
+          },
+        });
+      })
+      .catch(error => console.error('Error fetching data:', error));
+  });
+
+  // Function to generate a random color
+  function getRandomColor() {
+    const letters = '0123456789ABCDEF';
+    let color = '#';
+    for (let i = 0; i < 6; i++) {
+      color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
+  }
+</script>
+
 {% endblock %}
+<!-- Create a div to render the chart -->
+<!-- <div id="statusCountsChart" style="width: 100%; max-width: 800px; height: 400px;"></div> -->
+
+<!-- Create a div to render the services data -->
+<!-- <div id="servicesData"></div> -->
+
+<!-- Script to generate the chart and update modal content -->
+<!-- <script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    // Fetch data from the API
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/v1/faculty/requestall', { method: 'GET' });
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return [];
+      }
+    }
+
+    // Function to generate HTML content from the fetched data and update the modal counts
+    async function generateHTMLAndModal(data) {
+      let html = '';
+      let modalContent = '';
+
+      for (const entry of data) {
+        const modelName = Object.keys(entry)[0];
+        const statusCounts = entry[modelName];
+
+        html += `<div>
+                    <h2>${modelName}</h2>
+                    <ul>
+                        <li>Approved: ${statusCounts.approved}</li>
+                        <li>Denied: ${statusCounts.denied}</li>
+                        <li>Pending: ${statusCounts.pending}</li>
+                    </ul>
+                </div>`;
+
+        // Update modal content
+        modalContent += `<p>Total Pending ${modelName}: ${statusCounts.pending}</p>`;
+      }
+
+      // Update modal body with dynamic content
+      document.getElementById('pendingModalBody').innerHTML = modalContent;
+
+      return html;
+    }
+
+    // Function to update the HTML content on the page and the chart
+    async function updateHTMLAndChart() {
+      const container = document.getElementById('servicesData');
+      const chartContainer = document.getElementById('statusCountsChart');
+
+      const data = await fetchData();
+      const htmlContent = await generateHTMLAndModal(data);
+
+      container.innerHTML = htmlContent;
+
+      // Process the data for chart
+      var categories = Object.keys(data);
+      var seriesData = [];
+
+      Object.keys(data[categories[0]]).forEach(function (status) {
+        var statusData = [];
+        categories.forEach(function (category) {
+          statusData.push(data[category][status] || 0);
+        });
+        seriesData.push({
+          name: status,
+          data: statusData
+        });
+      });
+
+      // Create the chart
+      var options = {
+        chart: {
+          type: 'bar',
+          height: 350,
+          stacked: true,
+          toolbar: {
+            show: true
+          },
+          zoom: {
+            enabled: true
+          }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        series: seriesData,
+        xaxis: {
+          categories: Object.keys(data),
+          title: {
+            text: 'Service Types'
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Counts'
+          }
+        },
+        legend: {
+          position: 'top'
+        },
+        fill: {
+          opacity: 1
+        },
+      };
+
+      var chart = new ApexCharts(chartContainer, options);
+      chart.render();
+    }
+
+    // Call the updateHTMLAndChart function to initially load the data
+    updateHTMLAndChart();
+  });
+</script> -->
+
+<!-- 
+this is for the bar graph but the data is not presenting 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var chartDataElement = document.getElementById("chartData");
+    var servicesData = JSON.parse(chartDataElement.getAttribute("data-services"));
+
+    // Process the data for chart
+    var categories = Object.keys(servicesData);
+    var seriesData = [];
+
+    Object.keys(servicesData[categories[0]]).forEach(function (status) {
+      var statusData = [];
+      categories.forEach(function (category) {
+        statusData.push(servicesData[category][status] || 0);
+      });
+      seriesData.push({
+        name: status,
+        data: statusData,
+      });
+    });
+
+    // Create the chart
+    var options = {
+      chart: {
+        type: "bar",
+        height: 350,
+        stacked: true,
+        toolbar: {
+          show: true,
+        },
+        zoom: {
+          enabled: true,
+        },
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      series: seriesData,
+      xaxis: {
+        categories: categories,
+        title: {
+          text: "Service Types",
+        },
+      },
+      yaxis: {
+        title: {
+          text: "Counts",
+        },
+      },
+      legend: {
+        position: "top",
+      },
+      fill: {
+        opacity: 1,
+      },
+    };
+
+    var chart = new ApexCharts(
+      document.querySelector("#statusCountsChart"),
+      options
+    );
+    chart.render();
+
+    // Display the data as text
+    var detailsContainer = document.getElementById("serviceDataDetails");
+    detailsContainer.innerHTML = generateDetailsHTML(servicesData);
+
+    // Click event for each card number
+    $(".card h2").on("click", function () {
+      var status = $(this).closest(".card").find("p").text();
+      fetchDataForService(status);
+    });
+  });
+
+  // Function to generate HTML content for service details
+  function generateDetailsHTML(servicesData) {
+    var html = "<h3>Service Details:</h3>";
+    Object.keys(servicesData).forEach(function (category) {
+      html += "<div>";
+      html += "<h4>" + category + "</h4>";
+      html += "<ul>";
+      Object.keys(servicesData[category]).forEach(function (status) {
+        html +=
+          "<li>" + status + ": " + servicesData[category][status] + "</li>";
+      });
+      html += "</ul>";
+      html += "</div>";
+    });
+    return html;
+  }
+
+  // Function to fetch faculty details
+  async function fetchDataForService(status) {
+    try {
+      // Fetch faculty details based on the selected status
+      const response = await fetch(`/api/v1/faculty/details?status=${status}`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error('Faculty details request failed');
+      }
+
+      const facultyDetails = await response.json();
+
+      // Update the faculty details container
+      var facultyDetailsContainer = document.getElementById("facultyDetails");
+      facultyDetailsContainer.innerHTML = generateFacultyDetailsHTML(facultyDetails);
+    } catch (error) {
+      console.error('Error fetching faculty details:', error);
+      // Handle the error, e.g., show an error message to the user
+      var facultyDetailsContainer = document.getElementById("facultyDetails");
+      facultyDetailsContainer.innerHTML = '<p>Error fetching faculty details.</p>';
+    }
+  }
+
+  // Function to generate HTML content for faculty details
+  function generateFacultyDetailsHTML(facultyDetails) {
+    var html = "<h3>Faculty Details:</h3>";
+    html += "<ul>";
+    facultyDetails.forEach(function (faculty) {
+      html += "<li>" + faculty.name + " - " + faculty.department + "</li>";
+    });
+    html += "</ul>";
+    return html;
+  }
+</script> -->

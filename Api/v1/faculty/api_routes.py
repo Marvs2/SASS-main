@@ -1,7 +1,7 @@
 # api/api_routes.py
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from Api.v1.faculty.utils import get_all_services
+from Api.v1.faculty.utils import get_all_services, get_all_services_counts
 from models import Faculty
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -13,19 +13,21 @@ faculty_api = Blueprint('faculty_api', __name__)
 # Api/v1/faculty/api_routes.py
 
 def get_current_faculty_user():
+    # Retrieve faculty ID from the session
     current_faculty_id = session.get('user_id')
-    
+
     if current_faculty_id:
+        # Try to get the faculty using the retrieved ID
         faculty = Faculty.query.get(current_faculty_id)
-        print(faculty)
+
         if faculty:
             return faculty
         else:
-            # Handle case where faculty is not found
+            # Handle the case where faculty is not found more gracefully
             print(f"Faculty with ID {current_faculty_id} not found.")
             return None
     else:
-        # Handle case where there is no user_id in session
+        # Handle the case where there is no user_id in session
         print("No user_id found in session.")
         return None
 
@@ -196,5 +198,9 @@ def all_student_services():
         return jsonify(success=False, message="No data available or data is invalid.")
     
 
+@faculty_api.route('/requestall', methods=['GET'])
+def all_services():
+    # Assuming you have access to the faculty ID (you may need to retrieve it based on your authentication mechanism)
+    status_counts_list = get_all_services_counts()
 
-
+    return jsonify(success=True, message="All faculty services data retrieved successfully.", data=status_counts_list)

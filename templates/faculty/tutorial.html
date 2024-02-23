@@ -6,45 +6,62 @@
     <div class="data data1" id="firstTableContainer">
       <div class="content-data">
         <div class="head mb-3">
-            <h2>tutorial Request</h2>
+            <h2>Current tutorial_requests for Tutorial</h2>
         </div>
         <table id="changeSubjects" class="table table-bordered table-condensed display">
-    <thead>
-            <tr>
-                <th>ID</th>
-                <th>Student Number</th>
-                <th>Name</th>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>File</th>
-                <th>Created At</th>
-                <th>User Responsible</th>
-                <th>Status</th>
-                <!-- <th>Action</th> -->
-            </tr>
-        </thead>
-        <tbody>
-            {% for request in tutorial_requests %}
-            <tr>
-                <td>{{ request.TutorialId }}</td>
-                <td>{{ request.StudentNumber }}</td>
-                <td>{{ request.Name }}</td>
-                <td>{{ request.SubjectCode }}</td>
-                <td>{{ request.SubjectName }}</td>
-                <td>
-                    {% if request.Tutorialdata %}
-                        <a href="{{ url_for('get_tutorial_file', tutorial_request_id=request.TutorialId) }}">Download</a>
-                    {% else %}
-                        No File
-                    {% endif %}
-                </td>
-                <td>{{ request.created_at }}</td>
-                <td>{{ request.UserResponsible }}</td>
-                <td>{{ request.Status }}</td>
-                <!-- <td> Action buttons like edit or update status </td> -->
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Number</th>
+                    <th>Name</th>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>File</th>
+                    <th>Created At</th>
+                    <th>User Responsible</th>
+                    <th>Status</th>
+                    <th>Action</th>  <!-- Added an Action column for buttons -->
+                </tr>
+            </thead>
+            <tbody>
+                {% for tutorial_requests in tutorial_requests %}
+                <tr>
+                    <td>{{ tutorial_requests.TutorialId }}</td>
+                    <td>{{ tutorial_requests.StudentNumber }}</td>
+                    <td>{{ tutorial_requests.Name }}</td>
+                    <td>{{ tutorial_requests.SubjectCode }}</td>
+                    <td>{{ tutorial_requests.SubjectName }}</td>
+                    <td>
+                        {% if tutorial_requests.Tutorialdata %}
+                            <a href="{{ url_for('get_faculty_tutorial_file', tutorial_request_id=tutorial_requests.TutorialId) }}">Download</a>
+                        {% else %}
+                            No File
+                        {% endif %}
+                    </td>
+                    <td>{{ tutorial_requests.created_at }}</td>
+                    <td>{{ tutorial_requests.UserResponsible }}</td>
+                    <td>{{ tutorial_requests.Status }}</td>
+                    <td>
+                        <button
+                            type="button"
+                            title="View Info"
+                            class="btn btn-primary fa-solid fa-eye edit_btn"
+                            data-toggle="modal"
+                            data-target="#viewTutorialModal"
+                            onclick="openEditModal('{{ tutorial_requests.TutorialId }}', '{{ tutorial_requests.Status }}')"
+                        ></button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
+
+<!-- Tutorial Status Edit Modal -->
+<div class="modal fade" id="viewTutorialModal" tabindex="-1" role="dialog" aria-labelledby="viewTutorialModalLabel" aria-hidden="true">
+    <!-- Include your modal content here (similar to the previous modal) -->
+    <!-- ... -->
+</div>
+<!-- Needed to finish first all before you go to creating the modal -->
 {% endblock %}

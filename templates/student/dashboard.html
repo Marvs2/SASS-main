@@ -7,7 +7,7 @@
   }
 </style>
 <!-- MAIN -->
-<main>
+<main id="main-content">
   <h1 class="title">Dashboard</h1>
   <ul class="breadcrumbs">
     <li><a href="#">Home</a></li>
@@ -97,7 +97,12 @@
       </div>
   </div>
   </div>
+  <button id="generate-report-btn">Generate Report</button>
 </main>
+<!-- Add this script tag to include html2pdf library -->
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+
+<!-- Your existing script tags -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -186,6 +191,31 @@ document.addEventListener('DOMContentLoaded', function() {
       $progress.attr("data-value", percentage + "%");
       $label.text(percentage + "%");
     }
+
+    // Function to generate and save the report as PDF
+    function generateReport() {
+      // Get the main content container
+      var element = document.getElementById('main-content');
+
+      // Append additional text to the container
+      var additionalText = "This is additional text in the report.";
+      var textElement = document.createElement('p');
+      textElement.textContent = additionalText;
+      element.appendChild(textElement);
+
+      // Generate PDF
+      html2pdf(element);
+
+      // Remove the added text after generating the PDF (optional)
+      element.removeChild(textElement);
+    }
+
+    // Attach the click event to the "Generate Report" button
+    $('#generate-report-btn').on('click', function () {
+      generateReport();
+    });
   });
 </script>
+
 {% endblock %}
+

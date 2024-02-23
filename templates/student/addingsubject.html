@@ -1,191 +1,305 @@
-{% extends "student/layout.html" %}
+{% extends "student/layout.html" %} {% block content %}
+<style>
+  /* Add your existing styles here */
 
-{% block content %}
+  .subject-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
 
-  <!-- Progress bar -->
-  <div class="progressbar">
-    <div class="progress1" id="progress1"></div>
-    <div class="progress-step progress-step-active" data-title="Current Subjects"></div>
-    <div class="progress-step" data-title="Add Subject/s"></div>
-    <div class="progress-step" data-title="Payment"></div>
-    <div class="progress-step" data-title="Review Subject"></div>
-  </div>
+  .subject-table th,
+  .subject-table td {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    text-align: left;
+  }
 
-  <!-- SHOW CURRENT SUBJECT -->
-  <div class="form-step form-step-active">
-    <div class="data data1" id="firstTableContainer">
-      
-      <div class="content-data">  
-        <div class="head mb-3">
-          <h3>Current Subjects</h3>
-        </div>
+  .class-group-info {
+    margin-bottom: 10px;
+  }
 
-        <div class="row mb-3">
-          <span class="mb-3">  
-            <b>Student:</b>
-            <input type="text" class="form-control" name="Name" title="Name" id="Name" readonly>
-          </input>
-          </span>
+  .subject-entry {
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    margin: 10px 0;
+  }
+</style>
+<!-- Progress bar -->
+<div class="progressbar">
+  <div class="progress1" id="progress1"></div>
+  <div
+    class="progress-step progress-step-active"
+    data-title="Current Subjects"
+  ></div>
+  <div class="progress-step" data-title="Add Subject/s"></div>
+  <div class="progress-step" data-title="Payment"></div>
+  <div class="progress-step" data-title="Review Subject"></div>
+</div>
 
-          <span>
-            <b>Course:</b> {% if course %} {{ course.CourseCode }} {% endif %}
-          </span>
-        </div>
-
-        <table id="addingSubject" class="table table-bordered table-condensed display">
-          <thead>
-            <tr>
-              <th>Subject Code</th>
-              <th>Subject Name</th>
-              <th>Description</th>
-              <th>Units</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for subject_list in subject_list %}
-              <tr
-                data-subject-code="{{ subject_list.SubjectCode }}"
-                data-subject-name="{{ subject_list.Name }}"
-                data-subject-description="{{ subject_list.Description }}"
-                data-Units="{{ subject_list.Units }}"
-              >
-                <td>{{ subject_list.SubjectCode }}</td>
-                <td>{{ subject_list.Name }}</td>
-                <td>{{ subject_list.Description }}</td>
-                <td>{{ subject_list.Units }}</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-
-        <div class="d-flex justify-content-end mt-3">
-          <button type="button" class="btn btn-primary btn-next">Next</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- SHOW OPTION FOR ADDING OF SUBJECTS  -->
-
-  <div class="form-step">
-    <div class="data data1"  id="reviewHeading">
-      <div class="content-data">
-        <div class="head mb-3">
-          <h3>Review Selected Subjects</h3>
-        </div>
-
-        <!-- Review Table for Selected Subjects -->
-        <table class="table table-bordered table-condensed" id="reviewSubjectsTable">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Subject Code</th>
-              <th>Subject Name</th>
-              <th>Description</th>
-              <th>Units</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Selected subjects will be added here -->
-          </tbody>
-        </table>
-      </div>
+<!-- SHOW CURRENT SUBJECT -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Current Subjects</h3>
       </div>
 
-      <div class="data data1">
-        <div class="content-data">
+      <div class="row mb-3">
+        <span class="mb-3">
+          <b>Student:</b>
+          <input
+            type="text"
+            class="form-control"
+            name="Name"
+            title="Name"
+            id="Name"
+            readonly
+          />
+        </span>
 
-        <div class="head mb-3">
-          <h3>Add Subjects</h3>
-        </div>
-          <!-- Table for Displaying Subjects to Select -->
-          <table id="selectedSubjectsTable" class="table table-bordered table-condensed">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>Description</th>
-                <th>Units</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for selection_list in selection_list %}
-                <tr
-                  data-subject-code="{{ selection_list.SubjectCode }}"
-                  data-subject-name="{{ selection_list.Name }}"
-                  data-subject-description="{{ selection_list.Description }}"
-                  data-Units="{{ selection_list.Units }}"
-                >
-                  <td>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" name="checkbox" title="checkbox" class="custom-control-input selections-checkbox" id="checkbox{{ selection_list.SubjectId }}" onclick="handleCheckboxClick(this);"/>
+        <span>
+          <b>Course:</b> {% if course %} {{ course.CourseCode }} {% endif %}
+        </span>
+        <span id="semesterInfo"></span>
+        <br />
+        <span id="Sem"></span>
+      </div>
 
-                      <label class="custom-control-label" for="checkbox{{ selection_list.SubjectId }}"></label>
-                    </div>
-                  </td>
-                  <td>{{ selection_list.SubjectCode }}</td>
-                  <td>{{ selection_list.Name }}</td>
-                  <td>{{ selection_list.Description }}</td>
-                  <td>{{ selection_list.Units }}</td>
+      <!-- Display subjects and grades here -->
+      <div id="subjectsContainer">
+        {% for classGroup in subjects_data %}
+        <div class="class-group">
+          <!-- Add class group information (Batch, GPA, Semester, Scholastic Status, Course Code & Description) -->
+          <div>
+            <h4>
+              School Year {{ classGroup.Batch }} {% if classGroup.Semester == 1
+              %}(1st Semester){% elif classGroup.Semester == 2 %}(2nd
+              Semester){% else %}(Summer Term){% endif %}
+            </h4>
+            <p>Scholastic Status: {{ classGroup.EnrollmentStatus }}</p>
+            <p>
+              Course Code & Description: {{ classGroup.SecCode }} (QUEZON CITY
+              CAMPUS)
+            </p>
+            <p>
+              GPA (excludes NSTP and subjects with non-numeric ratings): {{
+              classGroup.GPA }} GPA
+            </p>
+          </div>
+
+          <!-- Add subjects -->
+          <div>
+            <table class="md:border md:border-1 p-2 md:my-4">
+              <thead>
+                <tr>
+                  <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">
+                    Subject
+                  </th>
+                  <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">
+                    Grade
+                  </th>
+                  <!-- Add more table headers as needed -->
                 </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-
-          <div class="d-flex justify-content-end mt-3">
-            <button type="button" class="btn btn-primary btn-prev">Previous</button>
-            <button type="button" class="btn btn-primary btn-next ml-2">Next</button>
+              </thead>
+              <tbody>
+                {% for subject in classGroup.Subject %}
+                <tr>
+                  <td class="lg:w-3/12 md:w-6/12 mt-4">
+                    {{ subject.Subject }}
+                  </td>
+                  <td class="lg:w-3/12 md:w-6/12 mt-4">{{ subject.Grade }}</td>
+                  <!-- Add more table cells as needed -->
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
+        </div>
+        {% endfor %}
+      </div>
+      <!-- Button to fetch data -->
+      <!-- <button onclick="fetchFirstSemSubjectsGrade()" class="mt-4 bg-blue-500 text-white p-2 rounded-md">Fetch Subjects & Grades</button> -->
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary btn-next">Next</button>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- PAYMENT-->
-  <div class="form-step">
-    <div class="data data1">
-      <div class="content-data">
-        <div class="head mb-5">
-          <h3 id="user-info">Payment</h3>
+<!-- SHOW OPTION FOR ADDING OF SUBJECTS  -->
+
+<div class="form-step">
+  <div class="data data1" id="reviewHeading">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Review Selected Subjects</h3>
+      </div>
+
+      <!-- Review Table for Selected Subjects -->
+      <table
+        class="table table-bordered table-condensed"
+        id="reviewSubjectsTable"
+      >
+        <thead>
+          <tr>
+            <th></th>
+            <th>Subject Code</th>
+            <th>Subject Name</th>
+            <th>Description</th>
+            <th>Units</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Selected subjects will be added here -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="data data1">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Add Subjects</h3>
+      </div>
+      <!-- Table for Displaying Subjects to Select -->
+      <table
+        id="selectedSubjectsTable"
+        class="table table-bordered table-condensed"
+      >
+        <thead>
+          <tr>
+            <th></th>
+            <th>Subject Code</th>
+            <th>Subject Name</th>
+            <th>Description</th>
+            <th>Units</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for selection_list in selection_list %}
+          <tr
+            data-subject-code="{{ selection_list.SubjectCode }}"
+            data-subject-name="{{ selection_list.Name }}"
+            data-subject-description="{{ selection_list.Description }}"
+            data-Units="{{ selection_list.Units }}"
+          >
+            <td>
+              <div class="custom-control custom-checkbox">
+                <input
+                  type="checkbox"
+                  name="checkbox"
+                  title="checkbox"
+                  class="custom-control-input selections-checkbox"
+                  id="checkbox{{ selection_list.SubjectId }}"
+                  onclick="handleCheckboxClick(this);"
+                />
+
+                <label
+                  class="custom-control-label"
+                  for="checkbox{{ selection_list.SubjectId }}"
+                ></label>
+              </div>
+            </td>
+            <td>{{ selection_list.SubjectCode }}</td>
+            <td>{{ selection_list.Name }}</td>
+            <td>{{ selection_list.Description }}</td>
+            <td>{{ selection_list.Units }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary btn-prev">Previous</button>
+        <button type="button" class="btn btn-primary btn-next ml-2">
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT-->
+<div class="form-step">
+  <div class="data data1">
+    <div class="content-data">
+      <div class="head mb-5">
+        <h3 id="user-info">Payment</h3>
+      </div>
+
+      <form
+        method="POST"
+        enctype="multipart/form-data"
+        class="application-form"
+        enctype="multipart/form-data"
+      >
+        <div class="row mb-5">
+          <label for="Name" class="col-sm-2 col-form-label">Sender Name</label>
+          <div class="col-sm-8">
+            <input
+              type="text"
+              class="form-control"
+              id="Name"
+              name="Name"
+              required
+            />
+          </div>
         </div>
 
-        <form method="POST" enctype="multipart/form-data" class="application-form" enctype="multipart/form-data">
-          <div class="row mb-5">
-            <label for="name" class="col-sm-2 col-form-label">Sender Name</label>
-            <div class="col-sm-8">
-            <input type="text" class="form-control" id="name" name="name" required>
+        <div class="row mb-5">
+          <label for="MobileNumber" class="col-sm-2 col-form-label"
+            >Contact Number</label
+          >
+          <div class="col-sm-8">
+            <input
+              type="text"
+              class="form-control"
+              name="MobileNumber"
+              id="MobileNumber"
+              required="required"
+              maxlength="11"
+              pattern="\d{11}"
+            />
           </div>
-          </div>
-
-          <div class="row mb-5">
-            <label for="MobileNumber" class="col-sm-2 col-form-label">Number</label>
-            <div class="col-sm-8">
-              <input type="text" class="form-control" name="MobileNumber" id="MobileNumber" required="required" maxlength="11" pattern="\d{11}">
-          </div>
-          </div>
-        
-          <div class="row mb-5">
-            <label for="paymentScreenshot" class="col-sm-2 col-form-label">Proof of Payment</label>
-            <div class="col-sm-8">
-                <input type="file" class="form-control" id="paymentScreenshot" name="paymentScreenshot" accept=".jpg" required>
-            </div>
         </div>
-        
-      
-          <!-- <div class="mb-3 form-check">
+
+        <div class="row mb-5">
+          <label for="paymentScreenshot" class="col-sm-2 col-form-label"
+            >Proof of Payment</label
+          >
+          <div class="col-sm-8">
+            <input
+              type="file"
+              class="form-control"
+              id="paymentScreenshot"
+              name="paymentScreenshot"
+              accept=".jpg"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- <div class="mb-3 form-check">
             <input type="checkbox" class="form-check-input" id="agreeTerms" name="agreeTerms">
             <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions</label>
           </div>          -->
-        </form>        
+      </form>
 
-        <div class="d-flex justify-content-end mt-3">
-          <button type="button" class="btn btn-primary btn-prev">Previous</button>
-          <button type="button" class="btn btn-primary btn-next ml-2"  onclick="showResponse()">Next</button>
-        </div>
-        
+      <div class="d-flex justify-content-end mt-3">
+        <button type="button" class="btn btn-primary btn-prev">Previous</button>
+        <button
+          type="button"
+          class="btn btn-primary btn-next ml-2"
+          onclick="showResponse()"
+        >
+          Next
+        </button>
       </div>
     </div>
   </div>
+</div>
 
 <!-- REVIEW TRANSACTIONS -->
 <div class="form-step">
@@ -195,101 +309,164 @@
         <h3>Review Transactions</h3>
       </div>
 
-      <form id="serviceRequestForm" action="{{url_for('submitapplication')}}" method="POST" enctype="multipart/form-data">
-      <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
-      <input type="hidden" name="StudentId" title="text" value="{{ session['user_id'] }}"/>
-      <input type="hidden" id="selectedSubjects" title="text" name="selectedSubjects" value="">
-      <input type="hidden" id="SenderNameHidden" title="text" name="SenderName" value="">
-      <input type="hidden" id="SenderContactNoHidden" title="text" name="SenderContactNo" value="">
-      <input type="hidden" id="PaymentFileHidden" title="text" name="PaymentFile" value="">
+      <form
+        id="serviceRequestForm"
+        action="{{url_for('submitapplication')}}"
+        method="POST"
+        enctype="multipart/form-data"
+      >
+        <!-- Hidden field for student ID (assuming it's available in the session or a similar context) -->
+        <input
+          type="hidden"
+          name="StudentId"
+          title="text"
+          value="{{ session['user_id'] }}"
+        />
+        <input
+          type="hidden"
+          id="selectedSubjects"
+          title="text"
+          name="selectedSubjects"
+          value=""
+        />
+        <input
+          type="hidden"
+          id="SenderNameHidden"
+          title="text"
+          name="SenderName"
+          value=""
+        />
+        <input
+          type="hidden"
+          id="SenderContactNoHidden"
+          title="text"
+          name="SenderContactNo"
+          value=""
+        />
+        <input
+          type="hidden"
+          id="PaymentFileHidden"
+          title="text"
+          name="PaymentFile"
+          value=""
+        />
 
-
-      <div class="row mb-5">
-        <label for="reviewSubjectList" class="col-sm-2 col-form-label">Selected Subjects</label>
-        <div class="col-sm-8">
-        <span id="reviewSubjectList" class="form-control"></span>
-      </div>
-      </div>
-
-      <div class="row mb-5">
-        <label for="SenderName" class="col-sm-2 col-form-label">Sender Name</label>
-        <div class="col-sm-8">
-          <span id="SenderName" class="form-control"></span>
+        <div class="row mb-5">
+          <label for="reviewSubjectList" class="col-sm-2 col-form-label"
+            >Selected Subjects</label
+          >
+          <div class="col-sm-8">
+            <span id="reviewSubjectList" class="form-control"></span>
+          </div>
         </div>
-      </div>
 
-      <div class="row mb-5">
-        <label for="SenderContactNo" class="col-sm-2 col-form-label">Number</label>
-        <div class="col-sm-8">
-          <span id="SenderContactNo" class="form-control"></span>
+        <div class="row mb-5">
+          <label for="SenderName" class="col-sm-2 col-form-label"
+            >Sender Name</label
+          >
+          <div class="col-sm-8">
+            <span id="SenderName" class="form-control"></span>
+          </div>
         </div>
-      </div>
 
-      <div class="row mb-5">
-        <label for="PaymentFile" class="col-sm-2 col-form-label">Proof of Payment</label>
-        <div class="col-sm-8">
-          <span id="PaymentFile" class="form-control"></span>
+        <div class="row mb-5">
+          <label for="SenderContactNo" class="col-sm-2 col-form-label"
+            >Number</label
+          >
+          <div class="col-sm-8">
+            <span id="SenderContactNo" class="form-control"></span>
+          </div>
         </div>
-      </div>
 
-      <div class="row mb-5">
-        <label for="ServiceDetails" class="col-sm-2 col-form-label">Reason/s</label>
-        <div class="col-sm-8">
-          <input type="text" class="form-control" id="ServiceDetails" name="ServiceDetails" required>
+        <div class="row mb-5">
+          <label for="PaymentFile" class="col-sm-2 col-form-label"
+            >Proof of Payment</label
+          >
+          <div class="col-sm-8">
+            <span id="PaymentFile" class="form-control"></span>
+          </div>
         </div>
-      </div>
 
-      <div class="d-flex justify-content-end mt-3">
-        <button type="button" class="btn btn-primary btn-prev">Previous</button>
-        <button type="submit" class="btn btn-primary ml-2" onclick="submitForm()">Submit</button>
-      </div>
-    </form>
+        <div class="row mb-5">
+          <label for="ServiceDetails" class="col-sm-2 col-form-label"
+            >Reason/s</label
+          >
+          <div class="col-sm-8">
+            <input
+              type="text"
+              class="form-control"
+              id="ServiceDetails"
+              name="ServiceDetails"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-end mt-3">
+          <button type="button" class="btn btn-primary btn-prev">
+            Previous
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary ml-2"
+            onclick="submitForm()"
+          >
+            Submit
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
 
-
 <script>
+  // this is for testing purposes
   var selectedSubjectIds = [];
 
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     function handleCheckboxClick(checkbox) {
       updateCheckboxState();
     }
 
-    var checkboxes = document.getElementsByClassName('selections-checkbox');
+    var checkboxes = document.getElementsByClassName("selections-checkbox");
     for (var i = 0; i < checkboxes.length; i++) {
-      checkboxes[i].addEventListener('click', function () {
+      checkboxes[i].addEventListener("click", function () {
         handleCheckboxClick(this);
       });
     }
 
     function updateCheckboxState() {
-      var checkboxes = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+      var checkboxes = document.querySelectorAll(
+        "#selectedSubjectsTable .selections-checkbox:checked"
+      );
       var totalUnits = 0;
       checkboxes.forEach(function (checkbox) {
-        var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
+        var units = parseInt(checkbox.closest("tr").getAttribute("data-Units"));
         totalUnits += units;
       });
 
-      document.querySelectorAll('#selectedSubjectsTable .selections-checkbox').forEach(function (checkbox) {
-        var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
-        if (!checkbox.checked && (totalUnits + units) > 6) {
-          checkbox.disabled = true;
-        } else {
-          checkbox.disabled = false;
-        }
-      });
+      document
+        .querySelectorAll("#selectedSubjectsTable .selections-checkbox")
+        .forEach(function (checkbox) {
+          var units = parseInt(
+            checkbox.closest("tr").getAttribute("data-Units")
+          );
+          if (!checkbox.checked && totalUnits + units > 6) {
+            checkbox.disabled = true;
+          } else {
+            checkbox.disabled = false;
+          }
+        });
     }
 
     updateCheckboxState();
   });
 
   function handleCheckboxClick(checkbox) {
-    var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
-    var reviewHeading = document.getElementById('reviewHeading');
-    var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
-    var tr = checkbox.closest('tr');
+    var reviewSubjectsTable = document.getElementById("reviewSubjectsTable");
+    var reviewHeading = document.getElementById("reviewHeading");
+    var reviewTableBody = reviewSubjectsTable.getElementsByTagName("tbody")[0];
+    var tr = checkbox.closest("tr");
 
     if (checkbox.checked) {
       var clonedRow = tr.cloneNode(true);
@@ -297,100 +474,202 @@
         handleCheckboxClick(this);
       };
       reviewTableBody.appendChild(clonedRow);
-      reviewSubjectsTable.style.display = 'table';
-      tr.style.display = 'none';
+      reviewSubjectsTable.style.display = "table";
+      tr.style.display = "none";
 
-      reviewHeading.style.display = 'block';
+      reviewHeading.style.display = "block";
 
-      var subjectId = checkbox.id.replace('checkbox', '');
-      var subjectCode = tr.getAttribute('data-subject-code');
-      var subjectName = tr.getAttribute('data-subject-name');
-      var subjectDescription = tr.getAttribute('data-subject-description');
+      var subjectId = checkbox.id.replace("checkbox", "");
+      var subjectCode = tr.getAttribute("data-subject-code");
+      var subjectName = tr.getAttribute("data-subject-name");
+      var subjectDescription = tr.getAttribute("data-subject-description");
       selectedSubjectIds.push(subjectId);
-      document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+      document.getElementById("selectedSubjects").value =
+        selectedSubjectIds.join(",");
 
-      var reviewSubjectList = document.getElementById('reviewSubjectList');
-      var listItem = document.createElement('li');
+      var reviewSubjectList = document.getElementById("reviewSubjectList");
+      var listItem = document.createElement("li");
       listItem.textContent = `${subjectCode} - ${subjectName} - ${subjectDescription}`;
       reviewSubjectList.appendChild(listItem);
     } else {
-      Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+      Array.from(reviewTableBody.getElementsByTagName("tr")).forEach(function (
+        row
+      ) {
         if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
           reviewTableBody.removeChild(row);
         }
       });
 
-      tr.style.display = '';
+      tr.style.display = "";
 
       var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
       if (indexToRemove !== -1) {
         selectedSubjectIds.splice(indexToRemove, 1);
-        document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+        document.getElementById("selectedSubjects").value =
+          selectedSubjectIds.join(",");
       }
 
-      var reviewSubjectList = document.getElementById('reviewSubjectList');
+      var reviewSubjectList = document.getElementById("reviewSubjectList");
       reviewSubjectList.removeChild(reviewSubjectList.lastChild);
     }
 
     updateCheckboxState();
-    
-    if (reviewTableBody.getElementsByTagName('tr').length === 0) {
-      reviewSubjectsTable.style.display = 'none';
-      reviewHeading.style.display = 'none';
+
+    if (reviewTableBody.getElementsByTagName("tr").length === 0) {
+      reviewSubjectsTable.style.display = "none";
+      reviewHeading.style.display = "none";
     }
   }
 
   function showResponse() {
-    var reviewSubjectList = document.getElementById('reviewSubjectList');
-    var senderName = document.getElementById('name').value;
-    var mobileNumber = document.getElementById('MobileNumber').value;
-    var proofOfPaymentInput = document.getElementById('paymentScreenshot');
-    var proofOfPaymentFileName = proofOfPaymentInput.value.split('\\').pop();
+    var reviewSubjectList = document.getElementById("reviewSubjectList");
+    var senderName = document.getElementById("Name").value;
+    var mobileNumber = document.getElementById("MobileNumber").value;
+    var proofOfPaymentInput = document.getElementById("paymentScreenshot");
+    var proofOfPaymentFileName = proofOfPaymentInput.value.split("\\").pop();
     var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
 
-    document.getElementById('SenderName').textContent = senderName;
-    document.getElementById('SenderContactNo').textContent = mobileNumber;
-    document.getElementById('SenderNameHidden').value = senderName;
-    document.getElementById('SenderContactNoHidden').value = mobileNumber;
+    document.getElementById("SenderName").textContent = senderName;
+    document.getElementById("SenderContactNo").textContent = mobileNumber;
+    document.getElementById("SenderNameHidden").value = senderName;
+    document.getElementById("SenderContactNoHidden").value = mobileNumber;
 
     if (proofOfPaymentFilePath) {
-      var proofOfPaymentLink = document.createElement('a');
+      var proofOfPaymentLink = document.createElement("a");
       proofOfPaymentLink.textContent = proofOfPaymentFileName;
       proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
-      proofOfPaymentLink.target = '_blank';
+      proofOfPaymentLink.target = "_blank";
 
-      document.getElementById('PaymentFile').innerHTML = '';
-      document.getElementById('PaymentFile').appendChild(proofOfPaymentLink);
-      document.getElementById('PaymentFileHidden').value = proofOfPaymentFileName;
+      document.getElementById("PaymentFile").innerHTML = "";
+      document.getElementById("PaymentFile").appendChild(proofOfPaymentLink);
+      document.getElementById("PaymentFileHidden").value =
+        proofOfPaymentFileName;
     }
 
     var selectedSubjects = [];
-    document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
-      var tr = checkbox.closest('tr');
-      var subjectCode = tr.getAttribute('data-subject-code');
-      var subjectName = tr.getAttribute('data-subject-name');
-      var subjectDescription = tr.getAttribute('data-subject-description');
-      selectedSubjects.push(`${subjectCode} - ${subjectName} - ${subjectDescription}`);
-    });
-    document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
+    document
+      .querySelectorAll("#reviewSubjectsTable .selections-checkbox:checked")
+      .forEach(function (checkbox) {
+        var tr = checkbox.closest("tr");
+        var subjectCode = tr.getAttribute("data-subject-code");
+        var subjectName = tr.getAttribute("data-subject-name");
+        var subjectDescription = tr.getAttribute("data-subject-description");
+        selectedSubjects.push(
+          `${subjectCode} - ${subjectName} - ${subjectDescription}`
+        );
+      });
+    document.getElementById("selectedSubjects").value =
+      selectedSubjects.join(",");
 
-    reviewSubjectList.innerHTML = '';
-    document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
-      var tr = checkbox.closest('tr');
-      var subjectCode = tr.getAttribute('data-subject-code');
-      var subjectName = tr.getAttribute('data-subject-name');
-      var subjectDescription = tr.getAttribute('data-subject-description');
-      var listItem = document.createElement('li');
-      listItem.textContent = `${subjectCode} - ${subjectName} - ${subjectDescription}`;
+    reviewSubjectList.innerHTML = "";
+    document
+      .querySelectorAll("#reviewSubjectsTable .selections-checkbox:checked")
+      .forEach(function (checkbox, index) {
+        var tr = checkbox.closest("tr");
+        var subjectCode = tr.getAttribute("data-subject-code");
+        var subjectName = tr.getAttribute("data-subject-name");
+        var subjectDescription = tr.getAttribute("data-subject-description");
+        var listItem = document.createElement("li");
+        listItem.textContent = `${subjectCode} - ${subjectName} - ${subjectDescription}`;
 
-      if (index === 0) {
-        listItem.style.marginBottom = '10px';
-      }
+        if (index === 0) {
+          listItem.style.marginBottom = "10px";
+        }
 
-      reviewSubjectList.appendChild(listItem);
+        reviewSubjectList.appendChild(listItem);
+      });
+  }
+</script>
+<script>
+  // Function to fetch data from the server
+  function fetchSubjectsGrade() {
+    // Replace 'your_endpoint' with the actual endpoint where you handle the server-side logic to fetch subjects data
+    fetch("/api/v1/student/currentsubject")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Call a function to update the HTML content with the fetched data
+        updateSubjectsContent(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
+
+  // Function to update HTML content with fetched data
+  function updateSubjectsContent(data) {
+    // Access the subjectsContainer element where you want to update the content
+    var subjectsContainer = document.getElementById("subjectsContainer");
+
+    // Clear previous content
+    subjectsContainer.innerHTML = "";
+
+    // Iterate through the data and update the content
+    data.forEach((classGroup) => {
+      var classGroupDiv = document.createElement("div");
+      classGroupDiv.className = "class-group";
+
+      // Add class group information
+      var classGroupInfo = document.createElement("div");
+      classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${
+        classGroup.Semester === 1
+          ? "(1st Semester)"
+          : classGroup.Semester === 2
+          ? "(2nd Semester)"
+          : "(Summer Term)"
+      }</h4>
+                                  <p>Scholastic Status: Continuing</p>
+                                  <p>Course Code & Description: ${
+                                    classGroup.SecCode
+                                  } (QUEZON CITY CAMPUS)</p>
+                                  <p>GPA : ${classGroup.GPA} GPA`;
+      classGroupInfo.className = "class-group-info";
+
+      // Add subjects
+      var subjectsDiv = document.createElement("div");
+      var subjectsTable = document.createElement("table");
+      subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+      // Add table header
+      var tableHeader = document.createElement("thead");
+      var headerRow = document.createElement("tr");
+      headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
+                      <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>`;
+      // Add more table headers as needed
+
+      tableHeader.appendChild(headerRow);
+      subjectsTable.appendChild(tableHeader);
+
+      // Add table body
+      var tableBody = document.createElement("tbody");
+      classGroup.Subject.forEach((subject) => {
+        var row = document.createElement("tr");
+        row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+                   <td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Grade}</td>`;
+        // Add more table cells as needed
+
+        tableBody.appendChild(row);
+      });
+
+      subjectsTable.appendChild(tableBody);
+      subjectsDiv.appendChild(subjectsTable);
+
+      // Append class group information and subjects to the classGroupDiv
+      classGroupDiv.appendChild(classGroupInfo);
+      classGroupDiv.appendChild(subjectsDiv);
+
+      // Append the classGroupDiv to the subjectsContainer
+      subjectsContainer.appendChild(classGroupDiv);
     });
   }
 
+  // Trigger the data fetching when the page is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchSubjectsGrade();
+  });
 </script>
 {% endblock content %}
-

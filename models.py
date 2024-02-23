@@ -64,12 +64,13 @@ class Student(db.Model):
         return self.StudentId
 
 # Faculty Users
+# Faculty Users
 class Faculty(db.Model):
-    __tablename__ = 'FISFaculty' # Set the name of table in database
+    __tablename__ = 'FISFaculty'  # Set the name of the table in the database
     FacultyId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     FacultyType = db.Column(db.String(50), nullable=False)  # Faculty Type
     Rank = db.Column(db.String(50))  # Faculty Rank
-    Units = db.Column(db.Numeric, nullable=False)  # Faculty Unit
+    Units = db.Column(db.Float, nullable=False)  # Faculty Unit
     FirstName = db.Column(db.String(50), nullable=False)  # First Name
     LastName = db.Column(db.String(50), nullable=False)  # Last Name
     MiddleName = db.Column(db.String(50))  # Middle Name
@@ -82,19 +83,22 @@ class Faculty(db.Model):
     FacultyCode = db.Column(db.Integer, nullable=False)  # Faculty Code
     Honorific = db.Column(db.String(50))  # Honorific
     Age = db.Column(db.Numeric, nullable=False)  # Age
-    
+
     Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
-    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
-    MobileNumber = db.Column(db.String(11))  # MobileNumber
-    Gender = db.Column(db.Integer) # Gender # 1 if Male 2 if Female
-    
+    ResidentialAddress = db.Column(db.String(50))  # Residential Address
+    MobileNumber = db.Column(db.String(11))  # Mobile Number
+    Gender = db.Column(db.Integer)  # Gender # 1 if Male, 2 if Female
+
     Password = db.Column(db.String(256), nullable=False)  # Password
-    ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
-    IsActive = db.Column(db.Boolean, default=True)
+    ProfilePic = db.Column(db.String(50), default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
+    # IsActive = db.Column(db.Boolean, default=True)
+    Specialization = db.Column(db.String)  # Specialization
+    PreferredSchedule = db.Column(db.String)  # Preferred Schedule
+    Login_Attempt = db.Column(db.Numeric(12), default=12)  # Login Attempt
+    Status = db.Column(db.String(50))  # Status
+
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
-    # FOREIGN TABLES
-    
 
     def to_dict(self):
         return {
@@ -112,19 +116,22 @@ class Faculty(db.Model):
             'Degree': self.Degree,
             'Remarks': self.Remarks,
             'FacultyCode': self.FacultyCode,
-            'honorific': self.Honorific,
+            'Honorific': self.Honorific,  # Corrected to match the column name
             'Age': self.Age,
             'Email': self.Email,
-            # 'password': self.password,
+            # 'password': self.password,  # Commented out for security reasons
             'ProfilePic': self.ProfilePic,
-            'IsActive': self.IsActive,
+            # 'IsActive': self.IsActive,
+            'Specialization': self.Specialization,
+            'PreferredSchedule': self.PreferredSchedule,
+            'Login_Attempt': self.Login_Attempt,
+            'Status': self.Status,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
-        
+
     def get_id(self):
         return str(self.FacultyId)  # Convert to string to ensure compatibility
-
 
 
 # System Admins Users
@@ -373,7 +380,7 @@ class StudentClassGrade(db.Model):
 class StudentClassSubjectGrade(db.Model):
     __tablename__ = 'SPSStudentClassSubjectGrade'
 
-    StudentClassSubjectGradeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    # StudentClassSubjectGradeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     ClassSubjectId = db.Column(db.Integer, db.ForeignKey('SPSClassSubject.ClassSubjectId', ondelete="CASCADE"), primary_key=True) # Reference to the class subject
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)# Referencing to the student in subject taken
     Grade = db.Column(db.Float) # Students Gradec
@@ -384,6 +391,7 @@ class StudentClassSubjectGrade(db.Model):
 
     def to_dict(self):
         return {
+            # 'StudentClassSubjectGradeId': self.StudentClassSubjectGradeId,
             'ClassSubjectId': self.ClassSubjectId,
             'StudentId': self.StudentId,
             'Grade': self.Grade,
@@ -1009,8 +1017,6 @@ class TutorialRequest(db.Model, UserMixin):
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
  #Status 
-    
-     
     def to_dict(self):
         return {
             'TutorialId': self.TutorialId,

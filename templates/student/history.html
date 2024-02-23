@@ -418,7 +418,7 @@
 							data-tutorial-student-number="{{ tutorial_requests.StudentNumber }}"
 							data-tutorial-subject-code="{{ tutorial_requests.SubjectCode }}"
 							data-tutorial-subject-name="{{ tutorial_requests.SubjectName }}"
-							data-tutorial-file-url="{{ url_for('view_tutorial_file', tutorial_request_id=tutorial_requests.TutorialId) }}"
+							data-tutorial-file-url="{{ url_for('get_tutorial_file', tutorial_request_id=tutorial_requests.TutorialId, student_id=tutorial_requests.StudentId) }}"
 							data-tutorial-file-filename="{{ tutorial_requests.Tutorialfilename }}"	
 							data-tutorial-status="{{ tutorial_requests.Status }}">
 							<td class="applicationID">{{ tutorial_requests.TutorialId }}</td>								

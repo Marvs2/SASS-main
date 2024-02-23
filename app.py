@@ -1,8 +1,8 @@
 import io
-from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session
+from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session, make_response
 from flask_login import current_user, login_user
-from sqlalchemy import and_
-from Api.v1.faculty.utils import get_all_services
+from sqlalchemy import and_, func
+from Api.v1.faculty.utils import get_all_services, get_all_services_counts
 from Api.v1.student.utils import get_student_services
 from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
@@ -577,39 +577,39 @@ def submitapplication():
 
 # ========================================== FOR NOTIFICATION IN ADDING OF SUBJECT ====================================================
 
-@app.route('/student/addingsubject/added', methods=['POST'])
-@role_required('student')
-def add_subjects():
-    try: 
-        current_StudentId = session.get('user_id')
-        current_StudentNumber = get_student_number_by_id(current_StudentId)
-        created_service_id = create_addsubjects_application(request.form, request.files, current_StudentId)
+# @app.route('/student/addingsubject/added', methods=['POST'])
+# @role_required('student')
+# def add_subjects():
+#     try: 
+#         current_StudentId = session.get('user_id')
+#         current_StudentNumber = get_student_number_by_id(current_StudentId)
+#         created_service_id = create_addsubjects_application(request.form, request.files, current_StudentId)
         
-        if created_service_id and current_StudentNumber:
-            db.session.add(created_service_id)
-            db.session.commit()
+#         if created_service_id and current_StudentNumber:
+#             db.session.add(created_service_id)
+#             db.session.commit()
 
-            # Create a notification
-            new_notification = create_notification(
-                StudentId=current_StudentId,
-                StudentNumber=current_StudentNumber,
-                ServiceType="Adding Subjects Request",
-                UserResponsible=request.form.get('UserResponsible'),
-                Status="Sent",
-                Message="Your add subjects request has been sent.",
-            )
-            db.session.add(new_notification)
-            db.session.commit()
+#             # Create a notification
+#             new_notification = create_notification(
+#                 StudentId=current_StudentId,
+#                 StudentNumber=current_StudentNumber,
+#                 ServiceType="Adding Subjects Request",
+#                 UserResponsible=request.form.get('UserResponsible'),
+#                 Status="Sent",
+#                 Message="Your add subjects request has been sent.",
+#             )
+#             db.session.add(new_notification)
+#             db.session.commit()
 
-            flash('Add subjects created Successfully!', category='success')
-            return redirect(url_for('studentaddingsubject'))
-    except Exception as e:
-        db.session.rollback()
-        flash(f'Error: {str(e)}', category='danger')
-    finally:
-        db.session.close()
+#             flash('Add subjects created Successfully!', category='success')
+#             return redirect(url_for('studentaddingsubject'))
+#     except Exception as e:
+#         db.session.rollback()
+#         flash(f'Error: {str(e)}', category='danger')
+#     finally:
+#         db.session.close()
 
-    return render_template('student/addingsubject.html') 
+#     return render_template('student/addingsubject.html') 
 
 #============================================ EDIT ADD SERVICE IN THE FACULTY ==============================================
 @app.route('/update_status', methods=['POST'])
@@ -982,7 +982,10 @@ def viewcrossenrollment():
 @app.route('/student/shifting')
 @student_required
 def studentshifting():
-    return render_template("/student/shifting.html", student_api_base_url=student_api_base_url)
+    # Query to get all data from the SPSCourse table
+    all_courses = Course.query.all()
+
+    return render_template("/student/shifting.html", student_api_base_url=student_api_base_url, all_courses=all_courses)
 
 @app.route('/student/shifting/submit', methods=['POST'])
 @role_required('student')
@@ -1097,7 +1100,6 @@ def get_subject_names():
 
     # Extract names from the query result
     subject_names = [name[0] for name in subject_names]
-
     return jsonify(success=True, message="Subject names retrieved successfully.", data=subject_names)
 
 @app.route('/student/onlinepetitionofsubject/submit_petition', methods=['POST'])
@@ -1155,7 +1157,7 @@ def viewpetition():
 
     return render_template("/student/viewpetition.html", petition_requests_list=petition_requests_list)
 
-#================================= ONLINE REQUEST FOR TUTORIAL ===================================================
+#================================= STUDENT ONLINE REQUEST FOR TUTORIAL =================================================== #
 
 @app.route('/student/tutorial')#
 @student_required
@@ -1219,21 +1221,74 @@ def viewtutorial():
 
     return render_template("/student/viewtutorial.html", tutorial_requests_list=tutorial_requests_list)
 
-@app.route('/student/view_tutorial_file/<int:tutorial_request_id>')
-def view_tutorial_file(tutorial_request_id):
-    tutorial_requests = TutorialRequest.query.get(tutorial_request_id)
+#tutorial for student - working
+@app.route('/student/tutorial/get_tutorial_file/<int:tutorial_request_id>/<int:student_id>')
+@student_required
+def get_tutorial_file(tutorial_request_id, student_id):
+    # You can add logic here to check if the current user has access to this tutorial for the given student_id
+
+    return redirect(url_for('download_tutorial_file', tutorial_request_id=tutorial_request_id, student_id=student_id))
+
+@app.route('/student/download_tutorial_file/<int:tutorial_request_id>/<int:student_id>')
+@student_required
+def download_tutorial_file(tutorial_request_id, student_id):
+    # Adjusted query using both parts of the composite key
+    tutorial_requests = TutorialRequest.query.get((tutorial_request_id, student_id))
 
     if tutorial_requests and tutorial_requests.Tutorialdata:
         tutorial_extension = get_tutorial_extension(tutorial_requests.Tutorialfilename)
-        mimetype = get_mimetype(tutorial_extension)
+        download_name = f'tutorial_request_{tutorial_request_id}.{tutorial_extension}'
 
         return send_file(
             io.BytesIO(tutorial_requests.Tutorialdata),
             as_attachment=False,
-            mimetype=mimetype
+            download_name=download_name,
+            mimetype=get_mimetype(tutorial_extension)
         )
     else:
         abort(404)  # File not found
+
+def get_tutorial_extension(Tutorialfilename):
+    return Tutorialfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(tutorial_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(tutorial_extension, 'application/octet-stream')
+
+# @app.route('/student/view_tutorial_file/<int:tutorial_request_id>')
+# @role_required('student')  # Make sure only students can access this route
+# def view_tutorial_file(tutorial_request_id):
+#     user_id = session.get('user_id')
+
+#     # Fetch the student based on the user_id
+#     student = Student.query.get(user_id)
+
+#     if not student:
+#         abort(403)  # Forbidden, user not authorized
+
+#     # Check if the tutorial request belongs to the logged-in student
+#     tutorial_request = TutorialRequest.query.get(tutorial_request_id)
+#     if not tutorial_request or tutorial_request.StudentId != student.StudentId:
+#         abort(404)  # File not found
+
+#     if tutorial_request.Tutorialdata:
+#         tutorial_extension = get_tutorial_extension(tutorial_request.Tutorialfilename)
+#         mimetype = get_mimetype(tutorial_extension)
+
+#         return send_file(
+#             io.BytesIO(tutorial_request.Tutorialdata),
+#             as_attachment=False,
+#             mimetype=mimetype
+#         )
+#     else:
+#         abort(404)  # File not found
+
 #======================================== REQUEST FOR CERTIFICATION ===========================================================
 @app.route('/student/certification')
 @student_required
@@ -1304,95 +1359,302 @@ def refresh_session():
 # ========================================================================
 #SERVICES
 @app.route('/faculty/overload')
+@faculty_required
 @role_required('faculty')
 def facultyoverload():
-    overload_applications = OverloadApplication.query.all()
-    return render_template("/faculty/overload.html", overload_applications=overload_applications)  #overload_applications in overload_applications
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Access the related OverloadApplications using the defined relationship
+        overload_applications = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/overload.html", overload_applications=overload_applications)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal')) #overload_applications in overload_applications
+
+@app.route('/faculty/adds')
+@faculty_required
+@role_required('faculty')
+def facultyadds():
+    return render_template("/faculty/adds.html")
 
 @app.route('/faculty/adding')
+@faculty_required
 @role_required('faculty')
 def facultyadding():
     session['last_activity'] = datetime.now(timezone.utc)
-    addsubjects = AddSubjects.query.all()
-    students = []
-    for subject in addsubjects:
-        student = Student.query.filter_by(StudentId=subject.StudentId).first()
-        students.append(student)
-    combined_data = zip(addsubjects, students)
 
-    return render_template("/faculty/adding.html", combined_data=combined_data) # addsubjects in addsubjects
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Assuming there is a relationship between Faculty and AddSubjects (adjust accordingly)
+        addsubjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        students = []
+        for subject in addsubjects:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+
+        combined_data = zip(addsubjects, students)
+
+        return render_template("/faculty/adding.html", combined_data=combined_data)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/change')
+@faculty_required
 @role_required('faculty')
 def facultychange():
     session['last_activity'] = datetime.now(timezone.utc)
-    changesubjects = ChangeSubject.query.all()
-    return render_template("/faculty/change.html", changesubjects=changesubjects) #changesubjects in changesubjects
+
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        changesubjects = ChangeSubject.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/change.html", changesubjects=changesubjects) 
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal')) # Redirect to a relevant page
 
 @app.route('/faculty/correction')
+@faculty_required
 @role_required('faculty')
 def facultycorrection():
     session['last_activity'] = datetime.now(timezone.utc)
-    grade_entry = GradeEntry.query.all()
-    
-    students = []
-    for entry in grade_entry:
-        student = Student.query.filter_by(StudentId=entry.StudentId).first()
-        students.append(student)
-    
-    combined_data = zip(grade_entry, students)
 
-    return render_template("/faculty/correction.html", combined_data=combined_data)
+     # Get the current faculty user
+    current_faculty = get_current_faculty_user()
 
+    if current_faculty:
+
+        grade_entry = GradeEntry.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+    
+        students = []
+        for entry in grade_entry:
+            student = Student.query.filter_by(StudentId=entry.StudentId).first()
+            students.append(student)
+    
+        combined_data = zip(grade_entry, students)
+
+        return render_template("/faculty/correction.html", combined_data=combined_data)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/crossenrollment')
+@faculty_required
 @role_required('faculty')
 def facultycrossenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
-    cross_enrollments = CrossEnrollment.query.all()
-    return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+
+        cross_enrollments = CrossEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
+
 
 @app.route('/faculty/shifting')
+@faculty_required
 @role_required('faculty')
 def facultyshifting():
     session['last_activity'] = datetime.now(timezone.utc) # none
-    shifting_applications = ShiftingApplication.query.all()
-    return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        shifting_applications = ShiftingApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        
+        return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/manualenrollment')
+@faculty_required
 @role_required('faculty')
 def facultyenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
-    manual_enrollments = ManualEnrollment.query.all()
-    return render_template("/faculty/enrollment.html", manual_enrollments=manual_enrollments)
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+
+        manual_enrollments = ManualEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/enrollment.html", manual_enrollments=manual_enrollments)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/onlinepetitionofsubject')
+@faculty_required
 @role_required('faculty')
 def facultypetition():
     session['last_activity'] = datetime.now(timezone.utc) #none
-    petition_requests = PetitionRequest.query.all()
-    return render_template("/faculty/petition.html", petition_requests=petition_requests)
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+
+        petition_requests = PetitionRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/petition.html", petition_requests=petition_requests)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/requestfortutorialofsubjects')
+@faculty_required
 @role_required('faculty')
 def faculty_view_tutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
-    return render_template("/faculty/view_tutorial.html")
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # I dont know where is the code here, but
+        return render_template("/faculty/view_tutorial.html")
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
 @app.route('/faculty/certification')
+@faculty_required
 @role_required('faculty')
 def facultycertification():
     session['last_activity'] = datetime.now(timezone.utc) #none
-    certification_request = CertificationRequest.query.all()
-    return render_template("/faculty/certification.html", certification_request=certification_request)
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
 
+    if current_faculty:
+        certification_request = CertificationRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        students = []
+        for subject in certification_request:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+
+        combined_data = zip(certification_request, students)
+
+        return render_template("/faculty/certification.html", certification_request=certification_request, combined_data=combined_data)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
+
+#================================= FACULTY ONLINE REQUEST FOR TUTORIAL =================================================== #
+    
 @app.route('/faculty/tutorial')
+@faculty_required
 @role_required('faculty')
 def facultytutorial():
     session['last_activity'] = datetime.now(timezone.utc) #none
-    tutorial_requests = TutorialRequest.query.all()
-    return render_template("/faculty/tutorial.html", tutorial_requests=tutorial_requests)
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
 
+    if current_faculty:
+        tutorial_requests = TutorialRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        # students = []
+        # for tutorial_requests in tutorial_requests:
+        #     student = Student.query.filter_by(StudentId=tutorial_requests.StudentId).first()
+        #     students.append(student)
+
+        # combined_data = zip(tutorial_requests, students)
+
+        return render_template("/faculty/tutorial.html", tutorial_requests=tutorial_requests)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
+
+
+#tutorial download for faculty
+@app.route('/update-tutorial-service-Status/<int:tutorial_request_id>', methods=['POST'])
+def update_tutorial_service_status(tutorial_request_id):
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Find the specific AddSubjects record
+    tutorial_requests = TutorialRequest.query.get_or_404(tutorial_request_id)
+
+    # Get the new Status from the form data
+    new_Status = request.form.get('Status')
+
+    if new_Status:
+        # Update the Status
+        tutorial_requests.Status = new_Status
+
+        # Commit the changes to the database
+        db.session.commit()
+        flash('Service Tutorial Status updated successfully!', 'success')
+    else:
+        flash('No Status provided.', 'danger')
+
+    return redirect(url_for('facultytutorial'))
+
+#tutorial for faculty - working  Updated faculty route
+@app.route('/faculty/tutorial/get_faculty_tutorial_file/<int:tutorial_request_id>')
+@faculty_required
+def get_faculty_tutorial_file(tutorial_request_id):
+    # Logic to check if the current faculty user has access to this tutorial can be added here
+    return redirect(url_for('download_faculty_tutorial_file', tutorial_request_id=tutorial_request_id))
+
+# Updated faculty download route
+@app.route('/faculty/download_faculty_tutorial_file/<int:tutorial_request_id>')
+@faculty_required
+def download_faculty_tutorial_file(tutorial_request_id):
+    # Adjusted query for faculty using filter_by
+    tutorial_requests = TutorialRequest.query.filter_by(TutorialId=tutorial_request_id).first()
+
+    if tutorial_requests and tutorial_requests.Tutorialdata:
+        tutorial_extension = get_faculty_tutorial_extension(tutorial_requests.Tutorialfilename)
+        download_name = f'tutorial_request_{tutorial_request_id}.{tutorial_extension}'
+
+        return send_file(
+            io.BytesIO(tutorial_requests.Tutorialdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(tutorial_extension)
+        )
+    else:
+        abort(404)  # File not found
+
+def get_faculty_tutorial_extension(Tutorialfilename):
+    return Tutorialfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(tutorial_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',  # Corrected 'docs' to 'docx'
+        # Add more file types as needed
+    }
+    return mimetypes.get(tutorial_extension, 'application/octet-stream')
 #=======================================================================#
 
 #===================================================TIMER=============================================================#
@@ -2590,64 +2852,6 @@ def update_certification_service_status(CertificationId):
         flash('No Status provided.', 'danger')
 
     return redirect(url_for('facultycertification'))
-#=====================================================================
-#tutorial
-@app.route('/update-tutorial-service-Status/<int:tutorial_request_id>', methods=['POST'])
-def update_tutorial_service_status(tutorial_request_id):
-    session['last_activity'] = datetime.now(timezone.utc)
-
-    # Find the specific AddSubjects record
-    tutorial_requests = TutorialRequest.query.get_or_404(tutorial_request_id)
-
-    # Get the new Status from the form data
-    new_Status = request.form.get('Status')
-
-    if new_Status:
-        # Update the Status
-        tutorial_requests.Status = new_Status
-
-        # Commit the changes to the database
-        db.session.commit()
-        flash('Service Tutorial Status updated successfully!', 'success')
-    else:
-        flash('No Status provided.', 'danger')
-
-    return redirect(url_for('facultytutorial'))
-
-#tutorial
-@app.route('/faculty/tutorial/get_tutorial_file/<int:tutorial_request_id>')
-def get_tutorial_file(tutorial_request_id):
-    return redirect(url_for('download_tutorial_file', tutorial_request_id=tutorial_request_id))
-
-@app.route('/faculty/download_tutorial_file/<int:tutorial_request_id>')
-def download_tutorial_file(tutorial_request_id):
-    tutorial_requests = TutorialRequest.query.get(tutorial_request_id)
-
-    if tutorial_requests and tutorial_requests.file_data:
-        tutorial_extension = get_tutorial_extension(tutorial_requests.file_filename)
-        download_name = f'tutorial_request_{tutorial_request_id}.{tutorial_extension}'
-
-        return send_file(
-            io.BytesIO(tutorial_requests.file_data),
-            as_attachment=True,
-            download_name=download_name,
-            mimetype=get_mimetype(tutorial_extension)  # Make sure this function is defined as in your previous code
-        )
-    else:
-        abort(404)  # File not found
-
-def get_tutorial_extension(file_filename):
-    return file_filename.rsplit('.', 1)[1].lower()
-
-def get_mimetype(tutorial_extension):
-    mimetypes = {
-        'txt': 'text/plain',
-        'pdf': 'application/pdf',
-        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        # Add more file types as needed
-    }
-
-    return mimetypes.get(tutorial_extension, 'application/octet-stream')
 
 #===================================================TIMER=============================================================#
 # Middleware to check for inactivity and redirect to login if needed
@@ -2680,9 +2884,13 @@ def faculty_portal():
     session.permanent=True
     return render_template('faculty/login.html') #, api_base_url=faculty_base_api_url
 
-@app.route('/dashboard')
+#dashboard in admin
+@app.route('/faculty/dashboard')
 @faculty_required
 def faculty_dashboard():
+
+    # with the counts obtained from the get_all_services_counts function
+    status_counts = get_all_services_counts()
     # Replace the get_student_services function with get_all_services
     all_services_list, total_services, pending_count, approved_count, denied_count = get_all_services()
 
@@ -2708,7 +2916,7 @@ def faculty_dashboard():
 
     print(data)
 
-    return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
+    return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data, status_counts=status_counts, faculty_api_base_url=faculty_api_base_url)
 
 #======================================== FACULTY PROFILE ======================================================
 @app.route('/faculty/profile')

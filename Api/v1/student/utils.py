@@ -173,57 +173,225 @@ def getCurrentSubjectFaculty(str_student_id):
         return jsonify({'error': 'Internal Server Error'}), 500
 
 #1 - confirm
+# def getCurrentSubject(str_student_id):
+#     try:        
+#         # Get the Class of student that the IsGradeFinalized is False
+#         # Metadata =  Year, Semester, BAtch
+#         # Class = Section
+#         # ClassSubject = #Reference to the class subject 
+#         # StudentClassSubjectGrade =# Reference to the class subject and have reference in student #Grade
+#         class_of_students = db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Metadata, Subject)\
+#         .join(Class, Class.ClassId == ClassSubject.ClassId)\
+#         .join(Metadata, Metadata.MetadataId == Class.MetadataId)\
+#         .join(StudentClassSubjectGrade, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)\
+#         .join(Subject, Subject.SubjectId == ClassSubject.ClassSubjectId)\
+#         .filter(Class.IsGradeFinalized == True, StudentClassSubjectGrade.StudentId == str_student_id)\
+#         .all()
+
+#         list = []
+
+#         for classofstudent in class_of_students:
+#             dict_class_subject = {
+#                 "Subject Code": classofstudent.Subject.SubjectCode,
+#                 "Subject Name": classofstudent.Subject.Name,
+#                 "Subject Description": classofstudent.Subject.Description,
+#             }
+
+
+#             list.append(dict_class_subject)
+
+#         # Using that class get all class subject along with StudenClassSubjectGrade that has the same studentidFilter
+
+#         # dict       
+#         return jsonify(list)
+#     except Exception as e:
+#         # Handle exceptions appropriately
+#         print(f"Error: {e}")
+#         return jsonify({'error': 'Internal Server Error'}), 500
 def getCurrentSubject(str_student_id):
-    try:        
+    try:
         # Get the Class of student that the IsGradeFinalized is False
         # Metadata =  Year, Semester, BAtch
         # Class = Section
         # ClassSubject = #Reference to the class subject 
         # StudentClassSubjectGrade =# Reference to the class subject and have reference in student #Grade
-        class_of_students = db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Metadata, Subject)\
-        .join(Class, Class.ClassId == ClassSubject.ClassId)\
-        .join(Metadata, Metadata.MetadataId == Class.MetadataId)\
-        .join(StudentClassSubjectGrade, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)\
-        .join(Subject, Subject.SubjectId == ClassSubject.ClassSubjectId)\
-        .filter(Class.IsGradeFinalized == True, StudentClassSubjectGrade.StudentId == str_student_id)\
-        .all()
+        class_of_students = db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Metadata, Subject, Course, CourseEnrolled)\
+            .join(Class, Class.ClassId == ClassSubject.ClassId)\
+            .join(Metadata, Metadata.MetadataId == Class.MetadataId)\
+            .join(StudentClassSubjectGrade, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)\
+            .join(Subject, Subject.SubjectId == ClassSubject.ClassSubjectId)\
+            .join(Course, Course.CourseId == Metadata.CourseId)\
+            .join(CourseEnrolled, CourseEnrolled.StudentId == str_student_id)\
+            .filter(Class.IsGradeFinalized == True, StudentClassSubjectGrade.StudentId == str_student_id)\
+            .all()
 
-        list = []
+        subject_list = []
 
         for classofstudent in class_of_students:
             dict_class_subject = {
                 "Subject Code": classofstudent.Subject.SubjectCode,
                 "Subject Name": classofstudent.Subject.Name,
                 "Subject Description": classofstudent.Subject.Description,
+                "Course": {
+                    "Course Code": classofstudent.Course.CourseCode,  # Update this based on your actual column name
+                    "Course Name": classofstudent.Course.Name  # Update this based on your actual column name
+                },
+                "CourseEnrolled": {
+                    "Enrollment Date": classofstudent.CourseEnrolled.DateEnrolled,  # Update this based on your actual column name
+                    # Add other CourseEnrolled details as needed
+                }
             }
 
-
-            list.append(dict_class_subject)
+            subject_list.append(dict_class_subject)
 
         # Using that class get all class subject along with StudenClassSubjectGrade that has the same studentidFilter
-
-        # dict       
-        return jsonify(list)
+        # dict
+        return jsonify(subject_list)
     except Exception as e:
         # Handle exceptions appropriately
         print(f"Error: {e}")
         return jsonify({'error': 'Internal Server Error'}), 500
     
-#2 - confirm
-def getSubjectsGrade(str_student_id):
+# #1st Sem
+# def getFirstSemSubjectsGrade(str_student_id):
+#     try:
+#         data_student_class_subject_grade = (
+#             db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata)
+#             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+#             .join(Class, ClassSubject.ClassId == Class.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(Course, Course.CourseId == Metadata.CourseId)
+#             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id,
+#                     Metadata.Batch == 2023,
+#                     Metadata.Semester == 1)
+#             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+#             .all()
+#         )
+
+#         if data_student_class_subject_grade:
+#             dict_semester_subjects = {}
+
+#             for student_class_subject_grade in data_student_class_subject_grade:
+#                 class_combination = (
+#                     student_class_subject_grade.Class.ClassId,
+#                     student_class_subject_grade.Metadata.Batch,
+#                     student_class_subject_grade.Metadata.Semester
+#                 )
+
+#                 # Check if class_combination already processed for this semester
+#                 if class_combination not in dict_semester_subjects:
+#                     dict_semester_subjects[class_combination] = {
+#                         "Batch": student_class_subject_grade.Metadata.Batch,
+#                         "GPA": "No GPA yet",  # Initialize with default value
+#                         "Semester": student_class_subject_grade.Metadata.Semester,
+#                         "Subject": []
+#                     }
+
+#                 subject_code = student_class_subject_grade.Subject.SubjectCode
+#                 # Check if the subject is already added for this semester
+#                 if subject_code not in [subject["Code"] for subject in dict_semester_subjects[class_combination]["Subject"]]:
+#                     subject_details = {
+#                         "Grade": format(student_class_subject_grade.StudentClassSubjectGrade.Grade, '.2f') if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "0.00",
+#                         "Subject": student_class_subject_grade.Subject.Name,
+#                         "Code": subject_code,
+#                         "SecCode": f"{student_class_subject_grade.Course.CourseCode} {student_class_subject_grade.Metadata.Year}-{student_class_subject_grade.Class.Section}",
+#                         "Units": format(student_class_subject_grade.Subject.Units, '.2f'),
+#                         "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"
+#                     }
+
+#                     dict_semester_subjects[class_combination]["Subject"].append(subject_details)
+
+#             # Convert the dictionary values to a list
+#             list_student_class_subject_grade = list(dict_semester_subjects.values())
+#             return list_student_class_subject_grade
+
+#         else:
+#             return None
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         return None
+    
+
+#1st Sem with section, year , smester, course, grade, current
+def getFirstSemSubjectsGrade(str_student_id):
     try:
         data_student_class_subject_grade = (
-            db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata )
+            db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata)
             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
             .join(Class, ClassSubject.ClassId == Class.ClassId)
             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
             .join(Course, Course.CourseId == Metadata.CourseId)
             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
-            .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+            .filter(StudentClassSubjectGrade.StudentId == str_student_id,
+                    Metadata.Batch == 2023,
+                    Metadata.Semester == 1)
             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
             .all()
         )
-                
+
+        if data_student_class_subject_grade:
+            dict_semester_subjects = {}
+
+            for student_class_subject_grade in data_student_class_subject_grade:
+                class_combination = (
+                    student_class_subject_grade.Class.ClassId,
+                    student_class_subject_grade.Metadata.Batch,
+                    student_class_subject_grade.Metadata.Semester
+                )
+
+                # Check if class_combination already processed for this semester
+                if class_combination not in dict_semester_subjects:
+                    dict_semester_subjects[class_combination] = {
+                        "Batch": student_class_subject_grade.Metadata.Batch,
+                        "GPA": "No GPA yet",  # Initialize with default value
+                        "Semester": student_class_subject_grade.Metadata.Semester,
+                        "Year": student_class_subject_grade.Metadata.Year,
+                        "Section": student_class_subject_grade.Class.Section,  # Include Section in the result
+                        "Subject": []
+                    }
+
+                subject_code = student_class_subject_grade.Subject.SubjectCode
+                # Check if the subject is already added for this semester
+                if subject_code not in [subject["Code"] for subject in dict_semester_subjects[class_combination]["Subject"]]:
+                    subject_details = {
+                        "Grade": format(student_class_subject_grade.StudentClassSubjectGrade.Grade, '.2f') if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "0.00",
+                        "Subject": student_class_subject_grade.Subject.Name,
+                        "Code": subject_code,
+                        "SecCode": f"{student_class_subject_grade.Course.CourseCode} {student_class_subject_grade.Metadata.Year}-{student_class_subject_grade.Class.Section}",
+                        "Units": format(student_class_subject_grade.Subject.Units, '.2f'),
+                        "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"
+                    }
+
+                    dict_semester_subjects[class_combination]["Subject"].append(subject_details)
+
+            # Convert the dictionary values to a list
+            list_student_class_subject_grade = list(dict_semester_subjects.values())
+            return list_student_class_subject_grade
+
+        else:
+            return None
+    except Exception as e:
+        print("ERROR HERE: ", e)
+        return None
+
+
+#2nd Sem
+def getSecondSemSubjectsGrade(str_student_id):
+    try:
+        data_student_class_subject_grade = (
+            db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata)
+            .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+            .join(Class, ClassSubject.ClassId == Class.ClassId)
+            .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+            .join(Course, Course.CourseId == Metadata.CourseId)
+            .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+            .filter(StudentClassSubjectGrade.StudentId == str_student_id,
+                    Metadata.Semester == 2)  # Update filter for the second semester
+            .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+            .all()
+        )
+
         if data_student_class_subject_grade:
             class_combinations = set()
             dict_class_group = {}
@@ -231,18 +399,15 @@ def getSubjectsGrade(str_student_id):
 
             for student_class_subject_grade in data_student_class_subject_grade:
                 teacher_name = ""
-                
-                # Check if teacher exist
+
                 if student_class_subject_grade.ClassSubject.FacultyId:
-                    # Query the teacher
                     data_teacher = (
                         db.session.query(Faculty)
                         .filter(Faculty.FacultyId == student_class_subject_grade.ClassSubject.FacultyId)
                         .first()
                     )
                     teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + ' ' + data_teacher.MiddleName
-                
-                
+
                 class_combination = (
                     student_class_subject_grade.Class.ClassId,
                     student_class_subject_grade.Metadata.Batch,
@@ -251,12 +416,12 @@ def getSubjectsGrade(str_student_id):
                 if class_combination not in class_combinations:
                     class_combinations.add(class_combination)
 
-                    # Check if existing in the list table already the ClassId and semester so it wont reiterate the query
                     data_student_class_grade = (
                         db.session.query(StudentClassGrade)
-                        .filter(StudentClassGrade.StudentId == str_student_id, StudentClassGrade.ClassId == student_class_subject_grade.Class.ClassId)
+                        .filter(StudentClassGrade.StudentId == str_student_id,
+                                StudentClassGrade.ClassId == student_class_subject_grade.Class.ClassId)
                         .first()
-                    ) 
+                    )
                     dict_class_group = {
                         "Batch": student_class_subject_grade.Metadata.Batch,
                         "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
@@ -265,41 +430,346 @@ def getSubjectsGrade(str_student_id):
                     }
 
                     list_student_class_subject_grade.append(dict_class_group)
-                
-                # Append the subject details to the existing class group
+
                 subject_details = {
                     "Grade": format(student_class_subject_grade.StudentClassSubjectGrade.Grade, '.2f') if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "0.00",
                     "Subject": student_class_subject_grade.Subject.Name,
                     "Code": student_class_subject_grade.Subject.SubjectCode,
-                    "Teacher": teacher_name if teacher_name else "N/A",
                     "SecCode": f"{student_class_subject_grade.Course.CourseCode} {student_class_subject_grade.Metadata.Year}-{student_class_subject_grade.Class.Section}",
                     "Units": format(student_class_subject_grade.Subject.Units, '.2f'),
-                    "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"                
+                    "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"
                 }
 
                 dict_class_group["Subject"].append(subject_details)
-            return (list_student_class_subject_grade)
+
+            return list_student_class_subject_grade
 
         else:
             return None
     except Exception as e:
         print("ERROR HERE: ", e)
+        return None
+ 
+#ALL Grades until second lateet - confirm without courseenrolled - status
+# def getSubjectsGrade(str_student_id):
+#     try:
+#         data_student_class_subject_grade = (
+#             db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata )
+#             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+#             .join(Class, ClassSubject.ClassId == Class.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(Course, Course.CourseId == Metadata.CourseId)
+#             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+#             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+#             .all()
+#         )
+        
+#         # print('data_student_class_subject_grade: '. )
+        
+#         if data_student_class_subject_grade:
+#             class_combinations = set()
+#             dict_class_group = {}
+#             list_student_class_subject_grade = []
+
+#             for student_class_subject_grade in data_student_class_subject_grade:
+#                 teacher_name = ""
+                
+#                 # Check if teacher exist
+#                 if student_class_subject_grade.ClassSubject.FacultyId:
+#                     # Query the teacher
+#                     data_teacher = (
+#                         db.session.query(Faculty)
+#                         .filter(Faculty.FacultyId == student_class_subject_grade.ClassSubject.FacultyId)
+#                         .first()
+#                     )
+#                     teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + ' ', data_teacher.MiddleName
+                
+                
+#                 class_combination = (
+#                     student_class_subject_grade.Class.ClassId,
+#                     student_class_subject_grade.Metadata.Batch,
+#                     student_class_subject_grade.Metadata.Semester
+#                 )
+#                 if class_combination not in class_combinations:
+#                     class_combinations.add(class_combination)
+
+#                     # Check if existing in the list table already the ClassId and semester so it wont reiterate the query
+#                     data_student_class_grade = (
+#                         db.session.query(StudentClassGrade)
+#                         .filter(StudentClassGrade.StudentId == str_student_id, StudentClassGrade.ClassId == student_class_subject_grade.Class.ClassId)
+#                         .first()
+#                     ) 
+#                     dict_class_group = {
+#                         "Batch": student_class_subject_grade.Metadata.Batch,
+#                         "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
+#                         "Semester": student_class_subject_grade.Metadata.Semester,
+#                         "Subject": []
+#                     }
+
+#                     list_student_class_subject_grade.append(dict_class_group)
+                
+#                 # Append the subject details to the existing class group
+#                 subject_details = {
+#                     "Grade": format(student_class_subject_grade.StudentClassSubjectGrade.Grade, '.2f') if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "0.00",
+#                     "Subject": student_class_subject_grade.Subject.Name,
+#                     "Code": student_class_subject_grade.Subject.SubjectCode,
+#                     "Teacher": teacher_name if teacher_name else "N/A",
+#                     "SecCode": f"{student_class_subject_grade.Course.CourseCode} {student_class_subject_grade.Metadata.Year}-{student_class_subject_grade.Class.Section}",
+#                     "Units": format(student_class_subject_grade.Subject.Units, '.2f'),
+#                     "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"
+                        
+#                 }
+
+#                 dict_class_group["Subject"].append(subject_details)
+#             return (list_student_class_subject_grade)
+
+#         else:
+#             return None
+#     except Exception as e:
+#         print("ERROR: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return None
+
+
+def getSubjectsGrade(str_student_id):
+    try:
+        data_student_class_subject_grade = (
+            db.session.query(
+                StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata, CourseEnrolled.Status
+            )
+            .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+            .join(Class, ClassSubject.ClassId == Class.ClassId)
+            .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+            .join(Course, Course.CourseId == Metadata.CourseId)
+            .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+            .join(CourseEnrolled, and_(
+                    CourseEnrolled.StudentId == str_student_id,
+                    CourseEnrolled.CourseId == Metadata.CourseId
+                ))
+            .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+            .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+            .all()
+        )
+
+        if data_student_class_subject_grade:
+            class_combinations = set()
+            list_student_class_subject_grade = []
+
+            for record in data_student_class_subject_grade:
+                student_class_subject_grade, class_subject, class_, course, subject, metadata, course_enrolled_status = record
+                teacher_name = ""
+
+                # Check if teacher exists
+                if class_subject.FacultyId:
+                    # Query the teacher
+                    data_teacher = db.session.query(Faculty).filter(Faculty.FacultyId == class_subject.FacultyId).first()
+                    teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + (' ' + data_teacher.MiddleName if data_teacher.MiddleName else '')
+
+                class_combination = (class_.ClassId, metadata.Batch, metadata.Semester)
+                if class_combination not in class_combinations:
+                    class_combinations.add(class_combination)
+                    # Check if existing in the list table already the ClassId and semester so it won't reiterate the query
+                    data_student_class_grade = db.session.query(StudentClassGrade).filter(
+                        StudentClassGrade.StudentId == str_student_id,
+                        StudentClassGrade.ClassId == class_.ClassId
+                    ).first()
+                    enrollment_status = "Continuing" if course_enrolled_status == 0 else "Graduated"
+                    dict_class_group = {
+                        "Batch": metadata.Batch,
+                        "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
+                        "Semester": metadata.Semester,
+                        "Subject": [],
+                        "EnrollmentStatus": enrollment_status,
+                        "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}"  # Added SecCode
+                    }
+
+                    list_student_class_subject_grade.append(dict_class_group)
+
+                subject_details = {
+                    "Grade": format(student_class_subject_grade.Grade, '.2f') if student_class_subject_grade.Grade is not None else "0.00",
+                    "Subject": subject.Name,
+                    "Code": subject.SubjectCode,
+                    "Teacher": teacher_name if teacher_name else "N/A",
+                    "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}",
+                    "Units": format(subject.Units, '.2f'),
+                    "Status": "Pass" if student_class_subject_grade.Grade >= 75 else "Fail"  # Assuming 75 is the passing grade
+                }
+
+                # Find the last dictionary in list_student_class_subject_grade and append the subject details to its "Subject" list
+                list_student_class_subject_grade[-1]["Subject"].append(subject_details)
+                
+            return list_student_class_subject_grade
+
+        else:
+            return None
+    except Exception as e:
+        print("ERROR: ", e)
         # Handle the exception here, e.g., log it or return an error response
         return None
+
+#first
+# def getSubjectsGrade(str_student_id):
+#     try:
+#         data_student_class_subject_grade = (
+#             db.session.query(StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata )
+#             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+#             .join(Class, ClassSubject.ClassId == Class.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(Course, Course.CourseId == Metadata.CourseId)
+#             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+#             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+#             .all()
+#         )
+        
+#         # print('data_student_class_subject_grade: '. )
+        
+#         if data_student_class_subject_grade:
+#             class_combinations = set()
+#             dict_class_group = {}
+#             list_student_class_subject_grade = []
+
+#             for student_class_subject_grade in data_student_class_subject_grade:
+#                 teacher_name = ""
+                
+#                 # Check if teacher exist
+#                 if student_class_subject_grade.ClassSubject.FacultyId:
+#                     # Query the teacher
+#                     data_teacher = (
+#                         db.session.query(Faculty)
+#                         .filter(Faculty.FacultyId == student_class_subject_grade.ClassSubject.FacultyId)
+#                         .first()
+#                     )
+#                     teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + ' ' + data_teacher.MiddleName
+                
+                
+#                 class_combination = (
+#                     student_class_subject_grade.Class.ClassId,
+#                     student_class_subject_grade.Metadata.Batch,
+#                     student_class_subject_grade.Metadata.Semester
+#                 )
+#                 if class_combination not in class_combinations:
+#                     class_combinations.add(class_combination)
+
+#                     # Check if existing in the list table already the ClassId and semester so it wont reiterate the query
+#                     data_student_class_grade = (
+#                         db.session.query(StudentClassGrade)
+#                         .filter(StudentClassGrade.StudentId == str_student_id, StudentClassGrade.ClassId == student_class_subject_grade.Class.ClassId)
+#                         .first()
+#                     ) 
+#                     dict_class_group = {
+#                         "Batch": student_class_subject_grade.Metadata.Batch,
+#                         "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
+#                         "Semester": student_class_subject_grade.Metadata.Semester,
+#                         "Year": student_class_subject_grade.Metadata.Year,
+#                         "Section": student_class_subject_grade.Class.Section,
+#                         "Subject": []
+#                     }
+
+#                     list_student_class_subject_grade.append(dict_class_group)
+                
+#                 # Append the subject details to the existing class group
+#                 subject_details = {
+#                     "Grade": format(student_class_subject_grade.StudentClassSubjectGrade.Grade, '.2f') if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "0.00",
+#                     "Subject": student_class_subject_grade.Subject.Name,
+#                     "Code": student_class_subject_grade.Subject.SubjectCode,
+#                     "SecCode": f"{student_class_subject_grade.Course.CourseCode} {student_class_subject_grade.Metadata.Year}-{student_class_subject_grade.Class.Section}",
+#                     "Units": format(student_class_subject_grade.Subject.Units, '.2f'),
+#                     "Status": checkStatus(student_class_subject_grade.StudentClassSubjectGrade.Grade) if student_class_subject_grade.StudentClassSubjectGrade.Grade is not None else "-"                
+#                 }
+
+#                 dict_class_group["Subject"].append(subject_details)
+#             return (list_student_class_subject_grade)
+
+#         else:
+#             return None
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return None
     
     #studentclassgrade = classId
     #class = 
     #ClassSubject
 #3 - confirm
-def getStudentClassSGrade(str_student_id):
-    try:       
-        data_student_subject_grade = (
-                db.session.query(StudentClassGrade, Class)
-                .join(StudentClassGrade, StudentClassGrade.ClassId == Class.ClassId)
-                .filter(Class.IsGradeFinalized == False, StudentClassGrade.StudentId == str_student_id)
-                .all()
-            )
+# def getStudentClassSGrade(str_student_id):
+#     try:       
+#         data_student_subject_grade = (
+#                 db.session.query(StudentClassGrade, Class)
+#                 .join(StudentClassGrade, StudentClassGrade.ClassId == Class.ClassId)
+#                 .filter(Class.IsGradeFinalized == False, StudentClassGrade.StudentId == str_student_id)
+#                 .all()
+#             )
 
+#         list_data_student_subject_grade = []
+
+#         for item in data_student_subject_grade:
+#             student_class_subject = (
+#                 db.session.query(StudentClassSubjectGrade, ClassSubject, Subject, Class, Metadata, Course)
+#                 .join(ClassSubject, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+#                 .join(Subject, Subject.SubjectId == ClassSubject.SubjectId)
+#                 .join(Class, Class.ClassId == ClassSubject.ClassId)
+#                 .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#                 .join(Course, Course.CourseId == Metadata.CourseId)
+#                 .filter(StudentClassSubjectGrade.StudentId == str_student_id, StudentClassSubjectGrade != 0, Class.ClassId == item.Class.ClassId)
+#                 .all()
+#             )
+#             for data in student_class_subject:
+#                 section_code = data.Course.CourseCode + ' ' + str(data.Metadata.Year) + '-' + str(data.Class.Section)
+#                 teacher = data.ClassSubject.FacultyId if data.ClassSubject.FacultyId else ''
+
+#                 subject_data = {
+#                     'SectionCode': section_code,
+#                     'SubjectName': data.Subject.Name,
+#                     'SubjectCode': data.Subject.SubjectCode,
+#                     'Batch': data.Metadata.Batch,
+#                     'Year': data.Metadata.Year,
+#                     'Semester': data.Metadata.Semester,
+#                 }
+
+#                 list_data_student_subject_grade.append(subject_data)
+
+#         return jsonify(list_data_student_subject_grade)
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return None
+def getStudentClassSGrade(str_student_id):
+    try:
+        # Determine the current semester based on the month
+        current_month = datetime.now().month
+        current_year = datetime.now().year
+
+        # Define semester based on month
+        if 3 <= current_month <= 8:
+            # March to August - 2nd Semester of the previous academic year
+            semester = 2
+            academic_year = current_year - 1 if current_month < 6 else current_year
+        elif 10 <= current_month <= 12:
+            # October to December - 1st Semester of the current academic year
+            semester = 1
+            academic_year = current_year
+        elif 1 <= current_month <= 2:
+            # January to February - 1st Semester of the current academic year
+            semester = 1
+            academic_year = current_year
+        else:
+            # September - Summer of the current academic year
+            semester = 'Summer'
+            academic_year = current_year
+
+        data_student_subject_grade = (
+            db.session.query(StudentClassGrade, Class)
+            .join(StudentClassGrade, StudentClassGrade.ClassId == Class.ClassId)
+            .filter(Class.IsGradeFinalized == False, 
+                    StudentClassGrade.StudentId == str_student_id,
+                    Class.Metadata.Year == academic_year,
+                    Class.Metadata.Semester == semester,
+                    Class.Metadata.Month <= current_month)  # Filter out future semesters
+            .all()
+        )
+        print(current_month)
         list_data_student_subject_grade = []
 
         for item in data_student_subject_grade:
@@ -310,18 +780,19 @@ def getStudentClassSGrade(str_student_id):
                 .join(Class, Class.ClassId == ClassSubject.ClassId)
                 .join(Metadata, Metadata.MetadataId == Class.MetadataId)
                 .join(Course, Course.CourseId == Metadata.CourseId)
-                .filter(StudentClassSubjectGrade.StudentId == str_student_id, StudentClassSubjectGrade != 0, Class.ClassId == item.Class.ClassId)
+                .filter(StudentClassSubjectGrade.StudentId == str_student_id, 
+                        StudentClassSubjectGrade != 0, 
+                        Class.ClassId == item.Class.ClassId)
                 .all()
             )
             for data in student_class_subject:
-                section_code = data.Course.CourseCode + ' ' + str(data.Metadata.Year) + '-' + str(data.Class.Section)
+                section_code = f"{data.Course.CourseCode} {data.Metadata.Year}-{data.Class.Section}"
                 teacher = data.ClassSubject.FacultyId if data.ClassSubject.FacultyId else ''
 
                 subject_data = {
                     'SectionCode': section_code,
                     'SubjectName': data.Subject.Name,
                     'SubjectCode': data.Subject.SubjectCode,
-                    'Teacher': teacher,
                     'Batch': data.Metadata.Batch,
                     'Year': data.Metadata.Year,
                     'Semester': data.Metadata.Semester,
@@ -332,7 +803,6 @@ def getStudentClassSGrade(str_student_id):
         return jsonify(list_data_student_subject_grade)
     except Exception as e:
         print("ERROR HERE: ", e)
-        # Handle the exception here, e.g., log it or return an error response
         return None
 
 def getSubjectFuture(str_student_id):
@@ -350,40 +820,6 @@ def getSubjectFuture(str_student_id):
         print("ERROR HERE: ", e)
         # Handle the exception here, e.g., log it or return an error response
         return None
-#5
-# def getAllSubjects(str_student_id):
-#     try:
-#         # Assuming you have a specific course ID, replace 'your_course_id' with the actual course ID
-#         data_all_subjects = (
-#             db.session.query(Subject, ClassSubject, Class, Metadata, Course, CourseEnrolled)
-#             .join(ClassSubject, ClassSubject.SubjectId == Subject.SubjectId)
-#             .join(Class, Class.ClassId == ClassSubject.ClassId)
-#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
-#             .join(CourseEnrolled, CourseEnrolled.CourseId == Metadata.CourseId)
-#             .filter(Class.IsGradeFinalized == True, CourseEnrolled.StudentId == str_student_id)
-#             .all()
-#         )
-
-#         list_data_subject_grade = []
-#         print(list_data_subject_grade)
-        
-#         for data in data_all_subjects:
-#             # Processing data and creating a dictionary
-#             section_code = data.Course.CourseCode + ' ' + str(data.Metadata.Year) + '-' + str(data.Class.Section)
-#             teacher = data.ClassSubject.FacultyId if data.ClassSubject.FacultyId else ''
-#             subject_data = {
-#                 'SectionCode': section_code,
-#                 'SubjectName': data.Subject.Name,
-#                 'SubjectCode': data.Subject.SubjectCode,
-#                 'Teacher': teacher,
-#                 'Batch': data.Metadata.Batch
-#             }
-
-#             list_data_subject_grade.append(subject_data)
-#         return jsonify(list_data_subject_grade)
-#     except Exception as e:
-#         print("ERROR HERE: ", e)
-#         return None
         
 def getAllSubjects(str_student_id):
     try:
@@ -455,6 +891,84 @@ def get_student_services(student_id):
     # print(total_services)
     
     return all_services_list, total_services, pending_count, approved_count, denied_count
+
+# def get_incomplete_subjects(str_student_id):
+#     incomplete_subjects = (
+#         db.session.query(StudentClassSubjectGrade, ClassSubject, Subject)
+#         .join(ClassSubject, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+#         .join(Subject, Subject.SubjectId == ClassSubject.SubjectId)
+#         .filter(StudentClassSubjectGrade.StudentId == str_student_id, StudentClassSubjectGrade.AcademicStatus == 1)
+#         .all()
+#     )
+
+#     return incomplete_subjects
+# def get_incomplete_subjects(str_student_id):
+#     try:
+#         incomplete_subjects = (
+#             db.session.query(StudentClassSubjectGrade, ClassSubject, Subject)
+#             .join(ClassSubject, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+#             .join(Subject, Subject.SubjectId == ClassSubject.SubjectId)
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id, StudentClassSubjectGrade.AcademicStatus == 1)
+#             .all()
+#         )
+
+#         # # Convert each object in the result to a dictionary
+#         incomplete_subjects_as_dict = [
+#             {
+#                 "StudentClassSubjectGrade": {
+#                     "StudentClassSubjectGradeId": row.StudentClassSubjectGradeId,
+#                     # add other attributes as needed
+#                 },
+#                 "ClassSubject": {
+#                     "ClassSubjectId": row.ClassSubject.ClassSubjectId,
+#                     # add other attributes as needed
+#                 },
+#                 "Subject": {
+#                     "SubjectId": row.Subject.SubjectId,
+#                     # add other attributes as needed
+#                 }
+#             }
+#             for row in incomplete_subjects
+#         ]
+
+#         return jsonify(incomplete_subjects_as_dict)
+#     except Exception as e:
+#         print("ERROR HERE: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return jsonify({"error": "An error occurred while processing the request"}), 500
+
+def get_incomplete_subjects(str_student_id):
+    try:
+        incomplete_subjects = (
+            db.session.query(StudentClassSubjectGrade, ClassSubject, Subject)
+            .join(ClassSubject, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
+            .join(Subject, Subject.SubjectId == ClassSubject.SubjectId)
+            .filter(
+                StudentClassSubjectGrade.StudentId == str_student_id,
+                StudentClassSubjectGrade.AcademicStatus == 3
+            )
+            .all()
+        )
+
+        # Create an array to store the incomplete subjects
+        list_incomplete_subjects = []
+
+        for row in incomplete_subjects:
+            # Append each item to the array
+            incomplete_subjects_item = {
+                "ClassSubjectId": row.ClassSubject.ClassSubjectId,
+                "SubjectId": row.Subject.SubjectId,
+                "Grade": row.StudentClassSubjectGrade.Grade
+            }
+            list_incomplete_subjects.append(incomplete_subjects_item)
+
+        return jsonify(list_incomplete_subjects)
+    except Exception as e:
+        print("ERROR HERE: ", e)
+        # Handle the exception here, e.g., log it or return an error response
+        return jsonify({"error": "An error occurred while processing the request"}), 500
+
+
 
 #=================================================== to get all the status from different services given=====================================================#
 #  def get_all_student_services():

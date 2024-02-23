@@ -1,94 +1,137 @@
 {% extends "student/layout.html" %}
 {% block content %}
-   
-    <div class="data data1">
-        <div class="content-data">
-            <div class="head">
-                <h3>Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h3>           
-            </div>
-          
-            <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+<style>
+  /* Your existing styles here */
 
-                <div class="row mb-3">
-                    <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
-                    </div>
-                </div>
+  .grade-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+  }
 
-                <div class="row mb-3">
-                    <label for="Name" class="col-sm-3 col-form-label">Name</label>
-                    <div class="col-sm-8">
-                        <input type="text" class="form-control" id="Name" name="Name" readonly>
-                    </div>
-                </div>
+  .grade-table th,
+  .grade-table td {
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem;
+    text-align: left;
+  }
+</style>
+<div class="lg:px-40 md:px-16 py-4 w-screen px-8">
+  <div class="bg-white w-full rounded-lg p-8 shadow-md grades-container">
+      <h3 class="text-2xl font-bold text-c4 mb-3" id="name-number">
+          <!-- Your existing content here -->
+      </h3>
 
-                <div class="row mb-3">
-                    <label for="ApplicationType" class="col-sm-3 col-form-label">Application Type</label>
-                        <div class="col-sm-8">
-                            <select class="custom-select" id="ApplicationType" name="ApplicationType" required>
-                                <option value="">Select Application Type</option>
-                                <option value="Correction of Grade Entry">Correction of Grade Entry</option>
-                                <option value="Late Reporting of Grades">Late Reporting of Grades</option>
-                                <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
-                            </select>
-                        </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <label for="completion_form" class="col-sm-3 col-form-label">Completion Form </label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="file" name="completion_form" id="completion_form" accept=".pdf">
-                      </div>
-                </div>
+      <!-- Display student grades here -->
+      <div id="gradesContainer"></div>
 
-                <div class="row mb-3">
-                    <label for="class_record" class="col-sm-3 col-form-label">Copy of Class Record</label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="file" name="class_record" id="class_record" accept=".pdf">
-                      </div>
-                </div>
+      <!-- Button to fetch data -->
+      <button onclick="fetchStudentSubjectGrade()" class="mt-4 bg-blue-500 text-white p-2 rounded-md">Fetch Grades</button>
+  </div>
+</div>
 
-                <div class="row mb-3">
-                    <label for="affidavit" class="col-sm-3 col-form-label">Notarized Affidavit for Change of Grade</label>
-                    <div class="col-sm-8">
-                        <input class="form-control" type="file" name="affidavit" id="affidavit" accept=".pdf">
-                      </div>
-                </div>
+<script>
+  async function fetchStudentSubjectGrade() {
+      try {
+          const response = await fetch(`${api_base_url}/grades`);
+          if (!response.ok) throw new Error('Failed to fetch data. Try to contact the admin to resolve the issue.');
+          const data_grades = await response.json();
+          displayGrades(data_grades);
+      } catch (error) {
+          console.error('Error fetching data:', error.message);
+      }
+  }
 
-                 <div class="row mb-3">
-                <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
-                            <option value="Associate Professor II">Professor</option>
-                            <option value="Instructor I">CDO</option>
-                            <option value="Associate Professor V">Head Academic</option>
-                            <option value="Associate Professor V">Director</option>
-                            <option value="Instructor I">Registrar</option>
-                        </select>
-                    </div>
-            </div>
+  function displayGrades(data) {
+      const gradesContainer = document.getElementById('gradesContainer');
+      gradesContainer.innerHTML = ''; // Clear existing content
 
-            <div class="row mb-3" style="display: none;">
-                <label for="Status" class="col-sm-3 col-form-label">Status </label>
-                <div class="col-sm-8">
-                    <select class="custom-select" id="Status" name="Status" required>
-                        <option value="pending" selected>Pending</option>
-                        <option value="Approved" disabled>Approved</option>
-                        <option value="Rejected" disabled>Rejected</option>
-                    </select>
-                </div>
-            </div>
+      data.forEach((entry, index) => {
+          // Container for each semester
+          const semesterContainer = document.createElement('div');
+          semesterContainer.id = `semesterContainer${index}`;
+          gradesContainer.appendChild(semesterContainer);
 
-             <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-success">Submit Application</button>
-                <!-- |||
-                
-                <a href="{{ url_for('viewcorrection') }}">View correction</a> -->
-            </div>
-            </form>   
+          const table = document.createElement('table');
+          table.className = 'grade-table';
+          table.innerHTML = `
+            <tr>
+              <th>Batch</th>
+              <th>Sect. Code</th>
+              <th>Semester</th>
+              <th>GPA</th>
+              <th>Subject Code</th>
+              <th>Subject</th>
+              <th>Units</th>
+              <th>Grade</th>
+              <th>Status</th>
+            </tr>
+          `;
+          entry.Subject.forEach(subject => {
+              const row = document.createElement('tr');
+              row.innerHTML = `
+                <td>${entry.Batch}</td>
+                <td>${subject.SecCode}</td>
+                <td>${entry.Semester}</td>
+                <td>${entry.GPA}</td>
+                <td>${subject.Code}</td>
+                <td>${subject.Subject}</td>
+                <td>${subject.Units}</td>
+                <td>${subject.Grade}</td>
+                <td>${subject.Status}</td>
+              `;
+              table.appendChild(row);
+          });
+          semesterContainer.appendChild(table);
 
-        </div>
-    </div>
-    
-{% endblock content %}
+          // Download button for the table
+          const downloadBtn = document.createElement('button');
+          downloadBtn.textContent = 'Download Table';
+          downloadBtn.className = 'download-btn bg-green-500 text-white p-2 rounded-md mt-2';
+          downloadBtn.onclick = () => downloadTableAsCSV(`semesterContainer${index}`);
+          semesterContainer.appendChild(downloadBtn);
+      });
+  }
+  function getGradeCell(grade, year, semester, subject, index) {
+    if (year === 2020) {
+        return `<td>${grade}</td>`;
+    } else if (year === 2021 && semester <= 3) {
+        return `<td>${grade}</td>`;
+    } else if (year === 2022 && semester <= 2) {
+        return `<td>${grade}</td>`;
+    } else if (year === 2023 && semester === 1) {
+        return `<td>${grade}</td>`;
+    } else if (year === 2024 && semester === 1 && index < entry.Subject.length - 1) {
+        // Erase the grade for the last subject in the table
+        return `<td></td>`;
+    } else {
+        return `<td>${grade}</td>`;
+    }
+}
+
+  function downloadTableAsCSV(containerId) {
+      let data = '';
+      const table = document.getElementById(containerId).querySelector('.grade-table');
+      const rows = table.querySelectorAll('tr');
+      
+      for (let i = 0; i < rows.length; i++) {
+          const cells = rows[i].querySelectorAll('th, td');
+          for (let j = 0; j < cells.length; j++) {
+              data += '"' + cells[j].innerText + '"';
+              if (j < (cells.length - 1)) data += ',';
+          }
+          data += '\r\n';
+      }
+
+      const blob = new Blob([data], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', `grades-${containerId}.csv`);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  }
+</script>
+{% endblock %}

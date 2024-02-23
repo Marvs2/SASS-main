@@ -5,7 +5,7 @@
   <div class="data data1" id="firstTableContainer">
     <div class="content-data">
       <div class="head mb-3">
-        <h3>Current Request</h3>
+        <h3>Current Requests for Certification</h3>
       </div>
 
       <table id="changeSubjects" class="table table-bordered table-condensed display">
@@ -23,24 +23,25 @@
 		</tr>
 	</thead>
 	<tbody>
-		{% for certification_request in certification_request %}
+		{% for subject, student in combined_data %}
 			<tr
-				data-certify-Id="{{ certification_request.CertificationId }}"
-				data-certify-Number="{{ certification_request.StudentNumber }}"
-				data-certify-Name="{{ certification_request.Name }}"
-				data-certify-certType="{{ certification_request.CertificationType }}"
-				data-certify-request="{{ certification_request.RequestFormdata }}"							
-        data-certify-identify="{{ certification_request.IdentificationCarddata }}"
-				data-certify-author="{{ certification_request.AuthorizationLetterdata }}"
-				data-certify-identify="{{ certification_request.RepresentativeIddata }}"
-				data-certify-status="{{ certification_request.Status }}">
-				<td>{{ certification_request.StudentNumber }}</td>
-				<td>{{ certification_request.Name }}</td>
-				<td>{{ certification_request.UserResponsible }}</td>
-				<td>{{ certification_request.Status }}</td>
-				<!-- <td>{{ certification_request.StudentId }}</td> -->
+        data-add-name="{{ student.FirstName }} {{ student.LastName }}"
+				data-certify-Id="{{ subject.CertificationId }}"
+				data-certify-Number="{{ subject.StudentNumber }}"
+				data-certify-Name="{{ subject.Name }}"
+				data-certify-certType="{{ subject.CertificationType }}"
+				data-certify-request="{{ subject.RequestFormdata }}"				
+        data-certify-identify="{{ subject.IdentificationCarddata }}"
+				data-certify-author="{{ subject.AuthorizationLetterdata }}"
+				data-certify-identify="{{ subject.RepresentativeIddata }}"
+				data-certify-status="{{ subject.Status }}">
+				<td>{{ subject.StudentNumber }}</td>
+				<td>{{ subject.Name }}</td>
+				<td>{{ subject.UserResponsible }}</td>
+				<td>{{ subject.Status }}</td>
+				<!-- <td>{{ subject.StudentId }}</td> -->
 				<td>
-					<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ certification_request.CertificationId }}', '{{ certification_request.Status }}')"></button>
+					<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ subject.CertificationId }}', '{{ subject.Status }}')"></button>
 					<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>
 				  </td>
 				</tr>
@@ -153,15 +154,15 @@
     $(document).ready(function() {
     $('#certificationRequestsTable').on('click', function(){
     // Retrieve data from the clicked row
-	var name = $(this).data('add-name');
-        var studentNumber = $(this).data('data-certify-Number');
-        var subjectName = $(this).data('data-certify-Name'); 
-        var certType = $(this).data('data-certify-certType'); 
-        var requestFile = $(this).data('data-certify-request'); 
-		var requestidentifyFile = $(this).data('data-certify-identify'); 
+	      var name = $(this).data('add-name');
+        var studentNumber = $(this).data('certify-Number');
+        var subjectName = $(this).data('certify-Name'); 
+        var certType = $(this).data('certify-certType'); 
+        var requestFile = $(this).data('certify-request'); 
+		var requestidentifyFile = $(this).data('certify-identify'); 
 
-        var requestauthorFile = $(this).data('data-certify-author');
-        var status = $(this).data('data-certify-status'); // Add this line to get the status
+        var requestauthorFile = $(this).data('certify-author');
+        var status = $(this).data('certify-status'); // Add this line to get the status
   
         // Populate modal with data
         $('#adding-name').text(name);
@@ -171,8 +172,8 @@
         // $('#adding-sender-name').text(sender);
         $('#adding-sender-contact').text(contact);
         $('#adding-file-request').text(requestFile);
-		$('#adding-file-identify').text(requestidentifyFile);
-		$('#adding-file-author').text(requestauthorFile);
+		    $('#adding-file-identify').text(requestidentifyFile);
+		    $('#adding-file-author').text(requestauthorFile);
   
         // Additional logic for handling status-related changes
         handleStatusChange(status);
