@@ -806,6 +806,33 @@ def get_mimetype(file_extension):
 
     return mimetypes.get(file_extension, 'application/octet-stream')
 
+
+#============================================ EDIT Change SERVICE IN THE FACULTY ==============================================
+@app.route('/certificate_update_status', methods=['POST'])
+def certificate_update_status():
+    data = request.get_json()
+    certificationId = data.get('certificationId')
+    new_status = data.get('status')
+    remarks = data.get('remarks')  # Get remarks from the request
+
+    try:
+        certification_request = CertificationRequest.query.filter_by(CertificationId=certificationId).first()
+        if certification_request:
+            certification_request.Status = new_status
+            certification_request.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Certification Status updated successfully'}), 200
+        else:
+            flash('certification not found', 'danger')  # Flash error message
+            return jsonify({'message': 'certification not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500
+
+
+
+
 #========================== CORRECTION OF GRADE ENTRY ================================================#
 
 @app.route('/student/correction')

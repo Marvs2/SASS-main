@@ -435,8 +435,133 @@
     return colors[index % colors.length];
   }
 </script>
-<!--This is the script for the bar graph-->
+
 <script>
+  document.addEventListener("DOMContentLoaded", async function () {
+    // Fetch data from the API
+    async function fetchData() {
+      try {
+        const response = await fetch('/api/v1/faculty/requestall', { method: 'GET' });
+        const data = await response.json();
+        return data.data;
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        return [];
+      }
+    }
+
+    // Function to generate HTML content from the fetched data and update the modal counts
+    async function generateHTMLAndModal(data) {
+      let html = '';
+      let modalContent = '';
+      let modalContent1 = '';
+      let modalContent2 = '';
+
+      for (const entry of data) {
+        const modelName = Object.keys(entry)[0];
+        const statusCounts = entry[modelName];
+
+        html += `<div>
+                    <h2>${modelName}</h2>
+                    <ul>
+                        <li>Approved: ${statusCounts.approved}</li>
+                        <li>Denied: ${statusCounts.rejected}</li>
+                        <li>Pending: ${statusCounts.pending}</li>
+                    </ul>
+                </div>`;
+
+        // Update modal content
+        modalContent += `<p>Total Pending ${modelName}: ${statusCounts.pending}</p>`;
+        // update modalcontent1
+        modalContent1 += `<p>Total Pending ${modelName}: ${statusCounts.approved} </p>`;
+        // Update modalContent2
+        modalContent2 += `<p>Total Pending ${modelName}: ${statusCounts.rejected} </p>`;
+      }
+
+      // Update modal body with dynamic content
+      document.getElementById('pendingModalBody').innerHTML = modalContent;
+      document.getElementById('approvedModalBody').innerHTML = modalContent1;
+      document.getElementById('deniedModalBody').innerHTML = modalContent2;
+
+      return html;
+    }
+
+    // Function to update the HTML content on the page and the chart
+    async function updateHTMLAndChart() {
+      const container = document.getElementById('servicesData');
+      const chartContainer = document.getElementById('statusCountsChart');
+
+      const data = await fetchData();
+      const htmlContent = await generateHTMLAndModal(data);
+
+      container.innerHTML = htmlContent;
+
+      // Process the data for chart
+      var categories = Object.keys(data);
+      var seriesData = [];
+
+      Object.keys(data[categories[0]]).forEach(function (status) {
+        var statusData = [];
+        categories.forEach(function (category) {
+          statusData.push(data[category][status] || 0);
+        });
+        seriesData.push({
+          name: status,
+          data: statusData
+        });
+      });
+
+      // Create the chart
+      var options = {
+        chart: {
+          type: 'bar',
+          height: 350,
+          stacked: true,
+          toolbar: {
+            show: true
+          },
+          zoom: {
+            enabled: true
+          }
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+          },
+        },
+        dataLabels: {
+          enabled: false
+        },
+        series: seriesData,
+        xaxis: {
+          categories: Object.keys(data),
+          title: {
+            text: 'Service Types'
+          }
+        },
+        yaxis: {
+          title: {
+            text: 'Counts'
+          }
+        },
+        legend: {
+          position: 'top'
+        },
+        fill: {
+          opacity: 1
+        },
+      };
+
+      var chart = new ApexCharts(chartContainer, options);
+      chart.render();
+    }
+
+    // Call the updateHTMLAndChart function to initially load the data
+    updateHTMLAndChart();
+  });
+</script>
+<!--This is the script for the bar graph-->
+<!-- <script>
   document.addEventListener("DOMContentLoaded", function () {
     // Fetch data from the server using an API endpoint
     fetch('/api/v1/faculty/requestall', { method: 'GET' })
@@ -485,7 +610,7 @@
     }
     return color;
   }
-</script>
+</script> -->
 
 {% endblock %}
 <!-- Create a div to render the chart -->

@@ -1,6 +1,4 @@
-{% extends "faculty/layout.html" %}
-
-{% block content %}
+{% extends "faculty/layout.html" %} {% block content %}
 <div class="form-step form-step-active">
   <div class="data data1" id="firstTableContainer">
     <div class="content-data">
@@ -8,278 +6,308 @@
         <h3>Current Requests for Certification</h3>
       </div>
 
-      <table id="changeSubjects" class="table table-bordered table-condensed display">
+      <table
+        id="changeSubjects"
+        class="table table-bordered table-condensed display"
+      >
         <thead>
-		<tr>
-			<!-- <th>Certification Id</th> -->
-			<th>Student Number</th>
-			<th>Name</th>
-			<!-- <th>Certification Type</th> -->
-			<!-- <th>Files</th> -->
-			<th>Responsible</th>
-			<th>Status</th>
-			<!-- <th>Stud Id</th> -->
-			<th>Action</th>
-		</tr>
-	</thead>
-	<tbody>
-		{% for subject, student in combined_data %}
-			<tr
-        data-add-name="{{ student.FirstName }} {{ student.LastName }}"
-				data-certify-Id="{{ subject.CertificationId }}"
-				data-certify-Number="{{ subject.StudentNumber }}"
-				data-certify-Name="{{ subject.Name }}"
-				data-certify-certType="{{ subject.CertificationType }}"
-				data-certify-request="{{ subject.RequestFormdata }}"				
-        data-certify-identify="{{ subject.IdentificationCarddata }}"
-				data-certify-author="{{ subject.AuthorizationLetterdata }}"
-				data-certify-identify="{{ subject.RepresentativeIddata }}"
-				data-certify-status="{{ subject.Status }}">
-				<td>{{ subject.StudentNumber }}</td>
-				<td>{{ subject.Name }}</td>
-				<td>{{ subject.UserResponsible }}</td>
-				<td>{{ subject.Status }}</td>
-				<!-- <td>{{ subject.StudentId }}</td> -->
-				<td>
-					<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewAddModal" onclick="openEditModal('{{ subject.CertificationId }}', '{{ subject.Status }}')"></button>
-					<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>
-				  </td>
-				</tr>
-			{% endfor %}
-	</tbody>
-</table>
-<!-- Status Edit Modal -->
-<div class="modal fade" id="viewAddModal" tabindex="-1" role="dialog" aria-labelledby="viewAddModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-white" id="viewAddModalLabel">Update Application Status</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <form id="statusForm">
-                <div class="modal-body">
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Name:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-name"></p>
-                      </div>          
-                    </div>
-
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Subject to Add:</label>
-                      <div class="col-sm-6">
-                        <p id="adding-student-subject"></p>
-                      </div>          
-                    </div>
-
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Reason/s:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-student-reason"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Sender Name:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-sender-name"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Sender Contact Number:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-sender-contact"></p>
-                      </div>          
-                    </div>
-            
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Payment file:</label>
-                      <div class="col-sm-4">
-                        <p id="adding-file-request"></p>
-                      </div>          
-                    </div>
-					<div class="form-group">
-						<label class="col-sm-3 control-label">Payment file:</label>
-						<div class="col-sm-4">
-						  <p id="adding-file-identify"></p>
-						</div>          
-					  </div>
-					  <div class="form-group">
-						<label class="col-sm-3 control-label">Payment file:</label>
-						<div class="col-sm-4">
-						  <p id="adding-file-author"></p>
-						</div>          
-					  </div>      
-                    <div class="form-group">
-                      <label class="col-sm-3 control-label">Status:</label>
-                      <div class="col-sm-4">
-                        <input type="hidden" id="subjectIdInput" name="subjectId">
-                          <select id="statusSelect" name="status" class="form-control">
-                              <option value="Pending">Pending</option>
-                              <option value="Approved">Approved</option>
-                              <option value="Completed">Completed</option>
-                              <option value="Rejected">Rejected</option>
-                          </select>
-                      </div>          
-                    </div>
-
-                    <div class="form-group">
-                      <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
-                      <div class="col-sm-10">
-                        <textarea type="text" class="form-control" id="remarks"></textarea>
-                      </div>          
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-success" onclick="submitStatus()">Save changes</button>
-                </div>
-            </form>
-        </div>
+          <tr>
+            <!-- <th>Certification Id</th> -->
+            <th>Student Number</th>
+            <th>Name</th>
+            <!-- <th>Certification Type</th> -->
+            <!-- <th>Files</th> -->
+            <th>Responsible</th>
+            <th>Status</th>
+            <!-- <th>Stud Id</th> -->
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject, student in combined_data %}
+          <tr
+            data-add-name="{{ student.FirstName }} {{ student.LastName }}"
+            data-certify-Number="{{ subject.StudentNumber }}"
+            data-certify-Name="{{ subject.Name }}"
+            data-certify-certType="{{ subject.CertificationType }}"
+            data-certify-request="{{ subject.RequestFormdata }}"
+            data-certify-identify="{{ subject.IdentificationCarddata }}"
+            data-certify-author="{{ subject.AuthorizationLetterdata }}"
+            data-certify-identify="{{ subject.RepresentativeIddata }}"
+            data-certify-status="{{ subject.Status }}"
+          >
+            <td>{{ subject.StudentNumber }}</td>
+            <td>{{ subject.Name }}</td>
+            <td>{{ subject.UserResponsible }}</td>
+            <td>{{ subject.Status }}</td>
+            <!-- <td>{{ subject.StudentId }}</td> -->
+            <td>
+              <button
+                type="button"
+                title="View Info"
+                class="btn btn-primary fa-solid fa-eye edit_btn"
+                data-toggle="modal"
+                data-target="#viewCertifyModal"
+                onclick="openEditModal('{{ subject.CertificationId }}', '{{ subject.Status }}')"
+              ></button>
+              <button
+                type="button"
+                title="Delete Info"
+                class="btn btn-danger fa-solid fa-trash delete_btn"
+                data-toggle="modal"
+                data-target="#deleteModal"
+              ></button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
+</div>
+
+<!-- Certification Status Edit Modal -->
+<div class="modal fade" id="viewCertifyModal" tabindex="-1" role="dialog" aria-labelledby="viewCertifyModalLabel" aria-hidden="true">
+  <!-- Include your modal content here (similar to the previous modal) -->
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title text-white" id="viewCertifyModalLabel">
+                  Update Certification Status
+              </h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+
+          <form id="certificationStatusForm">
+              <div class="modal-body">
+                  <!-- Add the necessary form fields based on your CertificationRequest model and Student model -->
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Name:</label>
+                      <div class="col-sm-4">
+                          <p id="certification-name"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Student Number:</label>
+                      <div class="col-sm-6">
+                          <p id="student-number"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Certification Type:</label>
+                      <div class="col-sm-4">
+                          <p id="certification-type"></p>
+                      </div>
+                  </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Reason/s:</label>
+            <div class="col-sm-4">
+              <p id="certification-student-reason"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Sender Name:</label>
+            <div class="col-sm-4">
+              <p id="certification-sender-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Sender Contact Number:</label>
+            <div class="col-sm-4">
+              <p id="certification-sender-contact"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Payment file:</label>
+            <div class="col-sm-4">
+              <p id="certification-file-request"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Payment file:</label>
+            <div class="col-sm-4">
+              <p id="certification-file-identify"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Payment file:</label>
+            <div class="col-sm-4">
+              <p id="certification-file-author"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Status:</label>
+            <div class="col-sm-4">
+              <input type="hidden" id="certificationIdInput" name="certificationId" />
+              <select id="certificationStatusSelect" name="status" class="form-control">
+                <option value="pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="recipient-name" class="col-sm-2 control-label"
+              >Remarks:</label
+            >
+            <div class="col-sm-10">
+              <textarea
+                type="text"
+                class="form-control"
+                id="remarks"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitCertificationStatus()"
+          >
+            Save changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+/>
 
 <!-- DataTable Initialization Script -->
 <script>
-    // Initialize DataTable
-    $(document).ready(function() {
-    $('#certificationRequestsTable').on('click', function(){
-    // Retrieve data from the clicked row
-	      var name = $(this).data('add-name');
-        var studentNumber = $(this).data('certify-Number');
-        var subjectName = $(this).data('certify-Name'); 
-        var certType = $(this).data('certify-certType'); 
-        var requestFile = $(this).data('certify-request'); 
-		var requestidentifyFile = $(this).data('certify-identify'); 
+  // Initialize DataTable
+  $(document).ready(function () {
+        $("#certificationRequestsTable tbody tr").on("click", function () {
+            // Retrieve data from the clicked row
+            var studentId = $(this).data("student-id");
+            var certificationName = $(this).data("certify-Name");
+            var studentNumber = $(this).data("certify-Number");
+            var certificationType = $(this).data("certify-certType");
+            var status = $(this).data("certify-status");
 
-        var requestauthorFile = $(this).data('certify-author');
-        var status = $(this).data('certify-status'); // Add this line to get the status
-  
-        // Populate modal with data
-        $('#adding-name').text(name);
-        $('#adding-student-number').text(studentNumber);
-        $('#adding-student-subject').text(subjectName);
-        $('#adding-student-reason').text(certType);
-        // $('#adding-sender-name').text(sender);
-        $('#adding-sender-contact').text(contact);
-        $('#adding-file-request').text(requestFile);
-		    $('#adding-file-identify').text(requestidentifyFile);
-		    $('#adding-file-author').text(requestauthorFile);
-  
-        // Additional logic for handling status-related changes
-        handleStatusChange(status);
-      });
+            // Populate modal with data
+            $("#certification-name").text(certificationName);
+            $("#student-number").text(studentNumber);
+            $("#certification-type").text(certificationType);
+
+            // Additional logic for handling status-related changes
+            handleCertificationStatusChange(status);
+
+            // For the student-specific data, you may want to make an AJAX request to fetch additional details
+            // and update the modal content dynamically.
+            // Example:
+            // fetch("/get_student_details?studentId=" + studentId)
+            //   .then(response => response.json())
+            //   .then(data => {
+            //      // Update modal content with additional student details
+            //      $("#student-details").text(data.studentDetails);
+            //   })
+            //   .catch(error => console.error("Error:", error));
+        });
     });
-  
-    function handleStatusChange(currentStatus) {
-      var statusDropdown = $('#statusSelect');
-      var updateButton = $('#updateBtn');
-  
-      // Enable/disable options based on the selected status
-      statusDropdown.find('option').prop('disabled', false);
-  
-      switch (currentStatus) {
-        case 'Pending':
-          // Admin can only change to 'Approved'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Completed"]').prop('disabled', true);
-          break;
-        case 'Approved':
-          // Admin can change to 'Completed'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Approved"]').prop('disabled', true);
-          break;
-        case 'Completed':
-          // Disable all options when status is 'Completed'
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        case 'Rejected':
-          // Admin cannot change to any other status
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        default:
-          break;
-      }
-  
-      // Set the current status as selected
-      statusDropdown.val(currentStatus);
-  
-      // Enable/disable "Update" button based on the selected status
-      updateButton.prop('disabled', true);
-  
-      // Bind an event handler to the status dropdown to check for changes
-      statusDropdown.on('change', function () {
-        updateButton.prop('disabled', false);
-      });
-  
-      if (currentStatus === 'Closed') {
-        statusDropdown.prop('disabled', true);
-      } else {
-        statusDropdown.prop('disabled', false);
-      }
+
+    function handleCertificationStatusChange(currentStatus) {
+        var statusDropdown = $("#certificationStatusSelect");
+        var updateButton = $("#updateCertificationStatusBtn");
+
+        // Enable/disable options based on the selected status
+        statusDropdown.find("option").prop("disabled", false);
+
+        switch (currentStatus) {
+            case "Pending":
+                // Admin can only change to 'Approved'
+                statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+                statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+                break;
+            case "Approved":
+                // Admin can change to 'Completed'
+                statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+                statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+                break;
+            case "Completed":
+                // Disable all options when status is 'Completed'
+                statusDropdown.find("option").prop("disabled", true);
+                break;
+            case "Rejected":
+                // Admin cannot change to any other status
+                statusDropdown.find("option").prop("disabled", true);
+                break;
+            default:
+                break;
+        }
+
+        // Set the current status as selected
+        statusDropdown.val(currentStatus);
+
+        // Enable/disable "Update" button based on the selected status
+        updateButton.prop("disabled", true);
+
+        // Bind an event handler to the status dropdown to check for changes
+        statusDropdown.on("change", function () {
+            updateButton.prop("disabled", false);
+        });
+
+        if (currentStatus === "Closed") {
+            statusDropdown.prop("disabled", true);
+        } else {
+            statusDropdown.prop("disabled", false);
+        }
     }
-  
-    function openEditModal(subjectId, currentStatus) {
-      $('#subjectIdInput').val(subjectId);
-      handleStatusChange(currentStatus);
+
+    function openEditModal(certificationId, currentStatus) {
+        $("#certificationIdInput").val(certificationId);
+        handleCertificationStatusChange(currentStatus);
     }
-  
-    function submitStatus() {
-      const subjectId = $('#subjectIdInput').val();
-      const newStatus = $('#statusSelect').val();
-      const remarks = $('#remarks').val(); // Get remarks value
-  
-      // AJAX request to Flask backend
-      fetch('/update_status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          subjectId: subjectId,
-          status: newStatus,
-          remarks: remarks, // Include remarks in the request
+
+    function submitCertificationStatus() {
+        const certificationId = $("#certificationIdInput").val();
+        const newStatus = $("#certificationStatusSelect").val();
+        const remarks = $("#remarks").val();
+
+        // AJAX request to Flask backend
+        fetch("/certificate_update_status", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                certificationId: certificationId,
+                status: newStatus,
+                remarks: remarks,
+            }),
         })
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Success:', data);
-          $('#viewAddModal').modal('hide');
-          location.reload(); // Reload the page to see the changes
+        .then((response) => response.json())
+        .then((data) => {
+            console.log("Success:", data);
+            $("#viewCertifyModal").modal("hide");
+            location.reload(); // Reload the page to see the changes
         })
         .catch((error) => {
-          console.error('Error:', error);
+            console.error("Error:", error);
         });
     }
-
-  // Function to update status
-  function updateStatus(CertificationId) {
-    const formId = `statusForm${CertificationId}`;
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
-
-    fetch('/faculty/certification', {
-      method: 'POST',
-      body: formData,
-    })
-      .then(response => response.json())
-      .then(data => {
-        alert(data.message);
-        location.reload(); // Reload the page after successful update
-      })
-      .catch(error => {
-        console.error('Error updating status:', error);
-      });
-  }
 </script>
 
 {% endblock %}
