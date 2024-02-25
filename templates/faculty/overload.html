@@ -1,264 +1,327 @@
-{% extends "faculty/layout.html" %}
-
-{% block content %}
+{% extends "faculty/layout.html" %} {% block content %}
 <!-- SHOW CURRENT REQUESTS -->
 <div class="form-step form-step-active">
-    <div class="data data1" id="firstTableContainer">
-      <div class="content-data">
-        <div class="head mb-3">
-          <h3>Current Requests for Overload</h3>
-        </div>
-  
-        <table id="changeSubjects" class="table table-bordered table-condensed display">
-          <thead>
-            <tr>
-              <th>Application Number</th>
-              <th>Student Number</th>
-              <th>Student Name</th>
-              <th>Subject</th>
-              <th>Subject to change</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for overload_application, student in combined_data %}
-              <tr data-change-name="{{ student.FirstName }} {{ student.LastName }}"
-                  data-change-student-number="{{ student.StudentNumber }}"
-                  data-change-change="{{ overload_application.SubjectsToAdd }}"
-                  data-change-subject="{{ overload_application.ToSubject }}"
-                  data-change-reason="{{ overload_application.Justification }}"
-                  data-change-status="{{ overload_application.Status }}">
-                <td>{{ overload_application.OverloadId }}</td>
-                <td>{{ student.StudentNumber }}</td>
-                <td>{{ student.FirstName }} {{ student.LastName }}</td>
-                <td>{{ overload_application.SubjectsToAdd }}</td>
-                <td>{{ overload_application.ToSubject }}</td>
-                <td>{{ overload_application.Justification }}</td>
-                <td>{{ overload_application.Status }}</td>
-                <td>
-                  <button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewChangeModal" onclick="openChangeModal('{{ overload_application.OverloadId }}', '{{ overload_application.Status }}')"></button>
-                </td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h2>Current Requests for Overload</h2>
       </div>
+
+      <table
+        id="overloadSubjects"
+        class="table table-bordered table-condensed display"
+      >
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Program</th>
+            <!-- <th>Semester</th>-->
+            <th>Downloadable</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for subject, students in overload_data %}
+          <tr
+            data-overload-name="{{ subject.Name }}"
+            data-overload-student-number="{{ subject.StudentNumber }}"
+            data-overload-program="{{ subject.ProgramCourse }}"
+            data-overload-semester="{{ subject.Semester }}"
+            data-overload-overload="{{ subject.SubjectsToAdd }}"
+            data-overload-file-url="{{ url_for('get_overload_file', overload_application_id=subject.OverloadId) }}"
+            data-overload-file-filename="{{ subject.Overloadfilename }}"
+            data-overload-ur="{{ subject.UserResponsible }}"
+            data-overload-reason="{{ subject.Justification }}"
+            data-overload-status="{{ subject.Status }}"
+          >
+            <td>{{ subject.OverloadId }}</td>
+            <td>{{ subject.StudentNumber }}</td>
+            <td>{{ subject.Name }}</td>
+            <td>{{ subject.ProgramCourse }}</td>
+            <td><a href="{{ url_for('get_overload_file', overload_application_id=subject.OverloadId) }}" target="_blank" title="Download File">Download file</a></td>
+            <!-- <td>{{ subject.Semester }}</td>
+              <td>{{ subject.SubjectsToAdd }}</td> -->
+            <td>{{ subject.Status }}</td>
+            <td>
+              <button
+                type="button"
+                title="View Info"
+                class="btn btn-primary fa-solid fa-eye edit_btn"
+                data-toggle="modal"
+                data-target="#viewoverloadModal"
+                onclick="openoverloadModal('{{ subject.OverloadId }}', '{{ subject.Status }}')"
+              ></button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
-  
-  <!-- Status Edit Modal -->
-  <div class="modal fade" id="viewChangeModal" tabindex="-1" role="dialog" aria-labelledby="viewChangeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title text-white" id="viewChangeModalLabel">Update Overload Application Status</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-  
-        <form id="statusForm">
-          <div class="modal-body">
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Name:</label>
-              <div class="col-sm-4">
-                <p id="changing-name"></p>
-              </div>
-            </div>
+</div>
 
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Student Number:</label>
-              <div class="col-sm-4">
-                <p id="changing-student-number"></p>
-              </div>
-            </div>
+<!-- Status Edit Modal -->
+<div
+  class="modal fade"
+  id="viewoverloadModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewoverloadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="viewoverloadModalLabel">
+          Update Overload Application Status
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Subject to Change:</label>
-              <div class="col-sm-6">
-                <p id="changing-change-subject"></p>
-              </div>
+      <form id="statusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Name:</label>
+            <div class="col-sm-4">
+              <p id="overloads-name"></p>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Subject:</label>
-              <div class="col-sm-6">
-                <p id="changing-student-subject"></p>
-              </div>
-            </div>
-  
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Reason/s:</label>
-              <div class="col-sm-4">
-                <p id="changing-student-reason"></p>
-              </div>
-            </div>
-  
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Sender Name:</label>
-              <div class="col-sm-4">
-                <p id="changing-sender-name"></p>
-              </div>
-            </div>
-  
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Sender Contact Number:</label>
-              <div class="col-sm-4">
-                <p id="changing-sender-contact"></p>
-              </div>
-            </div>
-  
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Payment file:</label>
-              <div class="col-sm-4">
-                <p id="changing-file-attachment"></p>
-              </div>
-            </div>
-  
-            <div class="form-group">
-              <label class="col-sm-3 control-label">Status:</label>
-              <div class="col-sm-4">
-                <input type="hidden" id="changeSubjectIdInput" name="overloadId">
-                <select id="changeStatusSelect" name="status" class="form-control">
-                  <option value="Pending">Pending</option>
-                  <option value="Approved">Approved</option>
-                  <option value="Completed">Completed</option>
-                  <option value="Rejected">Rejected</option>
-                </select>
-              </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-4">
+              <p id="overloads-student-number"></p>
             </div>
           </div>
           <div class="form-group">
-            <label for="recipient-name" class="col-sm-2 control-label"
-              >Remarks:</label
-            >
-            <div class="col-sm-10">
-              <textarea
-                type="text"
+            <label class="col-sm-3 control-label">Course and Sem:</label>
+            <div class="col-sm-4">
+              <p id="overloads-student-subjectcode"></p> <span id="overloads-student-semester"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Sender Contact Number:</label>
+            <div class="col-sm-4">
+              <p id="overloads-student-semester"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject to overload:</label>
+            <div class="col-sm-6">
+              <p id="overloads-overload-subject"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject:</label>
+            <div class="col-sm-6">
+              <p id="overloads-student-subject"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Reason/s:</label>
+            <div class="col-sm-4">
+              <p id="overloads-student-reason"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Sender Name:</label>
+            <div class="col-sm-4">
+              <p id="overloads-sender-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Payment file:</label>
+            <div class="col-sm-4">
+              <p id="overloads-file-attachment"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Status:</label>
+            <div class="col-sm-4">
+              <input
+                type="hidden"
+                id="overloadSubjectIdInput"
+                name="overloadId"
+              />
+              <select
+                id="overloadStatusSelect"
+                name="status"
                 class="form-control"
-                id="remarks"
-              ></textarea>
+              >
+                <option value="pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+              </select>
             </div>
           </div>
         </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-success" onclick="submitChangeStatus()">Save changes</button>
+        <div class="form-group">
+          <label for="recipient-name" class="col-sm-2 control-label"
+            >Remarks:</label
+          >
+          <div class="col-sm-10">
+            <textarea type="text" class="form-control" id="remarks"></textarea>
           </div>
-        </form>
-      </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitoverloadStatus()"
+          >
+            Save overloads
+          </button>
+        </div>
+      </form>
     </div>
   </div>
-  
-  <script>
-    $(document).ready(function () {
-      $('#changeSubjects tbody tr').on('click', function () {
-        // Retrieve data from the clicked row
-        var name = $(this).data('change-name');
-        var studentNumber = $(this).data('change-student-number');
-        var fromsubject = $(this).data('change-change');
-        var subject = $(this).data('change-subject');
-        var reason = $(this).data('change-reason');
-        var sender = $(this).data('change-sender');
-        var contact = $(this).data('change-contact');
-        var fileAttachment = $(this).data('change-file');
-        var status = $(this).data('change-status'); // Add this line to get the status
-  
-        // Populate modal with data
-        $('#changing-name').text(name);
-        $('#changing-student-number').text(studentNumber);
-        $('#changing-change-subject').text(fromsubject);
-        $('#changing-student-subject').text(subject);
-        $('#changing-student-reason').text(reason);
-        $('#changing-sender-name').text(sender);
-        $('#changing-sender-contact').text(contact);
-        $('#changing-file-attachment').text(fileAttachment);
-  
-        // Additional logic for handling status-related changes
-        handleChangeStatusChange(status);
-      });
+</div>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+/>
+<script>
+  $(document).ready(function () {
+    $("#overloadSubjects tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var name = $(this).data("overload-name");
+      var studentNumber = $(this).data("overload-student-number");
+      var subjectCode = $(this).data("overload-program");
+      var sem = $(this).data("overload-semester");
+      var subjectadd = $(this).data("overload-overload");
+      var subject = $(this).data("overload-subject");
+      var reason = $(this).data("overload-reason");
+      var sender = $(this).data("overload-ur");
+      // var overload = $(this).data("overload-contact");
+      var fileAttachmentUrl = $(this).data("overload-file-url");
+      var overloadfilename = $(this).data("overload-file-filename");
+      var status = $(this).data("overload-status"); // Add this line to get the status
+
+      // Populate modal with data
+      $("#overloads-name").text(name);
+      $("#overloads-student-number").text(studentNumber);
+      $("#overloads-student-subjectcode").text(subjectCode);
+      $("#overloads-student-semester").text(sem);
+      $("#overloads-overload-subject").text(subjectadd);
+      $("#overloads-student-reason").text(reason);
+      $("#overloads-sender-name").text(sender);
+      // $("#overloads-sender-contact").text(contact);
+
+         // Generate dynamic file download link
+         if (overloadfilename) {
+          var fileLink = $('<a>').attr('target', '_blank').text(overloadfilename);
+fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
+          $('#overloads-file-attachment').empty().append(fileLink);
+        } else {
+          $('#overloads-file-attachment').text('No File');
+        }
+
+      // Additional logic for handling status-related overloads
+      handleoverloadStatusoverload(status);
     });
-  
-    function handleChangeStatusChange(currentStatus) {
-      var statusDropdown = $('#changeStatusSelect');
-      var updateButton = $('#updateChangeBtn');
-  
-      // Enable/disable options based on the selected status
-      statusDropdown.find('option').prop('disabled', false);
-  
-      switch (currentStatus) {
-        case 'Pending':
-          // Admin can only change to 'Approved'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Completed"]').prop('disabled', true);
-          break;
-        case 'Approved':
-          // Admin can change to 'Completed'
-          statusDropdown.find('option[value="Pending"]').prop('disabled', true);
-          statusDropdown.find('option[value="Approved"]').prop('disabled', true);
-          break;
-        case 'Completed':
-          // Disable all options when status is 'Completed'
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        case 'Rejected':
-          // Admin cannot change to any other status
-          statusDropdown.find('option').prop('disabled', true);
-          break;
-        default:
-          break;
-      }
-  
-      // Set the current status as selected
-      statusDropdown.val(currentStatus);
-  
-      // Enable/disable "Update" button based on the selected status
-      updateButton.prop('disabled', true);
-  
-      // Bind an event handler to the status dropdown to check for changes
-      statusDropdown.on('change', function () {
-        updateButton.prop('disabled', false);
-      });
-  
-      if (currentStatus === 'Closed') {
-        statusDropdown.prop('disabled', true);
-      } else {
-        statusDropdown.prop('disabled', false);
-      }
+  });
+
+  function handleoverloadStatusoverload(currentStatus) {
+    var statusDropdown = $("#overloadStatusSelect");
+    var updateButton = $("#updateoverloadBtn");
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find("option").prop("disabled", false);
+
+    switch (currentStatus) {
+      case "Pending":
+        // Admin can only overload to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+        break;
+      case "Approved":
+        // Admin can overload to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+        break;
+      case "Completed":
+        // Disable all options when status is 'Completed'
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      case "Rejected":
+        // Admin cannot overload to any other status
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      default:
+        break;
     }
-  
-    function openChangeModal(overloadId, currentStatus) {
-      $('#changeSubjectIdInput').val(overloadId);
-      handleChangeStatusChange(currentStatus);
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop("disabled", true);
+
+    // Bind an event handler to the status dropdown to check for overloads
+    statusDropdown.on("overload", function () {
+      updateButton.prop("disabled", false);
+    });
+
+    if (currentStatus === "Closed") {
+      statusDropdown.prop("disabled", true);
+    } else {
+      statusDropdown.prop("disabled", false);
     }
-  
-    function submitChangeStatus() {
-      const overloadId = $('#changeSubjectIdInput').val();
-      const newStatus = $('#changeStatusSelect').val();
-  
-      // AJAX request to Flask backend
-      fetch('/update_overload_status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          overloadId: overloadId,
-          status: newStatus
-        })
+  }
+
+  function openoverloadModal(overloadId, currentStatus) {
+    $("#overloadSubjectIdInput").val(overloadId);
+    handleoverloadStatusoverload(currentStatus);
+  }
+
+  function submitoverloadStatus() {
+    const overloadId = $("#overloadSubjectIdInput").val();
+    const newStatus = $("#overloadStatusSelect").val();
+
+    // AJAX request to Flask backend
+    fetch("/update_overload_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        overloadId: overloadId,
+        status: newStatus,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        $("#viewoverloadModal").modal("hide");
+        location.reload(); // Reload the page to see the overloads
       })
-        .then(response => response.json())
-        .then(data => {
-          console.log('Success:', data);
-          $('#viewChangeModal').modal('hide');
-          location.reload(); // Reload the page to see the changes
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    }
-  </script>
-  
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+</script>
+
 {% endblock %}

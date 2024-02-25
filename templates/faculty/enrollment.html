@@ -7,14 +7,12 @@
       <div class="head mb-3">
           <h2>Current Requests for Manual Enrollment</h2>
       </div>
-      <table id="changeSubjects" class="table table-bordered table-condensed display">
+      <table id="manualenrollmenttable" class="table table-bordered table-condensed display">
   <thead>
             <tr>
-                <th>Application ID</th>
                 <th>Student Number</th>
                 <th>Name</th>
                 <th>Enrollment Type</th>
-                <th>Reason</th>
                 <th>File</th>
                 <!-- <th>Created At</th>
                 <th>Updated At</th> -->
@@ -25,12 +23,17 @@
         </thead>
         <tbody>
             {% for manual_enrollments in manual_enrollments %}
-            <tr>
-                <td>{{ manual_enrollments.ManualEnrollmentId }}</td>
+            <tr  
+            data-manual-add-name="{{ manual_enrollments.Name }}"
+            data-manual-student-Number="{{ manual_enrollments.StudentNumber }}"
+            data-manual-enrollType="{{ manual_enrollments.EnrollmentType }}"
+            data-manual-reason="{{ manual_enrollments.Reason }}"
+            data-manual-mefile="{{ manual_enrollments.MeFiledata }}"
+            data-manual-responsible="{{ manual_enrollments.UserResponsible }}"
+            data-manual-status="{{ manual_enrollments.Status }}">
                 <td>{{ manual_enrollments.StudentNumber }}</td>
                 <td>{{ manual_enrollments.Name }}</td>
                 <td>{{ manual_enrollments.EnrollmentType }}</td>
-                <td>{{ manual_enrollments.Reason }}</td>
                 <td>
                   {% if manual_enrollments.MeFiledata %}
                   {% set manualfile = manual_enrollments.MeFilefilename[:15] + '...' if manual_enrollments.MeFilefilename|length > 15 else manual_enrollments.MeFilefilename %}
@@ -45,36 +48,94 @@
                 <td>{{ manual_enrollments.Status }}</td>
                 <td>
                      <!-- Button to trigger the modal form -->
-                     <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ manual_enrollments.ManualEnrollmentId }}">Change Status</button>
+                     <button
+                type="button"
+                title="View Info"
+                class="btn btn-primary fa-solid fa-eye edit_btn"
+                data-toggle="modal"
+                data-target="#viewManualEnrollmentModal"
+                onclick="openEditModal('{{ manual_enrollments.ManualEnrollmentId }}', '{{ manual_enrollments.Status }}')"
+              ></button>
+              <button
+                type="button"
+                title="Delete Info"
+                class="btn btn-danger fa-solid fa-trash delete_btn"
+                data-toggle="modal"
+                data-target="#deleteModal"
+              ></button>
                 </td>
             </tr>
-            <!-- Modal for status editing -->
-            <div class="modal fade" id="statusModal{{ manual_enrollments.ManualEnrollmentId }}" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="statusModalLabel">Change Status for {{ manual_enrollments.Name }}</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form id="statusForm{{ manual_enrollments.ManualEnrollmentId }}" action="{{ url_for('update_manual_service_status', m_enrollment_ID=manual_enrollments.ManualEnrollmentId) }}" method="POST">
-                            <div class="modal-body">
-                              <select name="status" class="form-select">
-                                <option value="pending">Pending</option>
-                                <option value="Approved">Approved</option>
-                                <option value="Rejected">Rejected</option>
-                                <!-- Add other statuses as needed -->
-                              </select>
-                            </div>
-                            <div class="modal-footer">
-                              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                              <button type="submit" class="btn btn-primary" onclick="updateStatus({{ manual_enrollments.ManualEnrollmentId }})">Save changes</button>
-                            </div>
-                          </form>
-                        </div>
-                    </div>
-                </div>
+           <!-- Manual Enrollment Status Edit Modal -->
+<div class="modal fade" id="viewManualEnrollmentModal" tabindex="-1" role="dialog" aria-labelledby="viewManualEnrollmentModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title text-white" id="viewManualEnrollmentModalLabel">Update Manual Enrollment Status</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
+          </div>
+
+          <form id="manualEnrollmentStatusForm">
+              <div class="modal-body">
+                  <!-- Add the necessary form fields based on your ManualEnrollment model -->
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Name:</label>
+                      <div class="col-sm-4">
+                          <p id="manual-enrollment-name"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Student Number:</label>
+                      <div class="col-sm-6">
+                          <p id="manual-enrollment-number"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Enrollment Type:</label>
+                      <div class="col-sm-4">
+                          <p id="manual-enrollment-type"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">File:</label>
+                      <div class="col-sm-4">
+                          <p id="manual-enrollment-file"></p>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label class="col-sm-3 control-label">Status:</label>
+                      <div class="col-sm-4">
+                          <input type="hidden" id="manualEnrollmentIdInput" name="manualEnrollmentId" />
+                          <select id="manualEnrollmentStatusSelect" name="status" class="form-control">
+                              <option value="pending">Pending</option>
+                              <option value="Approved">Approved</option>
+                              <option value="Rejected">Rejected</option>
+                              <!-- Add other statuses as needed -->
+                          </select>
+                      </div>
+                  </div>
+
+                  <div class="form-group">
+                      <label for="recipient-name" class="col-sm-2 control-label">Remarks:</label>
+                      <div class="col-sm-10">
+                          <textarea type="text" class="form-control" id="manual-enrollment-remarks"></textarea>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-success" onclick="submitManualEnrollmentStatus()">Save changes</button>
+              </div>
+          </form>
+      </div>
+  </div>
+</div>
+
             </div>
             {% endfor %}
         </tbody>
@@ -88,8 +149,41 @@
 <script>
       // Initialize DataTable
       $(document).ready(function() {
-    $('#manualTable').DataTable({
+    $('#manualenrollmenttable').DataTable({
         "pageLength": 5
+    });
+    $("#manualenrollmenttable tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var studentName = $(this).data("manual-add-name");
+      var studentNumber = $(this).data("manual-student-Number");
+      var enrollmenttype = $(this).data("manual-enrollType");
+      var subjectname = $(this).data("manual-reason");
+      var fileAttachment = $(this).data("manual-mefile");
+      var personresponsible = $(this).data("manual-responsible");
+      var status = $(this).data("petition-status");
+
+      // Populate modal with data
+      $("#manual-enrollment-name").text(studentName);
+      $("#manual-enrollment-number").text(studentNumber);
+      $("#manual-enrollment-type").text(enrollmenttype);
+      // $("#petition-subname").text(subjectname);
+      // $("#petition-type").text(petitionType);
+      // $("#petition-request-reason").text(petitionReason);
+      $("#manual-enrollment-file").text(manual-status);
+
+      // Additional logic for handling status-related changes
+      handlePetitionStatusChange(status);
+
+      // For the student-specific data, you may want to make an AJAX request to fetch additional details
+      // and update the modal content dynamically.
+      // Example:
+      // fetch("/get_student_details?studentId=" + studentId)
+      //   .then(response => response.json())
+      //   .then(data => {
+      //      // Update modal content with additional student details
+      //      $("#student-details").text(data.studentDetails);
+      //   })
+      //   .catch(error => console.error("Error:", error));
     });
 });
 function updateStatus(ManualEnrollmentId) {

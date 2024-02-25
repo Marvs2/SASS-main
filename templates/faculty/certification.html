@@ -7,7 +7,7 @@
       </div>
 
       <table
-        id="changeSubjects"
+        id="changecertifys"
         class="table table-bordered table-condensed display"
       >
         <thead>
@@ -24,23 +24,22 @@
           </tr>
         </thead>
         <tbody>
-          {% for subject, student in combined_data %}
+          {% for certify, students in certification_data %}
           <tr
-            data-add-name="{{ student.FirstName }} {{ student.LastName }}"
-            data-certify-Number="{{ subject.StudentNumber }}"
-            data-certify-Name="{{ subject.Name }}"
-            data-certify-certType="{{ subject.CertificationType }}"
-            data-certify-request="{{ subject.RequestFormdata }}"
-            data-certify-identify="{{ subject.IdentificationCarddata }}"
-            data-certify-author="{{ subject.AuthorizationLetterdata }}"
-            data-certify-identify="{{ subject.RepresentativeIddata }}"
-            data-certify-status="{{ subject.Status }}"
+            data-certify-add-name="{{ students.FirstName }} {{ students.LastName }}"
+            data-certify-student-Number="{{ students.StudentNumber }}"
+            data-certify-certType="{{ certify.CertificationType }}"
+            data-certify-request="{{ certify.RequestFormdata }}"
+            data-certify-identify="{{ certify.IdentificationCarddata }}"
+            data-certify-author="{{ certify.AuthorizationLetterdata }}"
+            data-certify-identify="{{ certify.RepresentativeIddata }}"
+            data-certify-status="{{ certify.Status }}"
           >
-            <td>{{ subject.StudentNumber }}</td>
-            <td>{{ subject.Name }}</td>
-            <td>{{ subject.UserResponsible }}</td>
-            <td>{{ subject.Status }}</td>
-            <!-- <td>{{ subject.StudentId }}</td> -->
+            <td>{{ students.StudentNumber }}</td>
+            <td>{{ certify.Name }}</td>
+            <td>{{ certify.UserResponsible }}</td>
+            <td>{{ certify.Status }}</td>
+            <!-- <td>{{ certify.StudentId }}</td> -->
             <td>
               <button
                 type="button"
@@ -48,7 +47,7 @@
                 class="btn btn-primary fa-solid fa-eye edit_btn"
                 data-toggle="modal"
                 data-target="#viewCertifyModal"
-                onclick="openEditModal('{{ subject.CertificationId }}', '{{ subject.Status }}')"
+                onclick="openEditModal('{{ certify.CertificationId }}', '{{ certify.Status }}')"
               ></button>
               <button
                 type="button"
@@ -67,61 +66,52 @@
 </div>
 
 <!-- Certification Status Edit Modal -->
-<div class="modal fade" id="viewCertifyModal" tabindex="-1" role="dialog" aria-labelledby="viewCertifyModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="viewCertifyModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewCertifyModalLabel"
+  aria-hidden="true"
+>
   <!-- Include your modal content here (similar to the previous modal) -->
   <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-          <div class="modal-header">
-              <h5 class="modal-title text-white" id="viewCertifyModalLabel">
-                  Update Certification Status
-              </h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-              </button>
-          </div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="viewCertifyModalLabel">
+          Update Certification Status
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
 
-          <form id="certificationStatusForm">
-              <div class="modal-body">
-                  <!-- Add the necessary form fields based on your CertificationRequest model and Student model -->
-                  <div class="form-group">
-                      <label class="col-sm-3 control-label">Name:</label>
-                      <div class="col-sm-4">
-                          <p id="certification-name"></p>
-                      </div>
-                  </div>
-
-                  <div class="form-group">
-                      <label class="col-sm-3 control-label">Student Number:</label>
-                      <div class="col-sm-6">
-                          <p id="student-number"></p>
-                      </div>
-                  </div>
-
-                  <div class="form-group">
-                      <label class="col-sm-3 control-label">Certification Type:</label>
-                      <div class="col-sm-4">
-                          <p id="certification-type"></p>
-                      </div>
-                  </div>
-
+      <form id="certificationStatusForm">
+        <div class="modal-body">
+          <!-- Add the necessary form fields based on your CertificationRequest model and Student model -->
           <div class="form-group">
-            <label class="col-sm-3 control-label">Reason/s:</label>
+            <label class="col-sm-3 control-label">Name:</label>
             <div class="col-sm-4">
-              <p id="certification-student-reason"></p>
+              <p id="certification-name"></p>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="col-sm-3 control-label">Sender Name:</label>
-            <div class="col-sm-4">
-              <p id="certification-sender-name"></p>
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-6">
+              <p id="certification-number"></p>
             </div>
           </div>
 
           <div class="form-group">
-            <label class="col-sm-3 control-label">Sender Contact Number:</label>
+            <label class="col-sm-3 control-label">Certification Type:</label>
             <div class="col-sm-4">
-              <p id="certification-sender-contact"></p>
+              <p id="certification-type"></p>
             </div>
           </div>
 
@@ -146,8 +136,16 @@
           <div class="form-group">
             <label class="col-sm-3 control-label">Status:</label>
             <div class="col-sm-4">
-              <input type="hidden" id="certificationIdInput" name="certificationId" />
-              <select id="certificationStatusSelect" name="status" class="form-control">
+              <input
+                type="hidden"
+                id="certificationIdInput"
+                name="certificationId"
+              />
+              <select
+                id="certificationStatusSelect"
+                name="status"
+                class="form-control"
+              >
                 <option value="pending">Pending</option>
                 <option value="Approved">Approved</option>
                 <option value="Completed">Completed</option>
@@ -199,115 +197,114 @@
 <script>
   // Initialize DataTable
   $(document).ready(function () {
-        $("#certificationRequestsTable tbody tr").on("click", function () {
-            // Retrieve data from the clicked row
-            var studentId = $(this).data("student-id");
-            var certificationName = $(this).data("certify-Name");
-            var studentNumber = $(this).data("certify-Number");
-            var certificationType = $(this).data("certify-certType");
-            var status = $(this).data("certify-status");
+    $("#changecertifys tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var studentName = $(this).data("certify-add-name");
+      var studentNumber = $(this).data("certify-studentNumber");
+      var certificationType = $(this).data("certify-certType");
+      var status = $(this).data("certify-status");
 
-            // Populate modal with data
-            $("#certification-name").text(certificationName);
-            $("#student-number").text(studentNumber);
-            $("#certification-type").text(certificationType);
+      // Populate modal with data
+      $("#certification-name").text(studentName);
+      $("#certification-number").text(studentNumber);
+      $("#certification-type").text(certificationType);
 
-            // Additional logic for handling status-related changes
-            handleCertificationStatusChange(status);
+      // Additional logic for handling status-related changes
+      handleCertificationStatusChange(status);
 
-            // For the student-specific data, you may want to make an AJAX request to fetch additional details
-            // and update the modal content dynamically.
-            // Example:
-            // fetch("/get_student_details?studentId=" + studentId)
-            //   .then(response => response.json())
-            //   .then(data => {
-            //      // Update modal content with additional student details
-            //      $("#student-details").text(data.studentDetails);
-            //   })
-            //   .catch(error => console.error("Error:", error));
-        });
+      // For the student-specific data, you may want to make an AJAX request to fetch additional details
+      // and update the modal content dynamically.
+      // Example:
+      // fetch("/get_student_details?studentId=" + studentId)
+      //   .then(response => response.json())
+      //   .then(data => {
+      //      // Update modal content with additional student details
+      //      $("#student-details").text(data.studentDetails);
+      //   })
+      //   .catch(error => console.error("Error:", error));
+    });
+  });
+
+  function handleCertificationStatusChange(currentStatus) {
+    var statusDropdown = $("#certificationStatusSelect");
+    var updateButton = $("#updateCertificationStatusBtn");
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find("option").prop("disabled", false);
+
+    switch (currentStatus) {
+      case "Pending":
+        // Admin can only change to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+        break;
+      case "Approved":
+        // Admin can change to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+        break;
+      case "Completed":
+        // Disable all options when status is 'Completed'
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      case "Rejected":
+        // Admin cannot change to any other status
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      default:
+        break;
+    }
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop("disabled", true);
+
+    // Bind an event handler to the status dropdown to check for changes
+    statusDropdown.on("change", function () {
+      updateButton.prop("disabled", false);
     });
 
-    function handleCertificationStatusChange(currentStatus) {
-        var statusDropdown = $("#certificationStatusSelect");
-        var updateButton = $("#updateCertificationStatusBtn");
-
-        // Enable/disable options based on the selected status
-        statusDropdown.find("option").prop("disabled", false);
-
-        switch (currentStatus) {
-            case "Pending":
-                // Admin can only change to 'Approved'
-                statusDropdown.find('option[value="Pending"]').prop("disabled", true);
-                statusDropdown.find('option[value="Completed"]').prop("disabled", true);
-                break;
-            case "Approved":
-                // Admin can change to 'Completed'
-                statusDropdown.find('option[value="Pending"]').prop("disabled", true);
-                statusDropdown.find('option[value="Approved"]').prop("disabled", true);
-                break;
-            case "Completed":
-                // Disable all options when status is 'Completed'
-                statusDropdown.find("option").prop("disabled", true);
-                break;
-            case "Rejected":
-                // Admin cannot change to any other status
-                statusDropdown.find("option").prop("disabled", true);
-                break;
-            default:
-                break;
-        }
-
-        // Set the current status as selected
-        statusDropdown.val(currentStatus);
-
-        // Enable/disable "Update" button based on the selected status
-        updateButton.prop("disabled", true);
-
-        // Bind an event handler to the status dropdown to check for changes
-        statusDropdown.on("change", function () {
-            updateButton.prop("disabled", false);
-        });
-
-        if (currentStatus === "Closed") {
-            statusDropdown.prop("disabled", true);
-        } else {
-            statusDropdown.prop("disabled", false);
-        }
+    if (currentStatus === "Closed") {
+      statusDropdown.prop("disabled", true);
+    } else {
+      statusDropdown.prop("disabled", false);
     }
+  }
 
-    function openEditModal(certificationId, currentStatus) {
-        $("#certificationIdInput").val(certificationId);
-        handleCertificationStatusChange(currentStatus);
-    }
+  function openEditModal(certificationId, currentStatus) {
+    $("#certificationIdInput").val(certificationId);
+    handleCertificationStatusChange(currentStatus);
+  }
 
-    function submitCertificationStatus() {
-        const certificationId = $("#certificationIdInput").val();
-        const newStatus = $("#certificationStatusSelect").val();
-        const remarks = $("#remarks").val();
+  function submitCertificationStatus() {
+    const certificationId = $("#certificationIdInput").val();
+    const newStatus = $("#certificationStatusSelect").val();
+    const remarks = $("#remarks").val();
 
-        // AJAX request to Flask backend
-        fetch("/certificate_update_status", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                certificationId: certificationId,
-                status: newStatus,
-                remarks: remarks,
-            }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-            console.log("Success:", data);
-            $("#viewCertifyModal").modal("hide");
-            location.reload(); // Reload the page to see the changes
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
-    }
+    // AJAX request to Flask backend
+    fetch("/certificate_update_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        certificationId: certificationId,
+        status: newStatus,
+        remarks: remarks,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        $("#viewCertifyModal").modal("hide");
+        location.reload(); // Reload the page to see the changes
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
 </script>
 
 {% endblock %}

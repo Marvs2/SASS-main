@@ -1,6 +1,131 @@
 {% extends "student/layout.html" %}
 {% block content %}
-<style>
+
+<div class="data data1">
+  <div class="content-data">
+      <div class="head">
+          <h3>Correction of Grade Entry, Late Reporting of Grades, and Removal of Incomplete Mark</h3>           
+      </div>
+    
+      <form action="{{url_for('submit_grade_correction')}}" method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+
+          <div class="row mb-3">
+              <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+              <div class="col-sm-8">
+                  <input type="text" class="form-control" id="StudentNumber" Name="StudentNumber" readonly>
+              </div>
+          </div>
+
+          <div class="row mb-3">
+              <label for="Name" class="col-sm-3 col-form-label">Name</label>
+              <div class="col-sm-8">
+                  <input type="text" class="form-control" id="Name" Name="Name" readonly>
+              </div>
+          </div>
+
+          <div class="row mb-3">
+              <label for="ApplicationType" class="col-sm-3 col-form-label">Application Type</label>
+                  <div class="col-sm-8">
+                      <select class="custom-select" id="ApplicationType" Name="ApplicationType" required>
+                          <option value="">Select Application Type</option>
+                          <option value="Correction of Grade Entry">Correction of Grade Entry</option>
+                          <option value="Late Reporting of Grades">Late Reporting of Grades</option>
+                          <option value="Removal of Incomplete Mark">Removal of Incomplete Mark</option>
+                      </select>
+                  </div>
+          </div>
+          
+          <div class="row mb-3">
+              <label for="completion_form" class="col-sm-3 col-form-label">Completion Form </label>
+              <div class="col-sm-8">
+                  <input class="form-control" type="file" Name="completion_form" id="completion_form" accept=".pdf">
+                </div>
+          </div>
+
+          <div class="row mb-3">
+              <label for="class_record" class="col-sm-3 col-form-label">Copy of Class Record</label>
+              <div class="col-sm-8">
+                  <input class="form-control" type="file" Name="class_record" id="class_record" accept=".pdf">
+                </div>
+          </div>
+
+          <div class="row mb-3">
+              <label for="affidavit" class="col-sm-3 col-form-label">Notarized Affidavit for Change of Grade</label>
+              <div class="col-sm-8">
+                  <input class="form-control" type="file" Name="affidavit" id="affidavit" accept=".pdf">
+                </div>
+          </div>
+
+           <div class="row mb-3">
+          <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
+              <div class="col-sm-8">
+                  <select class="custom-select" id="UserResponsible" Name="UserResponsible" required>
+                      <option value="Associate Professor V">Director</option>
+                      <option value="Associate Professor V">Head of Academic Program</option>
+                      <option value="Instructor I">CDO Cashier/Accounting Office</option>
+                      <option value="Assistant Professor I">Registrar's Office</option>
+                      <option value="Assistant Professor I">Administrative, Staff Head of Admission and Registration Office.</option>
+                  </select>
+              </div>
+      </div>
+
+      <div class="row mb-3" style="display: none;">
+          <label for="Status" class="col-sm-3 col-form-label">Status </label>
+          <div class="col-sm-8">
+              <select class="custom-select" id="Status" Name="Status" required>
+                  <option value="pending" selected>Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Rejected">Rejected</option>
+              </select>
+          </div>
+      </div>
+
+       <div class="d-flex justify-content-center">
+          <button type="submit" class="btn btn-success">Submit Application</button>
+      </div>
+  </form>   
+</div>
+</div>
+
+<script>
+  function validateForm() {
+    // Get form inputs
+    var StudentNumber = document.getElementById('StudentNumber').value;
+    var Name = document.getElementById('Name').value;
+    var ApplicationType = document.getElementById('ApplicationType').value;
+    var completion_form = document.getElementById('completion_form').files[0];
+    var class_record = document.getElementById('class_record').files[0];
+    var affidavit = document.getElementById('affidavit').files[0];
+    var UserResponsible = document.getElementById('UserResponsible').value;
+
+    // Validate required fields
+    if (!StudentNumber || !Name || !ApplicationType || !completion_form || !class_record || !affidavit || !UserResponsible) {
+      alert('Please fill out all required fields.');
+      return false;
+    }
+
+    // Validate file extensions
+    if (!isValidFileExtension(completion_form, '.pdf') || !isValidFileExtension(class_record, '.pdf') || !isValidFileExtension(affidavit, '.pdf')) {
+      alert('Please upload PDF files only.');
+      return false;
+    }
+
+    // Form is valid
+    return true;
+  }
+
+  function isValidFileExtension(filename, validExtension) {
+    var ext = filename.split('.').pop().toLowerCase();
+    return ext === validExtension.replace('.', '');
+  }
+</script>
+
+{% endblock %}
+
+
+
+<!-- This code is given for testing if the fetching data is Good or not -->
+<!-- <style>
   /* Your existing styles here */
 
   .grade-table {
@@ -15,18 +140,18 @@
     padding: 0.5rem;
     text-align: left;
   }
-</style>
-<div class="lg:px-40 md:px-16 py-4 w-screen px-8">
+</style> -->
+<!-- <div class="lg:px-40 md:px-16 py-4 w-screen px-8">
   <div class="bg-white w-full rounded-lg p-8 shadow-md grades-container">
-      <h3 class="text-2xl font-bold text-c4 mb-3" id="name-number">
-          <!-- Your existing content here -->
-      </h3>
+      <h3 class="text-2xl font-bold text-c4 mb-3" id="Name-number"> -->
+          <!-- Your existing content here 
+      </h3>-->
 
-      <!-- Display student grades here -->
+      <!-- Display student grades here 
       <div id="gradesContainer"></div>
 
-      <!-- Button to fetch data -->
-      <button onclick="fetchStudentSubjectGrade()" class="mt-4 bg-blue-500 text-white p-2 rounded-md">Fetch Grades</button>
+       Button to fetch data -->
+      <!-- <button onclick="fetchStudentSubjectGrade()" class="mt-4 bg-blue-500 text-white p-2 rounded-md">Fetch Grades</button>
   </div>
 </div>
 
@@ -133,5 +258,4 @@
       a.click();
       document.body.removeChild(a);
   }
-</script>
-{% endblock %}
+</script> -->

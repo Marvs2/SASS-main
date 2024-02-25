@@ -32,7 +32,7 @@
 							data-overload-student-number="{{ overload_applications.StudentNumber }}"
 							data-overload-subjects-to-add="{{ overload_applications.SubjectsToAdd }}"
 							data-overload-justification="{{ overload_applications.Justification }}"
-							data-overload-file-url="{{ overload_applications.Overloaddata}}"
+							data-overload-file-url="{{ url_for('view_overload_file', overload_application_id=overload_applications.OverloadId, student_id=overload_applications.StudentId) }}"
 							data-overload-file-filename="{{ overload_applications.Overloadfilename }}"	
 							data-overload-status="{{ overload_applications.Status }}">
 							<td class="applicationID">{{ overload_applications.OverloadId }}</td>								
@@ -174,13 +174,13 @@
 							data-correction-student-number="{{ grade_entry.StudentNumber }}"
 							data-correction-application-type="{{ grade_entry.ApplicationType }}"
 
-							data-correction-file-completion="{{ url_for('view_completion_form', GradeEntryId=grade_entry.GradeEntryId) }}"
+							data-correction-file-completion-url="{{ url_for('get_student_completion_form', grade_entry_Id=grade_entry.GradeEntryId, student_id=grade_entry.StudentId) }}"
 							data-correction-form-filename="{{ grade_entry.CompletionFormfilename }}"
 
-							data-correction-file-record="{{ url_for('view_class_record', GradeEntryId=grade_entry.GradeEntryId) }}"
+							data-correction-file-record-url="{{ url_for('get_class_record_file', grade_entry_Id=grade_entry.GradeEntryId, student_id=grade_entry.StudentId) }}"
 							data-correction-record-filename="{{ grade_entry.ClassRecordfilename }}"
 
-							data-correction-file-affidavit="{{ url_for('view_affidavit', GradeEntryId=grade_entry.GradeEntryId) }}"
+							data-correction-file-affidavit-url="{{ url_for('get_student_affidavit', grade_entry_Id=grade_entry.GradeEntryId, student_id=grade_entry.StudentId) }}"
 							data-correction-affidavit-filename="{{ grade_entry.Affidavitfilename }}"	
 
 							data-correction-status="{{ grade_entry.Status }}">
@@ -466,7 +466,7 @@
 							data-certification-type="{{ certification_request.CertificationType }}"
 
 							data-request-url="{{ url_for('get_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
-							data-request-filename="{{ certification_request.RequestFormfilename }}"	
+							data-request-filename="{{ certification_request.CompletionFormfilename }}"	
 
 							data-registration-url="{{ url_for('download_certification_identification_file', certification_request_Id=certification_request.CertificationId) }}"
 							data-registration-filename="{{ certification_request.IdentificationCardfilename }}"	
@@ -1420,12 +1420,12 @@ $(document).ready(function () {
 		var name = $(this).data('correction-name');
 		var studentNumber = $(this).data('correction-student-number');
 		var applicationType = $(this).data('correction-application-type');
-		var completion = $(this).data('correction-file-completion');
-		var completionFile = $(this).data('correction-form-filename');
-		var record = $(this).data('correction-file-record');
-		var recordFile = $(this).data('correction-record-filename');
-		var affidavit = $(this).data('correction-file-affidavit');
-		var affidavitFile = $(this).data('correction-affidavit-filename');
+		var completionUrl = $(this).data('correction-file-completion-url');
+		var completionFilename = $(this).data('correction-form-filename');
+		var recordUrl = $(this).data('correction-file-record-url');
+		var recordFilename = $(this).data('correction-record-filename');
+		var affidavitUrl = $(this).data('correction-file-affidavit-url');
+		var affidavitFilename = $(this).data('correction-affidavit-filename');
 		var Status = $(this).data('correction-status');
 
 		// Populate modal with data
@@ -1435,22 +1435,22 @@ $(document).ready(function () {
 		$('#correction-application-type').text(applicationType);
 
 		// Generate dynamic file download link
-		if (completionFile) {
-				var fileLink = $('<a>').attr('href', completion).attr('target', '_blank').text(completionFile);
+		if (completionFilename) {
+				var fileLink = $('<a>').attr('href', completionUrl).attr('target', '_blank').text(completionFilename);
 				$('#correction-file-completion').empty().append(fileLink);
 			} else {
 				$('#correction-file-completion').text('No File');
 			}
 
-			if (recordFile) {
-				var fileLink = $('<a>').attr('href', record).attr('target', '_blank').text(recordFile);
+			if (recordFilename) {
+				var fileLink = $('<a>').attr('href', recordUrl).attr('target', '_blank').text(recordFilename);
 				$('#correction-record-file').empty().append(fileLink);
 			} else {
 				$('#correction-record-file').text('No File');
 			}
 
-			if (affidavitFile) {
-				var fileLink = $('<a>').attr('href', affidavit).attr('target', '_blank').text(affidavitFile);
+			if (affidavitFilename) {
+				var fileLink = $('<a>').attr('href', affidavitUrl).attr('target', '_blank').text(affidavitFilename);
 				$('#correction-affidavit-file').empty().append(fileLink);
 			} else {
 				$('#correction-affidavit-file').text('No File');
@@ -1658,6 +1658,7 @@ $(document).ready(function () {
             $('#certification-application-studentNumber').text(studentNumber);
             $('#certification-type').text(certificationType);
 
+			
             // Generate dynamic file download link
 			if (requestFile) {
 				var fileLink = $('<a>').attr('href', requestUrl).attr('target', '_blank').text(requestFile);

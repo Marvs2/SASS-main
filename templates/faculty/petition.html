@@ -1,76 +1,304 @@
-{% extends "faculty/layout.html" %}
-
-{% block content %}
+{% extends "faculty/layout.html" %} {% block content %}
 <div class="form-step form-step-active">
   <div class="data data1" id="firstTableContainer">
     <div class="content-data">
       <div class="head mb-3">
-          <h2>Current Requests for Petition Request</h2>
+        <h2>Current Requests for Petition Request</h2>
       </div>
-      <table id="changeSubjects" class="table table-bordered table-condensed display">
-  <thead>
-            <tr>
-                <th>Application ID</th>
-                <th>Student Number</th>
-                <th>Name</th>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>Petition Type</th>
-                <th>Request Reason</th>
-                <!-- <th>Created At</th> -->
-                <th>User Responsible</th>
-                <th>Status</th>
-                <!-- <th>Action</th> -->
-            </tr>
+      <table
+        id="petitionTable"
+        class="table table-bordered table-condensed display"
+      >
+        <thead>
+          <tr>
+            <th>Application ID</th>
+            <th>Student Number</th>
+            <th>Name</th>
+            <!-- <th>Subject Code</th>
+            <th>Subject Name</th>
+            <th>Petition Type</th>
+            <th>Request Reason</th>
+            <th>User Responsible</th> -->
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody>
-            {% for request in petition_requests %}
-            <tr>
-                <td>{{ request.PetitionId }}</td>
-                <td>{{ request.StudentNumber }}</td>
-                <td>{{ request.Name }}</td>
-                <td>{{ request.SubjectCode }}</td>
-                <td>{{ request.SubjectName }}</td>
-                <td>{{ request.PetitionType }}</td>
-                <td>{{ request.RequestReason }}</td>
-                <!-- <td>{{ request.created_at }}</td> -->
-                <td>{{ request.UserResponsible }}</td>
-                <td>{{ request.Status }}</td>
-                <!-- <td>Action buttons like edit or update status</td> -->
-            </tr>
-            {% endfor %}
+          {% for request in petition_requests %}
+          <tr
+            data-petition-id="{{ request.PetitionId }}"
+            data-petition-name="{{ request.Name }}"
+            data-petition-studnumber="{{ request.StudentNumber }}"
+            data-petition-subcode="{{ request.SubjectCode }}"
+            data-petition-subname="{{ request.SubjectName }}"
+            data-petition-petitiontype="{{ request.PetitionType }}"
+            data-petition-reason="{{ request.RequestReason }}"
+            data-petition-status="{{ request.Status }}"
+          >
+            <td>{{ request.PetitionId }}</td>
+            <td>{{ request.StudentNumber }}</td>
+            <td>{{ request.Name }}</td>
+            <!-- <td>{{ request.SubjectCode }}</td>
+            <td>{{ request.SubjectName }}</td>
+            <td>{{ request.PetitionType }}</td>
+            <td>{{ request.RequestReason }}</td>
+            <td>{{ request.UserResponsible }}</td> -->
+            <td>{{ request.Status }}</td>
+            <td>
+              <button
+                type="button"
+                title="View Info"
+                class="btn btn-primary fa-solid fa-eye edit_btn"
+                data-toggle="modal"
+                data-target="#viewPetitionModal"
+                onclick="openEditModal('{{ request.PetitionId }}', '{{ request.Status }}')"
+              ></button>
+            </td>
+          </tr>
+          {% endfor %}
         </tbody>
-    </table>
+      </table>
+    </div>
+  </div>
 </div>
+
+<!-- Petition Status Edit Modal -->
+<div
+  class="modal fade"
+  id="viewPetitionModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewPetitionModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="viewPetitionModalLabel">
+          Update Petition Status
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="petitionStatusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Name:</label>
+            <div class="col-sm-4">
+              <p id="petition-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-6">
+              <p id="petition-number"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject Code:</label>
+            <div class="col-sm-6">
+              <p id="petition-subcode"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject Name:</label>
+            <div class="col-sm-6">
+              <p id="petition-subname"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Petition Type:</label>
+            <div class="col-sm-4">
+              <p id="petition-type"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Request Reason:</label>
+            <div class="col-sm-4">
+              <p id="petition-request-reason"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Status:</label>
+            <div class="col-sm-4">
+              <input type="hidden" id="petitionIdInput" name="petitionId" />
+              <select
+                id="petitionStatusSelect"
+                name="status"
+                class="form-control"
+              >
+                <option value="pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="recipient-name" class="col-sm-2 control-label"
+              >Remarks:</label
+            >
+            <div class="col-sm-10">
+              <textarea
+                type="text"
+                class="form-control"
+                id="remarks"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitPetitionStatus()"
+          >
+            Save changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+/>
 <script>
-
-$(document).ready(function() {
-    $('#petitionTable').DataTable({
-        "pageLength": 5
+  $(document).ready(function () {
+    $("#petitionTable").DataTable({
+      pageLength: 5,
     });
-});
+    $("#petitionTable tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var studentName = $(this).data("petition-name");
+      var studentNumber = $(this).data("petition-studnumber");
+      var subjectcode = $(this).data("petition-subcode");
+      var subjectname = $(this).data("petition-subname");
+      var petitionType = $(this).data("petition-petitiontype");
+      var petitionReason = $(this).data("petition-reason");
+      var status = $(this).data("petition-status");
 
+      // Populate modal with data
+      $("#petition-name").text(studentName);
+      $("#petition-number").text(studentNumber);
+      $("#petition-subcode").text(subjectcode);
+      $("#petition-subname").text(subjectname);
+      $("#petition-type").text(petitionType);
+      $("#petition-request-reason").text(petitionReason);
+
+      // Additional logic for handling status-related changes
+      handlePetitionStatusChange(status);
+
+      // For the student-specific data, you may want to make an AJAX request to fetch additional details
+      // and update the modal content dynamically.
+      // Example:
+      // fetch("/get_student_details?studentId=" + studentId)
+      //   .then(response => response.json())
+      //   .then(data => {
+      //      // Update modal content with additional student details
+      //      $("#student-details").text(data.studentDetails);
+      //   })
+      //   .catch(error => console.error("Error:", error));
+    });
+  });
+  function handlePetitionStatusChange(currentStatus) {
+    var statusDropdown = $("#petitionStatusSelect");
+    var updateButton = $("#updatePetitionStatusBtn");
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find("option").prop("disabled", false);
+
+    switch (currentStatus) {
+      case "Pending":
+        // Admin can only change to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+        break;
+      case "Approved":
+        // Admin can change to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+        break;
+      case "Completed":
+        // Disable all options when status is 'Completed'
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      case "Rejected":
+        // Admin cannot change to any other status
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      default:
+        break;
+    }
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop("disabled", true);
+
+    // Bind an event handler to the status dropdown to check for changes
+    statusDropdown.on("change", function () {
+      updateButton.prop("disabled", false);
+    });
+
+    if (currentStatus === "Closed") {
+      statusDropdown.prop("disabled", true);
+    } else {
+      statusDropdown.prop("disabled", false);
+    }
+  }
+
+  function openEditModal(petitionId, currentStatus) {
+    $("#petitionIdInput").val(petitionId);
+    handlePetitionStatusChange(currentStatus);
+  }
   // Function to update status
-  function updateStatus(PetitionId) {
-    const formId = `statusForm${PetitionId}`;
-    const form = document.getElementById(formId);
-    const formData = new FormData(form);
+  function submitPetitionStatus(PetitionId) {
+    const petitionId = $("#petitionIdInput").val();
+    const newStatus = $("#petitionStatusSelect").val();
+    const remarks = $("#remarks").val();
 
-    fetch('/faculty/petition', {
-      method: 'POST',
-      body: formData,
+    // AJAX request to Flask backend
+    fetch("/petition_update_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        petitionId: petitionId,
+        status: newStatus,
+        remarks: remarks,
+      }),
     })
-      .then(response => response.json())
-      .then(data => {
-        alert(data.message);
-        location.reload(); // Reload the page after successful update
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        $("#viewPetitionModal").modal("hide");
+        location.reload(); // Reload the page to see the changes
       })
-      .catch(error => {
-        console.error('Error updating status:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
   }
 </script>

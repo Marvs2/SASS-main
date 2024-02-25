@@ -4,64 +4,294 @@
 
 <div class="form-step form-step-active">
     <div class="data data1" id="firstTableContainer">
-      <div class="content-data">
-        <div class="head mb-3">
-            <h2>Current tutorial_requests for Tutorial</h2>
+        <div class="content-data">
+            <div class="head mb-3">
+                <h3>Current Tutorial Requests for Tutorial</h3>
+            </div>
+            <table id="changeSubjects" class="table table-bordered table-condensed display">
+                <thead>
+                    <tr>
+                        <th>Student Number</th>
+                        <th>Name</th>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>User Responsible</th>
+                        <th>File</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tutorial_request, students in tutorial_data %}
+                    <tr
+                        data-tutorial-student-number="{{ tutorial_request.StudentNumber }}"
+                        data-tutorial-name="{{ tutorial_request.Name }}"
+                        data-tutorial-subject-code="{{ tutorial_request.SubjectCode }}"
+                        data-tutorial-subject-name="{{ tutorial_request.SubjectName }}"
+                        data-tutorial-file-url="{{ url_for('get_faculty_tutorial_file', tutorial_request_id=tutorial_request.TutorialId) }}"
+                        data-tutorial-file-filename="{{ tutorial_request.Tutorialfilename }}"	
+                        data-tutorial-created-at="{{ tutorial_request.created_at }}"
+                        data-tutorial-status="{{ tutorial_request.Status }}"
+                    >
+                        <td>{{ tutorial_request.StudentNumber }}</td>
+                        <td>{{ tutorial_request.Name }}</td>
+                        <td>{{ tutorial_request.SubjectCode }}</td>
+                        <td>{{ tutorial_request.SubjectName }}</td>
+                        <td>{{ tutorial_request.UserResponsible }}</td>
+                        <td><a href="{{ url_for('get_faculty_tutorial_file', tutorial_request_id=tutorial_request.TutorialId) }}" target="_blank" title="{{ tutorial_request.Tutorialfilename }}">Download file</a></td>
+                        <td>{{ tutorial_request.Status }}</td>
+                        <td>
+                            <button
+                                type="button"
+                                title="View Info"
+                                class="btn btn-primary fa-solid fa-eye edit_btn"
+                                data-toggle="modal"
+                                data-target="#viewTutorialModal"
+                                onclick="openEditModal('{{ tutorial_request.TutorialId }}', '{{ tutorial_request.Status }}')"
+                            ></button>
+                            <button
+                                type="button"
+                                title="Delete Info"
+                                class="btn btn-danger fa-solid fa-trash delete_btn"
+                                data-toggle="modal"
+                                data-target="#deleteModal"
+                            ></button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-        <table id="changeSubjects" class="table table-bordered table-condensed display">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Student Number</th>
-                    <th>Name</th>
-                    <th>Subject Code</th>
-                    <th>Subject Name</th>
-                    <th>File</th>
-                    <th>Created At</th>
-                    <th>User Responsible</th>
-                    <th>Status</th>
-                    <th>Action</th>  <!-- Added an Action column for buttons -->
-                </tr>
-            </thead>
-            <tbody>
-                {% for tutorial_requests in tutorial_requests %}
-                <tr>
-                    <td>{{ tutorial_requests.TutorialId }}</td>
-                    <td>{{ tutorial_requests.StudentNumber }}</td>
-                    <td>{{ tutorial_requests.Name }}</td>
-                    <td>{{ tutorial_requests.SubjectCode }}</td>
-                    <td>{{ tutorial_requests.SubjectName }}</td>
-                    <td>
-                        {% if tutorial_requests.Tutorialdata %}
-                            <a href="{{ url_for('get_faculty_tutorial_file', tutorial_request_id=tutorial_requests.TutorialId) }}">Download</a>
-                        {% else %}
-                            No File
-                        {% endif %}
-                    </td>
-                    <td>{{ tutorial_requests.created_at }}</td>
-                    <td>{{ tutorial_requests.UserResponsible }}</td>
-                    <td>{{ tutorial_requests.Status }}</td>
-                    <td>
-                        <button
-                            type="button"
-                            title="View Info"
-                            class="btn btn-primary fa-solid fa-eye edit_btn"
-                            data-toggle="modal"
-                            data-target="#viewTutorialModal"
-                            onclick="openEditModal('{{ tutorial_requests.TutorialId }}', '{{ tutorial_requests.Status }}')"
-                        ></button>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </div>
 </div>
 
 <!-- Tutorial Status Edit Modal -->
-<div class="modal fade" id="viewTutorialModal" tabindex="-1" role="dialog" aria-labelledby="viewTutorialModalLabel" aria-hidden="true">
-    <!-- Include your modal content here (similar to the previous modal) -->
-    <!-- ... -->
+<div
+  class="modal fade"
+  id="viewTutorialModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewTutorialModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="viewTutorialModalLabel">
+          Update Tutorial Status
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="tutorialStatusForm">
+        <div class="modal-body">
+          <!-- Display Tutorial Request Data -->
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Name:</label>
+            <div class="col-sm-4">
+              <p id="tutorial-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-6">
+              <p id="tutorial-number"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject Code:</label>
+            <div class="col-sm-4">
+              <p id="tutorial-subject-code"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject Name:</label>
+            <div class="col-sm-4">
+              <p id="tutorial-subject-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">File Attachment:</label>
+            <div class="col-sm-4">
+              <p id="adding-file-attachment"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Status:</label>
+            <div class="col-sm-4">
+              <input
+                type="hidden"
+                id="tutorialIdInput"
+                name="tutorialId"
+              />
+              <select
+                id="tutorialStatusSelect"
+                name="status"
+                class="form-control"
+              >
+                <option value="pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="recipient-name" class="col-sm-2 control-label"
+              >Remarks:</label
+            >
+            <div class="col-sm-10">
+              <textarea
+                type="text"
+                class="form-control"
+                id="remarks"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitTutorialStatus()"
+          >
+            Save changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-<!-- Needed to finish first all before you go to creating the modal -->
+
+<script>
+$(document).ready(function () {
+    $("#changeSubjects tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var name = $(this).data("tutorial-name");
+      var studentNumber = $(this).data("tutorial-student-number");
+      var subjectcode = $(this).data("tutorial-subject-code");
+      var subjectname = $(this).data("tutorial-subject-name");
+      var fileAttachmentUrl = $(this).data("tutorial-file-url");
+      var tutorialfileName = $(this).data("tutorial-file-filename");
+      var status = $(this).data("tutorial-status"); // Add this line to get the status
+
+      // Populate modal with data
+      $("#tutorial-name").text(name);
+      $("#tutorial-number").text(studentNumber);
+      $("#tutorial-subject-code").text(subjectcode);
+      $("#tutorial-subject-name").text(subjectname);
+
+        // Generate dynamic file download link
+        if (tutorialfileName) {
+          var fileLink = $('<a>').attr('target', '_blank').text(tutorialfileName);
+fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
+          $('#adding-file-attachment').empty().append(fileLink);
+        } else {
+          $('#adding-file-attachment').text('No File');
+        }
+      // Additional logic for handling status-related changes
+      handleStatusChange(status);
+    });
+  });
+
+  function handleStatusChange(currentStatus) {
+    var statusDropdown = $("#tutorialStatusSelect");
+    var updateButton = $("#updateBtn");
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find("option").prop("disabled", false);
+
+    switch (currentStatus) {
+      case "Pending":
+        // Admin can only change to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+        break;
+      case "Approved":
+        // Admin can change to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+        break;
+      case "Completed":
+        // Disable all options when status is 'Completed'
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      case "Rejected":
+        // Admin cannot change to any other status
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      default:
+        break;
+    }
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop("disabled", true);
+
+    // Bind an event handler to the status dropdown to check for changes
+    statusDropdown.on("change", function () {
+      updateButton.prop("disabled", false);
+    });
+
+    if (currentStatus === "Closed") {
+      statusDropdown.prop("disabled", true);
+    } else {
+      statusDropdown.prop("disabled", false);
+    }
+  }
+
+  function openEditModal(tutorialId, currentStatus) {
+    $("#tutorialIdInput").val(tutorialId);
+    handleStatusChange(currentStatus);
+  }
+
+  function submitTutorialStatus() {
+    const tutorialId = $("#tutorialIdInput").val();
+    const newStatus = $("#tutorialStatusSelect").val();
+    const remarks = $("#remarks").val(); // Get remarks value
+
+    // Needed to change the variables 
+    // AJAX request to Flask backend
+    fetch("/tutorial_update_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tutorialId: tutorialId,
+        tutorialstatus: newStatus,
+        remarks: remarks, // Include remarks in the request
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        $("#viewTutorialModal").modal("hide");
+        location.reload(); // Reload the page to see the changes
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+</script>
+<!-- Remember to implement or adapt the modal content and JavaScript functionality for editing and deleting tutorials, similar to what you have for certification requests. -->
+
 {% endblock %}

@@ -1,17 +1,17 @@
 {% extends "faculty/layout.html" %}
 
 {% block content %}
-
-
+<!-- SHOW CURRENT REQUESTS -->
 <div class="form-step form-step-active">
-    <div class="data data1" id="firstTableContainer">
-      <div class="content-data">
-        <div class="head mb-3">
-            <h2>Current Requests for Correction of Grade Entries</h2>
-        </div>
-        <table id="changeSubjects" class="table table-bordered table-condensed display">
-    <thead>
-        <tr>
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h2>Current Requests for Correction of Grade Entries</h2>
+      </div>
+
+      <table id="gradeEntries" class="table table-bordered table-condensed display">
+        <thead>
+          <tr>
             <th>Grade ID</th>
             <th>Student Number</th>
             <th>Name</th>
@@ -22,62 +22,76 @@
             <th>Status</th>
             <th>Stud ID</th>
             <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for grade_entry in grade_entry %}
-            <tr>
-                <td>{{ grade_entry.GradeEntryId }}</td>
-                <td>{{ grade_entry.StudentNumber }}</td>
-                <td>{{ grade_entry.Name }}</td>
-                <td>{{ grade_entry.ApplicationType }}</td>
-                <td>
-                    <!-- File Links -->
-                    {% if grade_entry.CompletionFormdata %}
-                        <a href="{{ url_for('get_completion_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.CompletionFormfilename }}</a>
-                    {% else %}
-                        <span class="badge badge-warning">No File</span>
-                    {% endif %}
-                    {% if grade_entry.ClassRecorddata %}
-                        <a href="{{ url_for('get_grade_class_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.ClassRecordfilename }}</a>
-                    {% else %}
-                        <span class="badge badge-warning">No File</span>
-                    {% endif %}
-                    {% if grade_entry.Affidavitdata %}
-                        <a href="{{ url_for('get_grade_affidavit_file', GradeEntryId=grade_entry.GradeEntryId) }}" class="btn btn-success" download>{{ grade_entry.Affidavitfilename }}</a>
-                    {% else %}
-                        <span class="badge badge-warning">No File</span>
-                    {% endif %}
-                </td>
-                <td>{{ grade_entry.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
-                <td>{{ grade_entry.UserResponsible }}</td>
-                <td>{{ grade_entry.Status }}</td>
-                <td>{{ grade_entry.StudentId }}</td>
-                <td>
-                    <!-- Action Buttons -->
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ grade_entry.GradeEntryId }}">View Status</button>
-                    <!-- Additional action buttons can be added here -->
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry, student in combined_data %}
+          <tr
+            data-gradeentry-id="{{ entry.GradeEntryId }}"
+            data-student-number="{{ entry.StudentNumber }}"
+            data-name="{{ entry.Name }}"
+            data-application-type="{{ entry.ApplicationType }}"
+            data-file-url="{{ url_for('get_completion_file', GradeEntryId=entry.GradeEntryId) }}"
+            data-file-filename="{{ entry.CompletionFormfilename }}"
+            data-user-responsible="{{ entry.UserResponsible }}"
+            data-status="{{ entry.Status }}"
+          >
+            <td>{{ entry.GradeEntryId }}</td>
+            <td>{{ entry.StudentNumber }}</td>
+            <td>{{ entry.Name }}</td>
+            <td>{{ entry.ApplicationType }}</td>
+            <td>
+              <!-- File Links -->
+              {% if entry.CompletionFormdata %}
+                <a href="{{ url_for('get_completion_file', GradeEntryId=entry.GradeEntryId) }}" class="btn btn-success" download>{{ entry.CompletionFormfilename }}</a>
+              {% else %}
+                <span class="badge badge-warning">No File</span>
+              {% endif %}
+            </td>
+            <td>{{ entry.created_at }}</td>
+            <td>{{ entry.UserResponsible }}</td>
+            <td>{{ entry.Status }}</td>
+            <td>{{ student.StudentId }}</td>
+            <td>
+              <!-- Action Buttons -->
+              <button class="btn btn-primary" data-toggle="modal" data-target="#statusModal{{ entry.GradeEntryId }}">View Status</button>
+              <!-- Additional action buttons can be added here -->
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
+
+<!-- Status Edit Modal -->
+<div
+  class="modal fade"
+  id="viewGradeEntryModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewGradeEntryModalLabel"
+  aria-hidden="true"
+>
+  <!-- The modal content goes here -->
+  <!-- ... -->
+
 </div>
 
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
 
 <!-- DataTable Initialization Script -->
 <script>
-    // Initialize DataTable
-    $(document).ready(function() {
-    $('#certificationRequestsTable').DataTable({
-        "pageLength": 5
+  // Initialize DataTable
+  $(document).ready(function () {
+    $('#gradeEntries').DataTable({
+      "pageLength": 5
     });
-});
+  });
 
   // Function to update status
   function updateStatus(GradeEntryId) {
@@ -96,6 +110,114 @@
       })
       .catch(error => {
         console.error('Error updating status:', error);
+      });
+  }
+
+  // Function to handle click on a grade entry row
+  function handleGradeEntryClick(row) {
+    var name = row.data("name");
+    var studentNumber = row.data("student-number");
+    var applicationType = row.data("application-type");
+    var fileAttachmentUrl = row.data("file-url");
+    var filename = row.data("file-filename");
+    var userResponsible = row.data("user-responsible");
+    var status = row.data("status");
+
+    // Populate modal with data
+    $("#grade-entry-name").text(name);
+    $("#grade-entry-student-number").text(studentNumber);
+    $("#grade-entry-application-type").text(applicationType);
+    $("#grade-entry-user-responsible").text(userResponsible);
+
+    // Generate dynamic file download link
+    if (filename) {
+      var fileLink = $('<a>').attr('target', '_blank').text(filename);
+      fileLink[0].href = fileAttachmentUrl;
+      $('#grade-entry-file-attachment').empty().append(fileLink);
+    } else {
+      $('#grade-entry-file-attachment').text('No File');
+    }
+
+    // Additional logic for handling status-related changes
+    handleGradeEntryStatusChange(status);
+  }
+
+  function handleGradeEntryStatusChange(currentStatus) {
+    var statusDropdown = $("#gradeEntryStatusSelect");
+    var updateButton = $("#updateGradeEntryBtn");
+
+    // Enable/disable options based on the selected status
+    statusDropdown.find("option").prop("disabled", false);
+
+    switch (currentStatus) {
+      case "Pending":
+        // Admin can only change to 'Approved'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+        break;
+      case "Approved":
+        // Admin can change to 'Completed'
+        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+        break;
+      case "Completed":
+        // Disable all options when status is 'Completed'
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      case "Rejected":
+        // Admin cannot change to any other status
+        statusDropdown.find("option").prop("disabled", true);
+        break;
+      default:
+        break;
+    }
+
+    // Set the current status as selected
+    statusDropdown.val(currentStatus);
+
+    // Enable/disable "Update" button based on the selected status
+    updateButton.prop("disabled", true);
+
+    // Bind an event handler to the status dropdown to check for changes
+    statusDropdown.on("change", function () {
+      updateButton.prop("disabled", false);
+    });
+
+    if (currentStatus === "Closed") {
+      statusDropdown.prop("disabled", true);
+    } else {
+      statusDropdown.prop("disabled", false);
+    }
+  }
+
+  function openGradeEntryModal(gradeEntryId, currentStatus) {
+    $("#gradeEntryIdInput").val(gradeEntryId);
+    handleGradeEntryStatusChange(currentStatus);
+  }
+
+  function submitGradeEntryStatus() {
+    const gradeEntryId = $("#gradeEntryIdInput").val();
+    const newStatus = $("#gradeEntryStatusSelect").val();
+
+    // AJAX request to Flask backend
+    fetch("/update_grade_entry_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        gradeEntryId: gradeEntryId,
+        status: newStatus,
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        $("#viewGradeEntryModal").modal("hide");
+        location.reload(); // Reload the page to see the changes
+      })
+      .catch((error) => {
+        console.error("Error:", error);
       });
   }
 </script>
