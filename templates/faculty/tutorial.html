@@ -8,7 +8,7 @@
             <div class="head mb-3">
                 <h3>Current Tutorial Requests for Tutorial</h3>
             </div>
-            <table id="changeSubjects" class="table table-bordered table-condensed display">
+            <table id="tutorialSubjects" class="table table-bordered table-condensed display">
                 <thead>
                     <tr>
                         <th>Student Number</th>
@@ -181,7 +181,7 @@
 
 <script>
 $(document).ready(function () {
-    $("#changeSubjects tbody tr").on("click", function () {
+    $("#tutorialSubjects tbody tr").on("click", function () {
       // Retrieve data from the clicked row
       var name = $(this).data("tutorial-name");
       var studentNumber = $(this).data("tutorial-student-number");

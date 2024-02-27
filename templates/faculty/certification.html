@@ -16,30 +16,65 @@
             <th>Student Number</th>
             <th>Name</th>
             <!-- <th>Certification Type</th> -->
-            <!-- <th>Files</th> -->
-            <th>Responsible</th>
+            <th>Files</th>
             <th>Status</th>
             <!-- <th>Stud Id</th> -->
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {% for certify, students in certification_data %}
+          {% for certification_request, students in certification_data %}
           <tr
             data-certify-add-name="{{ students.FirstName }} {{ students.LastName }}"
             data-certify-student-Number="{{ students.StudentNumber }}"
-            data-certify-certType="{{ certify.CertificationType }}"
-            data-certify-request="{{ certify.RequestFormdata }}"
-            data-certify-identify="{{ certify.IdentificationCarddata }}"
-            data-certify-author="{{ certify.AuthorizationLetterdata }}"
-            data-certify-identify="{{ certify.RepresentativeIddata }}"
-            data-certify-status="{{ certify.Status }}"
+            data-certify-certType="{{ certification_request.CertificationType }}"
+            data-certify-requestUrl="{{ url_for('get_faculty_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
+            data-certify-request-filename="{{ certification_request.RequestFormfilename}}"
+
+            data-certify-identificationUrl="{{ url_for('get_faculty_certification_identificaion_file', certification_request_Id=certification_request.CertificationId) }}"
+            data-certify-identify-filename="{{ certification_request.CertificationFilename }}"
+
+            data-certify-authorizationUrl="{{ url_for('get_faculty_certification_authorization_file', certification_request_Id=certification_request.CertificationId) }}"
+            data-certify-authori-filename="{{ certification_request.AuthorizationLetterfilename}}"
+
+            data-certify-identify="{{ certification_request.IdentificationCarddata }}"
+            data-certify-author="{{ certification_request.AuthorizationLetterdata }}"
+            data-certify-identify="{{ certification_request.RepresentativeIddata }}"
+            data-certify-status="{{ certification_request.Status }}"
+            data-certify-remarks="{{ certification_request.Remarks }}"
           >
-            <td>{{ students.StudentNumber }}</td>
-            <td>{{ certify.Name }}</td>
-            <td>{{ certify.UserResponsible }}</td>
-            <td>{{ certify.Status }}</td>
-            <!-- <td>{{ certify.StudentId }}</td> -->
+            <td>{{ certification_request.StudentNumber }}</td>
+            <td>{{ certification_request.Name }}</td>
+            <td>
+              <a
+                href="{{ url_for('get_faculty_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
+                target="_blank"
+                title="{{ certification_request.RequestFormfilename}}"
+                >{{ certification_request.RequestFormfilename | truncate(15) }}</a
+              >  ||   
+              <a
+                href="{{ url_for('get_faculty_certification_identificaion_file', certification_request_Id=certification_request.CertificationId) }}"
+                target="_blank"
+                title="{{ certification_request.IdentificationCardfilename}}"
+                >{{ certification_request.IdentificationCardfilename | truncate(15) }}</a
+              >  ||  
+              <a
+                href="{{ url_for('get_faculty_certification_authorization_file', certification_request_Id=certification_request.CertificationId) }}"
+                target="_blank"
+                title="{{ certification_request.AuthorizationLetterfilename}}"
+                >{{ certification_request.AuthorizationLetterfilename | truncate(15) }}</a
+              >  ||  
+              <a
+              href="{{ url_for('get_faculty_certification_representative_file', certification_request_Id=certification_request.CertificationId) }}"
+              target="_blank"
+              title="{{ certification_request.RepresentativeIdfilename }}"
+            >
+              {{ certification_request.RepresentativeIdfilename | truncate(15) }}
+            </a>
+            
+            </td>
+            <td>{{ certification_request.Status }}</td>
+            <!-- <td>{{ certification_request.StudentId }}</td> -->
             <td>
               <button
                 type="button"
@@ -47,7 +82,7 @@
                 class="btn btn-primary fa-solid fa-eye edit_btn"
                 data-toggle="modal"
                 data-target="#viewCertifyModal"
-                onclick="openEditModal('{{ certify.CertificationId }}', '{{ certify.Status }}')"
+                onclick="openEditModal('{{ certification_request.CertificationId }}', '{{ certification_request.Status }}')"
               ></button>
               <button
                 type="button"
@@ -114,25 +149,6 @@
               <p id="certification-type"></p>
             </div>
           </div>
-
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Payment file:</label>
-            <div class="col-sm-4">
-              <p id="certification-file-request"></p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Payment file:</label>
-            <div class="col-sm-4">
-              <p id="certification-file-identify"></p>
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-3 control-label">Payment file:</label>
-            <div class="col-sm-4">
-              <p id="certification-file-author"></p>
-            </div>
-          </div>
           <div class="form-group">
             <label class="col-sm-3 control-label">Status:</label>
             <div class="col-sm-4">
@@ -162,7 +178,7 @@
               <textarea
                 type="text"
                 class="form-control"
-                id="remarks"
+                id="certify-remarks"
               ></textarea>
             </div>
           </div>
@@ -197,31 +213,37 @@
 <script>
   // Initialize DataTable
   $(document).ready(function () {
+    $("#changecertifys").DataTable(); // Initialize DataTable separately
+
+    // Move event binding outside DataTable initialization
     $("#changecertifys tbody tr").on("click", function () {
-      // Retrieve data from the clicked row
+      // Your existing event binding logic here
       var studentName = $(this).data("certify-add-name");
       var studentNumber = $(this).data("certify-studentNumber");
       var certificationType = $(this).data("certify-certType");
+      var fileAttachmentUrl = $(this).data("certify-requestUrl");
+      var requestfilename = $(this).data("certify-request-filename");
       var status = $(this).data("certify-status");
+      var studentRemarks = $(this).data("certify-remarks");
 
       // Populate modal with data
       $("#certification-name").text(studentName);
       $("#certification-number").text(studentNumber);
       $("#certification-type").text(certificationType);
-
+      $("#certify-remarks").text(studentRemarks);
+      //certify-requestUrl
+      // Log the generated URL
+      console.log("Generated URL:", fileAttachmentUrl);
+      // Generate dynamic file download link
+      if (requestfilename) {
+        var fileLink = $("<a>").attr("target", "_blank").text(requestfilename);
+        fileLink[0].href = fileAttachmentUrl; // Set the href attribute directly
+        $("#certification-file-request").empty().append(fileLink);
+      } else {
+        $("#certification-file-request").text("No File");
+      }
       // Additional logic for handling status-related changes
       handleCertificationStatusChange(status);
-
-      // For the student-specific data, you may want to make an AJAX request to fetch additional details
-      // and update the modal content dynamically.
-      // Example:
-      // fetch("/get_student_details?studentId=" + studentId)
-      //   .then(response => response.json())
-      //   .then(data => {
-      //      // Update modal content with additional student details
-      //      $("#student-details").text(data.studentDetails);
-      //   })
-      //   .catch(error => console.error("Error:", error));
     });
   });
 
@@ -233,7 +255,7 @@
     statusDropdown.find("option").prop("disabled", false);
 
     switch (currentStatus) {
-      case "Pending":
+      case "pending":
         // Admin can only change to 'Approved'
         statusDropdown.find('option[value="Pending"]').prop("disabled", true);
         statusDropdown.find('option[value="Completed"]').prop("disabled", true);
@@ -281,7 +303,7 @@
   function submitCertificationStatus() {
     const certificationId = $("#certificationIdInput").val();
     const newStatus = $("#certificationStatusSelect").val();
-    const remarks = $("#remarks").val();
+    const remarks = $("#certify-remarks").val();
 
     // AJAX request to Flask backend
     fetch("/certificate_update_status", {

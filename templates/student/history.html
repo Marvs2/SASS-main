@@ -129,7 +129,8 @@
 							data-change-name="{{ changesubjects.SenderName }}"
 							data-change-contact-number="{{ changesubjects.SenderContactNo }}"
 							data-change-enrollment-type="{{ changesubjects.EnrollmentType }}"
-							data-change-file-url="{{ url_for('view_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}"
+							data-change-file-url="{{ url_for('view_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId,
+student_id=changesubjects.StudentId) }}">
 							data-change-file-filename="{{ changesubjects.AceFormfilename }}"	
 							data-change-status="{{ changesubjects.Status  }}">
 							<td class="applicationID">{{ changesubjects.ChangeSubjectId }}</td>								
@@ -277,7 +278,7 @@
 							data-shifting-years-residency="{{ shifting_applications.ResidencyYear }}"
 							data-shifting-intended-program="{{ shifting_applications.IntendedProgram }}"
 							data-shifting-qualification="{{ shifting_applications.Qualifications }}"
-							data-shifting-file-url="{{ url_for('get_shifting_file', ShiftingId=shifting_applications.ShiftingId) }}"
+							data-shifting-file-url="{{ url_for('get_stud_shifting_file', shifting_id=shifting_applications.ShiftingId, student_id=shifting_applications.StudentId) }}"
 							data-shifting-file-filename="{{shifting_applications.Shiftingfilename }}"	
 							data-shifting-status="{{ shifting_applications.Status }}">
 							<td class="applicationID">{{ shifting_applications.ShiftingId }}</td>								
@@ -323,8 +324,9 @@
 							data-manual-enrollment-student-number="{{ manual_enrollments.StudentNumber }}"
 							data-manual-enrollment-type="{{ manual_enrollments.EnrollmentType }}"
 							data-manual-enrollment-reason="{{ manual_enrollments.Reason }}"
-							data-manual-file-url="{{ url_for('get_manual_file', m_enrollments_ID=manual_enrollments.ManualEnrollmentId) }}"
-							data-manual-file-filename="{{ manual_enrollments.me_Overloadfilename }}"	
+							data-manual-file-url="{{ url_for('view_manual_file', m_enrollments_ID=manual_enrollments.ManualEnrollmentId,
+student_id=manual_enrollments.StudentId) }}"
+							data-manual-file-filename="{{ manual_enrollments.MeFilefilename }}"	
 							data-manual-status="{{ manual_enrollments.Status }}">
 							<td class="applicationID">{{ manual_enrollments.ManualEnrollmentId }}</td>								
 							<td>{{ manual_enrollments.EnrollmentType }}</td>
@@ -465,7 +467,7 @@
 							data-certification-student-number="{{ certification_request.StudentNumber }}"
 							data-certification-type="{{ certification_request.CertificationType }}"
 
-							data-request-url="{{ url_for('get_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
+							data-request-url="{{ url_for('get_certification_request_file', certification_request_Id=certification_request.CertificationId, student_id=certification_request.StudentId) }}"
 							data-request-filename="{{ certification_request.CompletionFormfilename }}"	
 
 							data-registration-url="{{ url_for('download_certification_identification_file', certification_request_Id=certification_request.CertificationId) }}"

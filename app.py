@@ -656,12 +656,12 @@ def viewaddsubject():
 
     return render_template("/student/viewaddsubject.html", addsubjects_list=addsubjects_list)
 
-@app.route('/student/view_payment_file/<int:subject_id>')
-def view_payment_file(subject_id):
-    add_subject = AddSubjects.query.get(subject_id)
+@app.route('/student/addingsubject/view_payment_file/<int:subject_id>/<int:student_id>')
+def view_payment_file(subject_id, student_id):
+    add_subject = AddSubjects.query.filter_by(AddSubjectId=subject_id, StudentId=student_id).first()
 
     if add_subject and add_subject.PaymentFile:
-        file_extension = get_file_extension(add_subject.Subject)  # Assuming the filename is stored in 'Subject'
+        file_extension = get_file_extension(add_subject.PaymentFile)  # Assuming the filename is stored in 'Subject'
         mimetype = get_mimetype(file_extension)
 
         return send_file(
@@ -776,25 +776,31 @@ def viewchange():
         changesubjects_list = [subject.to_dict() for subject in changesubjects]
 
     return render_template("/student/viewchange.html", changesubjects_list=changesubjects_list)
-#view_change_file
-@app.route('/student/view_change_file/<int:ChangeSubjectId>')
-def view_change_file(ChangeSubjectId):
-    changesubjects = ChangeSubject.query.get(ChangeSubjectId)
 
-    if changesubjects and changesubjects.ace_form_data:
-        file_extension = get_file_extension(changesubjects.ace_form_filename)
+# Download Change File
+@app.route('/student/view_change_file/<int:ChangeSubjectId>/<int:student_id>')
+@student_required
+def view_change_file(ChangeSubjectId, student_id):
+    changesubject = ChangeSubject.query.filter_by(ChangeSubjectId=ChangeSubjectId, StudentId=student_id).first()
+
+    if changesubject and changesubject.PaymentFile:
+        file_extension = get_file_extension(changesubject.PaymentFile)
         mimetype = get_mimetype(file_extension)
+        download_name = f'payment_file_{ChangeSubjectId}.{file_extension}'
 
         return send_file(
-            io.BytesIO(changesubjects.ace_form_data),
-            as_attachment=False,
+            io.BytesIO(changesubject.PaymentFile),
+            as_attachment=True,
+            download_name=download_name,
             mimetype=mimetype
         )
     else:
         abort(404)  # Change of subjects application or file not found
 
-def get_file_extension(ace_form_filename):
-    return ace_form_filename.rsplit('.', 1)[1].lower()
+def get_file_extension(file_data):
+    # Determine file extension based on the actual content
+    # In this example, assuming a simple method to get the extension
+    return 'pdf'  # Change this based on your actual logic
 
 def get_mimetype(file_extension):
     mimetypes = {
@@ -806,34 +812,6 @@ def get_mimetype(file_extension):
     }
 
     return mimetypes.get(file_extension, 'application/octet-stream')
-
-
-#============================================ EDIT Change SERVICE IN THE FACULTY ==============================================
-@app.route('/certificate_update_status', methods=['POST'])
-def certificate_update_status():
-    data = request.get_json()
-    certificationId = data.get('certificationId')
-    new_status = data.get('status')
-    remarks = data.get('remarks')  # Get remarks from the request
-
-    try:
-        certification_request = CertificationRequest.query.filter_by(CertificationId=certificationId).first()
-        if certification_request:
-            certification_request.Status = new_status
-            certification_request.Remarks = remarks  # Set the remarks field
-            db.session.commit()
-            flash('Status updated successfully', 'success')  # Flash success message
-            return jsonify({'message': 'Certification Status updated successfully'}), 200
-        else:
-            flash('certification not found', 'danger')  # Flash error message
-            return jsonify({'message': 'certification not found'}), 404
-    except Exception as e:
-        flash('Error updating status', 'danger')  # Flash error message
-        return jsonify({'message': str(e)}), 500
-
-
-
-
 #========================== CORRECTION OF GRADE ENTRY ================================================#
 
 @app.route('/student/correction')
@@ -1110,6 +1088,45 @@ def submit_shifting():
 
     return render_template('student/shifting.html')  
 
+#get_stud_shifting_file
+@app.route('/student/shifting/get_stud_shifting_file/<int:shifting_id>/<int:student_id>')
+def get_stud_shifting_file(shifting_id, student_id):
+    # You can add logic here to check if the current user has access to this tutorial for the given student_id
+
+    return redirect(url_for('download_shifting_stud_file', shifting_id=shifting_id, student_id=student_id))
+
+@app.route('/student/download_shifting_stud_file/<int:shifting_id>/<int:student_id>')
+@student_required
+def download_shifting_stud_file(shifting_id, student_id):
+    # Adjusted query using both parts of the composite key
+    shifting_applications = ShiftingApplication.query.filter_by(ShiftingId=shifting_id, StudentId=student_id).first()
+
+    if shifting_applications and shifting_applications.Shiftingdata:
+        shifting_stud_extension = get_stud_shifting_extension(shifting_applications.Shiftingfilename)
+        download_name = f'shifting_request_{shifting_id}.{shifting_stud_extension}'
+
+        return send_file(
+            io.BytesIO(shifting_applications.Shiftingdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(shifting_stud_extension)
+        )
+    else:
+        abort(404)  # File not found
+
+def get_stud_shifting_extension(Shiftingfilename):
+    return Shiftingfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(shifting_stud_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(shifting_stud_extension, 'application/octet-stream')
+
 #=========================================== MANUAL ENROLLMENT ========================================================
 @app.route('/student/manualenrollment')#
 @student_required
@@ -1170,6 +1187,46 @@ def viewmanual():
         manual_enrollments_list = [subject.to_dict() for subject in manual_enrollments]
 
     return render_template("/student/viewmanual.html", manual_enrollments_list=manual_enrollments_list)
+
+
+
+ #view manual file
+
+#enrollment - download enrollment
+@app.route('/student/manualenrollment/view_manual_file/<string:m_enrollments_ID>/<int:student_id>')
+def view_manual_file(m_enrollments_ID, student_id):
+    return redirect(url_for('download_manualenrollment_file', m_enrollments_ID=m_enrollments_ID, student_id=student_id))
+
+@app.route('/student/download_manualenrollment_file/<string:m_enrollments_ID>/<int:student_id>')
+@student_required
+def download_manualenrollment_file(m_enrollments_ID, student_id):
+    manual_enrollments = ManualEnrollment.query.filter_by(ManualEnrollmentId=m_enrollments_ID, StudentId=student_id).first()
+
+    if manual_enrollments and manual_enrollments.MeFiledata:
+        mefilename_extension = get_mefilename_extension(manual_enrollments.MeFilefilename)
+        download_name = f'manualenrollment_{m_enrollments_ID}.{mefilename_extension}'
+
+        return send_file(
+            io.BytesIO(manual_enrollments.MeFiledata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(mefilename_extension)
+        )
+    else:
+        abort(404)
+
+def get_mefilename_extension(MeFilefilename):
+    return MeFilefilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(mefilename_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+    return mimetypes.get(mefilename_extension, 'application/octet-stream')
+   
 #===================================== ONLINE PETITION OF SUBJECTS =====================================================
 
 # Flask route for rendering the initial page
@@ -1484,14 +1541,13 @@ def facultyadds():
 @role_required('faculty')
 def facultyadding():
     session['last_activity'] = datetime.now(timezone.utc)
-
     # Get the current faculty user
     current_faculty = get_current_faculty_user()
 
     if current_faculty:
         # Assuming there is a relationship between Faculty and AddSubjects (adjust accordingly)
         addsubjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
-
+        
         students = []
         for subject in addsubjects:
             student = Student.query.filter_by(StudentId=subject.StudentId).first()
@@ -1499,7 +1555,26 @@ def facultyadding():
 
         combined_data = zip(addsubjects, students)
 
-        return render_template("/faculty/adding.html", combined_data=combined_data)
+        approved_subjects = AddSubjects.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        add_students = []
+        for add_subject in approved_subjects:
+            add_student = Student.query.filter_by(StudentId=add_subject.StudentId).first()
+            add_students.append(add_student)
+
+        approved_data = zip(approved_subjects, add_students)
+        
+    # For Pending Subjects
+        pending_subjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_students = []
+        for pending_subject in pending_subjects:
+            pending_student = Student.query.filter_by(StudentId=pending_subject.StudentId).first()
+            pending_students.append(pending_student)
+
+        pending_data = zip(pending_subjects, pending_students)
+
+
+        return render_template("/faculty/adding.html", combined_data=combined_data, approved_data=approved_data, pending_data=pending_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1516,12 +1591,53 @@ def facultychange():
     if current_faculty:
         changesubjects = ChangeSubject.query.filter_by(FacultyId=current_faculty.FacultyId).all()
 
-        return render_template("/faculty/change.html", changesubjects=changesubjects) 
+        students = []
+        for subject in changesubjects:
+            student = Student.query.filter_by(StudentId=subject.StudentId).first()
+            students.append(student)
+
+        combined_data = zip(changesubjects, students)
+
+        return render_template("/faculty/change.html", combined_data=combined_data) 
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
         return redirect(url_for('faculty_portal')) # Redirect to a relevant page
+#=======================================================#
+#update_change_status
+@app.route('/change_update_status', methods=['POST'])
+def change_update_status():
+    data = request.get_json()
+    changeSubjectId = data.get('changeSubjectId')
+ # Corrected variable name
+    new_status = data.get('status')
+    remarks = data.get('remarks')  # Get remarks from the request
+    print('Received data:', data)  # Add this line for debugging
+    if not changeSubjectId:
+        flash('Change subject ID is missing or invalid', 'danger')
+        return jsonify({'message': 'Change subject ID is missing or invalid'}), 400
 
+    try:
+        changesubjects = ChangeSubject.query.filter_by(ChangeSubjectId=changeSubjectId).first()
+        if changesubjects:
+            changesubjects.Status = new_status
+            changesubjects.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Change Status updated successfully', 'success')
+            return jsonify({'message': 'Change Subject Status updated successfully'}), 200
+        else:
+            flash('Change subject not found', 'danger')
+            return jsonify({'message': 'Change subject not found'}), 404
+    except Exception as e:
+        flash('Error updating status: ' + str(e), 'danger')
+        return jsonify({'message': 'Error updating status: ' + str(e)}), 500
+
+
+# Note: There's no need to duplicate the error handling outside of the try-except block.
+
+
+
+#=======================================================#
 @app.route('/faculty/correction')
 @faculty_required
 @role_required('faculty')
@@ -1567,13 +1683,12 @@ def facultycrossenrollment():
         flash('Faculty not found.', 'danger')
         return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
 
-
+#=====================================================# Shifting #=====================================================#
 @app.route('/faculty/shifting')
 @faculty_required
 @role_required('faculty')
 def facultyshifting():
-    session['last_activity'] = datetime.now(timezone.utc) # none
-
+    session['last_activity'] = datetime.now(timezone.utc) # nonez
     # Get the current faculty user
     current_faculty = get_current_faculty_user()
 
@@ -1584,8 +1699,72 @@ def facultyshifting():
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
-        return redirect(url_for('faculty_portal'))  # Redirect to a relevant page
+        return redirect(url_for('faculty_portal'))  # Redirect
 
+@app.route('/shifting_update_status', methods=['POST'])
+def shifting_update_status():
+    data = request.get_json()
+    shiftingId = data.get('shiftingId')
+    new_status = data.get('shiftstatus')
+    remarks = data.get('shiftremarks')  # Get remarks from the request
+
+    try:
+        shifting_applications = ShiftingApplication.query.filter_by(ShiftingId=shiftingId).first()
+        if shifting_applications:
+            shifting_applications.Status = new_status
+            shifting_applications.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Shifting Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Certification Status updated successfully'}), 200
+        else:
+            flash('certification not found', 'danger')  # Flash error message
+            return jsonify({'message': 'certification not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500   
+    
+    #to a relevant page
+###############################################################################
+@app.route('/faculty/shifting/get_shifting_file/<int:shifting_id>')
+def get_shifting_file(shifting_id):
+    return redirect(url_for('download_shifting_form', shifting_id=shifting_id))
+
+@app.route('/faculty/download_shifting_form/<int:shifting_id>')
+def download_shifting_form(shifting_id):
+    shifting_applications = ShiftingApplication.query.filter_by(ShiftingId=shifting_id).first()
+
+    if shifting_applications and shifting_applications.Shiftingdata:
+        shifting_form_extension = get_completion_form_extension(shifting_applications.Shiftingfilename)
+        download_name = f'completion_form_{shifting_id}.{shifting_form_extension}'
+
+        return send_file(
+            io.BytesIO(shifting_applications.Shiftingdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(shifting_form_extension)
+        )
+    else:
+        abort(404)  # File not found
+
+# Route to download a specific file of a grade entry
+def get_shifting_form_extension(Shiftingfilename):
+    return Shiftingfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(shifting_form_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(shifting_form_extension, 'application/octet-stream')
+
+
+
+
+
+#manualenrollment - faculty
 @app.route('/faculty/manualenrollment')
 @faculty_required
 @role_required('faculty')
@@ -2560,7 +2739,7 @@ def download_completion_form(grade_entry_Id):
 
         return send_file(
             io.BytesIO(grade_entry.CompletionFormdata),
-            as_attachment=True,
+            as_attachment=False,
             download_name=download_name,
             mimetype=get_mimetype(completion_form_extension)
         )
@@ -2652,6 +2831,32 @@ def get_mimetype(affidavit_extension):
     }
 
     return mimetypes.get(affidavit_extension, 'application/octet-stream')
+
+#============================================ EDIT ADD SERVICE IN THE FACULTY ==============================================
+@app.route('/update_grade_entry_status', methods=['POST'])
+def update_grade_entry_status():
+    data = request.get_json()
+    gradeEntryId = data.get('gradeEntryId')
+    new_status = data.get('newStatus')
+    remarks = data.get('remarks')  # Get remarks from the request
+
+    try:
+        grade_entry = GradeEntry.query.filter_by(GradeEntryId=gradeEntryId).first()
+        if grade_entry:
+            grade_entry.Status = new_status
+            grade_entry.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Status updated successfully'}), 200
+        else:
+            flash('Subject not found', 'danger')  # Flash error message
+            return jsonify({'message': 'Subject not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500
+
+
+
 #=====================================================================
 #crossenrollment
 @app.route('/update-crossenrollment-service-Status/<int:CrossEnrollmentId>', methods=['POST'])
@@ -2774,53 +2979,53 @@ def view_shifting_applications():
     shifting_applications = GradeEntry.query.all()
     return render_template('/faculty/shifting.html', shifting_applications=shifting_applications)"""
 
-# Redirect to download change of change.html
-@app.route('/faculty/shifting_applications/get_shifting_file/<int:ShiftingId>')
-def get_shifting_file(ShiftingId):
-    return redirect(url_for('download_shifting_file', ShiftingId=ShiftingId))
+# # Redirect to download change of change.html
+# @app.route('/faculty/shifting_applications/get_shifting_file/<int:ShiftingId>')
+# def get_shifting_file(ShiftingId):
+#     return redirect(url_for('download_shifting_file', ShiftingId=ShiftingId))
 
-# Download change of subjects file
-@app.route('/faculty/download_shifting_file/<int:ShiftingId>')
-def download_shifting_file(ShiftingId):
-    shifting_applications = ShiftingApplication.query.get(ShiftingId)
+# # Download change of subjects file
+# @app.route('/faculty/download_shifting_file/<int:ShiftingId>')
+# def download_shifting_file(ShiftingId):
+#     shifting_applications = ShiftingApplication.query.get(ShiftingId)
 
-    if shifting_applications and shifting_applications.file_data:
-        shifting_file_extension = get_shifting_file_extension(shifting_applications.file_filename)
-        download_name = f'shifting_applications_{ShiftingId}.{shifting_file_extension}'
+#     if shifting_applications and shifting_applications.file_data:
+#         shifting_file_extension = get_shifting_file_extension(shifting_applications.file_filename)
+#         download_name = f'shifting_applications_{ShiftingId}.{shifting_file_extension}'
 
-        return send_file(
-            io.BytesIO(shifting_applications.file_data),
-            as_attachment=True,
-            download_name=download_name,
-            mimetype=get_mimetype(shifting_file_extension),
-        )
-    else:
-        abort(404)  # Change of subjects application or file not found
+#         return send_file(
+#             io.BytesIO(shifting_applications.file_data),
+#             as_attachment=True,
+#             download_name=download_name,
+#             mimetype=get_mimetype(shifting_file_extension),
+#         )
+#     else:
+#         abort(404)  # Change of subjects application or file not found
 
-def get_shifting_file_extension(file_filename):
-    return file_filename.rsplit('.', 1)[1].lower()
+# def get_shifting_file_extension(file_filename):
+#     return file_filename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(shifting_file_extension):
-    mimetypes = {
-        'txt': 'text/plain',
-        'pdf': 'application/pdf',
-        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        # Add more file types as needed
-    }
+# def get_mimetype(shifting_file_extension):
+#     mimetypes = {
+#         'txt': 'text/plain',
+#         'pdf': 'application/pdf',
+#         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+#         # Add more file types as needed
+#     }
 
-    return mimetypes.get(shifting_file_extension, 'application/octet-stream')
+#     return mimetypes.get(shifting_file_extension, 'application/octet-stream')
 #=====================================================================
 # Student - Overload View File
-@app.route('/student/view_overload_file/<int:overload_application_id>')
-def view_overload_file(overload_application_id):
+@app.route('/student/view_overload_file/<int:overload_application_id>/<int:student_id>')
+def view_overload_file(overload_application_id, student_id):
 
-    return redirect(url_for('download_student_overload_file', overload_application_id=overload_application_id))
+    return redirect(url_for('download_student_overload_file', overload_application_id=overload_application_id, student_id=student_id))
 
-@app.route('/student/download_student_overload_file/<int:overload_application_id>')
-def download_student_overload_file(overload_application_id):
+@app.route('/student/download_student_overload_file/<int:overload_application_id>/<int:student_id>')
+@student_required
+def download_student_overload_file(overload_application_id, student_id):
 
-    student_id = getCurrentUser('user_id')
-    overload_applications = OverloadApplication.query.get(overload_application_id, student_id)
+    overload_applications = OverloadApplication.query.filter_by(OverloadId=overload_application_id, StudentId=student_id).first()
 
     if overload_applications and overload_applications.Overloaddata:
         overloadfile_extension = get_overloadfile_extension(overload_applications.Overloadfilename)
@@ -2908,6 +3113,33 @@ def get_mimetype(overload_file_extension):
 
     return mimetypes.get(overload_file_extension, 'application/octet-stream')
 
+@app.route('/overload_update_status', methods=['POST'])
+def overload_update_status():
+    data = request.get_json()
+    overloadId = data.get('overloadId')
+ # Corrected variable name
+    new_status = data.get('status')
+    remarks = data.get('remarks')  # Get remarks from the request
+    print('Received data:', data)  # Add this line for debugging
+
+    if not overloadId:
+        flash('Change subject ID is missing or invalid', 'danger')
+        return jsonify({'message': 'Change subject ID is missing or invalid'}), 400
+
+    try:
+        overload_applications = OverloadApplication.query.filter_by(OverloadId=overloadId).first()
+        if overload_applications:
+            overload_applications.Status = new_status
+            overload_applications.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Overload Status updated successfully', 'success')
+            return jsonify({'message': 'Overoad Subject Status updated successfully'}), 200
+        else:
+            flash('Change subject not found', 'danger')
+            return jsonify({'message': 'Change subject not found'}), 404
+    except Exception as e:
+        flash('Error updating status: ' + str(e), 'danger')
+        return jsonify({'message': 'Error updating status: ' + str(e)}), 500
 
 
 #=====================================================================
@@ -2955,30 +3187,30 @@ def update_manual_service_status(m_enrollment_ID):
 
     return redirect(url_for('facultyenrollment'))
 
-#enrollment
-@app.route('/faculty/manualenrollment/get_manual_file/<int:m_enrollments_ID>')
+#enrollment - download enrollment
+@app.route('/faculty/manualenrollment/get_manual_file/<string:m_enrollments_ID>')
 def get_manual_file(m_enrollments_ID):
     return redirect(url_for('download_manual_enrollment_file', m_enrollments_ID=m_enrollments_ID))
 
-@app.route('/faculty/download_manual_enrollment_file/<int:m_enrollments_ID>')
+@app.route('/faculty/download_manual_enrollment_file/<string:m_enrollments_ID>')
 def download_manual_enrollment_file(m_enrollments_ID):
-    manual_enrollments = ManualEnrollment.query.get(m_enrollments_ID)
+    manual_enrollments = ManualEnrollment.query.filter_by(ManualEnrollmentId=m_enrollments_ID).first()
 
-    if manual_enrollments and manual_enrollments.me_file_data:
-        me_filename_extension = get_me_filename_extension(manual_enrollments.me_file_filename)
+    if manual_enrollments and manual_enrollments.MeFiledata:
+        me_filename_extension = get_me_filename_extension(manual_enrollments.MeFilefilename)
         download_name = f'manual_enrollment_{m_enrollments_ID}.{me_filename_extension}'
 
         return send_file(
-            io.BytesIO(manual_enrollments.me_file_data),
-            as_attachment=True,
+            io.BytesIO(manual_enrollments.MeFiledata),
+            as_attachment=False,
             download_name=download_name,
             mimetype=get_mimetype(me_filename_extension)
         )
     else:
         abort(404)
 
-def get_me_filename_extension(me_file_filename):
-    return me_file_filename.rsplit('.', 1)[1].lower()
+def get_me_filename_extension(MeFilefilename):
+    return MeFilefilename.rsplit('.', 1)[1].lower()
 
 def get_mimetype(me_filename_extension):
     mimetypes = {
@@ -2988,6 +3220,31 @@ def get_mimetype(me_filename_extension):
         # Add more file types as needed
     }
     return mimetypes.get(me_filename_extension, 'application/octet-stream')
+
+
+
+@app.route('/enrollment_update_status', methods=['POST'])
+def enrollment_update_status():
+    data = request.get_json()
+    manualEnrollmentId = data.get('manualEnrollmentId')
+    new_status = data.get('enrollmentstatus')
+    remarks = data.get('remarks')  # Get remarks from the request
+
+    try:
+        manual_enrollments = ManualEnrollment.query.filter_by(ManualEnrollmentId=manualEnrollmentId).first()
+        if manual_enrollments:
+            manual_enrollments.Status = new_status
+            manual_enrollments.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Status updated successfully'}), 200
+        else:
+            flash('Subject not found', 'danger')  # Flash error message
+            return jsonify({'message': 'Subject not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500
+
 #=====================================================================
 #certification
 @app.route('/update-certification-service-Status/<int:CertificationId>', methods=['POST'])
@@ -3118,17 +3375,181 @@ def faculty_update_profile():
     return render_template('/faculty/profile.html')
 
 # ======================Faculty Downloads========================== #
+
+#certification
+@app.route('/faculty/certification/get_faculty_certification_request_file/<string:certification_request_Id>')
+def get_faculty_certification_request_file(certification_request_Id):
+    return redirect(url_for('download_faculty_certification_request_file', certification_request_Id=certification_request_Id))
+
+@app.route('/faculty/download_faculty_certification_request_file/<string:certification_request_Id>')
+def download_faculty_certification_request_file(certification_request_Id):
+    
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id).first()
+
+    if certification_request and certification_request.RequestFormdata:
+        stud_certification_request_extension = get_stud_certification_request_extension(certification_request.RequestFormfilename)
+        download_name = f'certification_request_{certification_request_Id}.{stud_certification_request_extension}'
+
+        return send_file(
+            io.BytesIO(certification_request.RequestFormdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(stud_certification_request_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+def get_stud_certification_request_extension(RequestFormfilename):
+    return RequestFormfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(stud_certification_request_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(stud_certification_request_extension, 'application/octet-stream')
+
+# certification next file identification
+@app.route('/faculty/certification/get_faculty_certification_identificaion_file/<string:certification_request_Id>')
+def get_faculty_certification_identificaion_file(certification_request_Id):
+    return redirect(url_for('download_faculty_certification_identification_file', certification_request_Id=certification_request_Id))
+
+@app.route('/faculty/download_faculty_certification_identification_file/<string:certification_request_Id>')
+def download_faculty_certification_identification_file(certification_request_Id):
+    
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id).first()
+
+    if certification_request and certification_request.IdentificationCarddata:
+        stud_certification_identification_extension = get_stud_certification_identtification_extension(certification_request.IdentificationCardfilename)
+        download_name = f'certification_identification_{certification_request_Id}.{stud_certification_identification_extension}'
+
+        return send_file(
+            io.BytesIO(certification_request.IdentificationCarddata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(stud_certification_identification_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+def get_stud_certification_identtification_extension(IdentificationCardfilename):
+    return IdentificationCardfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(stud_certification_identification_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(stud_certification_identification_extension, 'application/octet-stream')
+
+# certification download authorization
+@app.route('/faculty/certification/get_faculty_certification_authorization_file/<string:certification_request_Id>')
+def get_faculty_certification_authorization_file(certification_request_Id):
+    return redirect(url_for('download_faculty_certification_authorization_file', certification_request_Id=certification_request_Id))
+
+@app.route('/faculty/download_faculty_certification_authorization_file/<string:certification_request_Id>')
+def download_faculty_certification_authorization_file(certification_request_Id):
+    
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id).first()
+
+    if certification_request and certification_request.AuthorizationLetterdata:
+        stud_certification_authorization_extension = get_stud_certification_authorization_extension(certification_request.AuthorizationLetterfilename)
+        download_name = f'certification_authorization_{certification_request_Id}.{stud_certification_authorization_extension}'
+
+        return send_file(
+            io.BytesIO(certification_request.AuthorizationLetterdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(stud_certification_authorization_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+def get_stud_certification_authorization_extension(AuthorizationLetterfilename):
+    return AuthorizationLetterfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(stud_certification_authorization_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(stud_certification_authorization_extension, 'application/octet-stream')
+
+# cetification representative 
+@app.route('/faculty/certification/get_faculty_certification_representative_file/<string:certification_request_Id>')
+def get_faculty_certification_representative_file(certification_request_Id):
+    return redirect(url_for('download_faculty_certification_representative_file', certification_request_Id=certification_request_Id))
+
+@app.route('/faculty/download_faculty_certification_representative_file/<string:certification_request_Id>')
+def download_faculty_certification_representative_file(certification_request_Id):
+    
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id).first()
+
+    if certification_request and certification_request.RepresentativeIddata:
+        stud_certification_representative_extension = get_stud_certification_representative_extension(certification_request.RepresentativeIdfilename)
+        download_name = f'certification_representative_{certification_request_Id}.{stud_certification_representative_extension}'
+
+        return send_file(
+            io.BytesIO(certification_request.RepresentativeIddata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype=get_mimetype(stud_certification_representative_extension),
+        )
+    else:
+        abort(404)  # Certification request or file not found
+def get_stud_certification_representative_extension(RepresentativeIdfilename):
+    return RepresentativeIdfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(stud_certification_representative_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(stud_certification_representative_extension, 'application/octet-stream')
+
+#Certification
+@app.route('/certificate_update_status', methods=['POST'])
+def certificate_update_status():
+    data = request.get_json()
+    certificationId = data.get('certificationId')
+    new_status = data.get('status')
+    remarks = data.get('remarks')  # Get remarks from the request
+
+    try:
+        certification_request = CertificationRequest.query.filter_by(CertificationId=certificationId).first()
+        if certification_request:
+            certification_request.Status = new_status
+            certification_request.Remarks = remarks  # Set the remarks field
+            db.session.commit()
+            flash('Status updated successfully', 'success')  # Flash success message
+            return jsonify({'message': 'Certification Status updated successfully'}), 200
+        else:
+            flash('certification not found', 'danger')  # Flash error message
+            return jsonify({'message': 'certification not found'}), 404
+    except Exception as e:
+        flash('Error updating status', 'danger')  # Flash error message
+        return jsonify({'message': str(e)}), 500
+
 # =======================Downloads File============================ #
 
 #certification
-@app.route('/student/get_certification_request_file/<int:certification_request_Id>')
-def get_certification_request_file(certification_request_Id):
-    return redirect(url_for('download_certification_request_file', certification_request_Id=certification_request_Id))
+@app.route('/student/certification/get_certification_request_file/<int:certification_request_Id>/<int:student_id>')
+def get_certification_request_file(certification_request_Id, student_id):
+    return redirect(url_for('download_certification_request_file', certification_request_Id=certification_request_Id, student_id=student_id))
 
-@app.route('/student/download_certification_request_file/<int:certification_request_Id>')
-def download_certification_request_file(certification_request_Id):
-    student_id = getCurrentUser('user_id') 
-    certification_request = CertificationRequest.query.get(certification_request_Id, student_id)
+@app.route('/student/download_certification_request_file/<int:certification_request_Id>/<int:student_id>')
+@student_required
+def download_certification_request_file(certification_request_Id, student_id):
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id, StudentId=student_id).first()
 
     if certification_request and certification_request.RequestFormdata:
         extension = get_file_extension(certification_request.RequestFormfilename)

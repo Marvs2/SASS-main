@@ -4,7 +4,7 @@
   <div class="data data1" id="firstTableContainer">
     <div class="content-data">
       <div class="head mb-3">
-        <h2>Current Requests for Overload</h2>
+        <h3>Current Requests for Overload</h3>
       </div>
 
       <table
@@ -176,7 +176,7 @@
             >Remarks:</label
           >
           <div class="col-sm-10">
-            <textarea type="text" class="form-control" id="remarks"></textarea>
+            <textarea type="text" class="form-control" id="overloadRemarksSelect"></textarea>
           </div>
         </div>
         <div class="modal-footer">
@@ -300,9 +300,9 @@ fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
   function submitoverloadStatus() {
     const overloadId = $("#overloadSubjectIdInput").val();
     const newStatus = $("#overloadStatusSelect").val();
-
+    const newRemarks = $("#overloadRemarksSelect").val();
     // AJAX request to Flask backend
-    fetch("/update_overload_status", {
+    fetch("/overload_update_status", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -310,6 +310,7 @@ fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
       body: JSON.stringify({
         overloadId: overloadId,
         status: newStatus,
+        remarks: newRemarks
       }),
     })
       .then((response) => response.json())

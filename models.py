@@ -96,7 +96,6 @@ class Faculty(db.Model):
     PreferredSchedule = db.Column(db.String)  # Preferred Schedule
     Login_Attempt = db.Column(db.Numeric(12), default=12)  # Login Attempt
     Status = db.Column(db.String(50))  # Status
-
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
@@ -536,7 +535,7 @@ class AddSubjects(db.Model):
     AddSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId =db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
     FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
-    FacultyRole =db.Column(db. String(50))
+    FacultyRole =db.Column(db.String(50))
     Subject = db.Column(db.String(255))
     ServiceDetails = db.Column(db.String(255))
     SenderName = db.Column(db.String(50))
@@ -571,7 +570,7 @@ class Notification(db.Model, UserMixin):
     StudentNumber = db.Column(db.String(100), nullable=False)
     ServiceType = db.Column(db.String(100), nullable=False)
     UserResponsible = db.Column(db.String(255), nullable=False)
-    Status = db.Column(db.String(100), nullable=False)
+    Status = db.Column(db.String(100))
     Message = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -662,7 +661,8 @@ class Post(db.Model):
 #     AddSubjectFiledata = db.Column(db.LargeBinary)  # Store binary data for the file
 #     AddSubjectFilefilename = db.Column(db.String(255))  # Store the filename
 #     UserResponsible = db.Column(db.String(255))  # Add user role attribute
-#     Status = db.Column(db.String(100))
+#     Status = db.Column(db.String(100)
+# Remarks =db.Column(db.String(255)))
 #     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
 #     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -691,7 +691,7 @@ class ChangeSubject(db.Model):
     ChangeSubjectId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId =db.Column(db. Integer, db.ForeignKey('SPSStudent.StudentId'))
     FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
-    FacultyRole =db.Column(db. String(50))
+    FacultyRole =db.Column(db.String(50))
     FromSubject = db.Column(db.String(255))
     ToSubject = db.Column(db.String(255))
     ServiceDetails = db.Column(db.String(255))
@@ -699,6 +699,7 @@ class ChangeSubject(db.Model):
     SenderContactNo = db.Column(db.String(255))
     PaymentFile = db.Column(db.LargeBinary)
     Status = db.Column(db.String(20))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     
@@ -715,7 +716,7 @@ class ChangeSubject(db.Model):
             'SenderContactNo': self.SenderContactNo,
             'PaymentFile': self.PaymentFile,
             'Status': self.Status,
-
+            'Remarks': self.Remarks
         }
 
 # ==========Requests========== #
@@ -734,6 +735,7 @@ class ManualEnrollment(db.Model, UserMixin):
     MeFiledata = db.Column(db.LargeBinary)
     UserResponsible = db.Column(db.String(255))  # Add user role attribute
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -749,6 +751,7 @@ class ManualEnrollment(db.Model, UserMixin):
             'MeFiledata': self.MeFiledata,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks,
             'created_at': self.created_at,
             'updated_at': self.updated_at,
         }
@@ -777,6 +780,7 @@ class CertificationRequest(db.Model, UserMixin):
     RepresentativeIddata = db.Column(db.LargeBinary)
     UserResponsible = db.Column(db.String(255)) 
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -800,6 +804,7 @@ class CertificationRequest(db.Model, UserMixin):
             'RepresentativeIddata': self.RepresentativeIddata,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks
         }
 
 # ========== Requests ========== #
@@ -820,6 +825,7 @@ class GradeEntry(db.Model, UserMixin):
     Affidavitdata = db.Column(db.LargeBinary)  # Add this line
     UserResponsible = db.Column(db.String(100)) 
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -839,6 +845,7 @@ class GradeEntry(db.Model, UserMixin):
             'Affidavitdata': self.Affidavitdata,  # Add this line
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks
         }
 
     
@@ -861,6 +868,7 @@ class CrossEnrollment(db.Model, UserMixin):
     PermitCrossEnrolldata = db.Column(db.LargeBinary)  # Add
     UserResponsible = db.Column(db.String(255)) 
     Status = db.Column(db.String(100))
+    Remarks =db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -882,6 +890,7 @@ class CrossEnrollment(db.Model, UserMixin):
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
             'StudentId': self.StudentId,
+            'Remarks': self.Remarks
         }
 
     
@@ -900,6 +909,7 @@ class PetitionRequest(db.Model, UserMixin):
     RequestReason = db.Column(db.Text, nullable=False)
     UserResponsible = db.Column(db.String(255)) 
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -917,6 +927,7 @@ class PetitionRequest(db.Model, UserMixin):
             'RequestReason': self.RequestReason,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks
         }
 
     
@@ -938,6 +949,7 @@ class ShiftingApplication(db.Model, UserMixin):
     Shiftingdata = db.Column(db.LargeBinary)
     UserResponsible = db.Column(db.String(255)) 
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now) 
 
@@ -956,6 +968,7 @@ class ShiftingApplication(db.Model, UserMixin):
             'Shiftingdata': self.Shiftingdata,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks,
         }
 
 # ==========Services========== #
@@ -976,6 +989,7 @@ class OverloadApplication(db.Model, UserMixin):
     Overloaddata = db.Column(db.LargeBinary)
     UserResponsible = db.Column(db.String(255))
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -994,6 +1008,7 @@ class OverloadApplication(db.Model, UserMixin):
             'Overloaddata': self.Overloaddata,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks
         }
 
 #Done
@@ -1013,6 +1028,7 @@ class TutorialRequest(db.Model, UserMixin):
     Tutorialdata = db.Column(db.LargeBinary)
     UserResponsible = db.Column(db.String(255))
     Status = db.Column(db.String(100))
+    Remarks = db.Column(db.String(255))
     created_at = db.Column(db.TIMESTAMP, default=datetime.now)
     updated_at = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
 
@@ -1031,6 +1047,7 @@ class TutorialRequest(db.Model, UserMixin):
             'created_at': self.created_at,
             'UserResponsible': self.UserResponsible,
             'Status': self.Status,
+            'Remarks': self.Remarks
         }
 
 

@@ -136,7 +136,7 @@
             <div class="col-sm-4">
               <input type="hidden" id="subjectIdInput" name="subjectId" />
               <select id="statusSelect" name="status" class="form-control">
-                <option value="Pending">Pending</option>
+                <option value="pending">Pending</option>
                 <option value="Approved">Approved</option>
                 <option value="Completed">Completed</option>
                 <option value="Rejected">Rejected</option>
@@ -170,6 +170,84 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Approved Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="approvedTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Approved Requests</h3>
+      </div>
+      <table id="approvedSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for approved_subject, approved_student in approved_data %} {% if approved_subject.Status not
+            in ['Rejected', 'pending'] %}
+            <tr>
+              <td>{{ approved_subject.AddSubjectId }}</td>
+              <td>{{ approved_student.StudentNumber }}</td>
+              <td>{{ approved_student.FirstName }} {{ approved_student.LastName }}</td>
+              <td>{{ approved_subject.Subject }}</td>
+              <td>{{ approved_subject.Status }}</td>
+              <td>
+                <!-- Action Buttons Here -->
+              </td>
+            </tr>
+          {% endif %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="pendingTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Denied Requests</h3>
+      </div>
+      <table id="pendingSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for pending_subject, pending_student in pending_data %}{% if pending_subject.Status not
+            in ['Approved', 'pending'] %}
+            <tr>
+              <td>{{ pending_subject.AddSubjectId }}</td>
+              <td>{{ pending_student.StudentNumber }}</td>
+              <td>{{ pending_student.FirstName }} {{ pending_student.LastName }}</td>
+              <td>{{ pending_subject.Subject }}</td>
+              <td>{{ pending_subject.Status }}</td>
+              <td>
+                <!-- Action Buttons Here -->
+              </td>
+            </tr>
+          {% endif %}{% endfor %}
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -282,7 +360,51 @@
       });
   }
 </script>
+<script>
+  $(document).ready(function () {
+  // Initialize DataTable for the approved and pending requests table
+  $("#approvedSubject").DataTable({
+    // Add any specific options you need
+    // Example options:
+    paging: true,
+    searching: true,
+    ordering: true,
+    info: true,
+  });
 
+  // You can also initialize DataTable for other tables if needed
+  // For example, if you have separate tables for approved and pending requests:
+  // $("#approvedSubject").DataTable({ /* DataTable options */ });
+  // $("#pendingSubject").DataTable({ /* DataTable options */ });
+
+  // Additional logic for handling clicks on rows or other events
+  $("#approvedSubject tbody").on("click", "tr", function () {
+    // Add your logic here for row click event
+  });
+});
+
+$(document).ready(function () {
+  // Initialize DataTable for the approved and pending requests table
+  $("#pendingSubject").DataTable({
+    // Add any specific options you need
+    // Example options:
+    paging: true,
+    searching: true,
+    ordering: true,
+    info: true,
+  });
+
+  // You can also initialize DataTable for other tables if needed
+  // For example, if you have separate tables for approved and pending requests:
+  // $("#approvedSubject").DataTable({ /* DataTable options */ });
+  // $("#pendingSubject").DataTable({ /* DataTable options */ });
+
+  // Additional logic for handling clicks on rows or other events
+  $("#pendingSubject tbody").on("click", "tr", function () {
+    // Add your logic here for row click event
+  });
+});
+</script>
 {% endblock %}
 
 
