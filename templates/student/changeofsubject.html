@@ -17,7 +17,7 @@
       
       <div class="content-data">
         <div class="head mb-3">
-          <h3>Current Subjects</h3>
+          <h3>Change of Subject / Schedule - Current Subjects</h3>
         </div>
 
         <div class="row mb-3">
@@ -32,7 +32,7 @@
           </span>
         </div>
 
-        <table id="addingSubject" class="table table-bordered table-condensed display">
+        <!-- <table id="addingSubject" class="table table-bordered table-condensed display">
           <thead>
             <tr>
               <th>Subject Code</th>
@@ -57,8 +57,8 @@
               </tr>
             {% endfor %}
           </tbody>
-        </table>
-
+        </table> -->
+        <div id="subjectsContainer"></div>
         <div class="d-flex justify-content-end mt-3">
           <button type="button" class="btn btn-primary btn-next">Next</button>
         </div>
@@ -476,8 +476,173 @@
     }
 </script>
 
-  
-  
+<script>
+  // Function to fetch data from the server
+  function fetchSubjectsGrade() {
+    fetch("/api/v1/student/currentsubject")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Call a function to update the HTML content with the first entry's data
+        if (data.length > 0) {
+          updateSubjectsContent([data[0]]);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
+
+  // Function to update the HTML content with the first set of fetched data
+  function updateSubjectsContent(data) {
+    var subjectsContainer = document.getElementById("subjectsContainer");
+    subjectsContainer.innerHTML = "";
+
+    var classGroup = data[0]; // Process only the first entry
+    var classGroupDiv = document.createElement("div");
+    classGroupDiv.className = "class-group";
+
+    // Check if current entry is the first entry
+    const isGPAZero = 0 === 0; // Always true for the first entry
+    const gpaDisplay = isGPAZero ? "0.00" : classGroup.GPA;
+    var classGroupInfo = document.createElement("div");
+    classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${
+      classGroup.Semester === 1
+        ? "(1st Semester)"
+        : classGroup.Semester === 2
+        ? "(2nd Semester)"
+        : "(Summer Term)"
+    }</h4>
+                                <p>Scholastic Status: Continuing</p>
+                                <p>Course Code & Description: ${
+                                  classGroup.SecCode
+                                } (QUEZON CITY CAMPUS)</p>
+                                <p>GPA : 0.00 GPA</p>`; // Display GPA as 0.00
+    classGroupInfo.className = "class-group-info";
+
+    var subjectsDiv = document.createElement("div");
+    var subjectsTable = document.createElement("table");
+    subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+    var tableHeader = document.createElement("thead");
+    var headerRow = document.createElement("tr");
+    headerRow.innerHTML = `<th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Subject</th>
+                           <th class="lg:w-4/12 md:w-4/12 mt-4 font-bold text-c1">Subject Code</th>
+                           <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Units</th>
+                           <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Grade</th>`;
+    tableHeader.appendChild(headerRow);
+    subjectsTable.appendChild(tableHeader);
+
+    var tableBody = document.createElement("tbody");
+    classGroup.Subject.forEach((subject) => {
+      var gradeDisplay = isGPAZero ? "0.00" : subject.Grade;
+      var row = document.createElement("tr");
+      row.innerHTML = `<td class="lg:w-2/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+      <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Code}</td>
+      <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Units}</td>
+      <td class="lg:w-2/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${gradeDisplay}</td>`; // Display Grade as N/A
+      tableBody.appendChild(row);
+    });
+
+    subjectsTable.appendChild(tableBody);
+    subjectsDiv.appendChild(subjectsTable);
+    classGroupDiv.appendChild(classGroupInfo);
+    classGroupDiv.appendChild(subjectsDiv);
+    subjectsContainer.appendChild(classGroupDiv);
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchSubjectsGrade();
+  });
+</script>
+
+<script>
+  // Function to fetch data for the second set of subjects
+  function fetchAdditionalSubjects() {
+    fetch("/api/v1/student/currentsubject")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Call a function to update the HTML content with the first entry's data
+        if (data.length > 0) {
+          updateAdditionalSubjectsContent(data);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching additional subjects:", error);
+      });
+  }
+
+  // Function to update the HTML content with the second set of fetched data
+  function updateAdditionalSubjectsContent(data) {
+    var additionalSubjectsContainer = document.getElementById("additionalSubjectsContainer");
+    additionalSubjectsContainer.innerHTML = "";
+
+    // Process each entry in the data
+    data.forEach((entry) => {
+      var classGroupDiv = document.createElement("div");
+      classGroupDiv.className = "class-group";
+
+      var classGroupInfo = document.createElement("div");
+      classGroupInfo.innerHTML = `<h4>School Year ${entry.Batch} ${
+        entry.Semester === 1
+          ? "(1st Semester)"
+          : entry.Semester === 2
+          ? "(2nd Semester)"
+          : "(Summer Term)"
+      }</h4>
+                                  <p>Scholastic Status: Continuing</p>
+                                  <p>Course Code & Description: ${
+                                    entry.SecCode
+                                  } (QUEZON CITY CAMPUS)</p>
+                                  <p>GPA : 0.00 GPA</p>`; // Display GPA as 0.00
+      classGroupInfo.className = "class-group-info";
+
+      var subjectsDiv = document.createElement("div");
+      var subjectsTable = document.createElement("table");
+      subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+      var tableHeader = document.createElement("thead");
+      var headerRow = document.createElement("tr");
+      headerRow.innerHTML = `<th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Subject</th>
+                             <th class="lg:w-4/12 md:w-4/12 mt-4 font-bold text-c1">Subject Code</th>
+                             <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Units</th>
+                             <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Grade</th>`;
+      tableHeader.appendChild(headerRow);
+      subjectsTable.appendChild(tableHeader);
+
+      var tableBody = document.createElement("tbody");
+      entry.Subject.forEach((subject) => {
+        var gradeDisplay = "0.00"; // Assuming 0.00 if data not available
+        var row = document.createElement("tr");
+        row.innerHTML = `<td class="lg:w-2/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+        <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Code}</td>
+        <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Units}</td>
+        <td class="lg:w-2/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${gradeDisplay}</td>`; // Display Grade as N/A
+        tableBody.appendChild(row);
+      });
+
+      subjectsTable.appendChild(tableBody);
+      subjectsDiv.appendChild(subjectsTable);
+      classGroupDiv.appendChild(classGroupInfo);
+      classGroupDiv.appendChild(subjectsDiv);
+      additionalSubjectsContainer.appendChild(classGroupDiv);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchAdditionalSubjects();
+  });
+</script>
+
   
 
 {% endblock content %}

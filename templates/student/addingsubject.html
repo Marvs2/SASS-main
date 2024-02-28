@@ -42,7 +42,7 @@
   <div class="data data1" id="firstTableContainer">
     <div class="content-data">
       <div class="head mb-3">
-        <h3>Current Subjects</h3>
+        <h3>AddSubject Application - Current Subjects</h3>
       </div>
 
       <div class="row mb-3">
@@ -109,7 +109,7 @@
                     {{ subject.Subject }}
                   </td>
                   <td class="lg:w-3/12 md:w-6/12 mt-4">{{ subject.Grade }}</td>
-                  <!-- Add more table cells as needed -->
+                  <!-- Add more table cells as needed  -->
                 </tr>
                 {% endfor %}
               </tbody>
@@ -600,20 +600,18 @@
       });
   }
 
-  // Function to update HTML content with fetched data
+  // this is the javscript you want to present the first data gven without grades or gpa
   function updateSubjectsContent(data) {
-    // Access the subjectsContainer element where you want to update the content
     var subjectsContainer = document.getElementById("subjectsContainer");
-
-    // Clear previous content
     subjectsContainer.innerHTML = "";
 
-    // Iterate through the data and update the content
-    data.forEach((classGroup) => {
+    data.forEach((classGroup, index) => {
       var classGroupDiv = document.createElement("div");
       classGroupDiv.className = "class-group";
 
-      // Add class group information
+      // Check if current entry is the first entry
+      const isGPAZero = index === 0;
+      const gpaDisplay = isGPAZero ? "0.00" : classGroup.GPA;
       var classGroupInfo = document.createElement("div");
       classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${
         classGroup.Semester === 1
@@ -622,54 +620,236 @@
           ? "(2nd Semester)"
           : "(Summer Term)"
       }</h4>
-                                  <p>Scholastic Status: Continuing</p>
-                                  <p>Course Code & Description: ${
-                                    classGroup.SecCode
-                                  } (QUEZON CITY CAMPUS)</p>
-                                  <p>GPA : ${classGroup.GPA} GPA`;
+                                <p>Scholastic Status: Continuing</p>
+                                <p>Course Code & Description: ${
+                                  classGroup.SecCode
+                                } (QUEZON CITY CAMPUS)</p>
+                                <p>GPA : ${gpaDisplay} GPA</p>`;
       classGroupInfo.className = "class-group-info";
 
-      // Add subjects
       var subjectsDiv = document.createElement("div");
       var subjectsTable = document.createElement("table");
       subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
 
-      // Add table header
       var tableHeader = document.createElement("thead");
       var headerRow = document.createElement("tr");
       headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
-                      <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>`;
-      // Add more table headers as needed
-
+                           <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>`;
       tableHeader.appendChild(headerRow);
       subjectsTable.appendChild(tableHeader);
 
-      // Add table body
       var tableBody = document.createElement("tbody");
       classGroup.Subject.forEach((subject) => {
+        var gradeDisplay = isGPAZero ? "0.00" : subject.Grade;
         var row = document.createElement("tr");
         row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
-                   <td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Grade}</td>`;
-        // Add more table cells as needed
-
+        <td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${gradeDisplay}</td>`;
         tableBody.appendChild(row);
       });
 
       subjectsTable.appendChild(tableBody);
       subjectsDiv.appendChild(subjectsTable);
-
-      // Append class group information and subjects to the classGroupDiv
       classGroupDiv.appendChild(classGroupInfo);
       classGroupDiv.appendChild(subjectsDiv);
-
-      // Append the classGroupDiv to the subjectsContainer
       subjectsContainer.appendChild(classGroupDiv);
     });
   }
 
-  // Trigger the data fetching when the page is loaded
   document.addEventListener("DOMContentLoaded", function () {
     fetchSubjectsGrade();
   });
+
+  // last entry of it dont have gpa and grades in it
+  //   function updateSubjectsContent(data) {
+  //   var subjectsContainer = document.getElementById("subjectsContainer");
+  //   subjectsContainer.innerHTML = "";
+
+  //   // Calculate the threshold index for hiding GPA
+  //   let thresholdIndexForGPA = data.length - 1;
+
+  //   data.forEach((classGroup, index) => {
+  //     var classGroupDiv = document.createElement("div");
+  //     classGroupDiv.className = "class-group";
+
+  //     var classGroupInfo = document.createElement("div");
+  //     classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${classGroup.Semester === 1 ? "(1st Semester)" : classGroup.Semester === 2 ? "(2nd Semester)" : "(Summer Term)"}</h4>
+  //                                 <p>Scholastic Status: Continuing</p>
+  //                                 <p>Course Code & Description: ${classGroup.SecCode} (QUEZON CITY CAMPUS)</p>
+  //                                 ${index < thresholdIndexForGPA ? `<p>GPA : ${classGroup.GPA} GPA</p>` : ''}`;
+  //     classGroupInfo.className = "class-group-info";
+
+  //     var subjectsDiv = document.createElement("div");
+  //     var subjectsTable = document.createElement("table");
+  //     subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+  //     var tableHeader = document.createElement("thead");
+  //     var headerRow = document.createElement("tr");
+  //     headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
+  //                            ${index === thresholdIndexForGPA ? '' : '<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>'}`;
+  //     tableHeader.appendChild(headerRow);
+  //     subjectsTable.appendChild(tableHeader);
+
+  //     var tableBody = document.createElement("tbody");
+  //     classGroup.Subject.forEach((subject) => {
+  //       var row = document.createElement("tr");
+  //       row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+  //                        ${index === thresholdIndexForGPA ? '' : `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Grade}</td>`}`;
+  //       tableBody.appendChild(row);
+  //     });
+
+  //     subjectsTable.appendChild(tableBody);
+  //     subjectsDiv.appendChild(subjectsTable);
+  //     classGroupDiv.appendChild(classGroupInfo);
+  //     classGroupDiv.appendChild(subjectsDiv);
+  //     subjectsContainer.appendChild(classGroupDiv);
+  //   });
+  // }
+
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   fetchSubjectsGrade();
+  // });
+
+  //   // this is the right function with conditional that the latest data grades is not presented
+  // // Function to update HTML content with fetched data
+  // function updateSubjectsContent(data) {
+  //   // Access the subjectsContainer element where you want to update the content
+  //   var subjectsContainer = document.getElementById("subjectsContainer");
+
+  //   // Clear previous content
+  //   subjectsContainer.innerHTML = "";
+
+  //   // Iterate through the data and update the content
+  //   data.forEach((classGroup, index) => {
+  //     var classGroupDiv = document.createElement("div");
+  //     classGroupDiv.className = "class-group";
+
+  //     // Add class group information
+  //     var classGroupInfo = document.createElement("div");
+  //     classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${
+  //       classGroup.Semester === 1
+  //         ? "(1st Semester)"
+  //         : classGroup.Semester === 2
+  //         ? "(2nd Semester)"
+  //         : "(Summer Term)"
+  //     }</h4>
+  //                                 <p>Scholastic Status: Continuing</p>
+  //                                 <p>Course Code & Description: ${classGroup.SecCode} (QUEZON CITY CAMPUS)</p>
+  //                                 <p>GPA : ${classGroup.GPA} GPA`;
+  //     classGroupInfo.className = "class-group-info";
+
+  //     // Add subjects
+  //     var subjectsDiv = document.createElement("div");
+  //     var subjectsTable = document.createElement("table");
+  //     subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+  //     // Add table header
+  //     var tableHeader = document.createElement("thead");
+  //     var headerRow = document.createElement("tr");
+  //     headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
+  //                     ${index === data.length - 1 ? '' : '<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>'}`;
+  //     // Add more table headers as needed
+
+  //     tableHeader.appendChild(headerRow);
+  //     subjectsTable.appendChild(tableHeader);
+
+  //     // Add table body
+  //     var tableBody = document.createElement("tbody");
+  //     classGroup.Subject.forEach((subject) => {
+  //       var row = document.createElement("tr");
+  //       row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+  //                 ${index === data.length - 7 ? '0.00' : `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Grade}</td>`}`;
+  //       // Add more table cells as needed
+
+  //       tableBody.appendChild(row);
+  //     });
+
+  //     subjectsTable.appendChild(tableBody);
+  //     subjectsDiv.appendChild(subjectsTable);
+
+  //     // Append class group information and subjects to the classGroupDiv
+  //     classGroupDiv.appendChild(classGroupInfo);
+  //     classGroupDiv.appendChild(subjectsDiv);
+
+  //     // Append the classGroupDiv to the subjectsContainer
+  //     subjectsContainer.appendChild(classGroupDiv);
+  //   });
+  // }
+
+  // // Trigger the data fetching when the page is loaded
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   fetchSubjectsGrade();
+  // });
+
+  // // Function to update HTML content with fetched data
+  // function updateSubjectsContent(data) {
+  //   // Access the subjectsContainer element where you want to update the content
+  //   var subjectsContainer = document.getElementById("subjectsContainer");
+
+  //   // Clear previous content
+  //   subjectsContainer.innerHTML = "";
+
+  //   // Iterate through the data and update the content
+  //   data.forEach((classGroup) => {
+  //     var classGroupDiv = document.createElement("div");
+  //     classGroupDiv.className = "class-group";
+
+  //     // Add class group information
+  //     var classGroupInfo = document.createElement("div");
+  //     classGroupInfo.innerHTML = `<h4>School Year ${classGroup.Batch} ${
+  //       classGroup.Semester === 1
+  //         ? "(1st Semester)"
+  //         : classGroup.Semester === 2
+  //         ? "(2nd Semester)"
+  //         : "(Summer Term)"
+  //     }</h4>
+  //                                 <p>Scholastic Status: Continuing</p>
+  //                                 <p>Course Code & Description: ${
+  //                                   classGroup.SecCode
+  //                                 } (QUEZON CITY CAMPUS)</p>
+  //                                 <p>GPA : ${classGroup.GPA} GPA`;
+  //     classGroupInfo.className = "class-group-info";
+
+  //     // Add subjects
+  //     var subjectsDiv = document.createElement("div");
+  //     var subjectsTable = document.createElement("table");
+  //     subjectsTable.className = "table md:border md:border-1 p-2 md:my-4";
+
+  //     // Add table header
+  //     var tableHeader = document.createElement("thead");
+  //     var headerRow = document.createElement("tr");
+  //     headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
+  //                     <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>`;
+  //     // Add more table headers as needed
+
+  //     tableHeader.appendChild(headerRow);
+  //     subjectsTable.appendChild(tableHeader);
+
+  //     // Add table body
+  //     var tableBody = document.createElement("tbody");
+  //     classGroup.Subject.forEach((subject) => {
+  //       var row = document.createElement("tr");
+  //       row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+  //                  <td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Grade}</td>`;
+  //       // Add more table cells as needed
+
+  //       tableBody.appendChild(row);
+  //     });
+
+  //     subjectsTable.appendChild(tableBody);
+  //     subjectsDiv.appendChild(subjectsTable);
+
+  //     // Append class group information and subjects to the classGroupDiv
+  //     classGroupDiv.appendChild(classGroupInfo);
+  //     classGroupDiv.appendChild(subjectsDiv);
+
+  //     // Append the classGroupDiv to the subjectsContainer
+  //     subjectsContainer.appendChild(classGroupDiv);
+  //   });
+  // }
+
+  // // Trigger the data fetching when the page is loaded
+  // document.addEventListener("DOMContentLoaded", function () {
+  //   fetchSubjectsGrade();
+  // });
 </script>
 {% endblock content %}

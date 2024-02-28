@@ -612,6 +612,19 @@ def currentsubject():
     else:
         return render_template('404.html'), 404
     
+@student_api.route('/anothertable', methods=['GET'])
+def anothertable():
+    student = getCurrentUser()
+    # print('STUDEINT ID: ', student.StudentId)
+    if student:
+        json_current_subject = getSubjectsGrade(student.StudentId) # getCurrentSubject # getFirstSemSubjectsGrade #get_incomplete_subjects #All subjectgrade = getSubjectsGrade
+        if json_current_subject:
+            return (json_current_subject)
+        else:
+            return jsonify(error="No data available")
+    else:
+        return render_template('404.html'), 404
+    
 #For 3rd sem only 
 @student_api.route('/studentsubject', methods=['GET'])
 def subjectsstudent():
@@ -1050,7 +1063,7 @@ def create_petitionrequest_form(form_data, StudentId):
     return new_petition_request
 
 #=================================================Grade entry========================================#
-
+#create_correction
 def create_gradeentry_application(form_data, files, StudentId):
     StudentNumber = form_data['StudentNumber']
     Name = form_data['Name']

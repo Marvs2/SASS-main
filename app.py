@@ -1045,6 +1045,72 @@ def viewcrossenrollment():
 
     return render_template("/student/viewcrossenrollment.html", cross_enrollments_list=cross_enrollments_list)
 
+
+# # donwload file for CrossEnrollment
+# # Download file 
+# @app.route('/student/crossenrollment/get_student_permit_form/<int:crossenrollment_Id>/<int:student_id>')
+# def get_student_permit_form(crossenrollment_Id, student_id):
+#     return redirect(url_for('download_student_permit_file', crossenrollment_Id=crossenrollment_Id, student_id=student_id))
+
+# @app.route('/student/download_student_permit_file/<int:crossenrollment_Id>/<int:student_id>')
+# @student_required
+# def download_student_permit_file(crossenrollment_Id, student_id):
+#     # Adjusted query using both parts of the composite key
+#     cross_enrollment = CrossEnrollment.query.filter_by(CrossEnrollmentId=crossenrollment_Id, StudentId=student_id).first()
+
+#     if cross_enrollment and cross_enrollment.ApplicationLetterdata:
+#         application_extension = get_application_extension(cross_enrollment.ApplicationLetterfilename)
+#         download_name = f'cross_enrollment_{crossenrollment_Id}.{application_extension}'
+
+#         return send_file(
+#             io.BytesIO(cross_enrollment.ApplicationLetterdata),
+#             as_attachment=False,
+#             download_name=download_name,
+#             mimetype=get_mimetype(application_extension)
+#         )
+#     else:
+#         abort(404)  # File not found
+
+# def get_application_extension(ApplicationLetterfilename):
+#     return ApplicationLetterfilename.rsplit('.', 1)[1].lower()
+
+# def get_mimetype(application_extension):
+#     mimetypes = {
+#         'txt': 'text/plain',
+#         'pdf': 'application/pdf',
+#         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+#         # Add more file types as needed
+#     }
+
+#     return mimetypes.get(application_extension, 'application/octet-stream')
+
+
+
+
+# Download file for CrossEnrollment
+@app.route('/student/crossenrollment/get_student_permit_form/<int:crossenrollment_Id>/<int:student_id>')
+def get_student_permit_form(crossenrollment_Id, student_id):
+    return redirect(url_for('download_student_permit_file', crossenrollment_Id=crossenrollment_Id, student_id=student_id))
+
+@app.route('/student/download_student_permit_file/<int:crossenrollment_Id>/<int:student_id>')
+@student_required
+def download_student_permit_file(crossenrollment_Id, student_id):
+    # Adjusted query using both parts of the composite key
+    cross_enrollment = CrossEnrollment.query.filter_by(CrossEnrollmentId=crossenrollment_Id, StudentId=student_id).first()
+
+    if cross_enrollment and cross_enrollment.ApplicationLetterdata:
+        download_name = f'cross_enrollment_{crossenrollment_Id}'
+
+        return send_file(
+            io.BytesIO(cross_enrollment.ApplicationLetterdata),
+            as_attachment=False,
+            download_name=download_name,
+            mimetype='application/octet-stream'  # Set the default MIME type to binary/octet-stream
+        )
+    else:
+        abort(404)  # File not found
+
+
 #================================== APPLICATION FOR SHIFTING ================================================
 @app.route('/student/shifting')
 @student_required

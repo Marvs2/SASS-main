@@ -228,7 +228,7 @@ student_id=changesubjects.StudentId) }}">
 							data-cross-school-to-enroll="{{ cross_enrollment.SchoolforCrossEnrollment }}"
 							data-cross-total-number-of-units="{{ cross_enrollment.TotalNumberofUnits }}"
 							data-cross-authorize-subject="{{cross_enrollment.AuthorizedSubjectstoTake}}"
-							data-cross-application-letter-url="{{ url_for('get_application_letter', CrossEnrollmentId=cross_enrollment.CrossEnrollmentId) }}"
+							data-cross-application-letter-url="{{ url_for('get_student_permit_form', crossenrollment_Id=cross_enrollment.CrossEnrollmentId, student_id=cross_enrollment.StudentId) }}"
 							data-cross-application-filename="{{ cross_enrollment.ApplicationLetterfilename }}"	
 							data-cross-permit-to-cross-url="{{ url_for('get_permit_to_enroll', CrossEnrollmentId=cross_enrollment.CrossEnrollmentId) }}"
 							data-cross-permit-filename="{{ cross_enrollment.PermitCrossEnrollfilename }}"	

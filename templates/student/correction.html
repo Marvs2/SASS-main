@@ -96,10 +96,11 @@
     var completion_form = document.getElementById('completion_form').files[0];
     var class_record = document.getElementById('class_record').files[0];
     var affidavit = document.getElementById('affidavit').files[0];
+    var Status = document.getElementById('Status').files[0];
     var UserResponsible = document.getElementById('UserResponsible').value;
 
     // Validate required fields
-    if (!StudentNumber || !Name || !ApplicationType || !completion_form || !class_record || !affidavit || !UserResponsible) {
+    if (!StudentNumber || !Name || !ApplicationType || !completion_form || !class_record || !affidavit || !Status || !UserResponsible) {
       alert('Please fill out all required fields.');
       return false;
     }
