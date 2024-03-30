@@ -27,7 +27,7 @@
           <tr
             data-certify-add-name="{{ students.FirstName }} {{ students.LastName }}"
             data-certify-student-Number="{{ students.StudentNumber }}"
-            data-certify-certType="{{ certification_request.CertificationType }}"
+            data-certify-certtype="{{ certification_request.CertificationType }}"
             data-certify-requestUrl="{{ url_for('get_faculty_certification_request_file', certification_request_Id=certification_request.CertificationId) }}"
             data-certify-request-filename="{{ certification_request.RequestFormfilename}}"
 
@@ -199,6 +199,82 @@
     </div>
   </div>
 </div>
+<!-- Approved Certification Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="approvedCertificationTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Approved Certification Requests</h3>
+      </div>
+      <table id="approvedCertificationSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cert_request, student in approved_certification_data %}
+          {% if cert_request.Status not
+            in ['Rejected', 'pending'] %}
+            <tr>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ cert_request.Subject }}</td>
+              <td>{{ cert_request.Status }}</td>
+              <td>
+                <button onclick="rejectCertificationRequest('{{ cert_request.CertificationRequestId }}')">Reject</button>
+              </td>
+            </tr>
+          {% endif %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Certification Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="pendingCertificationTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Pending Certification Requests</h3>
+      </div>
+      <table id="pendingCertificationSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cert_request, student in pending_certification_data %}
+          {% if cert_request.Status not
+            in ['Approved', 'pending'] %}
+            <tr>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ cert_request.Subject }}</td>
+              <td>{{ cert_request.Status }}</td>
+              <td>
+                <button onclick="approveCertificationRequest('{{ cert_request.CertificationRequestId }}')">Approve</button>
+                <!-- <button onclick="rejectCertificationRequest('{{ cert_request.CertificationRequestId }}')">Reject</button> -->
+              </td>
+            </tr>
+            {% endif %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -220,7 +296,7 @@
       // Your existing event binding logic here
       var studentName = $(this).data("certify-add-name");
       var studentNumber = $(this).data("certify-studentNumber");
-      var certificationType = $(this).data("certify-certType");
+      var certificationTypes = $(this).data("certify-certtype");
       var fileAttachmentUrl = $(this).data("certify-requestUrl");
       var requestfilename = $(this).data("certify-request-filename");
       var status = $(this).data("certify-status");
@@ -229,7 +305,7 @@
       // Populate modal with data
       $("#certification-name").text(studentName);
       $("#certification-number").text(studentNumber);
-      $("#certification-type").text(certificationType);
+      $("#certification-type").text(certificationTypes);
       $("#certify-remarks").text(studentRemarks);
       //certify-requestUrl
       // Log the generated URL

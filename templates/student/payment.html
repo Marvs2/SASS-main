@@ -1,0 +1,196 @@
+{% extends "student/layout.html" %}
+{% block content %}
+<title>Barcode Generator</title>
+<style>
+  /* Your CSS styles here */
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust as needed */
+  }
+
+  .barcode-form {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    width: 400px;
+    text-align: center;
+  }
+
+  .qr-code {
+    max-width: 200px;
+    margin: 10px auto; /* Center the QR code image horizontally */
+    display: block;
+  }
+
+  .form-group {
+    text-align: center; /* Align text in the center */
+    margin-bottom: 10px; /* Add some spacing between form groups */
+  }
+
+  .form-group label {
+    display: block; /* Display labels as block elements */
+    font-weight: bold; /* Make labels bold */
+    margin-bottom: 5px; /* Add some spacing between labels and inputs */
+    text-decoration: underline; /* Underline labels */
+  }
+
+  .form-control {
+    width: 100%; /* Set input width to 100% */
+    box-sizing: border-box; /* Include padding and border in the width */
+  }
+
+  #generate {
+    width: 100%; /* Set button width to 100% */
+    margin-top: 10px; /* Add some spacing between inputs and button */
+  }
+
+  /* Style for PDF content */
+  .pdf-content {
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: left;
+  }
+</style>
+<div id="main-content" class="container">
+  <div class="barcode-form">
+    <h1>QReceipt</h1>
+
+    <!-- Content Display -->
+    <div id="contentDisplay"></div>
+
+    <!-- Form -->
+    <form id="qrForm">
+      <div class="form-group">
+        <label class="control-label" for="contents">Content:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="contents"
+          placeholder="Enter Content"
+        />
+      </div>
+      <div class="form-group">
+        <label class="control-label" for="payment">Payment:</label>
+        <input
+          type="text"
+          class="form-control"
+          id="payment"
+          placeholder="Enter payment"
+        />
+      </div>
+      <button type="button" class="btn btn-default" id="generate">
+        Generate
+      </button>
+      <!-- Button to generate QR code -->
+    </form>
+
+    <!-- QR Code Image -->
+    <img
+      id="qrCodeImage"
+      src=""
+      class="qr-code img-thumbnail img-responsive"
+      style="display: none"
+    />
+  </div>
+</div>
+<button id="generate-report-btn">Generate Report</button>
+<!-- Add this script tag to include html2pdf library -->
+<!-- Add this script tag to include html2pdf library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://rawgit.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js"></script>
+
+<script>
+  function htmlEncode(value) {
+    return $("<div/>").text(value).html();
+  }
+
+  $("#generate").click(function () {
+    let content = $("#contents").val();
+    let payment = $("#payment").val();
+
+    let result = "";
+    if (content.trim() !== "" || payment.trim() !== "") {
+      result += "Printing Content: " + htmlEncode(content) + "\n";
+      result += "Printing Payment: " + htmlEncode(payment);
+      $("#contentDisplay")
+        .css("font-size", "24px")
+        .removeClass("alert alert-danger")
+        .addClass("alert alert-info")
+        .text(result);
+
+      let finalURL =
+        "https://chart.googleapis.com/chart?cht=qr&chl=" +
+        htmlEncode(
+          "Service: " +
+          content +
+          " Payment: " +
+          payment
+        ) +
+        "&chs=160x160&chld=L|0";
+
+      $("#qrCodeImage")
+        .on("load", function () {
+          $("#qrCodeImage").show();
+          $("#captureQR").show();
+        })
+        .attr("src", finalURL);
+    } else {
+      $("#contentDisplay")
+        .css("font-size", "18px")
+        .removeClass("alert alert-info")
+        .addClass("alert alert-danger")
+        .text("Please enter either content or payment!");
+    }
+  });
+
+  function captureBarcodeForm() {
+    var barcodeForm = document.querySelector(".barcode-form");
+
+    html2canvas(barcodeForm).then(function (canvas) {
+      var imageDataURL = canvas.toDataURL();
+
+      var link = document.createElement("a");
+      link.href = imageDataURL;
+      link.download = "barcode_form.png";
+      link.click();
+    });
+  }
+
+  document.getElementById("captureQR").addEventListener("click", function () {
+    captureBarcodeForm();
+  });
+
+  // Function to generate and save the report as PDF
+  function generateReport() {
+    // Create a container for PDF content
+    var pdfContent = document.createElement("div");
+    pdfContent.classList.add("pdf-content");
+
+    // Add content to the PDF container
+    var contentDisplay = document.getElementById("contentDisplay").cloneNode(true);
+    pdfContent.appendChild(contentDisplay);
+
+    var qrCodeImage = document.getElementById("qrCodeImage").cloneNode(true);
+    pdfContent.appendChild(qrCodeImage);
+
+    // Hide the form element
+    var formElement = document.getElementById("qrForm");
+    formElement.style.display = "none";
+
+    // Generate PDF from the PDF content container
+    html2pdf().from(pdfContent).save();
+
+    // Show the form element after generating the PDF
+    formElement.style.display = "block";
+  }
+
+  // Attach the click event to the "Generate Report" button
+  $('#generate-report-btn').on('click', function () {
+    generateReport();
+  });
+</script>
+
+{% endblock %}

@@ -23,53 +23,50 @@
           </tr>
         </thead>
         <tbody>
-          {% for enrollments in manual_enrollments %}
+          {% for enrollment, student in manual_enrollment_data %}
           <tr
-            data-manual-add-name="{{ enrollments.Name }}"
-            data-manual-studentnumber="{{ enrollments.StudentNumber }}"
-            data-manual-enrollType="{{ enrollments.EnrollmentType }}"
-            data-manual-reason="{{ enrollments.Reason }}"
-            data-manual-mefileUrl="{{ url_for('get_manual_file', m_enrollments_ID=enrollments.ManualEnrollmentId) }}"
-            data-manual-mefilename="{{ enrollments.MeFilefilename }}"
-            data-manual-responsible="{{ enrollments.UserResponsible }}"
-            data-manual-status="{{ enrollments.Status }}"
+              data-manual-add-name="{{ enrollment.Name }}"
+              data-manual-studentnumber="{{ enrollment.StudentNumber }}"
+              data-manual-enrollType="{{ enrollment.EnrollmentType }}"
+              data-manual-reason="{{ enrollment.Reason }}"
+              data-manual-mefileUrl="{{ url_for('get_manual_file', m_enrollments_ID=enrollment.ManualEnrollmentId) }}"
+              data-manual-mefilename="{{ enrollment.MeFilefilename }}"
+              data-manual-responsible="{{ enrollment.UserResponsible }}"
+              data-manual-status="{{ enrollment.Status }}"
           >
-            <td>{{ enrollments.StudentNumber }}</td>
-            <td>{{ enrollments.Name }}</td>
-            <td>{{ enrollments.EnrollmentType }}</td>
-            <td>
-                  {% if enrollments.MeFiledata %}
-                  {% set manualfile = enrollments.MeFilefilename[:15] + '...' if enrollments.MeFilefilename|length > 15 else enrollments.MeFilefilename %}
-                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=enrollments.ManualEnrollmentId) }}"  target="_blank" title="{{ enrollments.MeFilefilename }}">{{ manualfile }}</a>
-              {% else %}
+              <td>{{ enrollment.StudentNumber }}</td>
+              <td>{{ enrollment.Name }}</td>
+              <td>{{ enrollment.EnrollmentType }}</td>
+              <td>
+                  {% if enrollment.MeFiledata %}
+                  {% set manualfile = enrollment.MeFilefilename[:15] + '...' if enrollment.MeFilefilename|length > 15 else enrollment.MeFilefilename %}
+                  <a href="{{ url_for('get_manual_file', m_enrollments_ID=enrollment.ManualEnrollmentId) }}" target="_blank" title="{{ enrollment.MeFilefilename }}">{{ manualfile }}</a>
+                  {% else %}
                   <span class="badge badge-warning">No File</span>
-              {% endif %}
-                </td>
-            <!-- <td>{{ enrollments.created_at }}</td>
-                <td>{{ enrollments.updated_at }}</td> -->
-            <!-- <td>{{ enrollments.UserResponsible }}</td> -->
-            <td>{{ enrollments.Status }}</td>
-            <td>
-              <!-- Button to trigger the modal form -->
-              <button
-                type="button"
-                title="View Info"
-                class="btn btn-primary fa-solid fa-eye edit_btn"
-                data-toggle="modal"
-                data-target="#viewManualEnrollmentModal"
-                onclick="openManualEnrollmentModal('{{ enrollments.ManualEnrollmentId }}', '{{ enrollments.Status }}')"
-              ></button>
-              <button
-                type="button"
-                title="Delete Info"
-                class="btn btn-danger fa-solid fa-trash delete_btn"
-                data-toggle="modal"
-                data-target="#deleteModal"
-              ></button>
-            </td>
+                  {% endif %}
+              </td>
+              <td>{{ enrollment.Status }}</td>
+              <td>
+                  <!-- Button to trigger the modal form -->
+                  <button
+                      type="button"
+                      title="View Info"
+                      class="btn btn-primary fa-solid fa-eye edit_btn"
+                      data-toggle="modal"
+                      data-target="#viewManualEnrollmentModal"
+                      onclick="openManualEnrollmentModal('{{ enrollment.ManualEnrollmentId }}', '{{ enrollment.Status }}')"
+                  ></button>
+                  <button
+                      type="button"
+                      title="Delete Info"
+                      class="btn btn-danger fa-solid fa-trash delete_btn"
+                      data-toggle="modal"
+                      data-target="#deleteModal"
+                  ></button>
+              </td>
           </tr>
           {% endfor %}
-        </tbody>
+      </tbody>      
       </table>
     </div>
   </div>

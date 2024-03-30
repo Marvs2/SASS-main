@@ -530,8 +530,6 @@ def getSecondSemSubjectsGrade(str_student_id):
 #         print("ERROR: ", e)
 #         # Handle the exception here, e.g., log it or return an error response
 #         return None
-
-
 def getSubjectsGrade(str_student_id):
     try:
         data_student_class_subject_grade = (
@@ -581,7 +579,8 @@ def getSubjectsGrade(str_student_id):
                         "Semester": metadata.Semester,
                         "Subject": [],
                         "EnrollmentStatus": enrollment_status,
-                        "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}"  # Added SecCode
+                        "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}",  # Added SecCode
+                        "StudentID": str_student_id  # Added StudentID
                     }
 
                     list_student_class_subject_grade.append(dict_class_group)
@@ -593,12 +592,13 @@ def getSubjectsGrade(str_student_id):
                     "Teacher": teacher_name if teacher_name else "N/A",
                     "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}",
                     "Units": format(subject.Units, '.2f'),
-                    "Status": "Pass" if student_class_subject_grade.Grade >= 75 else "Fail"  # Assuming 75 is the passing grade
+                    "Status": "Pass" if student_class_subject_grade.Grade >= 75 else "Fail",  # Assuming 75 is the passing grade
+                    "Schedule": class_subject.Schedule if class_subject.Schedule else "Not specified"  # Include Schedule information
                 }
 
                 # Find the last dictionary in list_student_class_subject_grade and append the subject details to its "Subject" list
                 list_student_class_subject_grade[-1]["Subject"].append(subject_details)
-                
+
             return list_student_class_subject_grade
 
         else:
@@ -607,6 +607,163 @@ def getSubjectsGrade(str_student_id):
         print("ERROR: ", e)
         # Handle the exception here, e.g., log it or return an error response
         return None
+
+
+# def getSubjectsGrade(str_student_id):
+#     try:
+#         data_student_class_subject_grade = (
+#             db.session.query(
+#                 StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata, CourseEnrolled.Status
+#             )
+#             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+#             .join(Class, ClassSubject.ClassId == Class.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(Course, Course.CourseId == Metadata.CourseId)
+#             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .join(CourseEnrolled, and_(
+#                     CourseEnrolled.StudentId == str_student_id,
+#                     CourseEnrolled.CourseId == Metadata.CourseId
+#                 ))
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+#             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+#             .all()
+#         )
+
+#         if data_student_class_subject_grade:
+#             class_combinations = set()
+#             list_student_class_subject_grade = []
+
+#             for record in data_student_class_subject_grade:
+#                 student_class_subject_grade, class_subject, class_, course, subject, metadata, course_enrolled_status = record
+#                 teacher_name = ""
+
+#                 # Check if teacher exists
+#                 if class_subject.FacultyId:
+#                     # Query the teacher
+#                     data_teacher = db.session.query(Faculty).filter(Faculty.FacultyId == class_subject.FacultyId).first()
+#                     teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + (' ' + data_teacher.MiddleName if data_teacher.MiddleName else '')
+
+#                 class_combination = (class_.ClassId, metadata.Batch, metadata.Semester)
+#                 if class_combination not in class_combinations:
+#                     class_combinations.add(class_combination)
+#                     # Check if existing in the list table already the ClassId and semester so it won't reiterate the query
+#                     data_student_class_grade = db.session.query(StudentClassGrade).filter(
+#                         StudentClassGrade.StudentId == str_student_id,
+#                         StudentClassGrade.ClassId == class_.ClassId
+#                     ).first()
+#                     enrollment_status = "Continuing" if course_enrolled_status == 0 else "Graduated"
+#                     dict_class_group = {
+#                         "Batch": metadata.Batch,
+#                         "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
+#                         "Semester": metadata.Semester,
+#                         "Subject": [],
+#                         "EnrollmentStatus": enrollment_status,
+#                         "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}"  # Added SecCode
+#                     }
+
+#                     list_student_class_subject_grade.append(dict_class_group)
+
+#                 subject_details = {
+#                     "Grade": format(student_class_subject_grade.Grade, '.2f') if student_class_subject_grade.Grade is not None else "0.00",
+#                     "Subject": subject.Name,
+#                     "Code": subject.SubjectCode,
+#                     "Teacher": teacher_name if teacher_name else "N/A",
+#                     "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}",
+#                     "Units": format(subject.Units, '.2f'),
+#                     "Status": "Pass" if student_class_subject_grade.Grade >= 75 else "Fail",  # Assuming 75 is the passing grade
+#                     "Schedule": class_subject.Schedule if class_subject.Schedule else "Not specified"  # Include Schedule information
+#                 }
+
+#                 # Find the last dictionary in list_student_class_subject_grade and append the subject details to its "Subject" list
+#                 list_student_class_subject_grade[-1]["Subject"].append(subject_details)
+
+#             return list_student_class_subject_grade
+
+#         else:
+#             return None
+#     except Exception as e:
+#         print("ERROR: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return None
+
+
+# # without schedule
+# def getSubjectsGrade(str_student_id):
+#     try:
+#         data_student_class_subject_grade = (
+#             db.session.query(
+#                 StudentClassSubjectGrade, ClassSubject, Class, Course, Subject, Metadata, CourseEnrolled.Status
+#             )
+#             .join(ClassSubject, StudentClassSubjectGrade.ClassSubjectId == ClassSubject.ClassSubjectId)
+#             .join(Class, ClassSubject.ClassId == Class.ClassId)
+#             .join(Metadata, Metadata.MetadataId == Class.MetadataId)
+#             .join(Course, Course.CourseId == Metadata.CourseId)
+#             .join(Subject, ClassSubject.SubjectId == Subject.SubjectId)
+#             .join(CourseEnrolled, and_(
+#                     CourseEnrolled.StudentId == str_student_id,
+#                     CourseEnrolled.CourseId == Metadata.CourseId
+#                 ))
+#             .filter(StudentClassSubjectGrade.StudentId == str_student_id)
+#             .order_by(desc(Metadata.Batch), desc(Metadata.Semester))
+#             .all()
+#         )
+
+#         if data_student_class_subject_grade:
+#             class_combinations = set()
+#             list_student_class_subject_grade = []
+
+#             for record in data_student_class_subject_grade:
+#                 student_class_subject_grade, class_subject, class_, course, subject, metadata, course_enrolled_status = record
+#                 teacher_name = ""
+
+#                 # Check if teacher exists
+#                 if class_subject.FacultyId:
+#                     # Query the teacher
+#                     data_teacher = db.session.query(Faculty).filter(Faculty.FacultyId == class_subject.FacultyId).first()
+#                     teacher_name = data_teacher.LastName + ', ' + data_teacher.FirstName + (' ' + data_teacher.MiddleName if data_teacher.MiddleName else '')
+
+#                 class_combination = (class_.ClassId, metadata.Batch, metadata.Semester)
+#                 if class_combination not in class_combinations:
+#                     class_combinations.add(class_combination)
+#                     # Check if existing in the list table already the ClassId and semester so it won't reiterate the query
+#                     data_student_class_grade = db.session.query(StudentClassGrade).filter(
+#                         StudentClassGrade.StudentId == str_student_id,
+#                         StudentClassGrade.ClassId == class_.ClassId
+#                     ).first()
+#                     enrollment_status = "Continuing" if course_enrolled_status == 0 else "Graduated"
+#                     dict_class_group = {
+#                         "Batch": metadata.Batch,
+#                         "GPA": format(data_student_class_grade.Grade, '.2f') if data_student_class_grade and data_student_class_grade.Grade is not None else "No GPA yet",
+#                         "Semester": metadata.Semester,
+#                         "Subject": [],
+#                         "EnrollmentStatus": enrollment_status,
+#                         "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}"  # Added SecCode
+#                     }
+
+#                     list_student_class_subject_grade.append(dict_class_group)
+
+#                 subject_details = {
+#                     "Grade": format(student_class_subject_grade.Grade, '.2f') if student_class_subject_grade.Grade is not None else "0.00",
+#                     "Subject": subject.Name,
+#                     "Code": subject.SubjectCode,
+#                     "Teacher": teacher_name if teacher_name else "N/A",
+#                     "SecCode": f"{course.CourseCode} {metadata.Year}-{class_.Section} - {course.Name}",
+#                     "Units": format(subject.Units, '.2f'),
+#                     "Status": "Pass" if student_class_subject_grade.Grade >= 75 else "Fail",  # Assuming 75 is the passing grade
+#                     "Schedule": f"{class_.Day} {class_.TimeStart}-{class_.TimeEnd}"  # Add Schedule information
+#                 }
+
+#                 # Find the last dictionary in list_student_class_subject_grade and append the subject details to its "Subject" list
+#                 list_student_class_subject_grade[-1]["Subject"].append(subject_details)
+                
+#             return list_student_class_subject_grade
+
+#         else:
+#             return None
+#     except Exception as e:
+#         print("ERROR: ", e)
+#         # Handle the exception here, e.g., log it or return an error response
+#         return None
 
 #first
 # def getSubjectsGrade(str_student_id):
@@ -891,6 +1048,78 @@ def get_student_services(student_id):
     # print(total_services)
     
     return all_services_list, total_services, pending_count, approved_count, denied_count
+
+
+def get_all_based_on_services(student_id):
+    # Retrieve services from each table
+    addsubject_list = AddSubjects.query.filter_by(StudentId=student_id).all()
+    changesubjects_list = ChangeSubject.query.filter_by(StudentId=student_id).all()
+    manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
+    certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
+    grade_entry_list = GradeEntry.query.filter_by(StudentId=student_id).all()
+    cross_enrollment_list = CrossEnrollment.query.filter_by(StudentId=student_id).all()
+    petition_requests_list = PetitionRequest.query.filter_by(StudentId=student_id).all()
+    shifting_applications_list = ShiftingApplication.query.filter_by(StudentId=student_id).all()
+    overload_applications_list = OverloadApplication.query.filter_by(StudentId=student_id).all()
+    tutorial_requests_list = TutorialRequest.query.filter_by(StudentId=student_id).all()
+
+    # Prepare dictionary to store lists for each type of service
+    services_dict = {
+        'addsubject_list': [subject.to_dict() for subject in addsubject_list],
+        'changesubjects_list': [subject.to_dict() for subject in changesubjects_list],
+        'manual_enrollments_list': [subject.to_dict() for subject in manual_enrollments_list],
+        'certification_request_list': [subject.to_dict() for subject in certification_request_list],
+        'grade_entry_list': [subject.to_dict() for subject in grade_entry_list],
+        'cross_enrollment_list': [subject.to_dict() for subject in cross_enrollment_list],
+        'petition_requests_list': [subject.to_dict() for subject in petition_requests_list],
+        'shifting_applications_list': [subject.to_dict() for subject in shifting_applications_list],
+        'overload_applications_list': [subject.to_dict() for subject in overload_applications_list],
+        'tutorial_requests_list': [subject.to_dict() for subject in tutorial_requests_list]
+    }
+
+    # Calculate total number of services
+    total_services = sum(len(lst) for lst in services_dict.values())
+
+    # Count the number of services with status "pending", "approved", and "denied" for each type of service
+    status_counts = {key: {'pending': sum(1 for service in lst if service.get('Status') == 'pending'),
+                           'approved': sum(1 for service in lst if service.get('Status') == 'Approved'),
+                           'denied': sum(1 for service in lst if service.get('Status') == 'Rejected')}
+                     for key, lst in services_dict.items()}
+
+    return services_dict, total_services, status_counts
+
+
+
+
+
+
+def get_student_requests(student_id):
+    addsubject_list = AddSubjects.query.filter_by(StudentId=student_id).all()
+    changesubjects_list = ChangeSubject.query.filter_by(StudentId=student_id).all()
+    manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
+    certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
+    grade_entry_list = GradeEntry.query.filter_by(StudentId=student_id).all()
+    cross_enrollment_list = CrossEnrollment.query.filter_by(StudentId=student_id).all()
+    petition_requests_list = PetitionRequest.query.filter_by(StudentId=student_id).all()
+    shifting_applications_list = ShiftingApplication.query.filter_by(StudentId=student_id).all()
+    overload_applications_list = OverloadApplication.query.filter_by(StudentId=student_id).all()
+    tutorial_requests_list = TutorialRequest.query.filter_by(StudentId=student_id).all()
+
+    # Combine all lists into one dictionary
+    requests = {
+        'AddSubjects': addsubject_list,
+        'ChangeSubjects': changesubjects_list,
+        'ManualEnrollments': manual_enrollments_list,
+        'CertificationRequests': certification_request_list,
+        'GradeEntries': grade_entry_list,
+        'CrossEnrollments': cross_enrollment_list,
+        'PetitionRequests': petition_requests_list,
+        'ShiftingApplications': shifting_applications_list,
+        'OverloadApplications': overload_applications_list,
+        'TutorialRequests': tutorial_requests_list
+    }
+
+    return requests
 
 # def get_incomplete_subjects(str_student_id):
 #     incomplete_subjects = (
@@ -1220,3 +1449,79 @@ def get_student_history_services(student_id):
     }
 
     return services_data
+
+
+def get_all_services():
+    try:
+        # Retrieve services from each table without filtering on StudentId
+        addsubject_count = AddSubjects.query.count()
+        changesubjects_count = ChangeSubject.query.count()
+        manual_enrollments_count = ManualEnrollment.query.count()
+        certification_request_count = CertificationRequest.query.count()
+        grade_entry_count = GradeEntry.query.count()
+        cross_enrollment_count = CrossEnrollment.query.count()
+        petition_requests_count = PetitionRequest.query.count()
+        shifting_applications_count = ShiftingApplication.query.count()
+        overload_applications_count = OverloadApplication.query.count()
+        tutorial_requests_count = TutorialRequest.query.count()
+
+        # Prepare a dictionary to store counts for each type of service
+        services_count = {
+            "AddSubjects": addsubject_count,
+            "ChangeSubject": changesubjects_count,
+            "ManualEnrollment": manual_enrollments_count,
+            "CertificationRequest": certification_request_count,
+            "GradeEntry": grade_entry_count,
+            "CrossEnrollment": cross_enrollment_count,
+            "PetitionRequest": petition_requests_count,
+            "ShiftingApplication": shifting_applications_count,
+            "OverloadApplication": overload_applications_count,
+            "TutorialRequest": tutorial_requests_count
+        }
+
+        # Print the services counts for debugging
+        print("Services Counts:", services_count)
+
+        # Return the dictionary of service counts
+        return services_count
+    
+    except Exception as e:
+        # Handle exceptions appropriately
+        print(f"Error: {e}")
+        return {'error': 'Internal Server Error'}
+
+
+# def get_all_based_on_services(student_id):
+#     # Retrieve services from each table
+#     addsubject_list = AddSubjects.query.filter_by(StudentId=student_id).all()
+#     changesubjects_list = ChangeSubject.query.filter_by(StudentId=student_id).all()
+#     manual_enrollments_list = ManualEnrollment.query.filter_by(StudentId=student_id).all()
+#     certification_request_list = CertificationRequest.query.filter_by(StudentId=student_id).all()
+#     grade_entry_list = GradeEntry.query.filter_by(StudentId=student_id).all()
+#     cross_enrollment_list = CrossEnrollment.query.filter_by(StudentId=student_id).all()
+#     petition_requests_list = PetitionRequest.query.filter_by(StudentId=student_id).all()
+#     shifting_applications_list = ShiftingApplication.query.filter_by(StudentId=student_id).all()
+#     overload_applications_list = OverloadApplication.query.filter_by(StudentId=student_id).all()
+#     tutorial_requests_list = TutorialRequest.query.filter_by(StudentId=student_id).all()
+
+#     # Prepare dictionary to store lists for each type of service
+#     services_dict = {
+#         'addsubject_list': [subject.to_dict() for subject in addsubject_list],
+#         'changesubjects_list': [subject.to_dict() for subject in changesubjects_list],
+#         'manual_enrollments_list': [subject.to_dict() for subject in manual_enrollments_list],
+#         'certification_request_list': [subject.to_dict() for subject in certification_request_list],
+#         'grade_entry_list': [subject.to_dict() for subject in grade_entry_list],
+#         'cross_enrollment_list': [subject.to_dict() for subject in cross_enrollment_list],
+#         'petition_requests_list': [subject.to_dict() for subject in petition_requests_list],
+#         'shifting_applications_list': [subject.to_dict() for subject in shifting_applications_list],
+#         'overload_applications_list': [subject.to_dict() for subject in overload_applications_list],
+#         'tutorial_requests_list': [subject.to_dict() for subject in tutorial_requests_list]
+#     }
+
+#     # Calculate total number of services
+#     total_services = sum(len(lst) for lst in services_dict.values())
+
+#     return (addsubject_list, changesubjects_list, manual_enrollments_list,
+#             certification_request_list, grade_entry_list, cross_enrollment_list,
+#             petition_requests_list, shifting_applications_list, overload_applications_list,
+#             tutorial_requests_list, services_dict, total_services)

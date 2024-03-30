@@ -1,0 +1,100 @@
+{% extends "faculty/layout.html" %} 
+{% block content %}
+<h1>Create Additional Subject</h1>
+<form id="additionalSubjectForm">
+    <label for="student_id">Student ID:</label>
+    <input type="text" id="student_id" name="student_id"><br><br>
+
+    <label for="student_name">Student Name:</label>
+    <input type="text" id="student_name" name="student_name"><br><br>
+
+    <label for="student_number">Student Number:</label>
+    <input type="text" id="student_number" name="student_number"><br><br>
+
+    <label for="subject_code">Subject Code:</label>
+    <input type="text" id="subject_code" name="subject_code"><br><br>
+
+    <label for="subject_name">Subject Name:</label>
+    <input type="text" id="subject_name" name="subject_name"><br><br>
+
+    <label for="teacher">Teacher:</label>
+    <input type="text" id="teacher" name="teacher"><br><br>
+
+    <label for="units">Units:</label>
+    <input type="text" id="units" name="units"><br><br>
+
+    <label for="grade">Grade:</label>
+    <input type="text" id="grade" name="grade"><br><br>
+
+    <label for="status">Status:</label>
+    <input type="text" id="status" name="status"><br><br>
+
+    <button type="button" onclick="submitForm()">Submit</button>
+</form>
+
+<script>
+    // Function to fetch data associated with the overload ID and pre-fill the form fields
+    function fetchDataForOverloadId(overloadId) {
+        // Fetch data from the backend endpoint
+        fetch(`/get_overload_data/${overloadId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Pre-fill the form fields with the fetched data
+            document.getElementById("student_id").value = data.student_id;
+            document.getElementById("student_name").value = data.student_name;
+            document.getElementById("student_number").value = data.student_number;
+            document.getElementById("subject_code").value = data.subject_code;
+            document.getElementById("subject_name").value = data.subject_name;
+            document.getElementById("teacher").value = data.teacher;
+            document.getElementById("units").value = data.units;
+            document.getElementById("grade").value = data.grade;
+            document.getElementById("status").value = data.status;
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    // Function to submit the form
+    function submitForm() {
+        // Get form data
+        var formData = new FormData(document.getElementById("additionalSubjectForm"));
+
+        // Send POST request to Flask server
+        fetch('/create_additional_subject', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.text();
+            }
+            throw new Error('Network response was not ok.');
+        })
+        .then(data => {
+            // Handle success response
+            alert(data);
+        })
+        .catch(error => {
+            // Handle error
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+
+    // Call the function to fetch data for the overload ID when the page loads
+    window.onload = function() {
+        // Extract overload ID from the URL query parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const overloadId = urlParams.get('overload_id');
+
+        // Call the function to fetch data for the overload ID
+        fetchDataForOverloadId(overloadId);
+    };
+</script>
+
+{% endblock %}

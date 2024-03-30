@@ -51,8 +51,6 @@ def get_all_services():
 
     return all_services_list, total_services, pending_count, approved_count, denied_count
 
-
-
 def get_all_services_counts():
     # Define the models
     models = [AddSubjects, ChangeSubject, ManualEnrollment, CertificationRequest, GradeEntry, CrossEnrollment, PetitionRequest, ShiftingApplication, OverloadApplication, TutorialRequest]
@@ -96,6 +94,44 @@ def get_all_services_counts():
     #     print()
 
 
+def faculty_all_services():
+    try:
+        # Retrieve services from each table without filtering on StudentId
+        addsubject_count = AddSubjects.query.count()
+        changesubjects_count = ChangeSubject.query.count()
+        manual_enrollments_count = ManualEnrollment.query.count()
+        certification_request_count = CertificationRequest.query.count()
+        grade_entry_count = GradeEntry.query.count()
+        cross_enrollment_count = CrossEnrollment.query.count()
+        petition_requests_count = PetitionRequest.query.count()
+        shifting_applications_count = ShiftingApplication.query.count()
+        overload_applications_count = OverloadApplication.query.count()
+        tutorial_requests_count = TutorialRequest.query.count()
+
+        # Prepare a dictionary to store counts for each type of service
+        services_count = {
+            "AddSubjects": addsubject_count,
+            "ChangeSubject": changesubjects_count,
+            "ManualEnrollment": manual_enrollments_count,
+            "CertificationRequest": certification_request_count,
+            "GradeEntry": grade_entry_count,
+            "CrossEnrollment": cross_enrollment_count,
+            "PetitionRequest": petition_requests_count,
+            "ShiftingApplication": shifting_applications_count,
+            "OverloadApplication": overload_applications_count,
+            "TutorialRequest": tutorial_requests_count
+        }
+
+        # Print the services counts for debugging
+        print("Services Counts:", services_count)
+
+        # Return the dictionary of service counts
+        return services_count
+    
+    except Exception as e:
+        # Handle exceptions appropriately
+        print(f"Error: {e}")
+        return {'error': 'Internal Server Error'}
 
 
 

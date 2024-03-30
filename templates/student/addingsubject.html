@@ -236,28 +236,28 @@
         enctype="multipart/form-data"
       >
         <div class="row mb-5">
-          <label for="Name" class="col-sm-2 col-form-label">Sender Name</label>
+          <label for="paymentname" class="col-sm-2 col-form-label">Sender Name</label>
           <div class="col-sm-8">
             <input
               type="text"
               class="form-control"
-              id="Name"
-              name="Name"
+              id="paymentname"
+              name="paymentname"
               required
             />
           </div>
         </div>
 
         <div class="row mb-5">
-          <label for="MobileNumber" class="col-sm-2 col-form-label"
+          <label for="mobileno" class="col-sm-2 col-form-label"
             >Contact Number</label
           >
           <div class="col-sm-8">
             <input
               type="text"
               class="form-control"
-              name="MobileNumber"
-              id="MobileNumber"
+              name="mobileno"
+              id="mobileno"
               required="required"
               maxlength="11"
               pattern="\d{11}"
@@ -300,7 +300,6 @@
     </div>
   </div>
 </div>
-
 <!-- REVIEW TRANSACTIONS -->
 <div class="form-step">
   <div class="data data1">
@@ -418,6 +417,7 @@
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.3/dist/JsBarcode.all.min.js"></script>
 
 <script>
   // this is for testing purposes
@@ -523,8 +523,8 @@
 
   function showResponse() {
     var reviewSubjectList = document.getElementById("reviewSubjectList");
-    var senderName = document.getElementById("Name").value;
-    var mobileNumber = document.getElementById("MobileNumber").value;
+    var senderName = document.getElementById("paymentname").value;
+    var mobileNumber = document.getElementById("mobileno").value;
     var proofOfPaymentInput = document.getElementById("paymentScreenshot");
     var proofOfPaymentFileName = proofOfPaymentInput.value.split("\\").pop();
     var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
@@ -634,6 +634,8 @@
       var tableHeader = document.createElement("thead");
       var headerRow = document.createElement("tr");
       headerRow.innerHTML = `<th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Subject</th>
+      <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Subject Code</th>
+      <th class="lg:w-2/12 md:w-4/12 mt-4 font-bold text-c1">Units</th>
                            <th class="lg:w-3/12 md:w-6/12 mt-4 font-bold text-c1">Grade</th>`;
       tableHeader.appendChild(headerRow);
       subjectsTable.appendChild(tableHeader);
@@ -643,6 +645,8 @@
         var gradeDisplay = isGPAZero ? "0.00" : subject.Grade;
         var row = document.createElement("tr");
         row.innerHTML = `<td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${subject.Subject}</td>
+        <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Code}</td>
+        <td class="lg:w-4/12 md:w-4/12 mt-4 border-b border-gray-300 py-2">${subject.Units}</td>
         <td class="lg:w-3/12 md:w-6/12 mt-4 border-b border-gray-300 py-2">${gradeDisplay}</td>`;
         tableBody.appendChild(row);
       });
@@ -658,7 +662,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     fetchSubjectsGrade();
   });
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // last entry of it dont have gpa and grades in it
   //   function updateSubjectsContent(data) {
   //   var subjectsContainer = document.getElementById("subjectsContainer");
@@ -851,5 +855,62 @@
   // document.addEventListener("DOMContentLoaded", function () {
   //   fetchSubjectsGrade();
   // });
+</script>
+<script>
+  // FETCHING STUDENT DETAILS
+  function fetchPaymentDetails() {
+    fetch("/api/v1/student/student-details")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Call a function to update the HTML content with the fetched data
+        displayPaymentDetails(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
+  }
+
+  function displayPaymentDetails(data) {
+    // Concatenate the first name, middle name, and last name to form the full name
+    const fullName = `${data.FirstName} ${
+      data.MiddleName ? data.MiddleName + " " : ""
+    }${data.LastName}`;
+
+    // Select the Sender Name input and set the value to the full name
+    document.getElementById("paymentname").value = fullName;
+
+    // Select the StudentNumber and set the value to data.StudentNumber
+    document.getElementById("StudentNumber").value = data.StudentNumber;
+    // Select the Contact Number and set the value to data.MobileNumber
+    document.getElementById("mobileno").value = data.MobileNumber;
+  }
+
+  // Fetch student details when the document is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchPaymentDetails();
+  });
+</script>
+<script>
+  function generateAndDisplayBarcode() {
+  // Assuming you have a payment ID or similar unique identifier for the payment
+  var paymentId = "1234567890"; // This should be dynamically generated or retrieved from your back-end
+
+  JsBarcode("#barcode", paymentId, {
+    format: "CODE128",
+    lineColor: "#000",
+    width: 2,
+    height: 40,
+    displayValue: true,
+  });
+
+  // Optionally, show the barcode section if hidden
+  document.getElementById('barcodeDisplay').style.display = 'block';
+}
+
 </script>
 {% endblock content %}

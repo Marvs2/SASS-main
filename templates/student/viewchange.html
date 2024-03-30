@@ -1,134 +1,169 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-</script>
-  <style>
+<style>
     /* Add DataTables styles */
     table {
-        width: 60%;
-        border: 1px;
+        width: 100%;
+        border: 1px solid #ddd;
         margin-top: 20px;
     }
 
     th, td {
-        padding: 15px;
+        padding: 10px;
         text-align: left;
         border-bottom: 1px solid #ddd;
     }
 </style>
 
 <!-- DataTable HTML -->
-<h1>Subject Data</h1>
+<h1>Change Subject Data</h1>
 
-<table id="addSubjectsTable" class="table table-bordered">
-  <thead>
-    <tr>
-      <th>Subject ID</th>
-      <th>Student Number</th>
-      <th>Name</th>
-      <th>enrollment_type</th>
-      <th>created at</th>
-      <th>Enrollment Type</th>
-      <th>File</th>
-      <th>User Responsible</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for changesubjects in changesubjects_list %}
-    <tr>
-      <td>{{ changesubjects.ChangeSubjectId }}</td>
-      <td>{{ changesubjects.StudentNumber }}</td>
-      <td>{{ changesubjects.Name }}</td>
-      <td>{{ changesubjects.EnrollmentType }}</td>
-      <td>{{ changesubjects.created_at }}</td>
-      <td>
-        {% if changesubjects.ace_form_data %}
-        <a href="{{ url_for('get_change_file', ChangeSubjectId=changesubjects.ChangeSubjectId) }}" class="btn btn-success" download>{{ changesubjects.AceFormfilename }}</a>
-        {% else %}
-        <span class="badge badge-warning">No File</span>
-        {% endif %}
-      </td>
-      <td>{{ changesubjects.UserResponsible }}</td>
-      <td>{{ changesubjects.Status }}</td>
-      <td>{{ changesubjects.StudentId }}</td>
-      <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ changesubjects.ChangeSubjectId }}', '{{ changesubjects.Status }}')">View Status</button>
-      </td>
-    </tr>
-
-    <!-- Modal -->
-    <div class="modal fade" id="StatusModal{{ changesubjects.ChangeSubjectId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="StatusModalLabel">Status for Subject ID: {{ changesubjects.ChangeSubjectId }}</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-              <!-- Inside the modal body -->
-              <div class="modal-body" id="StatusModalBody{{ changesubjects.ChangeSubjectId }}">
-                  <!-- Status-related information will be populated here -->
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              </div>
-          </div>
-      </div>
-    </div>
-
-
-    {% endfor %}
-  </tbody>
+<table id="changeSubjectsTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Change Subject ID</th>
+            <th>Student ID</th>
+            <th>Faculty ID</th>
+            <th>Faculty Role</th>
+            <th>From Subject</th>
+            <th>To Subject</th>
+            <th>Service Details</th>
+            <th>Sender Name</th>
+            <th>Sender Contact No</th>
+            <th>Status</th>
+            <th>Remarks</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for change in changesubjects_list %}
+        <tr>
+            <td>{{ change.ChangeSubjectId }}</td>
+            <td>{{ change.StudentId }}</td>
+            <td>{{ change.FacultyId }}</td>
+            <td>{{ change.FacultyRole }}</td>
+            <td>{{ change.FromSubject }}</td>
+            <td>{{ change.ToSubject }}</td>
+            <td>{{ change.ServiceDetails }}</td>
+            <td>{{ change.SenderName }}</td>
+            <td>{{ change.SenderContactNo }}</td>
+            <td>{{ change.Status }}</td>
+            <td>{{ change.Remarks }}</td>
+            <td>
+                <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ change.ChangeSubjectId }}', '{{ change.Status }}')">View Status</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
+
+<!-- Modal -->
+{% for change in changesubjects_list %}
+<div class="modal fade" id="StatusModal{{ change.ChangeSubjectId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="StatusModalLabel">Status for Change Subject ID: {{ change.ChangeSubjectId }}</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="StatusModalBody{{ change.ChangeSubjectId }}">
+                <!-- Status-related information will be populated here -->
+                <form id="paymentForm{{ change.ChangeSubjectId }}" data-changesubjectid="{{ change.ChangeSubjectId }}">
+                    <div class="form-group">
+                        <label for="proofOfPaymentFile">Proof of Payment:</label>
+                        <input type="file" class="form-control-file" id="proofOfPaymentFile{{ change.ChangeSubjectId }}" name="proofOfPayment" accept=".pdf,.doc,.docx,.jpg,.png">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="uploadProofOfPayment({{ change.ChangeSubjectId }})">Upload Proof</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
 <!-- Include DataTables script -->
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#changeSubjectsTable').DataTable();
+    });
+
+    function checkStatusAndShowModal(ChangeSubjectId, Status) {
+        let message = '';
+
+        switch (Status) {
+            case 'Sent':
+                message = "Your item has been sent! Wait to be processed";
+                break;
+            case 'pending':
+                message = "Your item is pending.";
+                break;
+            case 'processing':
+                message = "Your item is being processed.";
+                break;
+            case 'approved':
+                message = "Your item has been approved!";
+                break;
+            case 'finish':
+                message = "Your item has been finished.";
+                break;
+            case 'rejected':
+                message = "Unfortunately, your item has been rejected.";
+                break;
+            default:
+                message = "Status not recognized.";
+                break;
+        }
+
+        // Set the Status message in the modal body based on the specific modal's ID
+        document.getElementById('StatusModalBody' + ChangeSubjectId).innerHTML = `<p>Status for Change Subject ID ${ChangeSubjectId}: ${message}</p>`;
+
+        // Display the modal
+        $('#StatusModal' + ChangeSubjectId).modal('show'); // Assuming you're using Bootstrap for modals
+    }
+
+    // Function to handle form submission
+    function uploadProofOfPayment(ChangeSubjectId) {
+        // Get the form and file input fields for the specific modal
+        var form = document.getElementById('paymentForm' + ChangeSubjectId);
+        var fileInput = document.getElementById('proofOfPaymentFile' + ChangeSubjectId);
+
+        // Get the file from the file input
+        var file = fileInput.files[0];
+
+        // Create a FormData object and append the file to it
+        var formData = new FormData();
+        formData.append('proofOfPayment', file);
+
+        // AJAX POST request to upload the file
+        $.ajax({
+            url: '/upload_proof_of_payment',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                // Handle success response
+                console.log('File uploaded successfully:', response);
+                // Close the modal after successful upload
+                $('#StatusModal' + ChangeSubjectId).modal('hide');
+            },
+            error: function(xhr, status, error) {
+                // Handle error response
+                console.error('Error uploading file:', error);
+            }
+        });
+    }
 </script>
 
-  <!-- DataTable initialization script -->
-  <script>
-    $(document).ready(function() {
-      $('#addSubjectsTable').DataTable();
-    });
-    function checkStatusAndShowModal(ChangeSubjectId, Status) {
-    let message = '';
-    
-    switch (Status) {
-        case 'Sent':
-            message = "Your item has been sent! Wait to be processed";
-            break;
-        case 'pending':
-            message = "Your item is pending.";
-            break;
-        case 'processing':
-            message = "Your item is being processed.";
-            break;
-        case 'approved':
-            message = "Your item has been approved!";
-            break;
-        case 'finish':
-            message = "Your item has been finished.";
-            break;
-        case 'rejected':
-            message = "Unfortunately, your item has been rejected.";
-            break;
-        default:
-            message = "Status not recognized.";
-            break;
-    }
-    
-    // Set the Status message in the modal body based on the specific modal's ID
-    document.getElementById('StatusModalBody' + ChangeSubjectId).innerHTML = `<p>Status for Subject ID ${ChangeSubjectId}: ${message}</p>`;
-    
-    // Display the modal
-    $('#StatusModal' + ChangeSubjectId).modal('show'); // Assuming you're using Bootstrap for modals
-}
-
-  </script>
-
 {% endblock %}
-

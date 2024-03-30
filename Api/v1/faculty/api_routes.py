@@ -1,7 +1,7 @@
 # api/api_routes.py
 import base64
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from Api.v1.faculty.utils import get_all_services, get_all_services_counts
+from Api.v1.faculty.utils import faculty_all_services, get_all_services, get_all_services_counts
 from models import Faculty
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
@@ -204,3 +204,8 @@ def all_services():
     status_counts_list = get_all_services_counts()
 
     return jsonify(success=True, message="All faculty services data retrieved successfully.", data=status_counts_list)
+
+@faculty_api.route('/services', methods=['GET'])
+def services():
+    all_services = faculty_all_services()
+    return jsonify(success=True, services=all_services)

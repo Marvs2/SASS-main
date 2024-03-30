@@ -1,6 +1,6 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  failingradeperbatch, get_incomplete_subjects, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getFirstSemSubjectsGrade, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
+from Api.v1.student.utils import  failingradeperbatch, get_all_services, get_incomplete_subjects, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getFirstSemSubjectsGrade, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
@@ -715,7 +715,15 @@ def student_history_services(student_id):
     else:
         return jsonify(error="No data available"), 404
 
-
+@student_api.route('/services', methods=['GET'])
+def services():
+    student = getCurrentUser()
+    if student:
+        all_services = get_all_services()
+        return jsonify(success=True, services=all_services)
+    else:
+        return render_template('404.html'), 404
+    
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):
     FacultyRole = 'Academic Head'

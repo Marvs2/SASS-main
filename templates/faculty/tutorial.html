@@ -178,6 +178,82 @@
     </div>
   </div>
 </div>
+<!-- Approved Tutorial Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="approvedTutorialTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Approved Tutorial Requests</h3>
+      </div>
+      <table id="approvedTutorialSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tutorial_request, student in approved_tutorial_data %}
+            <tr>
+              <td>{{ tutorial_request.TutorialRequestId }}</td>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ tutorial_request.Subject }}</td>
+              <td>{{ tutorial_request.Status }}</td>
+              <td>
+                <button onclick="rejectTutorialRequest('{{ tutorial_request.TutorialRequestId }}')">Reject</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Tutorial Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="pendingTutorialTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Pending Tutorial Requests</h3>
+      </div>
+      <table id="pendingTutorialSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tutorial_request, student in pending_tutorial_data %}
+            <tr>
+              <td>{{ tutorial_request.TutorialRequestId }}</td>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ tutorial_request.Subject }}</td>
+              <td>{{ tutorial_request.Status }}</td>
+              <td>
+                <button onclick="approveTutorialRequest('{{ tutorial_request.TutorialRequestId }}')">Approve</button>
+                <button onclick="rejectTutorialRequest('{{ tutorial_request.TutorialRequestId }}')">Reject</button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <script>
 $(document).ready(function () {
@@ -293,5 +369,29 @@ fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
   }
 </script>
 <!-- Remember to implement or adapt the modal content and JavaScript functionality for editing and deleting tutorials, similar to what you have for certification requests. -->
+<!--This is the table query for Approved and Pending-->
+<!-- <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Initialize DataTable for the approved tutorial requests table
+    $('#approvedTutorialSubject').DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      scrollX: true, // Enable horizontal scrolling if needed
+      // Add any other options or customization as needed
+    });
+
+    // Initialize DataTable for the pending tutorial requests table
+    $('#pendingTutorialSubject').DataTable({
+      paging: true,
+      searching: true,
+      ordering: true,
+      info: true,
+      scrollX: true, // Enable horizontal scrolling if needed
+      // Add any other options or customization as needed
+    });
+  });
+</script> -->
 
 {% endblock %}

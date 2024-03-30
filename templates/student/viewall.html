@@ -139,6 +139,7 @@ student_id=changesubjects.StudentId) }}"
 							<td id="Status">{{ changesubjects.Status }}</td>
 							<td>
 								<button type="button" title="View Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#viewChangeModal"></button>
+                                <button type="button" title="Edit Info" class="btn btn-primary fa-solid fa-eye edit_btn" data-toggle="modal" data-target="#paymentUploadModal" data-change-id="{{ changesubjects.ChangeSubjectId }}"></button>
 								<button type="button" title="Delete Info" class="btn btn-danger fa-solid fa-trash delete_btn" data-toggle="modal" data-target="#deleteModal"></button>						
 							</td>
 						</tr>	
@@ -725,6 +726,35 @@ student_id=manual_enrollments.StudentId) }}"
 	</div>
   </div>
 
+  <!-- Payment Upload Modal -->
+<div class="modal fade" id="paymentUploadModal" tabindex="-1" aria-labelledby="paymentUploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="paymentUploadModalLabel">Upload Payment Proof</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <!-- Form for Uploading Payment Proof -->
+          <form id="paymentUploadForm">
+            <div class="form-group">
+              <label for="paymentProofFile">Payment Proof:</label>
+              <input type="file" class="form-control-file" id="paymentProofFile" name="paymentProof">
+            </div>
+            <input type="hidden" id="changeSubjectIdForUpload" name="changeSubjectId">
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" id="uploadPaymentProofBtn">Upload</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<!---------------------------------------------------------------------->
   <!------------------------------------------------- CORRECTION OF GRADE ENTRY VIEW MODAL ---------------------------------------->
   <div class="modal fade" id="viewCorrectionModal" tabindex="-1" role="dialog" aria-labelledby="viewCorrectionModal" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
@@ -1737,4 +1767,31 @@ $(document).ready(function () {
       proofOfPaymentLink.target = '_blank';
 	  
 </script>
+<script>
+$('#uploadPaymentProofBtn').on('click', function() {
+    var formData = new FormData();
+    formData.append('proofOfPayment', $('#paymentProofFile').prop('files')[0]);
+    formData.append('changeSubjectId', $('#changeSubjectIdForUpload').val()); // Ensure this ID is being correctly populated
+
+    // AJAX call to upload the file
+    $.ajax({
+        url: '/upload_proof_of_payment', // Your Flask route
+        type: 'POST',
+        data: formData,
+        contentType: false,
+        processData: false,
+        success: function(response) {
+            // Handle success
+            console.log('Upload successful:', response);
+            $('#paymentUploadModal').modal('hide');
+        },
+        error: function(error) {
+            // Handle error
+            console.error('Upload failed:', error);
+        }
+    });
+});
+
+    </script>
+    
 {% endblock %}

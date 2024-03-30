@@ -25,6 +25,8 @@
         </thead>
         <tbody>
           {% for changesubjects, student in combined_data %}
+          {% if changesubjects.Status not
+            in ['Rejected', 'Approved'] %}
           <tr
             data-change-name="{{ student.FirstName }} {{ student.LastName }}"
             data-change-student-number="{{ student.StudentNumber }}"
@@ -51,14 +53,13 @@
               ></button>
             </td>
           </tr>
-          {% endfor %}
+          {% endif %}{% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 </div>
 
-<!-- Status Edit Modal -->
 <!-- Include the modal content here... -->
 <!-- Status Edit Modal -->
 <div
@@ -194,6 +195,79 @@
     </div>
   </div>
 </div>
+<!-- Approved Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="approvedTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Approved Requests</h3>
+      </div>
+      <table id="approvedSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for change_subject, student in approved_change_data %}
+          {% if change_subject.Status not in ['Rejected', 'pending'] %}
+            <tr>
+              <td>{{ change_subject.ChangeSubjectId }}</td>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ change_subject.FromSubject }}{{ change_subject.ToSubject }}</td>
+              <td>{{ change_subject.Status }}</td>
+              <td>
+              </td>
+            </tr>
+          {% endif %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Requests Table -->
+<div class="form-step form-step-active">
+  <div class="data data1" id="pendingTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Denied Requests</h3>
+      </div>
+      <table id="pendingSubject" class="table table-bordered table-condensed display">
+        <!-- Table Headers -->
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Student Name</th>
+            <th>Subject</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for change_subject, student in pending_change_data %}
+          {% if change_subject.Status not
+            in ['Approved', 'pending'] %}
+            <tr>
+              <td>{{ change_subject.ChangeSubjectId }}</td>
+              <td>{{ student.StudentNumber }}</td>
+              <td>{{ student.FirstName }} {{ student.LastName }}</td>
+              <td>{{ change_subject.FromSubject }}{{ change_subject.ToSubject }}</td>
+              <td>{{ change_subject.Status }}</td>
+            </tr>
+            {% endif %}{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <script>
   $(document).ready(function () {
@@ -297,6 +371,61 @@
       .catch((error) => {
         console.error("Error:", error);
       });
+  }
+</script>
+<script>
+  // Function to handle approval of change requests
+  function approveRequest(applicationNumber) {
+    // Perform an AJAX request to approve the request
+    // You can customize this part based on your backend implementation
+    // For example, you can use fetch API or jQuery's AJAX methods
+    // Here, we're assuming a hypothetical function named approveChangeRequest in your backend
+    fetch(`/faculty/approve_change_request?application_number=${applicationNumber}`, {
+      method: 'POST',
+      // Add any required headers or data here
+    })
+    .then(response => {
+      if (response.ok) {
+        // Request successfully processed, you may want to update the UI accordingly
+        alert('Request approved successfully.');
+        // You can refresh the page or update the table row dynamically
+        // For example, remove the row from the pending requests table
+        document.getElementById(`pendingRow_${applicationNumber}`).remove();
+      } else {
+        // Handle errors or display error messages
+        alert('Failed to approve request. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error approving request:', error);
+      alert('An error occurred while processing your request. Please try again later.');
+    });
+  }
+
+  // Function to handle rejection of change requests
+  function rejectRequest(applicationNumber) {
+    // Perform an AJAX request to reject the request
+    // Similar to the approveRequest function, but with different endpoint or parameters
+    fetch(`/faculty/reject_change_request?application_number=${applicationNumber}`, {
+      method: 'POST',
+      // Add any required headers or data here
+    })
+    .then(response => {
+      if (response.ok) {
+        // Request successfully processed, you may want to update the UI accordingly
+        alert('Request rejected successfully.');
+        // You can refresh the page or update the table row dynamically
+        // For example, remove the row from the pending requests table
+        document.getElementById(`pendingRow_${applicationNumber}`).remove();
+      } else {
+        // Handle errors or display error messages
+        alert('Failed to reject request. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error rejecting request:', error);
+      alert('An error occurred while processing your request. Please try again later.');
+    });
   }
 </script>
 

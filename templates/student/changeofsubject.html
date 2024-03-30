@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <!-- SHOW OPTION FOR ADDING OF SUBJECTS  -->
+  <!-- SHOW OPTION FOR CHANGE OF SUBJECTS  -->
 
   <div class="form-step">
     <div class="data data1"  id="reviewHeading">
@@ -102,9 +102,9 @@
           <!-- Dropdown for Selecting Subjects -->
             <select id="selectedSubjectsDropdown" title="select" class="form-control" onchange="handleDropdownChange(this);">
                 <option value="" selected disabled>Select a Subject</option>
-                {% for selections in selection_list %}
-                <option value="{{ selections.SubjectCode }}">
-                    {{ selections.SubjectCode }} - {{ selections.Name }}
+                {% for subject in subject_list %}
+                <option value="{{ subject.SubjectCode }}">
+                    {{ subject.SubjectCode }} - {{ subject.Name }}
                 </option>
                 {% endfor %}
             </select>
@@ -120,37 +120,36 @@
           <!-- Table for Displaying Subjects to Select -->
           <table id="selectedSubjectsTable" class="table table-bordered table-condensed">
             <thead>
-              <tr>
-                <th></th>
-                <th>Subject Code</th>
-                <th>Subject Name</th>
-                <th>Description</th>
-                <th>Units</th>
-              </tr>
+                <tr>
+                    <th></th>
+                    <th>Subject Code</th>
+                    <th>Subject Name</th>
+                    <th>Description</th>
+                    <th>Units</th>
+                </tr>
             </thead>
             <tbody>
                 {% for subject in subject_list %}
                 <tr
-                data-subject-code="{{ subject.SubjectCode }}"
-                data-subject-description="{{ subject.Name }}"
-                data-Description="{{ subject.Description }}"
-                data-Units="{{ subject.Units }}"
-                data-IsNSTP="{{ subject.IsNSTP }}">
-                  <td>
-                    <div class="custom-control custom-checkbox">
-                      <input type="checkbox" name="checkbox" title="checkbox" class="custom-control-input selections-checkbox" id="checkbox{{ subject_list.SubjectId }}" onclick="handleCheckboxClick(this);"/>
-
-                      <label class="custom-control-label" for="checkbox{{ subject_list.SubjectId }}"></label>
-                    </div>
-                  </td>
-                  <td>{{ subject.SubjectCode }}</td>
-                  <td>{{ subject.Name }}</td>
-                  <td>{{ subject.Description }}</td>
-                  <td>{{ subject.Units }}</td>
+                    data-subject-code="{{ subject.SubjectCode }}"
+                    data-subject-description="{{ subject.Name }}"
+                    data-Description="{{ subject.Description }}"
+                    data-Units="{{ subject.Units }}"
+                    data-IsNSTP="{{ subject.IsNSTP }}">
+                    <td>
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" name="checkbox" title="checkbox" class="custom-control-input selections-checkbox" id="checkbox{{ subject.SubjectId }}" onclick="handleCheckboxClick(this);"/>
+                            <label class="custom-control-label" for="checkbox{{ subject.SubjectId }}"></label>
+                        </div>
+                    </td>
+                    <td>{{ subject.SubjectCode }}</td>
+                    <td>{{ subject.Name }}</td>
+                    <td>{{ subject.Description }}</td>
+                    <td>{{ subject.Units }}</td>
                 </tr>
-              {% endfor %}
+                {% endfor %}
             </tbody>
-          </table>
+        </table>        
 
           <div class="d-flex justify-content-end mt-3">
             <button type="button" class="btn btn-primary btn-prev">Previous</button>
@@ -226,15 +225,15 @@
       <div class="row mb-5">
         <label for="reviewSubjectList" class="col-sm-2 col-form-label">From</label>
         <div class="col-sm-8">
-        <span id="reviewSubjectList" class="form-control"></span>
-      </div>
+          <span id="reviewSubjectList" class="form-control"></span>
+        </div>
       </div>
 
       <div class="row mb-5">
         <label for="toSubject" class="col-sm-2 col-form-label">To</label>
         <div class="col-sm-8">
-        <span id="toSubject" class="form-control"></span>
-      </div>
+          <span id="toSubject" class="form-control"></span>
+        </div>
       </div>
 
       <div class="row mb-5">
@@ -274,206 +273,227 @@
   </div>
 </div>
 
-
 <script>
-    var selectedSubjectIds = [];
+  var selectedSubjectIds = [];
 
-    document.addEventListener('DOMContentLoaded', function () {
-        function handleCheckboxClick(checkbox) {
-            updateCheckboxState();
-            handleFromSubjectDisplay();
-            handleToSubjectDropdown();
-        }
-
-        var checkboxes = document.getElementsByClassName('selections-checkbox');
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].addEventListener('click', function () {
-                handleCheckboxClick(this);
-            });
-        }
-
-        function updateCheckboxState() {
-            var checkboxes = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
-            var totalUnits = 0;
-            checkboxes.forEach(function (checkbox) {
-                var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
-                totalUnits += units;
-            });
-
-            document.querySelectorAll('#selectedSubjectsTable .selections-checkbox').forEach(function (checkbox) {
-                var units = parseInt(checkbox.closest('tr').getAttribute('data-Units'));
-                if (!checkbox.checked && (totalUnits + units) > 6) {
-                    checkbox.disabled = true;
-                } else {
-                    checkbox.disabled = false;
-                }
-            });
-        }
-
-        function handleFromSubjectDisplay() {
-            // Update the "From" subjects text based on selected checkboxes
-            var fromSubjects = [];
-            document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
-                var tr = checkbox.closest('tr');
-                var subjectCode = tr.getAttribute('data-subject-code');
-                var subjectName = tr.getAttribute('data-subject-description');
-                fromSubjects.push(`${subjectCode} - ${subjectName}`);
-            });
-            document.getElementById('reviewSubjectList').textContent = fromSubjects.join(', ');
-            document.getElementById('fromSubjectsHidden').value = fromSubjects.join(','); // Update hidden field
-        }
-
-        function handleToSubjectDropdown() {
-            var toSubjectDropdown = document.getElementById('selectedSubjectsDropdown');
-            var selectedSubjects = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
-            var options = toSubjectDropdown.options;
-
-            // Reset previous selections
-            for (var i = 1; i < options.length; i++) {
-                options[i].disabled = false;
-            }
-
-            // Disable options that are already selected
-            selectedSubjects.forEach(function (checkbox) {
-                var subjectCode = checkbox.closest('tr').getAttribute('data-subject-code');
-                for (var i = 1; i < options.length; i++) {
-                    if (options[i].value === subjectCode) {
-                        options[i].disabled = true;
-                    }
-                }
-            });
-        }
-
-        updateCheckboxState();
-    });
-
+  document.addEventListener('DOMContentLoaded', function () {
     function handleCheckboxClick(checkbox) {
-        var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
-        var reviewHeading = document.getElementById('reviewHeading');
-        var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
-        var tr = checkbox.closest('tr');
+    var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+    var reviewHeading = document.getElementById('reviewHeading');
+    var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+    var tr = checkbox.closest('tr');
 
-        if (checkbox.checked) {
-            var clonedRow = tr.cloneNode(true);
-            clonedRow.querySelector('input[type="checkbox"]').onclick = function () {
-                handleCheckboxClick(this);
-            };
-            reviewTableBody.appendChild(clonedRow);
-            reviewSubjectsTable.style.display = 'table';
-            tr.style.display = 'none';
-
-            reviewHeading.style.display = 'block';
-
-            var subjectId = checkbox.id.replace('checkbox', '');
-            var subjectCode = tr.getAttribute('data-subject-code');
-            var subjectName = tr.getAttribute('data-subject-description');
-            selectedSubjectIds.push(subjectId);
-            document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
-
-            var reviewSubjectList = document.getElementById('reviewSubjectList');
-            var listItem = document.createElement('li');
-            listItem.textContent = `${subjectCode} - ${subjectName}`;
-            reviewSubjectList.appendChild(listItem);
-        } else {
-            Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
-                if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
-                    reviewTableBody.removeChild(row);
-                }
-            });
-
-            tr.style.display = '';
-
-            var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
-            if (indexToRemove !== -1) {
-                selectedSubjectIds.splice(indexToRemove, 1);
-                document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
-            }
-
-            var reviewSubjectList = document.getElementById('reviewSubjectList');
-            reviewSubjectList.removeChild(reviewSubjectList.lastChild);
-        }
-
-        updateCheckboxState();
-
-        if (reviewTableBody.getElementsByTagName('tr').length === 0) {
-            reviewSubjectsTable.style.display = 'none';
-            reviewHeading.style.display = 'none';
-        }
-
-        handleFromSubjectDisplay();
-        handleToSubjectDropdown();
-    }
-
-    function toggleDropdownVisibility() {
-        var checkboxes = document.querySelectorAll('#addingSubject .selections-checkbox:checked');
-        var selectedSubjectsDropdown = document.getElementById('selectedSubjectsDropdown');
-        var selectHeading = document.getElementById('selectHeading');
-
-        if (checkboxes.length > 0) {
-            selectHeading.style.display = 'block';
-        } else {
-            selectHeading.style.display = 'none';
-        }
-    }
-
-    var checkboxesAddingSubject = document.querySelectorAll('#addingSubject .selections-checkbox');
-    for (var i = 0; i < checkboxesAddingSubject.length; i++) {
-        checkboxesAddingSubject[i].addEventListener('click', function () {
+    if (checkbox.checked) {
+        var clonedRow = tr.cloneNode(true);
+        clonedRow.querySelector('input[type="checkbox"]').onclick = function () {
             handleCheckboxClick(this);
-            toggleDropdownVisibility();
-        });
-    }
+        };
+        reviewTableBody.appendChild(clonedRow);
+        reviewSubjectsTable.style.display = 'table';
+        tr.style.display = 'none';
 
-    function showResponse() {
+        reviewHeading.style.display = 'block';
+
+        var subjectId = checkbox.id.replace('checkbox', ''); // Use the ID attribute directly
+        var subjectCode = tr.getAttribute('data-subject-code');
+        var subjectName = tr.getAttribute('data-subject-description');
+        selectedSubjectIds.push(subjectId);
+        document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+
         var reviewSubjectList = document.getElementById('reviewSubjectList');
-        var senderName = document.getElementById('name').value;
-        var mobileNumber = document.getElementById('MobileNumber').value;
-        var proofOfPaymentInput = document.getElementById('paymentScreenshot');
-        var proofOfPaymentFileName = proofOfPaymentInput.value.split('\\').pop();
-        var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
+        var listItem = document.createElement('li');
+        listItem.textContent = `${subjectCode} - ${subjectName}`;
+        reviewSubjectList.appendChild(listItem);
+    } else {
+        Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+            if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+                reviewTableBody.removeChild(row);
+            }
+        });
 
-        document.getElementById('SenderName').textContent = senderName;
-        document.getElementById('SenderContactNo').textContent = mobileNumber;
-        document.getElementById('SenderNameHidden').value = senderName;
-        document.getElementById('SenderContactNoHidden').value = mobileNumber;
+        tr.style.display = '';
 
-        if (proofOfPaymentFilePath) {
-            var proofOfPaymentLink = document.createElement('a');
-            proofOfPaymentLink.textContent = proofOfPaymentFileName;
-            proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
-            proofOfPaymentLink.target = '_blank';
-
-            document.getElementById('PaymentFile').innerHTML = '';
-            document.getElementById('PaymentFile').appendChild(proofOfPaymentLink);
-            document.getElementById('PaymentFileHidden').value = proofOfPaymentFileName;
+        var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
+        if (indexToRemove !== -1) {
+            selectedSubjectIds.splice(indexToRemove, 1);
+            document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
         }
 
-        var selectedSubjects = [];
-        document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
-            var tr = checkbox.closest('tr');
-            var subjectCode = tr.getAttribute('data-subject-code');
-            var subjectName = tr.getAttribute('data-subject-description');
-            selectedSubjects.push(`${subjectCode} - ${subjectName}`);
-        });
-        document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
-
-        reviewSubjectList.innerHTML = '';
-        document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
-            var tr = checkbox.closest('tr');
-            var subjectCode = tr.getAttribute('data-subject-code');
-            var subjectName = tr.getAttribute('data-subject-description');
-            var listItem = document.createElement('li');
-            listItem.textContent = `${subjectCode} - ${subjectName}`;
-
-            reviewSubjectList.appendChild(listItem);
-        });
+        var reviewSubjectList = document.getElementById('reviewSubjectList');
+        reviewSubjectList.removeChild(reviewSubjectList.lastChild);
     }
+}
 
-    function handleDropdownChange(dropdown) {
-        var selectedSubject = dropdown.options[dropdown.selectedIndex].text;
-        document.getElementById('toSubject').textContent = selectedSubject;
-        document.getElementById('toSubjectsHidden').value = selectedSubject; // Update hidden field
-    }
+      var checkboxes = document.getElementsByClassName('selections-checkbox');
+      for (var i = 0; i < checkboxes.length; i++) {
+          checkboxes[i].addEventListener('click', function () {
+              handleCheckboxClick(this);
+          });
+      }
+
+      function updateCheckboxState() {
+          // No need to update checkbox state based on total units
+      }
+
+      function handleFromSubjectDisplay() {
+          // Update the "From" subjects text based on selected checkboxes
+          var fromSubjects = [];
+          document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+              var tr = checkbox.closest('tr');
+              var subjectCode = tr.getAttribute('data-subject-code');
+              var subjectName = tr.getAttribute('data-subject-description');
+              fromSubjects.push(`${subjectCode} - ${subjectName}`);
+          });
+          document.getElementById('reviewSubjectList').textContent = fromSubjects.join(', ');
+          document.getElementById('fromSubjectsHidden').value = fromSubjects.join(','); // Update hidden field
+      }
+
+      function handleToSubjectDropdown() {
+      var toSubjectDropdown = document.getElementById('selectedSubjectsDropdown');
+      var selectedSubjects = document.querySelectorAll('#selectedSubjectsTable .selections-checkbox:checked');
+      var options = toSubjectDropdown.options;
+
+      // Reset previous selections
+      for (var i = 1; i < options.length; i++) {
+          options[i].disabled = false;
+      }
+
+      // Disable options that are already selected
+      selectedSubjects.forEach(function (checkbox) {
+          var subjectCode = checkbox.closest('tr').getAttribute('data-subject-code');
+          for (var i = 1; i < options.length; i++) {
+              if (options[i].value === subjectCode) {
+                  options[i].disabled = true;
+                  // Check if this option is already selected, if so, set it as selected
+                  if (toSubjectDropdown.value === subjectCode) {
+                      toSubjectDropdown.selectedIndex = 0; // Reset to default "Select a Subject" option
+                  }
+              }
+          }
+      });
+  }
+  });
+
+  function handleCheckboxClick(checkbox) {
+      var reviewSubjectsTable = document.getElementById('reviewSubjectsTable');
+      var reviewHeading = document.getElementById('reviewHeading');
+      var reviewTableBody = reviewSubjectsTable.getElementsByTagName('tbody')[0];
+      var tr = checkbox.closest('tr');
+
+      if (checkbox.checked) {
+          var clonedRow = tr.cloneNode(true);
+          clonedRow.querySelector('input[type="checkbox"]').onclick = function () {
+              handleCheckboxClick(this);
+          };
+          reviewTableBody.appendChild(clonedRow);
+          reviewSubjectsTable.style.display = 'table';
+          tr.style.display = 'none';
+
+          reviewHeading.style.display = 'block';
+
+          var subjectId = checkbox.id.replace('checkbox', '');
+          var subjectCode = tr.getAttribute('data-subject-code');
+          var subjectName = tr.getAttribute('data-subject-description');
+          selectedSubjectIds.push(subjectId);
+          document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+
+          var reviewSubjectList = document.getElementById('reviewSubjectList');
+          var listItem = document.createElement('li');
+          listItem.textContent = `${subjectCode} - ${subjectName}`;
+          reviewSubjectList.appendChild(listItem);
+      } else {
+          Array.from(reviewTableBody.getElementsByTagName('tr')).forEach(function (row) {
+              if (row.querySelector('input[type="checkbox"]').id === checkbox.id) {
+                  reviewTableBody.removeChild(row);
+              }
+          });
+
+          tr.style.display = '';
+
+          var indexToRemove = selectedSubjectIds.indexOf(checkbox.id);
+          if (indexToRemove !== -1) {
+              selectedSubjectIds.splice(indexToRemove, 1);
+              document.getElementById('selectedSubjects').value = selectedSubjectIds.join(',');
+          }
+
+          var reviewSubjectList = document.getElementById('reviewSubjectList');
+          reviewSubjectList.removeChild(reviewSubjectList.lastChild);
+      }
+
+      handleFromSubjectDisplay();
+      handleToSubjectDropdown();
+  }
+
+  function toggleDropdownVisibility() {
+      var checkboxes = document.querySelectorAll('#addingSubject .selections-checkbox:checked');
+      var selectedSubjectsDropdown = document.getElementById('selectedSubjectsDropdown');
+      var selectHeading = document.getElementById('selectHeading');
+
+      if (checkboxes.length > 0) {
+          selectHeading.style.display = 'block';
+      } else {
+          selectHeading.style.display = 'none';
+      }
+  }
+
+  var checkboxesAddingSubject = document.querySelectorAll('#addingSubject .selections-checkbox');
+  for (var i = 0; i < checkboxesAddingSubject.length; i++) {
+      checkboxesAddingSubject[i].addEventListener('click', function () {
+          handleCheckboxClick(this);
+          toggleDropdownVisibility();
+      });
+  }
+
+  function showResponse() {
+      var reviewSubjectList = document.getElementById('reviewSubjectList');
+      var senderName = document.getElementById('name').value;
+      var mobileNumber = document.getElementById('MobileNumber').value;
+      var proofOfPaymentInput = document.getElementById('paymentScreenshot');
+      var proofOfPaymentFileName = proofOfPaymentInput.value.split('\\').pop();
+      var proofOfPaymentFilePath = proofOfPaymentInput.files[0];
+
+      document.getElementById('SenderName').textContent = senderName;
+      document.getElementById('SenderContactNo').textContent = mobileNumber;
+      document.getElementById('SenderNameHidden').value = senderName;
+      document.getElementById('SenderContactNoHidden').value = mobileNumber;
+
+      if (proofOfPaymentFilePath) {
+          var proofOfPaymentLink = document.createElement('a');
+          proofOfPaymentLink.textContent = proofOfPaymentFileName;
+          proofOfPaymentLink.href = URL.createObjectURL(proofOfPaymentFilePath);
+          proofOfPaymentLink.target = '_blank';
+
+          document.getElementById('PaymentFile').innerHTML = '';
+          document.getElementById('PaymentFile').appendChild(proofOfPaymentLink);
+          document.getElementById('PaymentFileHidden').value = proofOfPaymentFileName;
+      }
+
+      var selectedSubjects = [];
+      document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox) {
+          var tr = checkbox.closest('tr');
+          var subjectCode = tr.getAttribute('data-subject-code');
+          var subjectName = tr.getAttribute('data-subject-description');
+          selectedSubjects.push(`${subjectCode} - ${subjectName}`);
+      });
+      document.getElementById('selectedSubjects').value = selectedSubjects.join(',');
+
+      reviewSubjectList.innerHTML = '';
+      document.querySelectorAll('#reviewSubjectsTable .selections-checkbox:checked').forEach(function (checkbox, index) {
+          var tr = checkbox.closest('tr');
+          var subjectCode = tr.getAttribute('data-subject-code');
+          var subjectName = tr.getAttribute('data-subject-description');
+          var listItem = document.createElement('li');
+          listItem.textContent = `${subjectCode} - ${subjectName}`;
+
+          reviewSubjectList.appendChild(listItem);
+      });
+  }
+
+  function handleDropdownChange(dropdown) {
+      var selectedSubject = dropdown.options[dropdown.selectedIndex].text;
+      document.getElementById('toSubject').textContent = selectedSubject;
+      document.getElementById('toSubjectsHidden').value = selectedSubject; // Update hidden field
+  }
 </script>
 
 <script>

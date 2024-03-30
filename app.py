@@ -3,7 +3,7 @@ from flask import Flask, abort, render_template, jsonify, redirect, request, fla
 from flask_login import current_user, login_user
 from sqlalchemy import and_, func
 from Api.v1.faculty.utils import get_all_services, get_all_services_counts
-from Api.v1.student.utils import get_student_services
+from Api.v1.student.utils import get_student_requests, get_student_services, get_all_based_on_services
 from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
@@ -187,6 +187,16 @@ def discipline():
     return render_template("/academic/discipline.html")
 
 #========================================= STUDENT SERVICES ====================================================
+# @app.route('/upload-pdf', methods=['POST'])
+# def upload_pdf():
+#     if 'pdfFile' not in request.files:
+#         return jsonify({'error': 'No file uploaded'}), 400
+
+#     pdf_file = request.files['pdfFile']
+#     # Process the PDF file, extract text, and return it
+#     # For simplicity, we're not implementing the PDF processing here
+#     extracted_text = 'Text extracted from PDF'
+#     return jsonify({'text': extracted_text})
 
 #======================================== STUDENT DASHBOARD ====================================================
 @app.route('/student/dashboard') 
@@ -194,6 +204,7 @@ def discipline():
 def student_dashboard():
    # Assuming you have a function to get student services based on their ID
     student_id = session.get('user_id')
+    # Call the function to get the dictionary of all services and the total count
     all_services_list, total_services, pending_count, approved_count, denied_count = get_student_services(student_id)  
   # Unpack the tuple
 
@@ -227,7 +238,89 @@ def student_dashboard():
 
     print(data)
     
-    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data)
+    return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data, student_id=student_id)
+
+@app.route('/student/payment')
+@student_required
+def studentpayment():
+    return render_template('/student/payment.html', student_api_base_url=student_api_base_url)
+
+@app.route('/student/viewall')
+@student_required
+def viewall():
+    user_id = session.get('user_id')
+    student = Student.query.get(user_id)
+    services_data = {}
+
+    if student:
+        # Fetch AddSubjects based on the StudentId foreign key
+        addsubjects = AddSubjects.query.filter_by(StudentId=student.StudentId).all()
+        services_data['addsubjects_list'] = [subject.to_dict() for subject in addsubjects]
+
+        # Fetch ChangeOfSubjects based on the StudentId foreign key
+        changesubjects = ChangeSubject.query.filter_by(StudentId=student.StudentId).all()
+        services_data['changesubjects_list'] = [subject.to_dict() for subject in changesubjects]
+
+        # Fetch ManualEnrollment based on the StudentId foreign key
+        manual_enrollments = ManualEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['manual_enrollments_list'] = [subject.to_dict() for subject in manual_enrollments]
+
+        # Fetch CertificationRequest based on the StudentId foreign key
+        certification_request = CertificationRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['certification_request_list'] = [subject.to_dict() for subject in certification_request]
+
+        # Fetch GradeEntry based on the StudentId foreign key
+        grade_entry = GradeEntry.query.filter_by(StudentId=student.StudentId).all()
+        services_data['grade_entry_list'] = [subject.to_dict() for subject in grade_entry]
+
+        # Fetch CrossEnrollment based on the StudentId foreign key
+        cross_enrollment = CrossEnrollment.query.filter_by(StudentId=student.StudentId).all()
+        services_data['cross_enrollment_list'] = [subject.to_dict() for subject in cross_enrollment]
+
+        # Fetch PetitionRequest based on the StudentId foreign key
+        petition_requests = PetitionRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['petition_requests_list'] = [subject.to_dict() for subject in petition_requests]
+
+        # Fetch ShiftingApplication based on the StudentId foreign key
+        shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
+
+        # Fetch OverloadApplication based on the StudentId foreign key
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+        services_data['overload_applications_list'] = [subject.to_dict() for subject in overload_applications]
+
+        # Fetch TutorialRequest based on the StudentId foreign key
+        tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
+        services_data['tutorial_requests_list'] = [subject.to_dict() for subject in tutorial_requests]
+
+    return render_template('/student/viewall.html', services_data=services_data)
+
+
+
+#file uploading zone ====================================================
+@app.route('/upload_proof_of_payment', methods=['POST'])
+def upload_proof_of_payment():
+    # Get the file and the ChangeSubjectId from the form data
+    file = request.files['proofOfPayment']
+    change_subject_id = request.form.get('changeSubjectId')
+    
+    if file and change_subject_id:
+        change_subject = ChangeSubject.query.filter_by(ChangeSubjectId=change_subject_id).first()
+        if change_subject:
+            # Assuming you want to save files to a directory and store the path in the DB
+            filename = secure_filename(file.filename)
+            save_path = os.path.join('path/to/save', filename)
+            file.save(save_path)
+            
+            # Update the PaymentFile field with the file path or handle as needed
+            change_subject.PaymentFile = save_path  # Adjust based on your requirements
+            db.session.commit()
+            return jsonify(message='File uploaded successfully'), 200
+        else:
+            return jsonify(message='Change subject not found'), 404
+    else:
+        return jsonify(message='No file or change subject ID provided'), 400
+
 
 
 #======================================== STUDENT PROFILE ======================================================
@@ -726,14 +819,16 @@ def studentchange():
         .join(ClassSubject, Subject.SubjectId == ClassSubject.SubjectId)
         .join(StudentClassSubjectGrade, ClassSubject.ClassSubjectId == StudentClassSubjectGrade.ClassSubjectId)
         .join(CourseEnrolled, CourseEnrolled.CourseId == ClassSubject.ClassId)
-        .filter(CourseEnrolled.StudentId == student_id)
+        # .filter(CourseEnrolled.StudentId == student_id)
         .all()
     ) 
 
     # Extracting details of each Subject from the result
     subject_list = [subject.to_dict() for subject in subjects]
 
-    return render_template("/student/changeofsubject.html", selection_list=selection_list, subject_list=subject_list, course=course, student_api_base_url=student_api_base_url)
+    changesubjects = db.session.query(Subject).all()
+
+    return render_template("/student/changeofsubject.html", selection_list=selection_list, subject_list=subject_list, course=course, changesubjects=changesubjects, student_api_base_url=student_api_base_url)
 
 #========================================= CHANGE OF SUBJECT SUBMIT APPLICATION ====================================================
 
@@ -770,7 +865,7 @@ def viewchange():
 
     if student:
         # Fetch AddSubjects based on the StudentId foreign key
-        changesubjects = changesubjects_list.query.filter_by(StudentId=student.StudentId).all()
+        changesubjects = ChangeSubject.query.filter_by(StudentId=student.StudentId).all()
 
         # Convert AddSubjects data to a list of dictionaries
         changesubjects_list = [subject.to_dict() for subject in changesubjects]
@@ -806,8 +901,12 @@ def get_mimetype(file_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        # Note: Changed 'docs' to 'docx' for the correct MIME type
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -905,6 +1004,11 @@ def get_mimetype(completion_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -941,6 +1045,11 @@ def get_mimetype(classrecord_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -979,6 +1088,11 @@ def get_mimetype(affidavit_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -1099,18 +1213,76 @@ def download_student_permit_file(crossenrollment_Id, student_id):
     cross_enrollment = CrossEnrollment.query.filter_by(CrossEnrollmentId=crossenrollment_Id, StudentId=student_id).first()
 
     if cross_enrollment and cross_enrollment.ApplicationLetterdata:
-        download_name = f'cross_enrollment_{crossenrollment_Id}'
+        student_permit_enroll_extension = get_student_permit_enroll_extension(cross_enrollment.PermitCrossEnrollfilename)
+        download_name = f'permit_to_enroll_{crossenrollment_Id}.{student_permit_enroll_extension}'
 
         return send_file(
-            io.BytesIO(cross_enrollment.ApplicationLetterdata),
+            io.BytesIO(cross_enrollment.PermitCrossEnrolldata),
             as_attachment=False,
-            download_name=download_name,
-            mimetype='application/octet-stream'  # Set the default MIME type to binary/octet-stream
+            download_name=download_name,   mimetype=get_mimetype(student_permit_enroll_extension),
         )
     else:
-        abort(404)  # File not found
+        abort(404) # File not found
+
+def get_student_permit_enroll_extension(PermitCrossEnrollfilename):
+    return PermitCrossEnrollfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(student_permit_enroll_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(student_permit_enroll_extension, 'application/octet-stream')
 
 
+
+@app.route('/student/crossenrollment/get_student_permit_to_enroll/<int:CrossEnrollmentId>/<int:student_id>')
+def get_student_permit_to_enroll(CrossEnrollmentId, student_id):
+    return redirect(url_for('download_student_permit_to_enroll', CrossEnrollmentId=CrossEnrollmentId, student_id=student_id))
+
+@app.route('/student/download_student_permit_to_enroll/<int:CrossEnrollmentId>/<int:student_id>')
+@student_required
+def download_student_permit_to_enroll(CrossEnrollmentId, student_id):
+    cross_enrollments = CrossEnrollment.query.filter_by(CrossEnrollmentId=CrossEnrollmentId, StudentId=student_id)
+
+    if cross_enrollments and cross_enrollments.PermitCrossEnrolldata:
+        stud_permit_enroll_extension = get_stud_permit_enroll_extension(cross_enrollments.PermitCrossEnrollfilename)
+        download_name = f'permit_to_enroll_{CrossEnrollmentId}.{stud_permit_enroll_extension}'
+
+        return send_file(
+            io.BytesIO(cross_enrollments.PermitCrossEnrolldata),
+            as_attachment=True,
+            download_name=download_name,
+            mimetype=get_mimetype(stud_permit_enroll_extension),
+        )
+    else:
+        abort(404)
+
+def get_stud_permit_enroll_extension(PermitCrossEnrollfilename):
+    return PermitCrossEnrollfilename.rsplit('.', 1)[1].lower()
+
+def get_mimetype(stud_permit_enroll_extension):
+    mimetypes = {
+        'txt': 'text/plain',
+        'pdf': 'application/pdf',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
+        # Add more file types as needed
+    }
+
+    return mimetypes.get(stud_permit_enroll_extension, 'application/octet-stream')
 #================================== APPLICATION FOR SHIFTING ================================================
 @app.route('/student/shifting')
 @student_required
@@ -1188,6 +1360,11 @@ def get_mimetype(shifting_stud_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -1288,7 +1465,12 @@ def get_mimetype(mefilename_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
     return mimetypes.get(mefilename_extension, 'application/octet-stream')
@@ -1468,6 +1650,11 @@ def get_mimetype(tutorial_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -1580,8 +1767,8 @@ def facultyoverload():
     current_faculty = get_current_faculty_user()
 
     if current_faculty:
-        # Access the related OverloadApplications using the defined relationship
-        overload_application = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        # Access all OverloadApplications without filtering by FacultyId
+        overload_application = OverloadApplication.query.all()
 
         students = []
         for subject in overload_application:
@@ -1590,11 +1777,37 @@ def facultyoverload():
 
         overload_data = zip(overload_application, students)
 
-        return render_template("/faculty/overload.html", overload_data=overload_data)
+        # You may still need the approved_overload part, so keeping it as is
+        approved_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        
+        over_students = []
+        for over_subject in approved_overload:
+            over_student = Student.query.filter_by(StudentId=over_subject.StudentId).first()
+            over_students.append(over_student)
+
+        approved_overload_data = zip(approved_overload, over_students)
+        
+    # For Pending Subjects
+        pending_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_over_students = []
+        for pending_over_subject in pending_overload:
+            pending_over_student = Student.query.filter_by(StudentId=pending_over_subject.StudentId).first()
+            pending_over_students.append(pending_over_student)
+
+        pending_overload_data = zip(pending_overload, pending_over_students)
+        
+        return render_template("/faculty/overload.html", overload_data=overload_data, approved_overload_data=approved_overload_data, pending_overload_data=pending_overload_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
         return redirect(url_for('faculty_portal')) #overload_applications in overload_applications
+
+@app.route('/faculty/actionoverload')
+@faculty_required
+@role_required('faculty')
+def actionoverload():
+    return render_template("/faculty/actionoverload.html")
+
 
 @app.route('/faculty/adds')
 @faculty_required
@@ -1664,7 +1877,25 @@ def facultychange():
 
         combined_data = zip(changesubjects, students)
 
-        return render_template("/faculty/change.html", combined_data=combined_data) 
+        approved_change_subjects = ChangeSubject.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        change_students = []
+        for change_subject in approved_change_subjects:
+            change_student = Student.query.filter_by(StudentId=change_subject.StudentId).first()
+            change_students.append(change_student)
+
+        approved_change_data = zip(approved_change_subjects, change_students)
+        
+    # For Change Pending Subjects
+        pending_change_subjects = ChangeSubject.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_change_students = []
+        for pending_change_subject in pending_change_subjects:
+            pending_change_student = Student.query.filter_by(StudentId=pending_change_subject.StudentId).first()
+            pending_change_students.append(pending_change_student)
+
+        pending_change_data = zip(pending_change_subjects, pending_change_students)
+
+        return render_template("/faculty/change.html", combined_data=combined_data, approved_change_data=approved_change_data, pending_change_data=pending_change_data) 
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1700,9 +1931,6 @@ def change_update_status():
 
 
 # Note: There's no need to duplicate the error handling outside of the try-except block.
-
-
-
 #=======================================================#
 @app.route('/faculty/correction')
 @faculty_required
@@ -1724,7 +1952,25 @@ def facultycorrection():
     
         combined_data = zip(grade_entry, students)
 
-        return render_template("/faculty/correction.html", combined_data=combined_data)
+        approved_correction_subjects = GradeEntry.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        add_correction_students = []
+        for add_correction_subject in approved_correction_subjects:
+            add_correction_student = Student.query.filter_by(StudentId=add_correction_subject.StudentId).first()
+            add_correction_students.append(add_correction_student)
+
+        approved_correction_data = zip(approved_correction_subjects, add_correction_students)
+        
+    # For Pending Subjects
+        pending_correction_subjects = GradeEntry.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_correction_students = []
+        for pending_correction_subject in pending_correction_subjects:
+            pending_correction_student = Student.query.filter_by(StudentId=pending_correction_subject.StudentId).first()
+            pending_correction_students.append(pending_correction_student)
+
+        pending_correction_data = zip(pending_correction_subjects, pending_correction_students)
+
+        return render_template("/faculty/correction.html", combined_data=combined_data, pending_correction_data=pending_correction_data, approved_correction_data=approved_correction_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1743,7 +1989,32 @@ def facultycrossenrollment():
 
         cross_enrollments = CrossEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
 
-        return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments)
+        crossstudents = []
+        for crosssub in cross_enrollments:
+            crosstudent = Student.query.filter_by(StudentId=crosssub.StudentId).first()
+            crossstudents.append(crosstudent)
+
+        combined_cross_data = zip(cross_enrollments, crossstudents)
+
+        approved_cross_subjects = CrossEnrollment.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        add_cross_students = []
+        for cross_subject in approved_cross_subjects:
+            add_cross_student = Student.query.filter_by(StudentId=cross_subject.StudentId).first()
+            add_cross_students.append(add_cross_student)
+
+        approved_cross_data = zip(approved_cross_subjects, add_cross_students)
+        
+    # For Pending Subjects
+        pending_cross_subjects = CrossEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_cross_students = []
+        for pending_cross_subject in pending_cross_subjects:
+            pending_student = Student.query.filter_by(StudentId=pending_cross_subject.StudentId).first()
+            pending_cross_students.append(pending_student)
+
+        pending_cross_data = zip(pending_cross_subjects, pending_cross_students)
+
+        return render_template("/faculty/crossenrollment.html", cross_enrollments=cross_enrollments, combined_cross_data=combined_cross_data, approved_cross_data=approved_cross_data, pending_cross_data=pending_cross_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1760,6 +2031,26 @@ def facultyshifting():
 
     if current_faculty:
         shifting_applications = ShiftingApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        # it dont have a student set on the page
+
+            #     approved_subjects = AddSubjects.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+    #     add_students = []
+    #     for add_subject in approved_subjects:
+    #         add_student = Student.query.filter_by(StudentId=add_subject.StudentId).first()
+    #         add_students.append(add_student)
+
+    #     approved_data = zip(approved_subjects, add_students)
+        
+    # # For Pending Subjects
+    #     pending_subjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+    #     pending_students = []
+    #     for pending_subject in pending_subjects:
+    #         pending_student = Student.query.filter_by(StudentId=pending_subject.StudentId).first()
+    #         pending_students.append(pending_student)
+
+    #     pending_data = zip(pending_subjects, pending_students)
         
         return render_template("/faculty/shifting.html", shifting_applications=shifting_applications)
     else:
@@ -1821,14 +2112,17 @@ def get_mimetype(shifting_form_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
     return mimetypes.get(shifting_form_extension, 'application/octet-stream')
 
-
-
-
+#=======================================================================
 
 #manualenrollment - faculty
 @app.route('/faculty/manualenrollment')
@@ -1836,14 +2130,39 @@ def get_mimetype(shifting_form_extension):
 @role_required('faculty')
 def facultyenrollment():
     session['last_activity'] = datetime.now(timezone.utc) # none
-    # Get the current faculty user
+   # Get the current faculty user
     current_faculty = get_current_faculty_user()
 
     if current_faculty:
-
+        # Access the related ManualEnrollments using the defined relationship
         manual_enrollments = ManualEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
 
-        return render_template("/faculty/enrollment.html", manual_enrollments=manual_enrollments)
+        students = []
+        for enrollmentsubject in manual_enrollments:
+            student = Student.query.filter_by(StudentId=enrollmentsubject.StudentId).first()
+            students.append(student)
+
+        manual_enrollment_data = zip(manual_enrollments, students)
+
+        approved_manual_subjects = ManualEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        
+        add_manual_students = []
+        for add_manual_subject in approved_manual_subjects:
+            add_manual_student = Student.query.filter_by(StudentId=add_manual_subject.StudentId).first()
+            add_manual_students.append(add_manual_student)
+            
+        approved_manual_data = zip(approved_manual_subjects, add_manual_students)
+        
+        # For Pending Subjects
+        pending_manual_subjects = ManualEnrollment.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_manual_students = []
+        for pending_manual_subject in pending_manual_subjects:
+            pending_manual_student = Student.query.filter_by(StudentId=pending_manual_subject.StudentId).first()
+            pending_manual_students.append(pending_manual_student)
+
+        pending_manual_data = zip(pending_manual_subjects, pending_manual_students)
+
+        return render_template("/faculty/enrollment.html", manual_enrollment_data=manual_enrollment_data, approved_manual_data=approved_manual_data, pending_manual_data=pending_manual_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1860,6 +2179,26 @@ def facultypetition():
     if current_faculty:
 
         petition_requests = PetitionRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+            # it dont have a student set on the page
+
+            #     approved_subjects = AddSubjects.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+    #     add_students = []
+    #     for add_subject in approved_subjects:
+    #         add_student = Student.query.filter_by(StudentId=add_subject.StudentId).first()
+    #         add_students.append(add_student)
+
+    #     approved_data = zip(approved_subjects, add_students)
+        
+    # # For Pending Subjects
+    #     pending_subjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+    #     pending_students = []
+    #     for pending_subject in pending_subjects:
+    #         pending_student = Student.query.filter_by(StudentId=pending_subject.StudentId).first()
+    #         pending_students.append(pending_student)
+
+    #     pending_data = zip(pending_subjects, pending_students)
 
         return render_template("/faculty/petition.html", petition_requests=petition_requests)
     else:
@@ -1903,6 +2242,27 @@ def faculty_view_tutorial():
 
     if current_faculty:
         # I dont know where is the code here, but
+
+            # it dont have a student set on the page
+
+            #     approved_subjects = AddSubjects.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+    #     add_students = []
+    #     for add_subject in approved_subjects:
+    #         add_student = Student.query.filter_by(StudentId=add_subject.StudentId).first()
+    #         add_students.append(add_student)
+
+    #     approved_data = zip(approved_subjects, add_students)
+        
+    # # For Pending Subjects
+    #     pending_subjects = AddSubjects.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+    #     pending_students = []
+    #     for pending_subject in pending_subjects:
+    #         pending_student = Student.query.filter_by(StudentId=pending_subject.StudentId).first()
+    #         pending_students.append(pending_student)
+
+    #     pending_data = zip(pending_subjects, pending_students)
+
         return render_template("/faculty/view_tutorial.html")
     else:
         # Handle the case where the current faculty is not found
@@ -1927,7 +2287,25 @@ def facultycertification():
 
         certification_data = zip(certification_request, students)
 
-        return render_template("/faculty/certification.html", certification_data=certification_data)
+        approved_cert_subjects = CertificationRequest.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        certs_students = []
+        for cert_subject in approved_cert_subjects:
+            certify_student = Student.query.filter_by(StudentId=cert_subject.StudentId).first()
+            certs_students.append(certify_student)
+
+        approved_certification_data = zip(approved_cert_subjects, certs_students)
+        
+    # For Pending Subjects
+        pending_cert_subjects = CertificationRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_cert_students = []
+        for pending_cert_subject in pending_cert_subjects:
+            pending_cert_student = Student.query.filter_by(StudentId=pending_cert_subject.StudentId).first()
+            pending_cert_students.append(pending_cert_student)
+
+        pending_certification_data = zip(pending_cert_subjects, pending_cert_students)
+
+        return render_template("/faculty/certification.html", certification_data=certification_data, pending_certification_data=pending_certification_data, approved_certification_data=approved_certification_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1953,7 +2331,25 @@ def facultytutorial():
 
         tutorial_data = zip(tutorial_requests, students)
 
-        return render_template("/faculty/tutorial.html", tutorial_data=tutorial_data)
+        approved_tutorial = TutorialRequest.query.filter_by(FacultyId= current_faculty.FacultyId).all()
+        
+        tutor_students = []
+        for tut_subject in approved_tutorial:
+            tut_student = Student.query.filter_by(StudentId=tut_subject.StudentId).first()
+            tutor_students.append(tut_student)
+
+        approved_tutorial_data = zip(approved_tutorial, tutor_students)
+        
+    # For Pending Tutorial Subjects
+        pending_tutor_subjects = TutorialRequest.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        pending_tutor_students = []
+        for pending_tut_subject in pending_tutor_subjects:
+            pending_tut_student = Student.query.filter_by(StudentId=pending_tut_subject.StudentId).first()
+            pending_tutor_students.append(pending_tut_student)
+
+        pending_tutorial_data = zip(pending_tutor_subjects, pending_tutor_students)
+
+        return render_template("/faculty/tutorial.html", tutorial_data=tutorial_data, approved_tutorial_data=approved_tutorial_data, pending_tutorial_data=pending_tutorial_data)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -2017,7 +2413,12 @@ def get_mimetype(tutorial_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
     return mimetypes.get(tutorial_extension, 'application/octet-stream')
@@ -2701,6 +3102,11 @@ def get_mimetype(file_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -2761,6 +3167,11 @@ def get_mimetype(file_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -2821,6 +3232,11 @@ def get_mimetype(completion_form_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -2857,6 +3273,11 @@ def get_mimetype(class_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -2893,6 +3314,11 @@ def get_mimetype(affidavit_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -2977,6 +3403,11 @@ def get_mimetype(application_letter_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3011,6 +3442,11 @@ def get_mimetype(permit_enroll_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3114,6 +3550,11 @@ def get_mimetype(overloadfile_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3174,6 +3615,11 @@ def get_mimetype(overload_file_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3282,7 +3728,12 @@ def get_mimetype(me_filename_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
     return mimetypes.get(me_filename_extension, 'application/octet-stream')
@@ -3472,6 +3923,11 @@ def get_mimetype(stud_certification_request_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3507,9 +3963,13 @@ def get_mimetype(stud_certification_identification_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
-
     return mimetypes.get(stud_certification_identification_extension, 'application/octet-stream')
 
 # certification download authorization
@@ -3542,6 +4002,11 @@ def get_mimetype(stud_certification_authorization_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3577,6 +4042,11 @@ def get_mimetype(stud_certification_representative_extension):
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
@@ -3618,47 +4088,52 @@ def download_certification_request_file(certification_request_Id, student_id):
     certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id, StudentId=student_id).first()
 
     if certification_request and certification_request.RequestFormdata:
-        extension = get_file_extension(certification_request.RequestFormfilename)
-        download_name = f'certification_request_{certification_request_Id}.{extension}'
+        certification_request_extension = get_certification_request_extension(certification_request.RequestFormfilename)
+        download_name = f'certification_request_{certification_request_Id}.{certification_request_extension}'
 
         return send_file(
             io.BytesIO(certification_request.RequestFormdata),
-            as_attachment=True,
+            as_attachment=False,
             download_name=download_name,
-            mimetype=get_mimetype(extension),
+            mimetype=get_mimetype(certification_request_extension),
         )
     else:
         abort(404)  # Certification request or file not found
 def get_certification_request_extension(RequestFormfilename):
     return RequestFormfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(extension):
+def get_mimetype(certification_request_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
-    return mimetypes.get(extension, 'application/octet-stream')
+    return mimetypes.get(certification_request_extension, 'application/octet-stream')
 #===================================================================================================================================
-@app.route('/student/get_certification_identification_file/<int:certification_request_Id>')
-def get_certification_identification_file(certification_request_Id):
-    return redirect(url_for('download_certification_identification_file', certification_request_Id=certification_request_Id))
+@app.route('/student/certification/get_certification_identification_file/<int:certification_request_Id>/<int:student_id>')
+def get_certification_identification_file(certification_request_Id, student_id):
+    return redirect(url_for('download_certification_identification_file', certification_request_Id=certification_request_Id, student_id=student_id))
 
-@app.route('/student/download_certification_identification_file/<int:certification_request_Id>')
-def download_certification_identification_file(certification_request_Id):
-    certification_request = CertificationRequest.query.get(certification_request_Id)
+@app.route('/student/download_certification_identification_file/<int:certification_request_Id>/<int:student_id>')
+def download_certification_identification_file(certification_request_Id, student_id):
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id, StudentId=student_id).first()
 
     if certification_request and certification_request.IdentificationCarddata:
-        extension = get_file_extension(certification_request.IdentificationCardfilename)
-        download_name = f'certification_identification_{certification_request_Id}.{extension}'
+        identification_file_extension = get_identification_file_extension(certification_request.IdentificationCardfilename)
+        download_name = f'certification_identification_{certification_request_Id}.{identification_file_extension}'
 
         return send_file(
             io.BytesIO(certification_request.IdentificationCarddata),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(extension),
+            mimetype=get_mimetype(identification_file_extension),
         )
     else:
         abort(404) # Certification request or file not found
@@ -3666,33 +4141,38 @@ def download_certification_identification_file(certification_request_Id):
 def get_identification_file_extension(IdentificationCardfilename):
     return IdentificationCardfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(extension):
+def get_mimetype(identification_file_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
-    return mimetypes.get(extension, 'application/octet-stream')
+    return mimetypes.get(identification_file_extension, 'application/octet-stream')
 #=========================================================================================================================
-@app.route('/student/get_certification_authorization_file/<int:certification_request_Id>')
-def get_certification_authorization_file(certification_request_Id):
-    return redirect(url_for('download_certification_authorization_file', certification_request_Id=certification_request_Id))
+@app.route('/student/certification/get_certification_authorization_file/<int:certification_request_Id>/<int:student_id>')
+def get_certification_authorization_file(certification_request_Id, student_id):
+    return redirect(url_for('download_certification_authorization_file', certification_request_Id=certification_request_Id, student_id=student_id))
 
-@app.route('/student/download_certification_authorization_file/<int:certification_request_Id>')
-def download_certification_authorization_file(certification_request_Id):
-    certification_request = CertificationRequest.query.get(certification_request_Id)
+@app.route('/student/download_certification_authorization_file/<int:certification_request_Id>/<int:student_id>')
+def download_certification_authorization_file(certification_request_Id, student_id):
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id, StudentId=student_id).first()
 
     if certification_request and certification_request.AuthorizationLetterdata:
-        extension = get_file_extension(certification_request.AuthorizationLetterfilename)
-        download_name = f'certification_authorization_{certification_request_Id}.{extension}'
+        authorization_file_extension = get_authorization_file_extension(certification_request.AuthorizationLetterfilename)
+        download_name = f'certification_authorization_{certification_request_Id}.{authorization_file_extension}'
 
         return send_file(
             io.BytesIO(certification_request.AuthorizationLetterdata),
             as_attachment=True,
             download_name=download_name,
-            mimetype=get_mimetype(extension),
+            mimetype=get_mimetype(authorization_file_extension),
         )
     else:
         abort(404)  # Certification request or file not found
@@ -3701,49 +4181,60 @@ def download_certification_authorization_file(certification_request_Id):
 def get_authorization_file_extension(AuthorizationLetterfilename):
     return AuthorizationLetterfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(extension):
+def get_mimetype(authorization_file_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
-    return mimetypes.get(extension, 'application/octet-stream')
+    return mimetypes.get(authorization_file_extension, 'application/octet-stream')
 #=============================================================================================================================
-@app.route('/student/certification/get_representative_file/<int:certification_request_Id>')
-def get_representative_file(certification_request_Id):
-    return redirect(url_for('download_representative_file', certification_request_Id=certification_request_Id))
+@app.route('/student/certification/get_representative_file/<int:certification_request_Id>/<int:student_id>')
+def get_representative_file(certification_request_Id, student_id):
+    return redirect(url_for('download_representative_file', certification_request_Id=certification_request_Id, student_id=student_id))
 
-@app.route('/student/download_representative_file/<int:certification_request_Id>')
-def download_representative_file(certification_request_Id):
-    certification_request = CertificationRequest.query.get(certification_request_Id)
+@app.route('/student/download_representative_file/<int:certification_request_Id>/<int:student_id>')
+@student_required
+def download_representative_file(certification_request_Id, student_id):
+    certification_request = CertificationRequest.query.filter_by(CertificationId=certification_request_Id, StudentId=student_id).first()
 
     if certification_request and certification_request.RepresentativeIddata:
-        representative_extension = get_representative_extension(certification_request.RepresentativeIdfilename)
-        download_name = f'certification_representative_{certification_request_Id}.{representative_extension}'
+        certification_representative_extension = get_certification_representative_extension(certification_request.RepresentativeIdfilename)
+        download_name = f'certification_representative_{certification_request_Id}.{certification_representative_extension}'
 
         return send_file(
             io.BytesIO(certification_request.RepresentativeIddata),
-            as_attachment=True,
+            as_attachment=False,
             download_name=download_name,
-            mimetype=get_mimetype(representative_extension),
+            mimetype=get_mimetype(certification_representative_extension),
         )
     else:
         abort(404)  # Certification request or file not found
 
-def get_representative_extension(RepresentativeIdfilename):
+def get_certification_representative_extension(RepresentativeIdfilename):
     return RepresentativeIdfilename.rsplit('.', 1)[1].lower()
 
-def get_mimetype(representative_extension):
+def get_mimetype(certification_representative_extension):
     mimetypes = {
         'txt': 'text/plain',
         'pdf': 'application/pdf',
         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'bmp': 'image/bmp',
         # Add more file types as needed
     }
 
-    return mimetypes.get(representative_extension, 'application/octet-stream')
+    return mimetypes.get(certification_representative_extension, 'application/octet-stream')
 
 # The functions get_file_extension and get_mimetype remain the same as in your existing code.
 #===========================================================#

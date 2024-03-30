@@ -1051,6 +1051,40 @@ class TutorialRequest(db.Model, UserMixin):
         }
 
 
+class SASSStudentClassSubjectGrade(db.Model, UserMixin):
+    __tablename__ = 'SASSStudentClassSubjectGrade'
+
+    studentid = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
+    batch = db.Column(db.Integer, primary_key=True)
+    enrollmentstatus = db.Column(db.String(100))
+    gpa = db.Column(db.Float)
+    seccode = db.Column(db.String(100))
+    semester = db.Column(db.Integer, nullable=False) 
+    subjectcode = db.Column(db.String(100))
+    grade = db.Column(db.Float)
+    schedule = db.Column(db.String(100), nullable=True)
+    subjectname = db.Column(db.String(100))
+    teachername = db.Column(db.String(100))
+    units = db.Column(db.Float)
+    status = db.Column(db.String(20))
+
+    def to_dict(self):
+        return {
+            'StudentId': self.studentid,
+            'Batch': self.batch,
+            'EnrollmentStatus': self.enrollmentstatus,
+            'GPA': self.gpa,
+            'SecCode': self.seccode,
+            'Semester': self.semester,
+            'SubjectCode': self.subjectcode,
+            'Grade': self.grade,
+            'Schedule': self.schedule,
+            'SubjectName': self.subjectname,
+            'TeacherName': self.teachername,
+            'Units': self.units,
+            'Status': self.status
+        }
+
 # class Job(db.Model):
 #     _tablename_ = 'APMSJob'
 

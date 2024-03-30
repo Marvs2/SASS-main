@@ -91,6 +91,8 @@
 				</ul>
 			</li>
 			<li><a href="{{url_for('student_history')}}"><i class='bx bx-history icon' ></i>Transaction History</a></li>
+      <li><a href="{{url_for('studentpayment')}}"><i class='bx bx-money icon' ></i>Transaction Payment</a></li>
+      <li style="display: none;"><a href="{{ url_for('viewall', student_id=student_id) }}"><i class='bx bx-table icon'></i>View All</a></li>
 
 		<!--	<li class="divider" data-text="Complaints">Complaints</li>
 			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
