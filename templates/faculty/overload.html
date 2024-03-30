@@ -27,6 +27,7 @@
           {% for subject, students in overload_data %} {% if subject.Status not
             in ['Rejected', 'Approved'] %}
           <tr
+            data-overload-ID="{{ subject.Id }}"
             data-overload-name="{{ subject.Name }}"
             data-overload-student-number="{{ subject.StudentNumber }}"
             data-overload-program="{{ subject.ProgramCourse }}"
@@ -91,6 +92,13 @@
       </div>
 
       <form id="statusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student ID:</label>
+            <div class="col-sm-4">
+              <p id="overloads-id"></p>
+            </div>
+          </div>
         <div class="modal-body">
           <div class="form-group">
             <label class="col-sm-3 control-label">Name:</label>
@@ -234,6 +242,7 @@
             data-app-overload-status="{{ over_subject.Status }}"
             data-app-overload-remark="{{ over_subject.Remarks }}"
           >
+            <td>{{ over_subject.StudentId }}</td>
             <td>{{ over_subject.OverloadId }}</td>
             <td>{{ over_subject.StudentNumber }}</td>
             <td>{{ over_subject.Name }}</td>
@@ -399,8 +408,6 @@
   </div>
 </div>
 
-
-
 <!-- Rejected Requests Table -->
 <div class="form-step form-step-active">
   <div class="data data1" id="pendingTableContainer">
@@ -448,6 +455,7 @@
   $(document).ready(function () {
     $("#overloadSubjects tbody tr").on("click", function () {
       // Retrieve data from the clicked row
+      var id = $(this).data("overload-ID");
       var name = $(this).data("overload-name");
       var studentNumber = $(this).data("overload-student-number");
       var subjectCode = $(this).data("overload-program");
@@ -463,6 +471,7 @@
       var remarks = $(this).data("overload-remark");
 
       // Populate modal with data
+      $("#overloads-id").text(id)
       $("#overloads-name").text(name);
       $("#overloads-student-number").text(studentNumber);
       $("#overloads-student-subjectcode").text(subjectCode);
@@ -685,27 +694,6 @@ fileLink[0].href = fileAttachmentUrl;  // Set the href attribute directly
 
 
 <script>
-  $(document).ready(function () {
-  // Initialize DataTable for the approved and pending requests table
-  $("#approvedSubject").DataTable({
-    // Add any specific options you need
-    // Example options:
-    paging: true,
-    searching: true,
-    ordering: true,
-    info: true,
-  });
-
-  // You can also initialize DataTable for other tables if needed
-  // For example, if you have separate tables for approved and pending requests:
-  // $("#approvedSubject").DataTable({ /* DataTable options */ });
-  // $("#pendingSubject").DataTable({ /* DataTable options */ });
-
-  // Additional logic for handling clicks on rows or other events
-  $("#approvedSubject tbody").on("click", "tr", function () {
-    // Add your logic here for row click event
-  });
-});
 
 $(document).ready(function () {
   // Initialize DataTable for the approved and pending requests table
