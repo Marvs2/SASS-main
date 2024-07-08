@@ -123,7 +123,7 @@ def faculty_all_services():
         }
 
         # Print the services counts for debugging
-        print("Services Counts:", services_count)
+        # print("Services Counts:", services_count)
 
         # Return the dictionary of service counts
         return services_count

@@ -236,7 +236,9 @@
         enctype="multipart/form-data"
       >
         <div class="row mb-5">
-          <label for="paymentname" class="col-sm-2 col-form-label">Sender Name</label>
+          <label for="paymentname" class="col-sm-2 col-form-label"
+            >Sender Name</label
+          >
           <div class="col-sm-8">
             <input
               type="text"
@@ -274,8 +276,8 @@
               type="file"
               class="form-control"
               id="paymentScreenshot"
-              name="paymentScreenshot"
-              accept=".jpg"
+              name="paymentScreenshots"
+              accept=".png, .jpg, .jpeg"
               required
             />
           </div>
@@ -300,14 +302,13 @@
     </div>
   </div>
 </div>
-<!-- REVIEW TRANSACTIONS -->
+<!-- Review Transactions -->
 <div class="form-step">
   <div class="data data1">
-    <div class="content-data">
+    <div class="content-data" id="content-to-save">
       <div class="head mb-5">
         <h3>Review Transactions</h3>
       </div>
-
       <form
         id="serviceRequestForm"
         action="{{url_for('submitapplication')}}"
@@ -400,11 +401,15 @@
             />
           </div>
         </div>
-
+        <div id="barcodeDisplay" style="align-items: flex-end">
+          <svg id="barcode"></svg>
+          <p id="barcodeNumber"></p>
+        </div>
         <div class="d-flex justify-content-end mt-3">
           <button type="button" class="btn btn-primary btn-prev">
             Previous
           </button>
+          <!-- Add a button to trigger PDF generation -->
           <button
             type="submit"
             class="btn btn-primary ml-2"
@@ -414,11 +419,41 @@
           </button>
         </div>
       </form>
+       <!-- Button to trigger report generation -->
+    <button type="button" class="btn btn-secondary" onclick="generateReport()">
+      Generate Report
+    </button>
     </div>
   </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.3/dist/JsBarcode.all.min.js"></script>
 
+<!-- JavaScript for barcode generation -->
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.3/dist/JsBarcode.all.min.js"></script>
+<!-- Include html2pdf library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+  // Function to generate and save the report as PDF
+  function generateReport() {
+    // Get the main content container
+    var element = document.getElementById("content-to-save");
+
+    // Call the function to generate and display the barcode and get the payment ID
+    var paymentId = generateAndDisplayBarcode();
+
+    // Append additional text to the container
+    var additionalText = "Payment ID: " + paymentId;
+    var textElement = document.createElement("p");
+    textElement.textContent = additionalText;
+    element.appendChild(textElement);
+
+    // Generate PDF
+    html2pdf().from(element).save();
+
+    // Remove the added text after generating the PDF (optional)
+    // element.removeChild(textElement);
+  }
+</script>
 <script>
   // this is for testing purposes
   var selectedSubjectIds = [];
@@ -662,6 +697,93 @@
   document.addEventListener("DOMContentLoaded", function () {
     fetchSubjectsGrade();
   });
+</script>
+
+<script>
+  // FETCHING STUDENT DETAILS
+  function fetchPaymentDetails() {
+    fetch("/api/v1/student/student-details")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        // Call a function to update the HTML content with the fetched data
+        displayPaymentDetails(data);
+        // Generate and display the barcode based on the payment ID
+        generateAndDisplayBarcode(data.paymentId); // Assuming the payment ID is available in the response data
+      })
+      .catch((error) => {
+        console.error("Error fetching payment details:", error);
+      });
+  }
+
+  // Fetch payment details and generate/display barcode when the document is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchPaymentDetails();
+  });
+
+  function displayPaymentDetails(data) {
+    // Concatenate the first name, middle name, and last name to form the full name
+    const fullName = `${data.FirstName} ${
+      data.MiddleName ? data.MiddleName + " " : ""
+    }${data.LastName}`;
+
+    // Select the Sender Name input and set the value to the full name
+    document.getElementById("paymentname").value = fullName;
+
+    // Select the StudentNumber and set the value to data.StudentNumber
+    document.getElementById("StudentNumber").value = data.StudentNumber;
+    // Select the Contact Number and set the value to data.MobileNumber
+    document.getElementById("mobileno").value = data.MobileNumber;
+  }
+
+  // Fetch student details when the document is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    fetchPaymentDetails();
+  });
+</script>
+<script>
+  // Function to generate a random payment ID
+  function generateRandomPaymentId() {
+    // Generate a random number between 1000000000 and 9999999999
+    var paymentId = Math.floor(Math.random() * 9000000000) + 1000000000;
+    return paymentId.toString(); // Convert the number to a string
+  }
+
+  // Function to generate and display the barcode
+  function generateAndDisplayBarcode() {
+    // Generate a random payment ID
+    var paymentId = generateRandomPaymentId();
+
+    JsBarcode("#barcode", paymentId, {
+      format: "CODE128",
+      lineColor: "#000",
+      width: 2,
+      height: 40,
+      displayValue: true,
+    });
+
+    // document.getElementById("barcodeNumber").textContent = "Payment ID: " + paymentId;
+    // Optionally, show the barcode section if hidden
+    // Display the payment ID along with the barcode
+    document.getElementById("barcodeNumber").textContent =
+      "Payment ID: " + paymentId;
+    document.getElementById("barcodeDisplay").style.display = "block";
+    // Return the payment ID
+    return paymentId;
+  }
+
+  // Call the function to generate and display the barcode when the document is loaded
+  document.addEventListener("DOMContentLoaded", function () {
+    generateAndDisplayBarcode();
+  });
+</script>
+
+{% endblock content %}
+<!-- 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // last entry of it dont have gpa and grades in it
   //   function updateSubjectsContent(data) {
@@ -854,63 +976,4 @@
   // // Trigger the data fetching when the page is loaded
   // document.addEventListener("DOMContentLoaded", function () {
   //   fetchSubjectsGrade();
-  // });
-</script>
-<script>
-  // FETCHING STUDENT DETAILS
-  function fetchPaymentDetails() {
-    fetch("/api/v1/student/student-details")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // Call a function to update the HTML content with the fetched data
-        displayPaymentDetails(data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
-  }
-
-  function displayPaymentDetails(data) {
-    // Concatenate the first name, middle name, and last name to form the full name
-    const fullName = `${data.FirstName} ${
-      data.MiddleName ? data.MiddleName + " " : ""
-    }${data.LastName}`;
-
-    // Select the Sender Name input and set the value to the full name
-    document.getElementById("paymentname").value = fullName;
-
-    // Select the StudentNumber and set the value to data.StudentNumber
-    document.getElementById("StudentNumber").value = data.StudentNumber;
-    // Select the Contact Number and set the value to data.MobileNumber
-    document.getElementById("mobileno").value = data.MobileNumber;
-  }
-
-  // Fetch student details when the document is loaded
-  document.addEventListener("DOMContentLoaded", function () {
-    fetchPaymentDetails();
-  });
-</script>
-<script>
-  function generateAndDisplayBarcode() {
-  // Assuming you have a payment ID or similar unique identifier for the payment
-  var paymentId = "1234567890"; // This should be dynamically generated or retrieved from your back-end
-
-  JsBarcode("#barcode", paymentId, {
-    format: "CODE128",
-    lineColor: "#000",
-    width: 2,
-    height: 40,
-    displayValue: true,
-  });
-
-  // Optionally, show the barcode section if hidden
-  document.getElementById('barcodeDisplay').style.display = 'block';
-}
-
-</script>
-{% endblock content %}
+  // }); -->

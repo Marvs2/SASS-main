@@ -1,4 +1,5 @@
-{% extends "faculty/layout.html" %} {% block content %}
+{% extends "faculty/layout.html" %} 
+{% block content %}
 <!-- SHOW CURRENT SUBJECT -->
 <div class="form-step form-step-active">
   <div class="data data1" id="firstTableContainer">
@@ -26,8 +27,9 @@
           {% for subject, student in combined_data %} {% if subject.Status not
           in ['Rejected', 'Approved'] %}
           <tr
+            data-add-student-Id="{{ student.StudentId }}"
             data-add-name="{{ student.FirstName }} {{ student.LastName }}"
-            data-add-student-Number="{{ student.StudentNumber }}"
+            data-add-studentnumber="{{ subject.StudentNumber }}"
             data-add-subject="{{ subject.Subject }}"
             data-add-reason="{{ subject.ServiceDetails }}"
             data-add-sender="{{ subject.SenderName }}"
@@ -70,6 +72,7 @@
   role="dialog"
   aria-labelledby="viewAddModalLabel"
   aria-hidden="true"
+  data-backdrop="false"
 >
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -87,47 +90,54 @@
         </button>
       </div>
 
-      <form id="statusForm">
+      <form id="approvedstatusForm">
         <div class="modal-body">
           <div class="form-group">
             <label class="col-sm-3 control-label">Name:</label>
             <div class="col-sm-4">
-              <p id="adding-name"></p>
+              <p id="modal-name"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-6">
+              <p id="modal-student-number"></p>
             </div>
           </div>
 
           <div class="form-group">
             <label class="col-sm-3 control-label">Subject to Add:</label>
             <div class="col-sm-6">
-              <p id="adding-student-subject"></p>
+              <p id="modal-student-subject"></p>
             </div>
           </div>
 
           <div class="form-group">
             <label class="col-sm-3 control-label">Reason/s:</label>
             <div class="col-sm-4">
-              <p id="adding-student-reason"></p>
+              <p id="modal-student-reason"></p>
             </div>
           </div>
 
           <div class="form-group">
             <label class="col-sm-3 control-label">Sender Name:</label>
             <div class="col-sm-4">
-              <p id="adding-sender-name"></p>
+              <p id="modal-sender-name"></p>
             </div>
           </div>
 
           <div class="form-group">
             <label class="col-sm-3 control-label">Sender Contact Number:</label>
             <div class="col-sm-4">
-              <p id="adding-sender-contact"></p>
+              <p id="modal-sender-contact"></p>
             </div>
           </div>
 
           <div class="form-group">
             <label class="col-sm-3 control-label">Payment file:</label>
             <div class="col-sm-4">
-              <p id="adding-file-attachment"></p>
+              <p id="modal-file-attachment"></p>
             </div>
           </div>
 
@@ -136,6 +146,7 @@
             <div class="col-sm-4">
               <input type="hidden" id="subjectIdInput" name="subjectId" />
               <select id="statusSelect" name="status" class="form-control">
+                <option value="G"></option>
                 <option value="pending">Pending</option>
                 <option value="Approved">Approved</option>
                 <option value="Completed">Completed</option>
@@ -143,7 +154,6 @@
               </select>
             </div>
           </div>
-
           <div class="form-group">
             <label for="recipient-name" class="col-sm-2 control-label"
               >Remarks:</label
@@ -179,36 +189,149 @@
   <div class="data data1" id="approvedTableContainer">
     <div class="content-data">
       <div class="head mb-3">
-        <h3>Approved Requests</h3>
+        <h3>Approved Requests for Overload</h3>
       </div>
-      <table id="approvedSubject" class="table table-bordered table-condensed display">
-        <!-- Table Headers -->
+      <table id="approvedSubjects" class="table table-bordered table-condensed display">
         <thead>
           <tr>
             <th>Application Number</th>
             <th>Student Number</th>
             <th>Student Name</th>
             <th>Subject</th>
+            <!-- <th>Subject Name</th> -->
+            <!-- <th>Contact</th> -->
+            <!-- <th>Units</th>
+            <th>Grade</th> -->
             <th>Status</th>
             <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {% for approved_subject, approved_student in approved_data %} {% if approved_subject.Status not
+          {% for approved_subjects, approved_student in approved_data %}
+          {% if approved_subjects.Status not
             in ['Rejected', 'pending'] %}
-            <tr>
-              <td>{{ approved_subject.AddSubjectId }}</td>
-              <td>{{ approved_student.StudentNumber }}</td>
-              <td>{{ approved_student.FirstName }} {{ approved_student.LastName }}</td>
-              <td>{{ approved_subject.Subject }}</td>
-              <td>{{ approved_subject.Status }}</td>
-              <td>
-                <!-- Action Buttons Here -->
-              </td>
-            </tr>
+          <tr
+            data-added-subject-id="{{ approved_subjects.AddSubjectId }}"
+            data-added-student-id="{{ approved_student.StudentId }}"
+            data-added-student-name="{{ approved_student.FirstName }} {{ approved_student.LastName }}"
+            data-added-student-number="{{ approved_student.StudentNumber }}"
+            data-added-subject="{{ approved_subjects.Subject }}"
+            data-added-contact="{{ approved_subjects.SenderContactNo }}"
+            data-added-payment="{{ approved_subjects.PaymentFile }}"
+            data-added-remark="{{ approved_subjects.Remarks }}"
+            data-added-status="{{ approved_subjects.Status }}"
+          >
+            <td>{{ approved_subjects.AddSubjectId }}</td>
+            <td>{{ approved_student.StudentNumber }}</td>
+            <td>{{ approved_student.FirstName }} {{ approved_student.LastName }}</td>
+            <!-- <td>{{ approved_subjects.ServiceDetails }}</td> -->
+            <td>{{ approved_subjects.Subject }}</td>
+            <!-- <td>{{ approved_subjects.SenderContactNo }}</td> -->
+            <!-- <td>{{ approved_subjects.PaymentFile }}</td>
+            <td>{{ approved_subjects.Remarks }}</td> -->
+            <td>{{ approved_subjects.Status }}</td>
+            <td>
+              <button
+                type="button"
+                title="View Info"
+                class="btn btn-primary fa-solid fa-eye edit_btn"
+                data-toggle="modal"
+                data-target="#approvedoverloadModal"
+                onclick="openappoverloadModal('{{ approved_subjects.AddSubjectId }}', '{{ approved_subjects.Status }}')"
+              ></button>
+            </td>
+          </tr>
           {% endif %}{% endfor %}
         </tbody>
       </table>
+    </div>
+  </div>
+</div>
+<!-- Approved Overload Modal -->
+<div class="modal fade" id="approvedoverloadModal" tabindex="-1" role="dialog" aria-labelledby="approvedoverloadModalLabel" aria-hidden="true" data-backdrop="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="approvedoverloadModalLabel">Approved Overload Information</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="approvedOverloadForm">
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Application Number:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-subject-id" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Student Number:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-student-number" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Student Name:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-student-name" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Subject Code:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-subject" class="form-control" readonly>
+                </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-3 col-form-label">Teacher:</label>
+              <div class="col-sm-6">
+                  <select id="modal-approved-teacher" class="form-control">
+                      {% for teaching in teachers %}
+                      <option value="{{ teaching.FirstName }} {{ teaching.LastName }}">{{ teaching.FirstName }} {{ teaching.LastName }}</option>
+                      {% endfor %}
+                  </select>
+              </div>
+          </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Units:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-units" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Grade:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-grade" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Status:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-status" class="form-control" readonly>
+                </div>
+            </div>
+            <!-- Additional details -->
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Created At:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-created-at" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-3 col-form-label">Updated At:</label>
+                <div class="col-sm-6">
+                    <input type="text" id="modal-approved-updated-at" class="form-control">
+                </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-9 offset-sm-3">
+                  <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+          </div>
+        </form>
+    </div>
+    
     </div>
   </div>
 </div>
@@ -229,7 +352,6 @@
             <th>Student Name</th>
             <th>Subject</th>
             <th>Status</th>
-            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -241,9 +363,6 @@
               <td>{{ pending_student.FirstName }} {{ pending_student.LastName }}</td>
               <td>{{ pending_subject.Subject }}</td>
               <td>{{ pending_subject.Status }}</td>
-              <td>
-                <!-- Action Buttons Here -->
-              </td>
             </tr>
           {% endif %}{% endfor %}
         </tbody>
@@ -251,162 +370,195 @@
     </div>
   </div>
 </div>
-
 <script>
   $(document).ready(function () {
-    $("#addingSubject tbody tr").on("click", function () {
-      // Retrieve data from the clicked row
-      var name = $(this).data("add-name");
-      var studentNumber = $(this).data("add-student-Number");
-      var subject = $(this).data("add-subject");
-      var reason = $(this).data("add-reason");
-      var sender = $(this).data("add-sender");
-      var contact = $(this).data("add-contact");
-      var fileAttachment = $(this).data("add-file");
-      var status = $(this).data("add-status"); // Add this line to get the status
+  $("#addingSubject tbody tr").on("click", function () {
+    // Retrieve data from the clicked row
+    var name = $(this).data("add-name");
+    var studentNumber = $(this).data("add-student-Number");
+    var subject = $(this).data("add-subject");
+    var reason = $(this).data("add-reason");
+    var sender = $(this).data("add-sender");
+    var contact = $(this).data("add-contact");
+    var fileAttachment = $(this).data("add-file");
+    var status = $(this).data("add-status"); // Add this line to get the status
 
-      // Populate modal with data
-      $("#adding-name").text(name);
-      $("#adding-student-number").text(studentNumber);
-      $("#adding-student-subject").text(subject);
-      $("#adding-student-reason").text(reason);
-      $("#adding-sender-name").text(sender);
-      $("#adding-sender-contact").text(contact);
-      $("#adding-file-attachment").text(fileAttachment);
+    // Populate modal with data
+    $("#modal-name").text(name);
+    $("#modal-student-number").text(studentNumber);
+    $("#modal-student-subject").text(subject);
+    $("#modal-student-reason").text(reason);
+    $("#modal-sender-name").text(sender);
+    $("#modal-sender-contact").text(contact);
+    $("#modal-file-attachment").text(fileAttachment);
 
-      // Additional logic for handling status-related changes
-      handleStatusChange(status);
-    });
+    // Additional logic for handling status-related changes
+    handleStatusChange(status);
   });
+});
 
-  function handleStatusChange(currentStatus) {
-    var statusDropdown = $("#statusSelect");
-    var updateButton = $("#updateBtn");
+function handleStatusChange(currentStatus) {
+  var statusDropdown = $("#statusSelect");
+  var updateButton = $("#updateBtn");
 
-    // Enable/disable options based on the selected status
-    statusDropdown.find("option").prop("disabled", false);
+  // Enable/disable options based on the selected status
+  statusDropdown.find("option").prop("disabled", false);
 
-    switch (currentStatus) {
-      case "Pending":
-        // Admin can only change to 'Approved'
-        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
-        statusDropdown.find('option[value="Completed"]').prop("disabled", true);
-        break;
-      case "Approved":
-        // Admin can change to 'Completed'
-        statusDropdown.find('option[value="Pending"]').prop("disabled", true);
-        statusDropdown.find('option[value="Approved"]').prop("disabled", true);
-        break;
-      case "Completed":
-        // Disable all options when status is 'Completed'
-        statusDropdown.find("option").prop("disabled", true);
-        break;
-      case "Rejected":
-        // Admin cannot change to any other status
-        statusDropdown.find("option").prop("disabled", true);
-        break;
-      default:
-        break;
-    }
-
-    // Set the current status as selected
-    statusDropdown.val(currentStatus);
-
-    // Enable/disable "Update" button based on the selected status
-    updateButton.prop("disabled", true);
-
-    // Bind an event handler to the status dropdown to check for changes
-    statusDropdown.on("change", function () {
-      updateButton.prop("disabled", false);
-    });
-
-    if (currentStatus === "Closed") {
-      statusDropdown.prop("disabled", true);
-    } else {
-      statusDropdown.prop("disabled", false);
-    }
+  switch (currentStatus) {
+    case "Pending":
+      // Admin can only change to 'Approved'
+      statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+      statusDropdown.find('option[value="Completed"]').prop("disabled", true);
+      break;
+    case "Approved":
+      // Admin can change to 'Completed'
+      statusDropdown.find('option[value="Pending"]').prop("disabled", true);
+      statusDropdown.find('option[value="Approved"]').prop("disabled", true);
+      break;
+    case "Completed":
+      // Disable all options when status is 'Completed'
+      statusDropdown.find("option").prop("disabled", true);
+      break;
+    case "Rejected":
+      // Admin cannot change to any other status
+      statusDropdown.find("option").prop("disabled", true);
+      break;
+    default:
+      break;
   }
 
-  function openEditModal(subjectId, currentStatus) {
-    $("#subjectIdInput").val(subjectId);
-    handleStatusChange(currentStatus);
-  }
+  // Set the current status as selected
+  statusDropdown.val(currentStatus);
 
-  function submitStatus() {
-    const subjectId = $("#subjectIdInput").val();
-    const newStatus = $("#statusSelect").val();
-    const remarks = $("#remarks").val(); // Get remarks value
+  // Enable/disable "Update" button based on the selected status
+  updateButton.prop("disabled", true);
 
-    // AJAX request to Flask backend
-    fetch("/update_status", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        subjectId: subjectId,
-        status: newStatus,
-        remarks: remarks, // Include remarks in the request
-      }),
+  // Bind an event handler to the status dropdown to check for changes
+  statusDropdown.on("change", function () {
+    updateButton.prop("disabled", false);
+  });
+}
+
+function openEditModal(subjectId, currentStatus) {
+  // Extract data attributes from the clicked row
+  var studentId = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-student-Id');
+  var studentNumber = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-studentnumber');
+  var studentName = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-name');
+  var subject = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-subject');
+  var reason = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-reason');
+  var sender = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-sender');
+  var contact = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-contact');
+  var fileAttachment = $('#addingSubject tr[data-add-id="' + subjectId + '"]').data('add-file');
+  var status = currentStatus; // Use the passed currentStatus
+
+  // Populate modal with data
+  $("#modal-name").text(studentName);
+  $("#modal-student-number").text(studentNumber);
+  $("#modal-student-subject").text(subject);
+  $("#modal-student-reason").text(reason);
+  $("#modal-sender-name").text(sender);
+  $("#modal-sender-contact").text(contact);
+  $("#modal-file-attachment").text(fileAttachment);
+  $("#subjectIdInput").val(subjectId);
+
+  // Set the current status as selected
+  handleStatusChange(status);
+
+  // Show the modal
+  $("#viewAddModal").modal("show");
+}
+
+function submitStatus() {
+  const subjectId = $("#subjectIdInput").val();
+  const newStatus = $("#statusSelect").val();
+  const remarks = $("#remarks").val(); // Get remarks value
+
+  // AJAX request to Flask backend
+  fetch("/update_status", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      subjectId: subjectId,
+      status: newStatus,
+      remarks: remarks, // Include remarks in the request
+    }),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
     })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", data);
-        $("#viewAddModal").modal("hide");
+    .then((data) => {
+      console.log("Success:", data);
+      if (data && data.message) {
+        alert(data.message); // Show success message from the server
+      }
+      $("#viewAddModal").modal("hide");
+      // Optionally reload the page only when necessary
+      if (data && data.reloadPage) {
         location.reload(); // Reload the page to see the changes
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
-  }
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
+      alert("An error occurred while updating the status."); // Show an alert for error
+    });
+}
+
+
+</script>
+<!--This is for Approved and Pending-->
+<script>
+ $(document).ready(function () {
+    $("#approvedSubjects tbody tr").on("click", function () {
+        var subjectId = $(this).data("added-subject-id");
+        var studentNumber = $(this).data("added-student-number");
+        var studentName = $(this).data("added-student-name");
+        var subject = $(this).data("added-subject");
+        var status = $(this).data("added-status");
+
+        // Populate the input fields in the modal with the fetched data
+        $("#modal-approved-subject-id").val(subjectId);
+        $("#modal-approved-student-number").val(studentNumber);
+        $("#modal-approved-student-name").val(studentName);
+        $("#modal-approved-subject").val(subject);
+        $("#modal-approved-status").val(status);
+
+        // Show the modal
+        $("#approvedoverloadModal").modal("show");
+    });
+});
+
 </script>
 <script>
   $(document).ready(function () {
-  // Initialize DataTable for the approved and pending requests table
-  $("#approvedSubject").DataTable({
-    // Add any specific options you need
-    // Example options:
-    paging: true,
-    searching: true,
-    ordering: true,
-    info: true,
+      $("#approvedOverloadForm").submit(function (event) {
+          event.preventDefault(); // Prevent the default form submission
+
+          // Serialize form data
+          var formData = $(this).serialize();
+
+          // AJAX request to submit the form data
+          $.ajax({
+              type: "POST",
+              url: "/submit_additional_subject",
+              data: formData,
+              success: function (response) {
+                  // Handle success response
+                  console.log(response);
+                  alert("Form submitted successfully!");
+                  // Optionally, you can close the modal or perform other actions
+              },
+              error: function (error) {
+                  // Handle error response
+                  console.log(error);
+                  alert("An error occurred while submitting the form.");
+              }
+          });
+      });
   });
-
-  // You can also initialize DataTable for other tables if needed
-  // For example, if you have separate tables for approved and pending requests:
-  // $("#approvedSubject").DataTable({ /* DataTable options */ });
-  // $("#pendingSubject").DataTable({ /* DataTable options */ });
-
-  // Additional logic for handling clicks on rows or other events
-  $("#approvedSubject tbody").on("click", "tr", function () {
-    // Add your logic here for row click event
-  });
-});
-
-$(document).ready(function () {
-  // Initialize DataTable for the approved and pending requests table
-  $("#pendingSubject").DataTable({
-    // Add any specific options you need
-    // Example options:
-    paging: true,
-    searching: true,
-    ordering: true,
-    info: true,
-  });
-
-  // You can also initialize DataTable for other tables if needed
-  // For example, if you have separate tables for approved and pending requests:
-  // $("#approvedSubject").DataTable({ /* DataTable options */ });
-  // $("#pendingSubject").DataTable({ /* DataTable options */ });
-
-  // Additional logic for handling clicks on rows or other events
-  $("#pendingSubject tbody").on("click", "tr", function () {
-    // Add your logic here for row click event
-  });
-});
 </script>
-{% endblock %}
-
-
-
-
+{% endblock content %}

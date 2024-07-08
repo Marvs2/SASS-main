@@ -1,0 +1,362 @@
+{% extends "faculty/layout.html" %}
+{% block content %}
+
+<!--Approved Requests Table-->
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Pending Requests</h3>
+      </div>
+
+      <table
+        id="viewoverloadSubjects"
+        class="table table-bordered table-condensed display"
+      >
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Faculty Comment</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for viewoversubject in view_faculty_overload %}
+            {% if viewoversubject.Status not in ['Rejected', 'Approved'] %}
+              <tr
+                data-view-app-overload-comment-id="{{ viewoversubject.CommentId }}"
+                data-view-app-overload-overload-id="{{ viewoversubject.overloadid }}"
+                data-view-app-overload-student-id="{{ viewoversubject.StudentId }}"
+                data-view-app-overload-comment="{{ viewoversubject.Comment }}"
+                data-view-app-overload-status="{{ viewoversubject.Status }}"
+                data-view-app-overload-dateinserted="{{ viewoversubject.DateInserted }}"
+                data-view-app-overload-dateupdated="{{ viewoversubject.DateUpdated }}"
+                data-view-app-overload-faculty-id="{{ viewoversubject.FacultyId }}"
+              > 
+                <td>{{ format_overload_id(viewoversubject.overloadid) }}</td>
+                <td>{{ viewoversubject.StudentId }}</td>
+                <td>{{ viewoversubject.Comment }}</td>
+                <td>{{ viewoversubject.DateInserted.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ viewoversubject.Status }}</td>
+                <td>
+                  <button
+                    type="button"
+                    title="View Info"
+                    class="btn btn-primary fa-solid fa-eye edit_btn"
+                    data-toggle="modal"
+                    data-target="#viewoverloadModal"
+                    onclick="openoverloadModal('{{ viewoversubject.overloadid }}', '{{ viewoversubject.Status }}')"
+                  ></button>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Status Edit Modal -->
+<div
+  class="modal fade"
+  id="viewoverloadModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewoverloadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title text-white" id="viewoverloadModalLabel">
+          Update Second Responsible Status
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form id="statusForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Overload ID:</label>
+            <div class="col-sm-4">
+              <p id="overloads-overloadId"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Student Number:</label>
+            <div class="col-sm-4">
+              <p id="overloads-status"></p>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label"> Date From - To </label>:</label>
+            <div class="col-sm-4">
+              <p id="overloads-student-dateinsert"></p> - <span id="overloads-student-dateupdated"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Subject to overload:</label>
+            <div class="col-sm-6">
+              <p id="overloads-overload-facultyId"></p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-sm-3 control-label">Status:</label>
+            <div class="col-sm-4">
+              <input
+                type="hidden"
+                id="overloadSubjectIdInput"
+                comment="overloadId"
+              />
+              <select
+                id="overloadStatusSelect"
+                comment="status"
+                class="form-control"
+              >
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Completed">Completed</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <input type="hidden" id="commentid" name="commentid">
+          <label for="recipient-comment" class="col-sm-2 control-label"
+            >Remarks:</label
+          >
+          <div class="col-sm-10">
+            <textarea type="text" class="form-control" id="overloadRemarksSelect"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            Close
+          </button>
+          <button
+            type="button"
+            class="btn btn-success"
+            onclick="submitoverloadStatus()"
+          >
+            Save overloads
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<!--Approved Requests Table-->
+<div class="form-step form-step-active">
+  <div class="data data1" id="firstTableContainer">
+    <div class="content-data">
+      <div class="head mb-3">
+        <h3>Approved Request</h3>
+      </div>
+
+      <table
+        id="viewcommentoverloadSubjects"
+        class="table table-bordered table-condensed display"
+      >
+        <thead>
+          <tr>
+            <th>Application Number</th>
+            <th>Student Number</th>
+            <th>Faculty Comment</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for viewoversubject in view_faculty_overload %}
+            {% if viewoversubject.Status not in [ 'Pending'] %}
+              <tr
+                data-view-app-overload-comment-id="{{ viewoversubject.CommentId }}"
+                data-view-app-overload-overload-id="{{ viewoversubject.overloadid }}"
+                data-view-app-overload-view-overload-id="{{ format_overload_id(viewoversubject.overloadid) }}"
+                data-view-app-overload-student-id="{{ viewoversubject.StudentId }}"
+                data-view-app-overload-comment="{{ viewoversubject.Comment }}"
+                data-view-app-overload-status="{{ viewoversubject.Status }}"
+                data-view-app-overload-dateinserted="{{ viewoversubject.DateInserted }}"
+                data-view-app-overload-dateupdated="{{ viewoversubject.DateUpdated }}"
+                data-view-app-overload-faculty-id="{{ viewoversubject.FacultyId }}"
+              > 
+                <td>{{ format_overload_id(viewoversubject.overloadid) }}</td>
+                <td>{{ viewoversubject.StudentId }}</td>
+                <td>{{ viewoversubject.Comment }}</td>
+                <td>{{ viewoversubject.DateInserted.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td>{{ viewoversubject.Status }}</td>
+                <td>
+                  <button
+                    type="button"
+                    title="View Info"
+                    class="btn btn-primary fa-solid fa-eye edit_btn"
+                    data-toggle="modal"
+                    data-target="#viewcommentoverloadModal"
+                    onclick="openoverloadModal('{{ viewoversubject.overloadid }}', '{{ viewoversubject.Status }}')"
+                  ></button>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="viewcommentoverloadModal" tabindex="-1" role="dialog" aria-labelledby="viewcommentoverloadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content" style="background-color: white;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewcommentoverloadModalLabel">View Overload Request Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="viewOverloadForm" action="{{url_for('viewcomment')}}" method="POST" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="viewApplicationNumber">Application Number:</label>
+            <input type="text" id="viewApplicationNumber" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="viewStudentId">Student ID:</label>
+            <input type="text" id="viewStudentId" class="form-control" readonly>
+          </div>
+          <div class="form-group">
+            <label for="viewFacultyComment">Faculty Comment:</label>
+            <textarea id="viewFacultyComment" rows="4" class="form-control"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" data-dismiss="modal">Submit</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css" />
+<!-- Include DataTables script -->
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css"
+/>
+<script>
+  $(document).ready(function () {
+    $("#viewoverloadSubjects tbody tr").on("click", function () {
+      // Retrieve data from the clicked row
+      var commentId = $(this).data("view-app-overload-comment-id");
+      var studoverloadid = $(this).data("view-app-overload-overload-id");
+      var studentstudid = $(this).data("view-app-overload-student-id");
+      var comment = $(this).data("view-app-overload-comment");
+      var status = $(this).data("view-app-overload-status");
+      var dateinsert = $(this).data("view-app-overload-dateinserted");
+      var dateupdated = $(this).data("view-app-overload-dateupdated");
+      var facultyId = $(this).data("view-app-overload-faculty-id");
+
+      // Populate modal with data
+      $("#commentid").val(commentId); // Update hidden input
+      $("#overloads-overloadId").text(studoverloadid);
+      $("#overloads-studId").text(studentstudid);
+      $("#overloadRemarksSelect").val(comment);
+      $("#overloads-status").text(status);
+      $("#overloads-student-dateinsert").text(dateinsert);
+      $("#overloads-student-dateupdated").text(dateupdated);
+      $("#overloads-overload-facultyId").text(facultyId);
+      
+      // Additional logic for handling status-related updates
+      handleoverloadStatusoverload(status);
+    });
+  });
+
+  function openoverloadModal(commentId, currentStatus) {
+    $("#commentid").val(commentId); // Update hidden input when opening the modal
+    handleoverloadStatusoverload(currentStatus);
+  }
+
+  function submitoverloadStatus() {
+    console.log("submitoverloadStatus function called");
+    const commentId = $("#commentid").val();
+    const newStatus = $("#overloadStatusSelect").val();
+    const newComments = $("#overloadRemarksSelect").val();
+    
+    console.log("Sending data:", { commentId, newStatus, newComments });
+
+    if (!commentId) {
+      console.error("Comment ID is missing");
+      alert("Error: Comment ID is missing. Please try again.");
+      return;
+    }
+
+    fetch("/view_overload_update_status", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        commentId: commentId,
+        status: newStatus,
+        comments: newComments
+      }),
+    })
+    .then(response => {
+      console.log("Response status:", response.status);
+      return response.json();
+    })
+    .then(data => {
+      if (!data.message) {
+        throw new Error('No message in response');
+      }
+      console.log("Success:", data);
+      alert(data.message);
+      $("#viewoverloadModal").modal("hide");
+      location.reload();
+    })
+    .catch(error => {
+      console.error("Error:", error);
+      alert(`An error occurred while updating the status: ${error.message}`);
+    });
+  }
+</script>
+<script>
+  $(document).ready(function (){
+    $("#viewcommentoverloadSubjects tbody tr").on("click", function (){
+      //retrieve data from the clicked row form viewcommentoverloadSubjects
+      var viewapplication = $(this).data("view-app-overload-view-overload-id");
+      var studentnum = $(this).data("view-app-overload-student-id");
+      var viewcomment = $(this).data("view-app-overload-comment");
+      var viewdate = $(this).data("view-app-overload-dateupdated");
+      // var viewstatus = $(this).data("view-app-overload-status");
+
+      // to populate to modal data
+      $('#viewApplicationNumber').val(viewapplication);
+      $('#viewStudentId').val(studentnum);
+      $('#viewFacultyComment').val(viewcomment);
+      $('#viewDate').val(viewdate);
+      // $('#viewStatus').val(viewstatus);
+    });
+  });
+</script>
+{% endblock %}

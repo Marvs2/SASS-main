@@ -90,10 +90,26 @@
 					<li><a href="{{url_for('facultycertification')}}">Request for Certification</a></li>
 
 				</ul>
-
+      </li>  
 		<!--	<li class="divider" data-text="Complaints">Complaints</li>
 			<li><a href="#"><i class='bx bxs-widget icon' ></i> Create Complaint</a></li>
 			<li><a href="#"><i class='bx bxs-widget icon' ></i> Manage Complaint</a></li>-->
+			<li>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> 2nd Acceptance Requests<i class='bx bx-chevron-right icon-right' ></i></a>
+				<ul class="side-dropdown">
+					<li><a href="{{url_for('facultyviewoverload')}}">For Overload</a></li>
+					<li><a href="{{ url_for('facultyadding')}}">For Adding</a></li>
+					<li><a href="{{url_for('facultychange')}}">For Change</a></li>
+					<li><a href="{{url_for('facultycorrection')}}">For Correction</a></li>
+					<li><a href="{{url_for('facultycrossenrollment')}}">For Cross-Enrollment</a></li>
+					<li><a href="{{url_for('facultyshifting')}}">For Shifting</a></li>
+					<li><a href="{{url_for('facultyenrollment')}}">For Manual Enroll.</a></li>
+					<li><a href="{{url_for('facultypetition')}}">For Petition</a></li>
+					<li><a href="{{url_for('facultytutorial')}}">For Tutorial</a></li>
+					<li><a href="{{url_for('facultycertification')}}">For Certification</a></li>
+
+				</ul>
+      </li>  
 		</ul>
 	</section>
 
@@ -271,43 +287,6 @@
   <script>
   //FAculty API
 	const api_base_url = '{{ faculty_api_base_url | default("") }}';
-	console.log('api_base_url: ', api_base_url)
-
-
-    // Function to close the notification card
-    function closeNotificationCard() {
-      var notificationCard = document.getElementById('notification-card');
-      if (notificationCard.classList.contains('show')) {
-        notificationCard.classList.remove('show');
-      }
-    }
-  
-    // Add event listener to the notification icon
-    document.getElementById('notification-icon').addEventListener('click', function (event) {
-      // Prevent the click event from propagating to the document body
-      event.stopPropagation();
-  
-      // Toggle the visibility of the notification card
-      document.getElementById('notification-card').classList.toggle('show');
-    });
-  
-    // Add event listener to the document body to close the notification card on any click outside of it
-    document.body.addEventListener('click', closeNotificationCard);
-  
-    // Add event listener to prevent the notification card from closing when clicking inside it
-    document.getElementById('notification-card').addEventListener('click', function (event) {
-      event.stopPropagation();
-    });
-  
-    // JavaScript to show all notifications when "See All Notifications" is clicked
-    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-      // Prevent the link from navigating (you may adjust this behavior as needed)
-      event.preventDefault();
-  
-      // Show all notifications by removing the 'd-none' class
-      var notificationList = document.getElementById('notification-card');
-      notificationList.classList.toggle('show');
-    });
     </script>
 
 
@@ -323,130 +302,35 @@
         }
 
         const data_faculty_details = await response.json();
-        console.log('data_faculty_details:', data_faculty_details);
         displayFacultyDetails(data_faculty_details);
     } catch (error) {
         console.error('Error fetching student details:', error.message);
     }
 }
-  fetchFacultyDetails()
-  function displayFacultyDetails(data) {
-      document.getElementById('FacultyType').value = data.FacultyType;
-      const DateOfBirthInput = document.getElementById("DateOfBirth");
+fetchFacultyDetails();
 
-      // Format the date to display only the birthday
-      const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
+function displayFacultyDetails(data) {
+    document.getElementById('FacultyType').value = data.FacultyType;
+    const DateOfBirthInput = document.getElementById("DateOfBirth");
+
+    // Format the date to display only the birthday
+    const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
-      });
-      document.getElementById('Name').value = [data.FirstName, data.MiddleName, data.LastName].filter(Boolean).join(' ');
-      document.getElementById('ResidentialAddress').value = data.ResidentialAddress;
-      document.getElementById('Gender').value = data.Gender;
-      document.getElementById('Email').value = data.Email;
-      document.getElementById('MobileNumber').value = data.MobileNumber;
+    });
+    document.getElementById('Name').value = [data.FirstName, data.MiddleName, data.LastName].filter(Boolean).join(' ');
+    document.getElementById('ResidentialAddress').value = data.ResidentialAddress;
+    document.getElementById('Gender').value = data.Gender;
+    document.getElementById('Email').value = data.Email;
+    document.getElementById('MobileNumber').value = data.MobileNumber;
 
-      if (data.ProfilePic) {
-          let profilePic = document.getElementById('profilePic');
-          profilePic.src = 'data:image/png;base64,' + data.ProfilePic;
-          profilePic.hidden = false;
-      }
-  }
-  // DATEPICKER FUNCTION
-  document.addEventListener("DOMContentLoaded", function () {
-        // Initialize flatpickr
-        flatpickr("#date", {
-            dateFormat: 'm-d-Y', // Set the date format
-            defaultDate: 'today', // Set default date to today
-            // disableMobile: true, // Disable on mobile
-            minDate: 'today', // Disable previous dates
-            onClose: function (selectedDates, dateStr, instance) {
-                // Update the input value when the user selects a date
-                document.getElementById('date').value = dateStr;
-            }
-        });
-    });
-    // NOTIFICATION ICON
-    var showAllNotifications = false;
-  
-    // Function to close the notification card
-    function closeNotificationCard() {
-      var notificationCard = document.getElementById('notification-card');
-      if (notificationCard.classList.contains('show')) {
-        notificationCard.classList.remove('show');
-      }
+    if (data.ProfilePic) {
+        let profilePic = document.getElementById('profilePic');
+        profilePic.src = 'data:image/png;base64,' + data.ProfilePic;
+        profilePic.hidden = false;
     }
-  
-    // Function to toggle the visibility of the notification card
-    function toggleNotificationCard() {
-      var notificationCard = document.getElementById('notification-card');
-      notificationCard.classList.toggle('show');
-  
-      // If not showing all notifications, only display the first four
-      if (!showAllNotifications) {
-        showFirstFourNotifications();
-      }
-    }
-      
-    // Function to show only the first four notifications
-    function showFirstFourNotifications() {
-      var allNotifications = document.querySelectorAll('#notification-card .list-group-item');
-      allNotifications.forEach(function (item, index) {
-        if (index < 4) {
-          item.classList.remove('d-none');
-        } else {
-          item.classList.add('d-none');
-        }
-      });
-    }
-  
-    // Add event listener to the notification icon
-    document.getElementById('notification-icon').addEventListener('click', function (event) {
-      // Prevent the click event from propagating to the document body
-      event.stopPropagation();
-  
-      // If notification card is already visible, close it; otherwise, show the first four notifications
-      if (document.getElementById('notification-card').classList.contains('show')) {
-        closeNotificationCard();
-      } else {
-        showFirstFourNotifications();
-        toggleNotificationCard();
-      }
-    });
-  
-    // Add event listener to the document body to close the notification card on any click outside of it
-    document.body.addEventListener('click', closeNotificationCard);
-  
-    // Add event listener to prevent the notification card from closing when clicking inside it
-    document.getElementById('notification-card').addEventListener('click', function (event) {
-      event.stopPropagation();
-    });
-  
-    // JavaScript to show all or only the first four notifications when "See All Notifications" is clicked
-    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-      // Prevent the link from navigating (you may adjust this behavior as needed)
-      event.preventDefault();
-  
-      // Toggle between showing all and displaying only the first four notifications
-      showAllNotifications = !showAllNotifications;
-  
-      if (showAllNotifications) {
-        // Show all hidden notifications by removing the 'd-none' class
-        var hiddenItems = document.querySelectorAll('#notification-card .list-group-item.d-none');
-        hiddenItems.forEach(function (item) {
-          item.classList.remove('d-none');
-        });
-      } else {
-        // Show only the first four notifications
-        showFirstFourNotifications();
-      }
-  
-      // Toggle the visibility of the notification card
-      toggleNotificationCard();
-    });
-  
-    // Show only the first four notifications initially
-    showFirstFourNotifications();
+}
 </script>
   
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>

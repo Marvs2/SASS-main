@@ -1,137 +1,166 @@
 {% extends "student/layout.html" %}
 
 {% block content %}
-</script>
-  <style>
-    /* Add DataTables styles */
-    table {
-        width: 60%;
-        border: 1px;
-        margin-top: 20px;
-    }
+<style>
+  .progressbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    margin-bottom: 30px;
+  }
 
-    th, td {
-        padding: 15px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
+  .progressbar::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background-color: #d3d3d3;
+    z-index: 0;
+  }
+
+  .progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background-color: #4caf50;
+    z-index: 1;
+    transition: width 0.4s ease;
+  }
+
+  .progress.rejected {
+    background-color: #f44336;
+  }
+
+  .progress-step {
+    position: relative;
+    z-index: 2;
+    width: 25px;
+    height: 25px;
+    background-color: #d3d3d3;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+  }
+
+  .progress-step-active {
+    background-color: #4caf50;
+  }
+
+  .progress-step-rejected {
+    background-color: #f44336;
+  }
+
+  .progress-step-pending {
+    background-color: #fee60d;
+  }
+
+  .progress-step::after {
+    content: attr(data-title);
+    position: absolute;
+    top: 35px;
+    white-space: nowrap;
+    font-size: 12px;
+    color: #555;
+  }
 </style>
 
-<!-- DataTable HTML -->
-<h1>Overload Data</h1>
-
-<table id="overloadTable" class="table table-bordered">
-  <thead>
-    <tr>
-      <th>Overload ID</th>
-      <th>Student Number</th>
-      <th>Name</th>
-      <th>programcourse</th>
-      <th>semester</th>
-      <th>subjects_to_add</th>
-      <th>File</th>
-      <th>User Responsible</th>
-      <th>Status</th>
-      <th>Action</th>
-      <th>StudentId</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for overload_applications in overload_applicationss_list %}
-    <tr>
-      <td>{{ overload_applications.OverloadId }}</td>
-      <td>{{ overload_applications.StudentNumber }}</td>
-      <td>{{ overload_applications.Name }}</td>
-      <td>{{ overload_applications.ProgramCourse }}</td>
-      <td>{{ overload_applications.Semester }}</td>
-      <td>{{ overload_applications.SubjectsToAdd }}</td>
-      <td>
-        {% if overload_applications.Overloaddata %}
-            {% set truncated_overload_name = overload_applications.Overloadfilename[:15] + '...' if overload_applications.Overloadfilename|length > 15 else overload_applications.Overloadfilename %}
-        <a href="{{ url_for('view_overload_file', Overload_Id=overload_applications.OverloadId) }}" class="btn btn-success" download title="{{ overload_applications.Overloadfilename }}">{{ truncated_overload_name }}</a>
-        {% else %}
-        <span class="badge badge-warning">No File</span>
-        {% endif %}
-      </td>
-      <td>{{ overload_applications.UserResponsible }}</td>
-      <td>{{ overload_applications.Status }}</td>
-      <td>{{ overload_applications.StudentId }}</td>
-      <td>
-          <button class="btn btn-primary" onclick="checkStatusAndShowModal('{{ overload_applications.OverloadId }}', '{{ overload_applications.Status }}')">View Status</button>
-      </td>
-    </tr>
-
-    <!-- Modal -->
-    <div class="modal fade" id="StatusModal{{ overload_applications.OverloadId }}" tabindex="-1" role="dialog" aria-labelledby="StatusModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="StatusModalLabel">Status for oveload ID: {{ overload_applications.OverloadId }}</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                  </button>
-              </div>
-              <!-- Inside the modal body -->
-              <div class="modal-body" id="StatusModalBody{{ overload_applications.OverloadId }}">
-                  <!-- Status-related information will be populated here -->
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              </div>
-          </div>
-      </div>
+<div class="data data1">
+  <div class="content-data">
+    <div class="head">
+      <h3>Application for Overload of Subjects</h3>
     </div>
+    <div class="progressbar" id="progress-bar-{{ overload_application.formatted_overload_id }}">
+      <div class="progress" id="progress-{{ overload_application.formatted_overload_id }}"></div>
+      <div class="progress-step" data-title="First Step"></div>
+      <div class="progress-step" data-title="Second Step"></div>
+      <div class="progress-step" data-title="Last Step"></div>
+    </div>
+    <br>
+    <br>
+    <p><strong>Overload ID:</strong> {{ overload_application.formatted_overload_id }}</p>
+    <p><strong>User Responsible:</strong> {{ overload_application.UserResponsible }}</p>
+    <p><strong>Application Status:</strong> {{ overload_application.Status }}</p>
+    <p><strong>Faculty Status:</strong> {{ overload_application.FacultyStatus }}</p>
+    <p><strong>Faculty Comment:</strong> {{ overload_application.FacultyComment }}</p>
+  </div>
+</div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    function setProgress(step, barId, isRejected, isPending) {
+      const progressBar = document.getElementById(barId);
+      const steps = progressBar.parentElement.querySelectorAll('.progress-step');
+      const progressBarFullWidth = progressBar.parentElement.offsetWidth;
+      const stepWidth = progressBarFullWidth / (steps.length - 1);
+      const stepPercentage = 100 / (steps.length - 1);
 
-    {% endfor %}
-  </tbody>
-</table>
-<!-- Include DataTables script -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
-<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js">
+      if (isRejected) {
+        progressBar.classList.add('rejected');
+        steps.forEach(stepElem => stepElem.classList.add('progress-step-rejected'));
+        progressBar.style.width = '100%';
+      } else if (isPending) {
+        steps[0].classList.add('progress-step-pending');
+        progressBar.style.width = (step * stepPercentage) + '%';
+      } else {
+        progressBar.style.width = (step * stepPercentage) + '%';
+        steps.forEach((stepElem, index) => {
+          if (index <= step) {
+            stepElem.classList.add('progress-step-active');
+          } else {
+            stepElem.classList.remove('progress-step-active');
+          }
+        });
+      }
+
+      for (let i = 0; i < steps.length - 1; i++) {
+        if (i < step) {
+          let progressSegment = document.createElement('div');
+          progressSegment.style.position = 'absolute';
+          progressSegment.style.top = '50%';
+          progressSegment.style.left = (i * stepPercentage) + '%';
+          progressSegment.style.width = stepWidth + 'px';
+          progressSegment.style.height = '4px';
+          progressSegment.style.backgroundColor = isRejected ? '#f44336' : '#4caf50';
+          progressSegment.style.zIndex = '1';
+          progressBar.parentElement.appendChild(progressSegment);
+        }
+      }
+    }
+
+    const application = {{ overload_application | tojson }};
+    const appStatus = application.Status;
+    const facultyStatus = application.FacultyStatus;
+
+    let step = 0;
+    let isRejected = false;
+    let isPending = false;
+
+    if (appStatus === 'Pending') {
+      isPending = true;
+    } else if (appStatus === 'Approved') {
+      if (facultyStatus === 'Approved') {
+        step = 2;
+      } else if (facultyStatus === 'Rejected') {
+        isRejected = true;
+        step = 1;
+      } else {
+        step = 1;
+      }
+    } else if (appStatus === 'Rejected') {
+      isRejected = true;
+      step = 2;
+    }
+
+    setProgress(step, `progress-${application.formatted_overload_id}`, isRejected, isPending);
+  });
 </script>
 
-  <!-- DataTable initialization script -->
-  <script>
-    $(document).ready(function() {
-      $('#overloadTable').DataTable();
-    });
-    function checkStatusAndShowModal(studentID, Status) {
-    let message = '';
-    
-    switch (Status) {
-        case 'Sent':
-            message = "Your item has been sent! Wait to be processed";
-            break;
-        case 'pending':
-            message = "Your item is pending.";
-            break;
-        case 'processing':
-            message = "Your item is being processed.";
-            break;
-        case 'approved':
-            message = "Your item has been approved!";
-            break;
-        case 'finish':
-            message = "Your item has been finished.";
-            break;
-        case 'rejected':
-            message = "Unfortunately, your item has been rejected.";
-            break;
-        default:
-            message = "Status not recognized.";
-            break;
-    }
-    
-    // Set the Status message in the modal body based on the specific modal's ID
-    document.getElementById('StatusModalBody' + studentID).innerHTML = `<p>Status for Overload ID ${studentID}: ${message}</p>`;
-    
-    // Display the modal
-    $('#StatusModal' + studentID).modal('show'); // Assuming you're using Bootstrap for modals
-}
-
-  </script>
-
 {% endblock %}
-

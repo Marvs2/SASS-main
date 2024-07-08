@@ -1,9 +1,10 @@
 # api/api_routes.py
 import base64
-from Api.v1.student.utils import  failingradeperbatch, get_all_services, get_incomplete_subjects, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getFirstSemSubjectsGrade, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
+import json
+from Api.v1.student.utils import  failingradeperbatch, get_all_services, get_incomplete_subjects, get_student_history_services, get_student_services, get_subject_name_by_code, getAllSubjects, getCurrentSubject, getFirstSemSubjectsGrade, getOverloadApplication, getStudentClassSGrade, getSubjectFuture, getSubjectsGrade, totalfailure
 from decorators.auth_decorators import role_required
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
-from models import  db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
+from models import  AdditionalSubject, db, AddSubjects, CertificationRequest, ChangeSubject, CrossEnrollment, GradeEntry, ManualEnrollment, Notification, OverloadApplication, PetitionRequest, ShiftingApplication, Student, TutorialRequest
 from werkzeug.utils import secure_filename
 from datetime import datetime #, timedelta, timezone
 #from models import Services
@@ -724,6 +725,23 @@ def services():
     else:
         return render_template('404.html'), 404
     
+#Api to HelpDesk Overload data
+@student_api.route('/getoverloaddata', methods=['GET'])
+def getoverloaddata():
+    student = getCurrentUser()
+    if student:
+        overload_data = getOverloadApplication(student.StudentId)
+        if overload_data:
+            return jsonify(json.loads(overload_data))  # Parse JSON string and return as JSON response
+        else:
+            return jsonify(error="No overload applications available")
+    else:
+        return render_template('404.html'), 404
+
+
+
+
+    
 #====================================== FUNCTION FOR ADDING OF SUBJECTS  =========================================================#
 def create_services_application(form_data, files, StudentId):
     FacultyRole = 'Academic Head'
@@ -1343,61 +1361,52 @@ def create_notification(StudentNumber, ServiceType, UserResponsible, Status, Mes
 
     return new_notification
 #===============================================================================================#
+#Additional Subject
 
+
+def create_additional_subject(form_data, current_StudentId):
+    Name = form_data['Name']
+    StudentNumber = form_data['StudentNumber']
+    SubjectCode = form_data['SubjectCode']
+    SubjectName = form_data['SubjectName']
+    Teacher = form_data['Teacher']
+    Units = form_data['Units']
+    Grade = form_data['Grade']
+    Status = form_data['Status']
+
+    # Additional validation logic can be added here
+
+    # Check if any of the required fields is empty
+    if not Name or not StudentNumber or not SubjectCode or not SubjectName or not Teacher or not Units or not Grade or not Status:
+        flash('Please fill out all required fields.', 'danger')
+        return None
+
+    new_additional_subject = AdditionalSubject(
+        StudentId=current_StudentId,
+        StudentName=Name,
+        StudentNumber=StudentNumber,
+        SubjectCode=SubjectCode,
+        SubjectName=SubjectName,
+        Teacher=Teacher,
+        Units=Units,
+        Grade=Grade,
+        Status=Status,
+        created_at=datetime.utcnow(),  # Set created_at to the current timestamp
+        updated_at=datetime.utcnow()   # Set updated_at to the current timestamp
+    )
+
+    db.session.add(new_additional_subject)
+    db.session.commit()
+
+    flash('Additional Subject added successfully', 'success')
+
+    return new_additional_subject
 
 #===============================================================================================#
 #===============================Semester, Program, YearLevel====================================#
 #===============================================================================================#
 
 
-
-"""# Insert function for Program
-def insert_program(form_data):
-    # Get the form data
-    programCode = form_data['programCode']
-    programName = form_data['programName']
-
-    new_program = Program(
-        programCode=programCode,
-        programName=programName,
-    )
-    return new_program
-
-# Insert function for YearLevel
-def insert_year_level(form_data):
-
-        # Get the form data
-    yearLevel = form_data['yearLevel']
-    #programId = form_data['programId']
-
-    new_year_level = YearLevel(
-        yearLevel=yearLevel,
-       # programId=programId,
-    )
-    return new_year_level
-
-# Insert function for Semester
-def insert_Semester(form_data):
-    SemesterName = form_data['SemesterName']
-    
-    new_Semester = Semester(
-        SemesterName=SemesterName, 
-    #yearId=yearId
-    )
-    
-    return new_Semester
-
-# Insert function for CourseSub
-def insert_course_sub(form_data):
-
-    courseSub_Code = form_data['courseSub_Code']
-    Sub_Description = form_data['Sub_Description']
-
-    new_course_sub = CourseSub(
-        courseSub_Code=courseSub_Code, Sub_Description=Sub_Description,
-    )
-    return new_course_sub
-"""
 
 
 

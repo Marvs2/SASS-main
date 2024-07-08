@@ -1,124 +1,275 @@
 {% extends "student/layout.html" %}
 {% block content %}
 
-
 <div class="data data2">
-    <div class="content-data">
-        <div class="head">
-            <h3>Application for Overload of Subjects</h3>           
-        </div>
-        <form id="overloadApplicationForm" action="{{ url_for('submit_overload_applications')}}" method="POST" enctype="multipart/form-data">
-          
-            <div class="row mb-3">
-                <label for="Name" class="col-sm-3 col-form-label">Name</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="Name" name="Name" readonly>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="date" class="col-sm-3 col-form-label">Application Date</label>
-                <div class="col-sm-8">
-                    <input type="text" class="form-control" id="date" name="date" required>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <label for="ProgramCourse" class="col-sm-3 col-form-label">Program</label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="ProgramCourse" name="ProgramCourse" required>
-                            <option value ="">Select Program...</option>
-                            <option value="BSIT">Bachelor of Science in Information Technology</option>
-                            <option value="BBTLE_HE">Bachelor of Business Technology and Livelihood Education - Home Economics</option>
-                            <option value="BBTLE_ICT">Bachelor of Business Technology and Livelihood Education - Information and Communication Technology</option>
-                            <option value="BSBA_MM">Bachelor of Science in Business Administration - Marketing Management</option>
-                            <option value="BSBA_HRM">Bachelor of Science in Business Administration - Human Resource Management</option>
-                            <option value="BSE">Bachelor of Science in Entrepreneurship</option>
-                            <option value="DOMT_MOM">Diploma in Office Management Technology - Medical Office Management</option>
-                            <option value="BPA_PFM">Bachelor of Public Administration - Public Financial Management</option>
-                        </select>
-                    </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="Semester" class="col-sm-3 col-form-label">Semester</label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="Semester" name="Semester" required>
-                            <option value="">Select Semester...</option>
-                            <option value="First">First Semester</option>
-                            <option value="Second">Second Semester</option>
-                            <option value="Summer">Summer</option>
-                        </select>
-                    </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="SubjectsToAdd" class="col-sm-3 col-form-label">Subjects to Add</label>
-                <div class="col-sm-8">
-                  <input type="text" class="form-control" id="SubjectsToAdd" name="SubjectsToAdd" required>
-                </div>
-            </div>
-
-            <div class="row mb-4">
-                <label for="Justification" class="col-sm-3 col-form-label">Justification for Overload <br> (State your Reason/s)</label>
-                <div class="col-sm-8">
-                  <textarea class="form-control" id="Justification" name="Justification" required></textarea>
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <label for="fileoverload" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester) </label>
-                <div class="col-sm-8">
-                    <input class="form-control" type="file" name="fileoverload" id="fileoverload" accept=".pdf">
-                  </div>
-            </div>
-            <div class="row mb-3">
-                <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible </label>
-                    <div class="col-sm-8">
-                        <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
-                            <option value="Associate Professor V">Director</option>
-                            <option value="Associate Professor V">Head of Academic Program</option>
-                            <option value="Associate Professor II">Administrative Staff ICT Office</option>
-                        </select>
-                    </div>
-            </div>
-            <div class="row mb-3" style="display: none;">
-                <label for="Status" class="col-sm-3 col-form-label">Status </label>
-                <div class="col-sm-8">
-                    <select class="custom-select" id="Status" name="Status" required>
-                        <option value="pending" selected>Pending</option>
-                        <option value="Approved" disabled>Approved</option>
-                        <option value="Rejected" disabled>Rejected</option>
-                    </select>
-                </div>
-            </div>
-            <div class="d-flex justify-content-center">
-                <button type="submit" class="btn btn-success">Submit Application</button>
-                <!-- |||
-                
-                <a href="{{ url_for('viewoverload') }}">View Overload Subject</a>||| -->
-                
-            </div>
-        </form>
+  <div class="content-data">
+    <div class="head">
+      <h3>Application for Overload of Subjects</h3>
     </div>
+    <form id="overloadApplicationForm" action="{{ url_for('submit_overload_applications') }}" method="POST" enctype="multipart/form-data">
+      <!-- Form Fields -->
+      <div class="row mb-3">
+        <label for="Name" class="col-sm-3 col-form-label">Name</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="Name" name="Name" readonly>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="StudentNumber" class="col-sm-3 col-form-label">Student Number</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="StudentNumber" name="StudentNumber" readonly>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="date" class="col-sm-3 col-form-label">Application Date</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="date" name="date" required>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="ProgramCourse" class="col-sm-3 col-form-label">Program</label>
+        <div class="col-sm-8">
+          <select class="custom-select" id="ProgramCourse" name="ProgramCourse" required>
+            <option value="">Select Program...</option>
+            <option value="BSIT">Bachelor of Science in Information Technology</option>
+            <option value="BBTLE_HE">Bachelor of Business Technology and Livelihood Education - Home Economics</option>
+            <option value="BBTLE_ICT">Bachelor of Business Technology and Livelihood Education - Information and Communication Technology</option>
+            <option value="BSBA_MM">Bachelor of Science in Business Administration - Marketing Management</option>
+            <option value="BSBA_HRM">Bachelor of Science in Business Administration - Human Resource Management</option>
+            <option value="BSE">Bachelor of Science in Entrepreneurship</option>
+            <option value="DOMT_MOM">Diploma in Office Management Technology - Medical Office Management</option>
+            <option value="BPA_PFM">Bachelor of Public Administration - Public Financial Management</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="Semester" class="col-sm-3 col-form-label">Semester</label>
+        <div class="col-sm-8">
+          <select class="custom-select" id="Semester" name="Semester" required>
+            <option value="">Select Semester...</option>
+            <option value="First">First Semester</option>
+            <option value="Second">Second Semester</option>
+            <option value="Summer">Summer</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="SubjectsToAdd" class="col-sm-3 col-form-label">Subjects to Add</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" id="SubjectsToAdd" name="SubjectsToAdd" required>
+        </div>
+      </div>
+      <div class="row mb-4">
+        <label for="Justification" class="col-sm-3 col-form-label">Justification for Overload <br> (State your Reason/s)</label>
+        <div class="col-sm-8">
+          <textarea class="form-control" id="Justification" name="Justification" required></textarea>
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="fileoverload" class="col-sm-3 col-form-label">Certificate of Registration <br> (Current Semester)</label>
+        <div class="col-sm-8">
+          <input class="form-control" type="file" name="fileoverload" id="fileoverload" accept=".pdf">
+        </div>
+      </div>
+      <div class="row mb-3">
+        <label for="UserResponsible" class="col-sm-3 col-form-label">User Responsible</label>
+        <div class="col-sm-8">
+          <select class="custom-select" id="UserResponsible" name="UserResponsible" required>
+            <option value="Associate Professor V">Director</option>
+            <option value="Associate Professor V">Head of Academic Program</option>
+            <option value="Associate Professor II">Administrative Staff ICT Office</option>
+          </select>
+        </div>
+      </div>
+      <div class="row mb-3" style="display: none;">
+        <label for="Status" class="col-sm-3 col-form-label">Status</label>
+        <div class="col-sm-8">
+          <select class="custom-select" id="Status" name="Status" required>
+            <option value="pending" selected>Pending</option>
+            <option value="Approved" disabled>Approved</option>
+            <option value="Rejected" disabled>Rejected</option>
+          </select>
+        </div>
+      </div>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-success">Submit Application</button>
+      </div>
+
+      <!-- Button to trigger the slider -->
+      <div class="d-flex justify-content-right mt-3">
+        <button type="button" class="btn btn-primary" onclick="toggleSlider()">Additional Information</button>
+      </div>
+    </form>
+  </div>
 </div>
 
+<!-- Sliding Panel -->
+<div id="slider" class="slider">
+  <div class="close-btn">&times;</div>
+  <div class="content-data p-3">
+    <h4>Additional Information</h4>
+    <!-- Additional content in slider -->
+    <p>This panel can be used to provide extra information or collect more details related to the overload application.</p>
+    <table id="overloadTable" class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Overload Number</th>
+          <th>Student Number</th>
+          <th>Program Course</th>
+          <th>Semester</th>
+          <th>Subject to Add</th>
+          <th>Status</th>
+          <th>View details</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for overload_application in overload_applications_list %}
+        <tr class="{% if overload_application.Status == 'Approved' %}table-success{% elif overload_application.Status == 'pending' %}table-warning{% elif overload_application.Status == 'Rejected' %}table-danger{% endif %}">
+          <td>{{ format_overload_id(overload_application.OverloadId) }}</td>
+          <td>{{ overload_application.StudentNumber }}</td>
+          <td>{{ overload_application.ProgramCourse }}</td>
+          <td>{{ overload_application.Semester }}</td>
+          <td>{{ overload_application.SubjectsToAdd }}</td>
+          <td>{{ overload_application.Status }}</td>
+          <td>
+            <a href="{{ url_for('studviewoverload', overload_id=overload_application.OverloadId) }}" class="btn btn-primary">View Details</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<style>
+  thead {
+    background-color: #dc3c49;
+    color: white;
+  }
+  .slider {
+    position: fixed;
+    right: -100%;
+    top: 0;
+    width: 30%; /* Initial width of the slider */
+    height: 100%;
+    background: #f8f9fa;
+    overflow: auto;
+    transition: right 0.3s ease;
+    box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+  }
+
+  .slider.open {
+    right: 0;
+  }
+
+  .slider .close-btn {
+    display: block;
+    padding: 10px;
+    text-align: right;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .table-success {
+    background-color: #60e47f !important;
+  }
+
+  .table-warning {
+    background-color: #fbd96b !important;
+  }
+
+  .table-danger {
+    background-color: #f28b8c !important;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .slider {
+      width: 50%; /* Adjust width for smaller screens */
+    }
+    .content-data {
+      font-size: 0.9em; /* Adjust overall font size */
+    }
+    .content-data h4 {
+      font-size: 1.2em; /* Adjust h4 font size */
+      margin-bottom: 1em; /* Adjust margin bottom for spacing */
+    }
+    .content-data p {
+      font-size: 0.9em; /* Adjust paragraph font size */
+      margin-bottom: 1em; /* Adjust margin bottom for spacing */
+    }
+    .content-data table {
+      font-size: 0.9em; /* Adjust table font size */
+      margin-top: 1em; /* Adjust margin top for spacing */
+      width: 50%; /* Ensure table spans full width */
+    }
+    .content-data th, .content-data td, .content-data a {
+      padding: 0.5em; /* Adjust padding for table cells */
+      font-size: 0.9em;
+    }
+    .content-data button {
+      font-size: 0.8em; /* Adjust button font size */
+      width: 40%; /* Adjust button width */
+      margin-top: 1em; /* Adjust margin top for spacing */
+    }
+    .content-data input[type="text"],
+    .content-data input[type="date"],
+    .content-data input[type="file"],
+    .content-data input[type="submit"],
+    .content-data select,
+    .content-data textarea {
+      font-size: 0.9em; /* Adjust input, select, textarea font size */
+      padding: 0.3em 0.5em; /* Adjust padding for inputs */
+      margin-bottom: 0.5em; /* Adjust margin bottom for spacing between elements */
+      width: 100%; /* Ensure inputs and selects span full width */
+      box-sizing: border-box; /* Include padding and border in element's total width and height */
+    }
+    .content-data label {
+      font-size: 0.9em; /* Adjust label font size */
+      margin-bottom: 0.3em; /* Adjust margin bottom for spacing */
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const slider = document.getElementById('slider');
+    const closeBtn = slider.querySelector('.close-btn');
+    const toggleButton = document.querySelector('.btn-primary');
+
+    if (toggleButton && slider && closeBtn) {
+      toggleButton.addEventListener('click', function() {
+        slider.classList.toggle('open');
+      });
+
+      closeBtn.addEventListener('click', function() {
+        slider.classList.remove('open');
+      });
+    } else {
+      console.error("Toggle button, slider element, or close button not found.");
+    }
+
+    // Additional JavaScript logic to handle form and table manipulations
+    const form = document.getElementById('overloadApplicationForm');
+    if (form) {
+      const nameField = document.getElementById('Name');
+      const studentNumberField = document.getElementById('StudentNumber');
+      const dateField = document.getElementById('date');
+      const programCourseField = document.getElementById('ProgramCourse');
+      const semesterField = document.getElementById('Semester');
+      const subjectsToAddField = document.getElementById('SubjectsToAdd');
+
+      if (nameField && studentNumberField && dateField && programCourseField && semesterField && subjectsToAddField) {
+        // Assume you have logic to fetch and populate these fields
+        // nameField.value = "Some Value";
+      } else {
+        console.error("One or more form fields not found.");
+      }
+    }
+  });
+</script>
+
+  
+
 {% endblock content %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-

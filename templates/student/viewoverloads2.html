@@ -1,0 +1,122 @@
+{% extends "student/layout.html" %}
+
+{% block content %}
+<style>
+   pre {
+            padding: 10px;
+            background-color: #f4f4f4;
+            border: 1px solid #ccc;
+            overflow-x: auto;
+            line-height: 1.5;
+            position: relative;
+        }
+        .line-number {
+            display: inline-block;
+            width: 40px;
+            color: #999;
+            padding-right: 10px;
+            text-align: right;
+            user-select: none;
+        }
+        .python .err {
+            background: #FDD;
+        }
+        .python .kwd {
+            color: #00F;
+            font-weight: bold;
+        }
+        .python .d {
+            color: #080;
+        }
+        .python .s2 {
+            background: #FFF0F0;
+            border: 1px solid #F88;
+        }
+        .python .nf {
+            color: #00F;
+        }
+        .python .cp {
+            color: #00F;
+        }
+</style>
+
+<div class="data data1">
+  <div class="content-data">
+    <h1>Python Code Highlighter</h1>
+    <form method="POST">
+        <textarea name="python_code" rows="20" cols="80" placeholder="Enter your Python code here...">{{ python_code }}</textarea><br>
+        <button type="submit">Highlight Code</button>
+    </form>
+    <br>
+    {% if html_code %}
+    <h2>Highlighted HTML Output:</h2>
+    {{ html_code | safe }}
+    {% endif %}
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    function setProgress(step, barId, isRejected) {
+      const progressBar = document.getElementById(barId);
+      const steps = progressBar.parentElement.querySelectorAll('.progress-step');
+      const progressBarFullWidth = progressBar.parentElement.offsetWidth;
+      const stepWidth = progressBarFullWidth / (steps.length - 1);
+      const stepPercentage = 100 / (steps.length - 1);
+
+      if (isRejected) {
+        progressBar.classList.add('rejected');
+        steps.forEach(stepElem => stepElem.classList.add('progress-step-rejected'));
+        progressBar.style.width = '100%';
+      } else {
+        progressBar.style.width = (step * stepPercentage) + '%';
+        steps.forEach((stepElem, index) => {
+          if (index <= step) {
+            stepElem.classList.add('progress-step-active');
+          } else {
+            stepElem.classList.remove('progress-step-active');
+          }
+        });
+      }
+
+      for (let i = 0; i < steps.length - 1; i++) {
+        if (i < step) {
+          let progressSegment = document.createElement('div');
+          progressSegment.style.position = 'absolute';
+          progressSegment.style.top = '50%';
+          progressSegment.style.left = (i * stepPercentage) + '%';
+          progressSegment.style.width = stepWidth + 'px';
+          progressSegment.style.height = '4px';
+          progressSegment.style.backgroundColor = isRejected ? '#f44336' : '#4caf50';
+          progressSegment.style.zIndex = '1';
+          progressBar.parentElement.appendChild(progressSegment);
+        }
+      }
+    }
+
+    const application = {{ overload_application | tojson }};
+    const appStatus = application.Status;
+    const facultyStatus = application.FacultyStatus;
+
+    let step = 0;
+    let isRejected = false;
+
+    if (appStatus === 'Approved') {
+      if (facultyStatus === 'Approved') {
+        step = 2;
+      } else if (facultyStatus === 'Rejected') {
+        isRejected = true;
+        step = 1;
+      } else {
+        step = 1;
+      }
+    } else if (appStatus === 'Rejected') {
+      isRejected = true;
+      step = 2;
+    }
+
+    setProgress(step, `progress-${application.OverloadId}`, isRejected);
+  });
+</script>
+
+{% endblock %}

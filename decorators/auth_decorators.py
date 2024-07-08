@@ -51,10 +51,56 @@ def role_required(required_role):
             if user_role == required_role:
                 return func(*args, **kwargs)
             else:
-                return render_template('404.html'), 404
+                flash('Access Denied', category='danger')
+                return redirect(url_for('studentLogin'))
         return wrapper
     return decorator
 
+    
+
+# Dictionary mapping facultyId to their respective HTML menu content
+# faculty_menus = {
+#     10017: """
+#     <ul class="side-dropdown">
+#         <li><a href="{{ url_for('facultyoverload') }}">Overload of Subjects</a></li>
+#         <li><a href="{{ url_for('facultypetition') }}">Online Petition of Subjects</a></li>
+#         <li><a href="{{ url_for('facultyshifting') }}">Application for Shifting</a></li>
+#         <li><a href="{{ url_for('facultytutorial') }}">Online Request for Tutorial</a></li>
+#     </ul>
+#     """,
+#     10018: """
+#     <ul class="side-dropdown">
+#         <li><a href="{{ url_for('facultyadding') }}">Adding of Subjects</a></li>
+#         <li><a href="{{ url_for('facultychange') }}">Change of Schedule/Subjects</a></li>
+#         <li><a href="{{ url_for('facultycrossenrollment') }}">Cross-Enrollment</a></li>
+#     </ul>
+#     """,
+#     1: """
+#     <ul class="side-dropdown">
+#         <li><a href="{{ url_for('facultycorrection') }}">Correction of Grade Entry</a></li>
+#         <li><a href="{{ url_for('facultyenrollment') }}">Manual Enrollment</a></li>
+#         <li><a href="{{ url_for('facultycertification') }}">Request for Certification</a></li>
+#     </ul>
+#     """
+# }
+
+# def faculty_menu_required(fn):
+#     @wraps(fn)
+#     def wrapper(*args, **kwargs):
+#         facultyId = session.get('facultyId')
+#         faculty_menu = faculty_menus.get(facultyId, "")  # Default to empty string if facultyId not found
+#         return fn(faculty_menu=faculty_menu, *args, **kwargs)
+#     return wrapper
+# def faculty_menu_required(fn):
+#     @wraps(fn)
+#     def wrapper(*args, **kwargs):
+#         facultyId = session.get('facultyId')
+#         if facultyId in faculty_menus:
+#             faculty_menu = faculty_menus[facultyId]
+#         else:
+#             faculty_menu = ""  # Fallback if facultyId not found
+#         return fn(*args, **kwargs)
+#     return wrapper
 # def student_required(route_function):
 #     @studentlogin_required
 #     @wraps(route_function)

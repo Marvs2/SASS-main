@@ -35,7 +35,7 @@
 							data-overload-file-url="{{ url_for('view_overload_file', overload_application_id=overload_applications.OverloadId, student_id=overload_applications.StudentId) }}"
 							data-overload-file-filename="{{ overload_applications.Overloadfilename }}"	
 							data-overload-status="{{ overload_applications.Status }}">
-							<td class="applicationID">{{ overload_applications.OverloadId }}</td>								
+							<td class="applicationID">{{ format_overload_id(overload_applications.OverloadId) }}</td>								
 							<td>{{ overload_applications.SubjectsToAdd }}</td>
 							<td>{{ overload_applications.Justification }}</td>														
 							<td id="Status">{{ overload_applications.Status }}</td>
@@ -376,7 +376,7 @@ student_id=manual_enrollments.StudentId) }}"
 							data-petition-type="{{ petition_requests.PetitionType }}"
 							data-petition-reason="{{ petition_requests.RequestReason }}"
 							data-petition-status="{{ petition_requests.Status }}">
-							<td class="applicationID">{{ petition_requests.petition_request_id }}</td>								
+							<td class="applicationID">{{ petition_requests.PetitionId }}</td>								
 							<td>{{ petition_requests.SubjectName }}</td>
 							<td>{{ petition_requests.PetitionType }}</td>	
 							<td>{{ petition_requests.RequestReason }}</td>													

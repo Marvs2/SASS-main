@@ -71,10 +71,10 @@
 <script>
     // JavaScript code to set innerHTML dynamically for post carousel
     var postCarouselInner = document.getElementById('postCarouselInner');
-    {% for post in posts %}
-        document.getElementById('postTitle{{ loop.index }}').innerHTML = '{{ post.Title }}';
-        document.getElementById('postContent{{ loop.index }}').innerHTML = '{{ post.Content }}';
-    {% endfor %}
+    // {% for post in posts %}
+    //     document.getElementById('postTitle{{ loop.index }}').innerHTML = '{{ post.Title }}';
+    //     document.getElementById('postContent{{ loop.index }}').innerHTML = '{{ post.Content }}';
+    // {% endfor %}
 </script>
 
 <!-- Your existing HTML code -->

@@ -1,5 +1,6 @@
 # api/api_routes.py
 import base64
+from datetime import datetime
 from flask import Blueprint, jsonify, render_template, request, redirect, url_for, flash, session
 from Api.v1.faculty.utils import faculty_all_services, get_all_services, get_all_services_counts
 from models import Faculty
@@ -132,6 +133,7 @@ def fetchFacultyDetails():
 
         # Construct and return the JSON response
         return jsonify({
+            'FacultyId': faculty.FacultyId,
             'FacultyType': faculty.FacultyType,
             'FirstName': faculty.FirstName,
             'LastName': faculty.LastName,
@@ -209,3 +211,23 @@ def all_services():
 def services():
     all_services = faculty_all_services()
     return jsonify(success=True, services=all_services)
+
+
+#facultyId
+
+@faculty_api.route('/faculty-id', methods=['GET'])
+@role_required('faculty')
+def fetch_faculty_id():
+    user_id = session.get('user_id')
+
+    faculty = Faculty.query.get(user_id)
+
+    if faculty:
+        # Return only the FacultyId
+        return jsonify({
+            'FacultyId': faculty.FacultyId
+        })
+    else:
+        flash('User not found', 'danger')
+        return redirect(url_for('faculty_api.faculty_login'))
+    

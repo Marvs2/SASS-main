@@ -990,21 +990,126 @@ table th, table td {
 
 
 
-@media screen and (max-width: 768px) {
-	#content {
-		position: relative;
-		width: calc(100% - 60px);
-		transition: all .3s ease;
+
+/* MEDIA QUERIES */
+@media (max-width: 768px) {
+	#sidebar {
+		max-width: 108px;
 	}
-	nav .nav-link,
-	nav .divider {
+
+	#sidebar .side-menu {
+		padding: 0 4px;
+	}
+
+	#content {
+		width: calc(100% - 100px);
+		left: 100px;
+	}
+
+	nav {
+		padding: 0 14px;
+		grid-gap: 15px;
+	}
+
+	nav .profile img {
+		width: 24px; /* Reduced width */
+		height: 24px; /* Reduced height */
+		border-radius: 50%;
+		object-fit: cover;
+		cursor: pointer;
+	}
+
+	/* Adjust logo size */
+	#sidebar .brand {
+		font-size: 15px; /* Reduced font size for logo text */
+	}
+	#sidebar .img {
+		width: 34px;
+		margin-right: 5px;
+	}
+	/* Adjust the font size and padding of main content */
+	main {
+		width: 90%; /* Adjusted width for main content */
+		margin: 0 auto; /* Center the main content */
+		padding: 2px; /* Reduced padding */
+		font-size: 9px; /* Reduced font size */
+	}
+
+	main .title {
+		font-size: 17px;
+		font-weight: 600;
+		margin-bottom: 10px;
+		margin-top: 15px;
+	}
+	/* Adjust the card size and font */
+	main .card {
+		padding: 6px; /* Reduced padding */
+		font-size: 9px; /* Reduced font size for cards */
+	}
+
+	#sidebar.hide {
+		max-width: 0;
+	}
+
+	#sidebar.hide + #content {
+		width: 100%;
+		left: 0;
+	}
+
+	/* Hide brand text in sidebar */
+	#sidebar.hide .brand {
+		font-size: 0;
+	}
+
+	/* Adjust sidebar links */
+	#sidebar .side-menu a {
+		padding: 2px 4px; /* Reduced padding */
+		font-size: 9px; /* Reduced font size */
+	}
+	#sidebar .icon {
+		min-width: 20px;
+		display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 6px;
+	}
+
+	/* Adjust sidebar dropdown links */
+	#sidebar .side-dropdown a {
+		background-color: #D0E4FF;
+		padding-left: 6px;
+		font-size: 9px; /* Reduced font size */
+	}
+
+	/* Hide ads section in sidebar */
+	#sidebar .ads {
 		display: none;
 	}
 
-	nav .toggle-sidebar {
-		font-size: 18px;
-		cursor: pointer;
-	}	
+	/* Adjust a elements globally */
+	a {
+		font-size: 9px; /* Reduced font size for all a elements */
+	}
 
-	
+	/* Adjust side-menu lists */
+	#sidebar .side-menu ul {
+		padding-left: 4px; /* Reduced padding */
+	}
+
+	#sidebar .side-menu ul li a {
+		font-size: 9px; /* Reduced font size */
+		padding: 2px 4px; /* Reduced padding */
+	}
+
+	/* Adjust divider font size */
+	#sidebar .divider {
+		font-size: 9px; /* Reduced font size for divider */
+		margin-top: 6px;
+	}
+
+	/* Adjust list after divider */
+	#sidebar .side-menu .list-after-divider a {
+		font-size: 9px; /* Reduced font size */
+		padding: 2px 4px; /* Reduced padding */
+	}
 }

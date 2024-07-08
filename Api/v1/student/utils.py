@@ -1,4 +1,6 @@
 
+import base64
+import json
 from models import AddSubjects, CertificationRequest, ChangeSubject, Class, Course, CrossEnrollment, Faculty, GradeEntry, ManualEnrollment, Metadata, OverloadApplication, PetitionRequest, ShiftingApplication, StudentClassGrade, LatestBatchSemester, StudentClassSubjectGrade, ClassSubject, Student, Subject, TutorialRequest, db, CourseEnrolled, Curriculum
 from sqlalchemy import AliasedReturnsRows, desc, func, and_
 import re
@@ -926,7 +928,7 @@ def getStudentClassSGrade(str_student_id):
                     Class.Metadata.Month <= current_month)  # Filter out future semesters
             .all()
         )
-        print(current_month)
+        # print(current_month)
         list_data_student_subject_grade = []
 
         for item in data_student_subject_grade:
@@ -1480,7 +1482,7 @@ def get_all_services():
         }
 
         # Print the services counts for debugging
-        print("Services Counts:", services_count)
+        # print("Services Counts:", services_count)
 
         # Return the dictionary of service counts
         return services_count
@@ -1525,3 +1527,114 @@ def get_all_services():
 #             certification_request_list, grade_entry_list, cross_enrollment_list,
 #             petition_requests_list, shifting_applications_list, overload_applications_list,
 #             tutorial_requests_list, services_dict, total_services)
+
+
+
+
+#HelpDesk
+# # def getOverloadApplication(str_student_id):
+# #     try:
+# #         # Fetch OverloadApplication based on the StudentId foreign key
+# #         overload_applications = OverloadApplication.query.filter_by(StudentId=str_student_id).all()
+# #         overload_data = []
+# #         print(overload_data)
+# #         if overload_applications:
+# #             for application in overload_applications:
+# #                 data = {
+# #                     "Name": application.Name,
+# #                     "StudentNumber": application.StudentNumber,
+# #                     "ProgramCourse": application.ProgramCourse,
+# #                     "Semester": application.Semester,
+# #                     "SubjectsToAdd": application.SubjectsToAdd,
+# #                     "Justification": application.Justification,
+# #                     "Overloadfilename": application.Overloadfilename,
+# #                     "UserResponsible": application.UserResponsible,
+# #                     "Status": application.Status,
+# #                     "Remarks": application.Remarks
+# #                 }
+# #                 # Convert bytes objects to strings or appropriate formats
+# #                 if application.Overloaddata:
+# #                     data["Overloaddata"] = application.Overloaddata.decode()  # Assuming Overloaddata is a bytes object
+# #                 else:
+# #                     data["Overloaddata"] = None
+
+# #                 overload_data.append(data)
+# #                 print(overload_data)
+# #             return json.dumps(overload_data)  # Convert data to JSON and return
+# #         else:
+# #             return None
+
+# #     except Exception as e:
+# #         print(f"Error: {e}")
+# #         return None
+# # It gives a message No Overload application available
+
+
+# def getOverloadApplication(str_student_id):
+#     try:
+#         overload_applications = OverloadApplication.query.filter_by(StudentId=str_student_id).all()
+#         overload_data = []
+#         print(overload_data)
+#         if overload_applications:
+#             for application in overload_applications:
+#                 data = {
+#                     "Name": application.Name,
+#                     "StudentNumber": application.StudentNumber,
+#                     "ProgramCourse": application.ProgramCourse,
+#                     "Semester": application.Semester,
+#                     "SubjectsToAdd": application.SubjectsToAdd,
+#                     "Justification": application.Justification,
+#                     "Overloadfilename": application.Overloadfilename,
+#                     "Overloaddata": base64.b64encode(application.Overloaddata).decode(),  # Convert binary data to Base64 string
+#                     "UserResponsible": application.UserResponsible,
+#                     "Status": application.Status,
+#                     "Remarks": application.Remarks
+#                 }
+#                 overload_data.append(data)
+#                 print(overload_data)
+#             return json.dumps(overload_data)
+#         else:
+#             return None
+
+#     except Exception as e:
+#         print(f"Error: {e}")
+#         return None
+
+
+
+def getOverloadApplication(str_student_id):
+    try:
+        overload_applications = OverloadApplication.query.filter_by(StudentId=str_student_id).all()
+        overload_data = []
+
+        if overload_applications:
+            for application in overload_applications:
+                data = {
+                    "Name": application.Name,
+                    "StudentNumber": application.StudentNumber,
+                    "ProgramCourse": application.ProgramCourse,
+                    "Semester": application.Semester,
+                    "SubjectsToAdd": application.SubjectsToAdd,
+                    "Justification": application.Justification,
+                    "Overloadfilename": application.Overloadfilename,
+                    "UserResponsible": application.UserResponsible,
+                    "Status": application.Status,
+                    "Remarks": application.Remarks
+                }
+
+                # Check if Overloaddata is present and exclude it from JSON serialization
+                if application.Overloaddata:
+                    data["Overloaddata"] = "Binary data"  # Placeholder for binary data
+                else:
+                    data["Overloaddata"] = None
+
+                overload_data.append(data)
+
+            return json.dumps(overload_data)  # Convert data to JSON and return
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return None
+

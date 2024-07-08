@@ -1,13 +1,15 @@
 import io
+import logging
 from flask import Flask, abort, render_template, jsonify, redirect, request, flash, send_file, url_for, session, make_response
 from flask_login import current_user, login_user
+from requests import Session
 from sqlalchemy import and_, func
 from Api.v1.faculty.utils import get_all_services, get_all_services_counts
 from Api.v1.student.utils import get_student_requests, get_student_services, get_all_based_on_services
-from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
+from models import CertificationRequest, ChangeSubject, Class, ClassSubject, Course, CourseEnrolled, CrossEnrollment, ESISAnnouncement, FacultyAdding, FacultyCertification, FacultyCorrection, FacultyCrossEnroll, FacultyManualEnroll, FacultyPetition, FacultyShifting, FacultyTutorial, Post, Faculty, GradeEntry, ManualEnrollment, Metadata, Notification, OverloadApplication, PetitionRequest, Post, FacultyOverload, ShiftingApplication, StudentClassSubjectGrade, Subject, TutorialRequest, db, AddSubjects, init_db, Student
 from werkzeug.utils import secure_filename
 from werkzeug.security import generate_password_hash, check_password_hash 
-from datetime import datetime, timezone #, timedelta, 
+from datetime import datetime, timedelta, timezone #, timedelta, 
 #from models import Services
 #from models import init_db
 from Api.v1.student.api_routes import  create_certification_request, create_change_subject, create_crossenrollment_form, create_gradeentry_application, create_manualenrollment_form, create_notification, create_overload_application, create_petitionrequest_form, create_services_application, create_shifting_application, create_tutorial_request, fetchStudentDetails, get_student_number_by_id, getCurrentUser, getCurrentUserStudentNumber, student_api
@@ -42,7 +44,6 @@ app.config['SQLALCHEMY_POOL_RECYCLE'] = 1800
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 app.config['PERMANENT_SESSION_LIFETIME'] = 1800  # 30 minutes (in seconds)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
-
 app.secret_key = os.getenv('SECRET_KEY')  # Replace 'your-secret-key' with an actual secret key
 jwt = JWTManager(app)
 init_db(app)
@@ -57,7 +58,11 @@ def custom_context_processor():
         authenticated = True
     return {'authenticated': authenticated}
 
+#========================= Formating the Id's ===========================#
+# def format_overload_id(overload_id):
+#     return f"OA-{overload_id:05d}"
 
+# app.jinja_env.globals.update(format_overload_id=format_overload_id)
 #========================= LANDING PAGE ===================================
 
 # @app.route('/')
@@ -70,20 +75,35 @@ def custom_context_processor():
 @app.route('/')
 @prevent_authenticated
 def index():
-    # Fetch announcements from both tables
-    announcements_esis = ESISAnnouncement.query.filter_by(IsLive=True).all()
+    # Current datetime
+    now = datetime.now()
+
+    # Fetch announcements from ESISAnnouncement table within the last 5 days and IsLive is True
+    announcements_esis = ESISAnnouncement.query.filter(
+        ESISAnnouncement.IsLive == True,
+        ESISAnnouncement.Created >= now - timedelta(days=5)
+    ).all()
+
+    # Fetch all announcements from Post table
     announcements_posts = Post.query.filter_by(PostType='announcement').all()
 
-    # Combine data from both tables
-    combined_data = announcements_esis + announcements_posts
-
-    return render_template('main/home.html', items=combined_data)
+    return render_template('main/home.html', announcements=announcements_esis, posts=announcements_posts)
 
 @app.route('/events')
 @prevent_authenticated
 def events():
-    posts = Post.query.filter_by(PostType='announcement').all()  
-    return render_template('main/events.html', posts=posts)
+    # Current datetime
+    now = datetime.now()
+
+    # Fetch all posts of type 'announcement'
+    posts = Post.query.filter_by(PostType='announcement').all()
+    
+    # Fetch announcements from ESISAnnouncement table that are either older than 5 days or IsLive is False
+    past_announcements = ESISAnnouncement.query.filter(
+        (ESISAnnouncement.Created < now - timedelta(days=5)) | (ESISAnnouncement.IsLive == False)
+    ).all()
+
+    return render_template('main/events.html', posts=posts, past_announcements=past_announcements)
 
 #===========================================================================
 @app.route('/')
@@ -236,8 +256,6 @@ def student_dashboard():
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
 
-    print(data)
-    
     return render_template('/student/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data, student_id=student_id)
 
 @app.route('/student/payment')
@@ -365,7 +383,9 @@ def student_update_profile():
     return render_template('/student/profile.html')
 
 
-#======================================== STUDENT TRANSACTION HISTORY ===================================================
+#======================================== STUDENT TRANSACTION HISTORY ===================================================#
+
+
 @app.route('/student/history', methods=['GET'])
 @student_required
 def student_history():
@@ -409,9 +429,15 @@ def student_history():
         shifting_applications = ShiftingApplication.query.filter_by(StudentId=student.StudentId).all()
         services_data['shifting_applications_list'] = [subject.to_dict() for subject in shifting_applications]
 
-        # Fetch OverloadApplication based on the StudentId foreign key
+        # Fetch OverloadApplication based on the StudentId foreign key and format the OverloadId
         overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
-        services_data['overload_applicationss_list'] = [subject.to_dict() for subject in overload_applications]
+        services_data['overload_applicationss_list'] = [
+            {
+                **subject.to_dict(),
+                'FormattedOverloadId': format_overload_id(subject.OverloadId)
+            }
+            for subject in overload_applications
+        ]
 
         # Fetch TutorialRequest based on the StudentId foreign key
         tutorial_requests = TutorialRequest.query.filter_by(StudentId=student.StudentId).all()
@@ -420,6 +446,7 @@ def student_history():
     return render_template("/student/history.html", services_data=services_data)
 #=======================================For Notification=======================================#
 @app.route('/student/notifications' , methods=['GET'])
+@student_required
 @role_required('student')
 def show_notifications():
     user_id = session.get('user_id')
@@ -527,10 +554,36 @@ def get_subjects(year_level_id, semester_id):
     return jsonify([subject.to_dict() for subject in subjects])"""
     
 #================================= OVERLOAD OF SUBJECT =============================================================
-@app.route('/student/overload') 
+
+# Route for student overload
+@app.route('/student/overload')
+@role_required('student')
 @student_required
 def studentoverload():
-    return render_template("/student/overload.html", student_api_base_url=student_api_base_url)
+    user_id = session.get('user_id')
+
+    # Fetch the student based on the user_id
+    student = Student.query.get(user_id)
+
+    overload_applications_list = []  # Initialize an empty list
+
+    if student:
+        # Fetch OverloadApplications based on the StudentId foreign key
+        overload_applications = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+
+        # Convert OverloadApplications data to a list of dictionaries
+        overload_applications_list = [
+            {
+                **subject.to_dict(),
+                'formatted_overload_id': format_overload_id(subject.OverloadId)
+            }
+            for subject in overload_applications
+        ]
+
+    return render_template("/student/overload.html", 
+                           student_api_base_url=student_api_base_url, 
+                           overload_applications_list=overload_applications_list)
+
 #DONE
 @app.route('/student/overload/submitted', methods=['POST'])
 @role_required('student')
@@ -538,6 +591,18 @@ def submit_overload_applications():
     try:
         current_StudentId = session.get('user_id')
         current_StudentNumber = get_student_number_by_id(current_StudentId)
+
+          # Get the form data from POST request
+        form_data = {
+            'Name': request.form['Name'],
+            'StudentNumber': request.form['StudentNumber'],
+            'ApplicationDate': request.form['date'],
+            'ProgramCourse': request.form['ProgramCourse'],
+            'Semester': request.form['Semester'],
+            'SubjectsToAdd': request.form['SubjectsToAdd'],
+            'Justification': request.form['Justification'],
+            'UserResponsible': request.form['UserResponsible']
+        }
         # Get the form data from POST request
         new_overload_applications = create_overload_application(request.form, request.files, current_StudentId)
 
@@ -559,7 +624,7 @@ def submit_overload_applications():
         
                 # Ensure student_api_base_url is defined and accessible
             flash('Overload application submitted successfully!', category='success')
-            return redirect(url_for('studentoverload'))
+            return redirect(url_for('studentoverload', form_data=form_data))
     except Exception as e:
         print(f'Error: {str(e)}')
         db.session.rollback()
@@ -568,26 +633,71 @@ def submit_overload_applications():
         db.session.close()
 
     return render_template('/student/overload.html')
-  # Adjust the template as needed
 
-@app.route('/student/viewoverload', methods=['GET'])
+
+@app.route('/student/reviewoverrequest')
 @role_required('student')
-def viewoverload():
+def overload_application():
     user_id = session.get('user_id')
 
     # Fetch the student based on the user_id
     student = Student.query.get(user_id)
 
-    overload_applicationss_list = []  # Initialize an empty list
+    overloadlist = []  # Initialize an empty list
 
     if student:
         # Fetch AddSubjects based on the StudentId foreign key
-        overload_applicationss = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
+        overload_list = OverloadApplication.query.filter_by(StudentId=student.StudentId).all()
 
         # Convert AddSubjects data to a list of dictionaries
-        overload_applicationss_list = [subject.to_dict() for subject in overload_applicationss]
+        overloadlist = [subjects.to_dict() for subjects in overload_list]
 
-    return render_template("/student/viewoverload.html", overload_applicationss_list=overload_applicationss_list)
+    return render_template("/student/reviewoverrequest.html", overloadlist=overloadlist)
+
+  # Adjust the template as needed
+
+#this is the route to the page 
+
+@app.route('/student/viewoverload/<int:overload_id>', methods=['GET'])
+@role_required('student')
+def studviewoverload(overload_id):
+    try:
+        user_id = session.get('user_id')
+        student = Student.query.get(user_id)
+
+        if not student:
+            return jsonify(error=True, message="Student not found."), 404
+
+        overload_application = OverloadApplication.query.filter_by(StudentId=student.StudentId, OverloadId=overload_id).first()
+
+        if not overload_application:
+            return jsonify(error=True, message="Overload application not found."), 404
+
+        app_dict = overload_application.to_dict()
+
+        # Convert bytes to strings if necessary
+        for key, value in app_dict.items():
+            if isinstance(value, bytes):
+                app_dict[key] = value.decode('utf-8', errors='replace')
+
+        # Add formatted overload ID
+        app_dict['formatted_overload_id'] = format_overload_id(overload_application.OverloadId)
+
+        faculty_overload = FacultyOverload.query.filter_by(overloadid=app_dict['OverloadId']).first()
+        if faculty_overload:
+            app_dict['FacultyStatus'] = faculty_overload.Status.decode('utf-8', errors='replace') if isinstance(faculty_overload.Status, bytes) else faculty_overload.Status
+            app_dict['FacultyComment'] = faculty_overload.Comment.decode('utf-8', errors='replace') if isinstance(faculty_overload.Comment, bytes) else faculty_overload.Comment
+        else:
+            app_dict['FacultyStatus'] = 'Pending'
+            app_dict['FacultyComment'] = 'No comments'
+
+        app.logger.info(f"Overload Application Data: {app_dict}")
+        return render_template("student/viewoverload.html", overload_application=app_dict)
+    except Exception as e:
+        app.logger.error(f"Error processing overload application: {e}")
+        return jsonify(error=True, message="Internal server error."), 500
+
+
 
 
 # =================================== GET THE STUDENT SUBJECT FOR ADDING OF SUBJECT ================================================
@@ -1754,7 +1864,53 @@ def refresh_session():
 
 #======================View_Compilation=====================#
 #===========================================================#
+#SERVICES
+# @app.route('/faculty/validationofoverload')
+# @faculty_required
+# @role_required('faculty')
+# def validationofoverload():
+#     session['last_activity'] = datetime.now(timezone.utc)
 
+#     # Get the current faculty user
+#     current_faculty = get_current_faculty_user()
+
+#     if current_faculty:
+#         # Access all OverloadApplications without filtering by FacultyId
+#         overload_application = OverloadApplication.query.all() 
+# This is from different table now like for the second validation table and pls after this work pls propagate with other services as well. It needed a time to be precise so if the given time exceed the given then it will check as one of the late
+
+#         students = []
+#         for subject in overload_application:
+#             student = Student.query.filter_by(StudentId=subject.StudentId).first()
+#             students.append(student)
+
+#         overload_data = zip(overload_application, students)
+
+#         # You may still need the Sapproval_overload part, so keeping it as is
+#         Sapproval_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# New Query for new table but same logic
+        
+#         over_students = []
+#         for over_subject in Sapproval_overload:
+#             over_student = Student.query.filter_by(StudentId=over_subject.StudentId).first()
+#             over_students.append(over_student)
+
+#         Sapproval_overload_data = zip(Sapproval_overload, over_students)
+        
+#     # For Pending Subjects
+#         pending_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+#         pending_over_students = []
+#         for pending_over_subject in pending_overload:
+#             pending_over_student = Student.query.filter_by(StudentId=pending_over_subject.StudentId).first()
+#             pending_over_students.append(pending_over_student)
+
+#         pending_overload_data = zip(pending_overload, pending_over_students)
+        
+#         return render_template("/faculty/overload.html", overload_data=overload_data, approved_overload_data=approved_overload_data, pending_overload_data=pending_overload_data)
+#     else:
+#         # Handle the case where the current faculty is not found
+#         flash('Faculty not found.', 'danger')
+#         return redirect(url_for('faculty_portal')) #overload_applications in overload_applications
 # ========================================================================
 #SERVICES
 @app.route('/faculty/overload')
@@ -1768,7 +1924,7 @@ def facultyoverload():
 
     if current_faculty:
         # Access all OverloadApplications without filtering by FacultyId
-        overload_application = OverloadApplication.query.all()
+        overload_application = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
 
         students = []
         for subject in overload_application:
@@ -1779,28 +1935,89 @@ def facultyoverload():
 
         # You may still need the approved_overload part, so keeping it as is
         approved_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
-        
-        over_students = []
-        for over_subject in approved_overload:
-            over_student = Student.query.filter_by(StudentId=over_subject.StudentId).first()
-            over_students.append(over_student)
+        app_over_students = []
+        for app_over_subject in approved_overload:
+            app_over_student = Student.query.filter_by(StudentId=app_over_subject.StudentId).first()
+            app_over_students.append(app_over_student)
 
-        approved_overload_data = zip(approved_overload, over_students)
+        approved_overload_data = zip(approved_overload, app_over_students)
         
     # For Pending Subjects
-        pending_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
-        pending_over_students = []
-        for pending_over_subject in pending_overload:
-            pending_over_student = Student.query.filter_by(StudentId=pending_over_subject.StudentId).first()
-            pending_over_students.append(pending_over_student)
+        # pending_overload = OverloadApplication.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        # pending_over_students = []
+        # for pending_over_subject in pending_overload:
+        #     pending_over_student = Student.query.filter_by(StudentId=pending_over_subject.StudentId).first()
+        #     pending_over_students.append(pending_over_student)
 
-        pending_overload_data = zip(pending_overload, pending_over_students)
+        # pending_overload_data = zip(pending_overload, pending_over_students)
         
-        return render_template("/faculty/overload.html", overload_data=overload_data, approved_overload_data=approved_overload_data, pending_overload_data=pending_overload_data)
+
+        # faculty_overload = FacultyOverload.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+        # faculty_overload_students = []
+        # for faculty_overload_subject in faculty_overload:
+        #     faculty_overload_student = Student.query.filter_by(StudentId=faculty_overload_subject.StudentId).first()
+        #     faculty_overload_students.append(faculty_overload_student)
+
+        # faculty_overload_data = zip(faculty_overload, faculty_overload_students)
+
+
+        return render_template("/faculty/overload.html", overload_data=overload_data, approved_overload_data=approved_overload_data, 
+                            #    pending_overload_data=pending_overload_data, 
+                            # faculty_overload_data=faculty_overload_data, 
+                               format_overload_id=format_overload_id)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
         return redirect(url_for('faculty_portal')) #overload_applications in overload_applications
+
+#===========================================================================#
+#overload functions
+@app.route('/comment', methods=['POST'])
+@faculty_required
+@role_required('faculty')
+def comment():
+    try:
+        faculty_id = ['facultys_id'] # Set the desired faculty_id value
+        form_data = request.form
+        comment = form_data['Comment']
+        status = 'Pending'
+        student_id = form_data['StudentId']
+        overloadid = form_data['overloadId']
+        date_inserted = datetime.now()
+        date_updated = datetime.now()
+
+        # Check if a FacultyOverload record with the same overloadid already exists
+        existing_comment = FacultyOverload.query.filter_by(overloadid=overloadid).first()
+        if existing_comment:
+            # If a record already exists, don't save and inform the user
+            flash('This application already existed and has been passed already to another User Responsible.', 'warning')
+        else:
+            # Create a new record only if it doesn't exist
+            new_comment = FacultyOverload(
+                FacultyId=faculty_id,
+                Comment=comment,
+                Status=status,
+                StudentId=student_id,
+                DateInserted=date_inserted,
+                DateUpdated=date_updated,
+                overloadid=overloadid
+            )
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('Comment submitted successfully!', 'success')
+
+        return redirect(url_for('facultyoverload'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
+
+    return render_template('/faculty/overload.html')
+
+
+
+#=========================================================== New Breed 
 
 @app.route('/faculty/actionoverload')
 @faculty_required
@@ -1852,8 +2069,9 @@ def facultyadding():
 
         pending_data = zip(pending_subjects, pending_students)
 
+        teachers = Faculty.query.all()
 
-        return render_template("/faculty/adding.html", combined_data=combined_data, approved_data=approved_data, pending_data=pending_data)
+        return render_template("/faculty/adding.html", combined_data=combined_data, approved_data=approved_data, pending_data=pending_data, teachers=teachers)
     else:
         # Handle the case where the current faculty is not found
         flash('Faculty not found.', 'danger')
@@ -1909,7 +2127,7 @@ def change_update_status():
  # Corrected variable name
     new_status = data.get('status')
     remarks = data.get('remarks')  # Get remarks from the request
-    print('Received data:', data)  # Add this line for debugging
+    # print('Received data:', data)  # Add this line for debugging
     if not changeSubjectId:
         flash('Change subject ID is missing or invalid', 'danger')
         return jsonify({'message': 'Change subject ID is missing or invalid'}), 400
@@ -2080,8 +2298,6 @@ def shifting_update_status():
         flash('Error updating status', 'danger')  # Flash error message
         return jsonify({'message': str(e)}), 500   
     
-    #to a relevant page
-###############################################################################
 @app.route('/faculty/shifting/get_shifting_file/<int:shifting_id>')
 def get_shifting_file(shifting_id):
     return redirect(url_for('download_shifting_form', shifting_id=shifting_id))
@@ -2448,6 +2664,364 @@ def tutorial_update_status():
         return jsonify({'message': str(e)}), 500
 
 #=======================================================================#
+# function ID
+
+def format_overload_id(overload_id):
+    return f"OA-{overload_id:05d}"
+
+def format_adding_id(adding_id):
+    return f"AS-{adding_id:05d}"
+
+def format_change_id(change_id):
+    return f"CS-{change_id:05d}"
+
+def format_correction_id(correction_id):
+    return f"GE-{correction_id:05d}"
+
+def format_cross_id(crossenroll_id):
+    return f"CE-{crossenroll_id:05d}"
+
+def format_shifting_id(shifting_id):
+    return f"SA-{shifting_id:05d}"
+
+def format_manual_id(manual_id):
+    return f"ME-{manual_id:05d}"
+
+def format_petition_id(petition_id):
+    return f"PA-{petition_id:05d}"
+
+def format_tutorial_id(tutorial_id):
+    return f"TA-{tutorial_id:05d}"
+
+def format_certify_id(certificate_id):
+    return f"CA-{certificate_id:05d}"
+
+app.jinja_env.globals.update(
+    format_overload_id=format_overload_id,
+    format_adding_id=format_adding_id,
+    format_change_id=format_change_id,
+    format_correction_id=format_correction_id,
+    format_cross_id=format_cross_id,
+    format_shifting_id=format_shifting_id,
+    format_manual_id=format_manual_id,
+    format_petition_id=format_petition_id,
+    format_tutorial_id=format_tutorial_id,
+    format_certify_id=format_certify_id
+)
+
+#=======================================================================#
+#=======================View Request for Accepted Request======================#
+#========================================================================#
+#viewoverload
+
+@app.route('/faculty/viewoverload')
+@faculty_required
+@role_required('faculty')
+def facultyviewoverload():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_overload = FacultyOverload.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+
+        return render_template("/faculty/viewoverload.html", 
+                               view_faculty_overload=view_faculty_overload, 
+                               format_overload_id=format_overload_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+
+@app.route('/view_overload_update_status', methods=['POST'])
+def view_overload_update_status():
+    try:
+        data = request.get_json()
+        logging.info(f"Received data: {data}")
+        
+        if not data:
+            logging.error("No data provided")
+            return jsonify({'message': 'No data provided'}), 400
+        
+        comment_id = data.get('commentId')
+        new_status = data.get('status')
+        new_comment = data.get('comments')
+
+        logging.info(f"Updating comment {comment_id} with status {new_status} and comment {new_comment}")
+
+        if not comment_id:
+            logging.error("Comment ID is missing")
+            return jsonify({'message': 'Comment ID is required'}), 400
+
+        # Find the FacultyOverload entry by Comment ID
+        existing_overload = FacultyOverload.query.filter_by(CommentId=comment_id).first()
+
+        if existing_overload:
+            # Update the status, comment, and date
+            existing_overload.Status = new_status
+            existing_overload.Comment = new_comment
+            existing_overload.DateUpdated = datetime.now()
+
+            db.session.commit()
+            logging.info(f"Successfully updated comment {comment_id}")
+            return jsonify({'message': 'Overload status updated successfully'}), 200
+        else:
+            logging.error(f"Comment ID {comment_id} not found")
+            return jsonify({'message': f'Comment ID {comment_id} not found'}), 404
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error updating status: {str(e)}")
+        return jsonify({'message': f'Error updating status: {str(e)}'}), 500
+
+
+@app.route('/viewcomment', methods=['POST'])
+@faculty_required
+@role_required('faculty')
+def viewcomment():
+    try:
+        faculty_id = ['facultys_id'] # Set the desired faculty_id value
+        form_data = request.form
+        comment = form_data['Comment']
+        status = 'Pending'
+        student_id = form_data['StudentId']
+        overloadid = form_data['overloadId']
+        date_inserted = datetime.now()
+        date_updated = datetime.now()
+
+        # Check if a FacultyOverload record with the same overloadid already exists
+        existing_comment = FacultyOverload.query.filter_by(overloadid=overloadid).first()
+        if existing_comment:
+            # If a record already exists, don't save and inform the user
+            flash('This application already existed and has been passed already to another User Responsible.', 'warning')
+        else:
+            # Create a new record only if it doesn't exist
+            new_comment = FacultyOverload(
+                FacultyId=faculty_id,
+                Comment=comment,
+                Status=status,
+                StudentId=student_id,
+                DateInserted=date_inserted,
+                DateUpdated=date_updated,
+                overloadid=overloadid
+            )
+            db.session.add(new_comment)
+            db.session.commit()
+            flash('Comment submitted successfully!', 'success')
+
+        return redirect(url_for('facultyoverload'))
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error: {str(e)}', 'danger')
+    finally:
+        db.session.close()
+
+    return render_template('/faculty/viewoverload.html')
+
+#===================================================================================#
+
+@app.route('/faculty/viewadding')
+@faculty_required
+@role_required('faculty')
+def facultyviewadding():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_adding = FacultyAdding.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change it to table for FacultyAdding
+
+        return render_template("/faculty/viewadding.html", 
+                               view_faculty_adding=view_faculty_adding, 
+                               format_adding_id=format_adding_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewchange')
+@faculty_required
+@role_required('faculty')
+def facultyviewchange():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_change = FacultyOverload.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyChange
+
+        return render_template("/faculty/viewchange.html", 
+                               view_faculty_change=view_faculty_change,
+                               format_change_id=format_change_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+
+@app.route('/faculty/viewcorrection')
+@faculty_required
+@role_required('faculty')
+def facultyviewcorrection():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_correction = FacultyCorrection.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyCorrection
+
+        return render_template("/faculty/viewcorrection.html", 
+                               view_faculty_correction=view_faculty_correction,
+                               format_correction_id=format_correction_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewcrossenroll')
+@faculty_required
+@role_required('faculty')
+def facultyviewcrossenroll():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_crossenroll = FacultyCrossEnroll.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyCrossEnroll
+
+        return render_template("/faculty/viewcrossenroll.html", 
+                               view_faculty_crossenroll=view_faculty_crossenroll,
+                               format_cross_id=format_cross_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewshifting')
+@faculty_required
+@role_required('faculty')
+def facultyviewshifting():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_shifting = FacultyShifting.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyShifting
+
+        return render_template("/faculty/viewshifting.html", 
+                               view_faculty_shifting=view_faculty_shifting,
+                               format_shifting_id=format_shifting_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewmanual')
+@faculty_required
+@role_required('faculty')
+def facultyviewmanual():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_manual = FacultyManualEnroll.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyManualEnroll
+
+        return render_template("/faculty/viewmanual.html", 
+                               view_faculty_manual=view_faculty_manual,
+                               format_manual_id=format_manual_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewpetition')
+@faculty_required
+@role_required('faculty')
+def facultyviewpetition():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_petition = FacultyPetition.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyPetition
+
+        return render_template("/faculty/viewpetition.html", 
+                               view_faculty_petition=view_faculty_petition,
+                               format_petition_id=format_petition_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewtutorial')
+@faculty_required
+@role_required('faculty')
+def facultyviewtutorial():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_tutorial = FacultyTutorial.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyTutorial
+
+        return render_template("/faculty/viewtutorial.html", 
+                               view_faculty_tutorial=view_faculty_tutorial,
+                               format_tutorial_id=format_tutorial_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+@app.route('/faculty/viewcertification')
+@faculty_required
+@role_required('faculty')
+def facultyviewcertification():
+    session['last_activity'] = datetime.now(timezone.utc)
+
+    # Get the current faculty user
+    current_faculty = get_current_faculty_user()
+
+    if current_faculty:
+        # Fetch FacultyOverload data for the current faculty
+        view_faculty_certify = FacultyCertification.query.filter_by(FacultyId=current_faculty.FacultyId).all()
+# change the FacultyOverload to FacultyCertification
+
+        return render_template("/faculty/viewcertification.html", 
+                               view_faculty_certify=view_faculty_certify,
+                               format_certify_id=format_tutorial_id)
+    else:
+        # Handle the case where the current faculty is not found
+        flash('Faculty not found.', 'danger')
+        return redirect(url_for('faculty_portal'))
+
+
 
 #===================================================TIMER=============================================================#
 # Middleware to check for inactivity and redirect to login if needed
@@ -2470,7 +3044,7 @@ def check_user_activity():
     # Update the last activity timestamp
     session['last_activity'] = datetime.now(timezone.utc)"""
 
-#=====================================================================================================================#
+#====================================================Student route=================================================================#
 # ALL STUDENT ROUTES HERE
 @app.route('/student')
 @prevent_authenticated
@@ -2580,6 +3154,8 @@ def student_portal_overload():
     session.permanent = True
     if is_user_logged_in_overload():
         return render_template('student/overload.html')
+    
+    return redirect(url_for('portal_overload'))
     # Overload subjects function for student
 
 def get_student_details(StudentId):
@@ -2753,7 +3329,7 @@ def student_portal_addingofsubjects():
     session.permanent = True
     # Use the common login check
     if is_user_logged_in_addingofsubjects():
-        return render_template("student/addingsubject.html")
+        return render_template('student/addingsubject.html')
     
     return redirect(url_for('portal_addingofsubjects'))
 
@@ -3475,47 +4051,6 @@ def update_shifting_service_status(ShiftingId):
 
     return redirect(url_for('facultyshifting'))
 
-#shifting
-"""@app.route('/faculty/shifting_applications')
-def view_shifting_applications():
-    shifting_applications = GradeEntry.query.all()
-    return render_template('/faculty/shifting.html', shifting_applications=shifting_applications)"""
-
-# # Redirect to download change of change.html
-# @app.route('/faculty/shifting_applications/get_shifting_file/<int:ShiftingId>')
-# def get_shifting_file(ShiftingId):
-#     return redirect(url_for('download_shifting_file', ShiftingId=ShiftingId))
-
-# # Download change of subjects file
-# @app.route('/faculty/download_shifting_file/<int:ShiftingId>')
-# def download_shifting_file(ShiftingId):
-#     shifting_applications = ShiftingApplication.query.get(ShiftingId)
-
-#     if shifting_applications and shifting_applications.file_data:
-#         shifting_file_extension = get_shifting_file_extension(shifting_applications.file_filename)
-#         download_name = f'shifting_applications_{ShiftingId}.{shifting_file_extension}'
-
-#         return send_file(
-#             io.BytesIO(shifting_applications.file_data),
-#             as_attachment=True,
-#             download_name=download_name,
-#             mimetype=get_mimetype(shifting_file_extension),
-#         )
-#     else:
-#         abort(404)  # Change of subjects application or file not found
-
-# def get_shifting_file_extension(file_filename):
-#     return file_filename.rsplit('.', 1)[1].lower()
-
-# def get_mimetype(shifting_file_extension):
-#     mimetypes = {
-#         'txt': 'text/plain',
-#         'pdf': 'application/pdf',
-#         'docs': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-#         # Add more file types as needed
-#     }
-
-#     return mimetypes.get(shifting_file_extension, 'application/octet-stream')
 #=====================================================================
 # Student - Overload View File
 @app.route('/student/view_overload_file/<int:overload_application_id>/<int:student_id>')
@@ -3629,27 +4164,32 @@ def get_mimetype(overload_file_extension):
 def overload_update_status():
     data = request.get_json()
     overloadId = data.get('overloadId')
- # Corrected variable name
     new_status = data.get('status')
-    remarks = data.get('remarks')  # Get remarks from the request
-    print('Received data:', data)  # Add this line for debugging
+    remarks = data.get('remarks')
 
     if not overloadId:
         flash('Change subject ID is missing or invalid', 'danger')
         return jsonify({'message': 'Change subject ID is missing or invalid'}), 400
 
     try:
-        overload_applications = OverloadApplication.query.filter_by(OverloadId=overloadId).first()
-        if overload_applications:
-            overload_applications.Status = new_status
-            overload_applications.Remarks = remarks  # Set the remarks field
+        # Check if an overload application with the same overloadId already exists
+        existing_overload = OverloadApplication.query.filter_by(OverloadId=overloadId).first()
+        if existing_overload:
+            # Update the existing record
+            existing_overload.Status = new_status
+            existing_overload.Remarks = remarks
             db.session.commit()
             flash('Overload Status updated successfully', 'success')
             return jsonify({'message': 'Overoad Subject Status updated successfully'}), 200
         else:
-            flash('Change subject not found', 'danger')
-            return jsonify({'message': 'Change subject not found'}), 404
+            # Create a new record
+            new_overload = OverloadApplication(OverloadId=overloadId, Status=new_status, Remarks=remarks)
+            db.session.add(new_overload)
+            db.session.commit()
+            flash('New Overload Subject added successfully', 'success')
+            return jsonify({'message': 'New Overoad Subject added successfully'}), 201
     except Exception as e:
+        db.session.rollback()  # Rollback the transaction in case of an error
         flash('Error updating status: ' + str(e), 'danger')
         return jsonify({'message': 'Error updating status: ' + str(e)}), 500
 
@@ -3808,7 +4348,7 @@ def check_user_activity():
     session['last_activity'] = datetime.now(timezone.utc)"""
 
 #================================================================#
-# function that is sent for teachers
+# function that is sent for teachers or faculty
 #================================================================#
 # ALL FACULTY ROUTES HERE
 @app.route('/faculty')
@@ -3821,7 +4361,6 @@ def faculty_portal():
 @app.route('/faculty/dashboard')
 @faculty_required
 def faculty_dashboard():
-
     # with the counts obtained from the get_all_services_counts function
     status_counts = get_all_services_counts()
     # Replace the get_student_services function with get_all_services
@@ -3847,11 +4386,11 @@ def faculty_dashboard():
         'labels': ['Pending', 'Approved', 'Rejected', 'Total']
     }
 
-    print(data)
+    # print(data)
 
     return render_template('/faculty/dashboard.html', pending_count=pending_count, pending_percentage=pending_percentage, approved_count=approved_count, approved_percentage=approved_percentage, denied_count=denied_count, denied_percentage=denied_percentage, total_services=total_services, total_percentage=total_percentage, data=data, status_counts=status_counts, faculty_api_base_url=faculty_api_base_url)
 
-#======================================== FACULTY PROFILE ======================================================
+#================================================================== FACULTY PROFILE ==================================================================#
 @app.route('/faculty/profile')
 @faculty_required
 def facultyprofile():
@@ -3891,7 +4430,7 @@ def faculty_update_profile():
 
     return render_template('/faculty/profile.html')
 
-# ======================Faculty Downloads========================== #
+# ================================================================== Faculty Downloads ================================================================== #
 
 #certification
 @app.route('/faculty/certification/get_faculty_certification_request_file/<string:certification_request_Id>')
@@ -4348,6 +4887,34 @@ def admin_portal():
 app.register_blueprint(admin_api, url_prefix='/api/v1/admin')
 app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)
 app.register_blueprint(student_api, url_prefix=student_api_base_url)
+
+
+#=========================================================================
+# HelpDesk -  not working ?
+
+# # Use the @student_required decorator for your route
+# @app.route('/api/studentoverload', methods=['GET'])
+# @student_required
+# def get_alloverload_data():
+#     try:
+#         # Create a session
+#         session = Session()
+
+#         # Query the OverloadApplication data
+#         overload_data = session.query(OverloadApplication).all()
+
+#         # Convert the data to dictionaries
+#         overload_dicts = [overload.to_dict() for overload in overload_data]
+
+#         # Close the session
+#         session.close()
+
+#         # Return the JSON response
+#         return jsonify(overload_dicts)
+    
+#     except Exception as e: # type: ignore
+#         error_msg = "Error accessing database: {}".format(str(e))
+#         return jsonify({'error': error_msg}), 500
 
 # ========================================================================
 # TESTING

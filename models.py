@@ -64,7 +64,6 @@ class Student(db.Model):
         return self.StudentId
 
 # Faculty Users
-# Faculty Users
 class Faculty(db.Model):
     __tablename__ = 'FISFaculty'  # Set the name of the table in the database
     FacultyId = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -525,6 +524,42 @@ class CourseGrade(db.Model):
 #             # Add other attributes if needed
 #         }
 
+#================================================================================#
+#==============Admin who create the needed requests for student==================#
+#================================================================================#
+class AdditionalSubject(db.Model):
+    __tablename__ = 'SASSAdditionalSubject'
+
+    AddsubId = db.Column(db.Integer, primary_key=True)
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId'))
+    StudentName = db.Column(db.String(255))
+    StudentNumber = db.Column(db.String(255))
+    SubjectCode = db.Column(db.String(255))
+    SubjectName = db.Column(db.String(255))
+    Teacher = db.Column(db.String(255))
+    Units = db.Column(db.Float)
+    Grade = db.Column(db.Float)
+    Status = db.Column(db.String(20))
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'AddsubId': self.AddsubId,
+            'StudentId': self.StudentId,
+            'StudentName': self.StudentName,
+            'StudentNumber': self.StudentNumber,
+            'SubjectCode': self.SubjectCode,
+            'SubjectName': self.SubjectName,
+            'Teacher': self.Teacher,
+            'Units': self.Units,
+            'Grade': self.Grade,
+            'Status': self.Status,
+            'created_at': self.created_at,
+            'updated_at': self.updated_at
+        }
+
+
 #======================================================#
 #==============Link with the Students==================#
 #======================================================#
@@ -978,7 +1013,7 @@ class OverloadApplication(db.Model, UserMixin):
 
     OverloadId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE"), primary_key=True)
-    FacultyId =db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId')) 
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId'))
     Name = db.Column(db.String(255), nullable=False)
     StudentNumber = db.Column(db.String(100), nullable=False)
     ProgramCourse = db.Column(db.String(255), nullable=False)
@@ -995,21 +1030,22 @@ class OverloadApplication(db.Model, UserMixin):
 
     def to_dict(self):
         return {
-            'OverloadId':  self.OverloadId,
+            'OverloadId': self.OverloadId,
             'StudentId': self.StudentId,
             'FacultyId': self.FacultyId,
             'Name': self.Name,
             'StudentNumber': self.StudentNumber,
-            'ProgramCourse':self.ProgramCourse,
+            'ProgramCourse': self.ProgramCourse,
             'Semester': self.Semester,
             'SubjectsToAdd': self.SubjectsToAdd,
             'Justification': self.Justification,
             'Overloadfilename': self.Overloadfilename,
-            'Overloaddata': self.Overloaddata,
-            'UserResponsible': self.UserResponsible,
-            'Status': self.Status,
-            'Remarks': self.Remarks
+            'Overloaddata': self.Overloaddata.decode('utf-8', errors='replace') if isinstance(self.Overloaddata, bytes) else self.Overloaddata,
+            'UserResponsible': self.UserResponsible.decode('utf-8', errors='replace') if isinstance(self.UserResponsible, bytes) else self.UserResponsible,
+            'Status': self.Status.decode('utf-8', errors='replace') if isinstance(self.Status, bytes) else self.Status,
+            'Remarks': self.Remarks.decode('utf-8', errors='replace') if isinstance(self.Remarks, bytes) else self.Remarks
         }
+
 
 #Done
 # ==========Services========== #
@@ -1085,56 +1121,278 @@ class SASSStudentClassSubjectGrade(db.Model, UserMixin):
             'Status': self.status
         }
 
-# class Job(db.Model):
-#     _tablename_ = 'APMSJob'
 
-#     id = db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-#     created_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-#     updated_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-#     deleted_at =db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
-#     name =db.Column(db.String(255), nullable=False, index=True)
-#     employment = db.relationship("Employment", back_populates="job")
-#     classifications = db.relationship("Classification", secondary="APMSJobClassification", back_populates="jobs", overlaps="job_classifications")
-#     job_classifications = db.relationship("JobClassification", back_populates="job", overlaps="classifications")
+#==============================================
 
-# class Classification(db.Model):
-#     _tablename_ = 'APMSClassification'
+class FacultyComments(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyComments'
 
-#     id =db.Column(db.UUID(as_uuid=True), default=uuid.uuid4, primary_key=True)
-#     created_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-#     updated_at =db.Column(TIMESTAMP(timezone=True), nullable=False, server_default=text("now()"))
-#     deleted_at =db.Column(TIMESTAMP(timezone=True))  # Deletion timestamp (null if not deleted)
-#     name =db.Column(db.String(255), nullable=False, index=True)
-#     code =db.Column(db.String(255), nullable=False, index=True, unique=True)
-#     courses = db.relationship("Course", secondary="APMSCourseClassification", back_populates="classifications", overlaps="course_classifications")
-#     jobs = db.relationship("Job", secondary="APMSJobClassification", back_populates="classifications", overlaps="job_classifications")
-#     national_certifications = db.relationship("NationalCertification", secondary="APMSNationalCertificationClassification", back_populates="classifications", overlaps="national_certification_classifications")
-#     course_classifications = db.relationship("CourseClassification", back_populates="classification", overlaps="courses")
-#     job_classifications = db.relationship("JobClassification", back_populates="classification", overlaps="jobs")
-#     national_certification_classifications = db.relationship("NationalCertificationClassification", back_populates="classification", overlaps="national_certifications")
+    CommentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    Comment = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+    ApplicationNum = db.Column(db.String(50), nullable=True)
+    Message = db.Column(db.Text, nullable=True)
 
-# class CourseClassification(db.Model):
-#     _tablename_ = "APMSCourseClassification"
-#     course_id =db.Column(db.Integer, db.ForeignKey('SPSCourse.CourseId', ondelete="CASCADE"), primary_key=True)
-#     classification_id =db.Column('ClassificationId', db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
-#     course = db.relationship("Course", back_populates="course_classifications", overlaps="classifications,courses")
-#     classification = db.relationship("Classification", back_populates="course_classifications", overlaps="classifications,courses")
+    def to_dict(self):
+        return {
+            'CommentId': self.CommentId,
+            'FacultyId': self.FacultyId,
+            'Comment': self.Comment,
+            'Status': self.Status,
+            'StudentId': self.StudentId,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated,
+            'ApplicationNum': self.ApplicationNum,
+            'Message': self.Message
+        }
+#==============================================
+class FacultyOverload(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyOverload'
 
-# class JobClassification(db.Model):
-#     _tablename_ = "APMSJobClassification"
+    CommentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    Comment = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+    overloadid = db.Column(db.Integer, nullable=True)
 
-#     job_id =db.Column('JobId',db.UUID(as_uuid=True), db.ForeignKey('APMSJob.id', ondelete="CASCADE"), primary_key=True)
-#     classification_id =db.Column('ClassificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
-#     job = db.relationship("Job", back_populates="job_classifications", overlaps="classifications,jobs")
-#     classification = db.relationship("Classification", back_populates="job_classifications", overlaps="job_classifications,classifications,jobs")
+    def to_dict(self):
+        return {
+            'CommentId': self.CommentId,
+            'FacultyId': self.FacultyId,
+            'Comment': self.Comment.decode('utf-8', errors='replace') if isinstance(self.Comment, bytes) else self.Comment,
+            'Status': self.Status.decode('utf-8', errors='replace') if isinstance(self.Status, bytes) else self.Status,
+            'StudentId': self.StudentId,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated,
+            'overloadid': self.overloadid
+        }
 
-# class NationalCertificationClassification(db.Model):
-#     _tablename_ = "APMSNationalCertificationClassification"
 
-#     national_certification_id =db.Column('NationalCertificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSNationalCertification.id', ondelete="CASCADE"), primary_key=True)
-#     classification_id =db.Column('ClassificationId',db.UUID(as_uuid=True), db.ForeignKey('APMSClassification.id', ondelete="CASCADE"), primary_key=True)
-#     national_certification = db.relationship("NationalCertification", back_populates="national_certification_classifications", overlaps="classifications,national_certifications")
-#     classification = db.relationship("Classification", back_populates="national_certification_classifications", overlaps="national_certification_classifications,classifications,national_certifications")
+class FacultyAdding(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyAdding'
+
+    AddingId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    AddingTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'AddingId': self.AddingId,
+            'FacultyId': self.FacultyId,
+            'AddingTypeId': self.AddingTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+    
+class FacultyChange(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyChange'
+
+    ChangeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    ChangeTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ChangeId': self.ChangeId,
+            'FacultyId': self.FacultyId,
+            'ChangeTypeId': self.ChangeTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyCorrection(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyCorrection'
+
+    CorrectionId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    CorrectionTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CorrectionId': self.CorrectionId,
+            'FacultyId': self.FacultyId,
+            'CorrectionTypeId': self.CorrectionTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyCrossEnroll(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyCrossEnroll'
+
+    CrossEnrollId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    CrossEnrollTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CrossEnrollId': self.CrossEnrollId,
+            'FacultyId': self.FacultyId,
+            'CrossEnrollTypeId': self.CrossEnrollTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyShifting(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyShifting'
+
+    ShiftingId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    ShiftingTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ShiftingId': self.ShiftingId,
+            'FacultyId': self.FacultyId,
+            'ShiftingTypeId': self.ShiftingTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyManualEnroll(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyManualEnroll'
+
+    ManualEnrollId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    ManualEnrollTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'ManualEnrollId': self.ManualEnrollId,
+            'FacultyId': self.FacultyId,
+            'ManualEnrollTypeId': self.ManualEnrollTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyPetition(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyPetition'
+
+    PetitionId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    PetitionTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'PetitionId': self.PetitionId,
+            'FacultyId': self.FacultyId,
+            'PetitionTypeId': self.PetitionTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyTutorial(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyTutorial'
+
+    TutorialId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    TutorialTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'TutorialId': self.TutorialId,
+            'FacultyId': self.FacultyId,
+            'TutorialTypeId': self.TutorialTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+class FacultyCertification(db.Model, UserMixin):
+    __tablename__ = 'SASSFacultyCertification'
+
+    CertificationId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyId = db.Column(db.Integer, nullable=False)
+    CertificationTypeId = db.Column(db.Integer, nullable=False)
+    StudentId = db.Column(db.Integer, nullable=True)
+    Remarks = db.Column(db.Text, nullable=False)
+    Status = db.Column(db.String(50), nullable=False)
+    DateInserted = db.Column(db.TIMESTAMP, default=datetime.now)
+    DateUpdated = db.Column(db.TIMESTAMP, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CertificationId': self.CertificationId,
+            'FacultyId': self.FacultyId,
+            'CertificationTypeId': self.CertificationTypeId,
+            'StudentId': self.StudentId,
+            'Remarks': self.Remarks,
+            'Status': self.Status,
+            'DateInserted': self.DateInserted,
+            'DateUpdated': self.DateUpdated
+        }
+
+
+
 # ------------------------------------------------
 # List of Faculty that is being called in the services needed
 # FacultyList

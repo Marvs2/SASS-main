@@ -77,7 +77,7 @@
 			<li>
 				<a href="#"><i class='bx bxs-inbox icon' ></i> Request Services <i class='bx bx-chevron-right icon-right' ></i></a>
 				<ul class="side-dropdown">
-					<li><a href="{{url_for('studentoverload')}}">Overload of Subjects</a></li>
+					<li><a href="{{url_for('studentoverload')}}">Overload Request</a></li>
 					<li><a href="{{ url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
 					<li><a href="{{url_for('studentchange')}}">Change of Schedule/Subjects</a></li>
 					<li><a href="{{url_for('studentcorrection')}}">Correction of Grade Entry</a></li>
@@ -90,8 +90,25 @@
 
 				</ul>
 			</li>
+      <!--=======================================================================-->
+      <li>
+				<a href="#"><i class='bx bxs-inbox icon' ></i> View Request <i class='bx bx-chevron-right icon-right' ></i></a>
+				<ul class="side-dropdown">
+					<li><a href="{{ url_for('studentaddingsubject')}}">Adding of Subjects</a></li>
+					<li><a href="{{url_for('studentchange')}}">Change of Schedule/Subjects</a></li>
+					<li><a href="{{url_for('studentcorrection')}}">Correction of Grade Entry</a></li>
+					<li><a href="{{url_for('studentenrollment')}}">Cross-Enrollment</a></li>
+					<li><a href="{{url_for('studentshifting')}}">Application for Shifting</a></li>
+					<li><a href="{{url_for('studentmanualenrollment')}}">Manual Enrollment</a></li>
+					<li><a href="{{url_for('studentpetition')}}"> Online Petition of Subjects</a></li>
+					<li><a href="{{url_for('studenttutorial')}}">Online Request for Tutorial</a></li>
+					<li><a href="{{url_for('studentcertification')}}">Request for Certification</a></li>
+
+				</ul>
+			</li>
+      <!--=======================================================================-->
 			<li><a href="{{url_for('student_history')}}"><i class='bx bx-history icon' ></i>Transaction History</a></li>
-      <li><a href="{{url_for('studentpayment')}}"><i class='bx bx-money icon' ></i>Transaction Payment</a></li>
+      <!-- <li><a href="{{url_for('studentpayment')}}"><i class='bx bx-money icon' ></i>Transaction Payment</a></li> -->
       <li style="display: none;"><a href="{{ url_for('viewall', student_id=student_id) }}"><i class='bx bx-table icon'></i>View All</a></li>
 
 		<!--	<li class="divider" data-text="Complaints">Complaints</li>
@@ -275,7 +292,7 @@
   <script>
     // STUDENT API
     const api_base_url = '{{ student_api_base_url | default("") }}';
-    console.log('api_base_url: ', api_base_url);
+    // console.log('api_base_url: ', api_base_url);
 
     // Function to close the notification card
     function closeNotificationCard() {
@@ -326,24 +343,20 @@
         }
 
         const data_student_details = await response.json();
-        console.log('data_student_details:', data_student_details);
+        // console.log('data_student_details:', data_student_details); //present the data to console
         displayDetails(data_student_details);
     } catch (error) {
         console.error('Error fetching student details:', error.message);
     }
 }
-    fetchStudentDetails()
-      function displayDetails(data){
+fetchStudentDetails();
+      
+function displayDetails(data){
         // Concatenate the first name, middle name, and last name to form the full name
     const fullName = `${data.FirstName} ${data.MiddleName ? data.MiddleName + ' ' : ''}${data.LastName}`;
 
 // Select the Name input and set the value to the full name
-document.getElementById("Name").value = fullName;
-
-// ... (other code remains unchanged)
-// Update label to display full name
-// document.getElementById('name-label').innerText = fullName;
-
+        document.getElementById("Name").value = fullName;
         // Select the StudentNumber and set the value to data.StudentNumber
         document.getElementById("StudentNumber").value = data.StudentNumber;
         // Select the Gender and set the value to data.Gender
@@ -354,7 +367,7 @@ document.getElementById("Name").value = fullName;
         document.getElementById("ResidentialAddress").value = data.ResidentialAddress;
         // Select the DateOfBirth and set the value to data.DateOfBirth
         const DateOfBirthInput = document.getElementById("DateOfBirth");
-
+      
       // Format the date to display only the birthday
       const formattedDateOfBirth = new Date(data.DateOfBirth).toLocaleDateString('en-US', {
         month: 'long',
@@ -385,87 +398,87 @@ document.getElementById("Name").value = fullName;
             }
         });
     });
-    // NOTIFICATION ICON
-    var showAllNotifications = false;
+    // // NOTIFICATION ICON
+    // var showAllNotifications = false;
   
-    // Function to close the notification card
-    function closeNotificationCard() {
-      var notificationCard = document.getElementById('notification-card');
-      if (notificationCard.classList.contains('show')) {
-        notificationCard.classList.remove('show');
-      }
-    }
+    // // Function to close the notification card
+    // function closeNotificationCard() {
+    //   var notificationCard = document.getElementById('notification-card');
+    //   if (notificationCard.classList.contains('show')) {
+    //     notificationCard.classList.remove('show');
+    //   }
+    // }
   
-    // Function to toggle the visibility of the notification card
-    function toggleNotificationCard() {
-      var notificationCard = document.getElementById('notification-card');
-      notificationCard.classList.toggle('show');
+    // // Function to toggle the visibility of the notification card
+    // function toggleNotificationCard() {
+    //   var notificationCard = document.getElementById('notification-card');
+    //   notificationCard.classList.toggle('show');
   
-      // If not showing all notifications, only display the first four
-      if (!showAllNotifications) {
-        showFirstFourNotifications();
-      }
-    }
+    //   // If not showing all notifications, only display the first four
+    //   if (!showAllNotifications) {
+    //     showFirstFourNotifications();
+    //   }
+    // }
       
-    // Function to show only the first four notifications
-    function showFirstFourNotifications() {
-      var allNotifications = document.querySelectorAll('#notification-card .list-group-item');
-      allNotifications.forEach(function (item, index) {
-        if (index < 4) {
-          item.classList.remove('d-none');
-        } else {
-          item.classList.add('d-none');
-        }
-      });
-    }
+    // // Function to show only the first four notifications
+    // function showFirstFourNotifications() {
+    //   var allNotifications = document.querySelectorAll('#notification-card .list-group-item');
+    //   allNotifications.forEach(function (item, index) {
+    //     if (index < 4) {
+    //       item.classList.remove('d-none');
+    //     } else {
+    //       item.classList.add('d-none');
+    //     }
+    //   });
+    // }
   
-    // Add event listener to the notification icon
-    document.getElementById('notification-icon').addEventListener('click', function (event) {
-      // Prevent the click event from propagating to the document body
-      event.stopPropagation();
+    // // Add event listener to the notification icon
+    // document.getElementById('notification-icon').addEventListener('click', function (event) {
+    //   // Prevent the click event from propagating to the document body
+    //   event.stopPropagation();
   
-      // If notification card is already visible, close it; otherwise, show the first four notifications
-      if (document.getElementById('notification-card').classList.contains('show')) {
-        closeNotificationCard();
-      } else {
-        showFirstFourNotifications();
-        toggleNotificationCard();
-      }
-    });
+    //   // If notification card is already visible, close it; otherwise, show the first four notifications
+    //   if (document.getElementById('notification-card').classList.contains('show')) {
+    //     closeNotificationCard();
+    //   } else {
+    //     showFirstFourNotifications();
+    //     toggleNotificationCard();
+    //   }
+    // });
   
     // Add event listener to the document body to close the notification card on any click outside of it
-    document.body.addEventListener('click', closeNotificationCard);
+    // document.body.addEventListener('click', closeNotificationCard);
   
-    // Add event listener to prevent the notification card from closing when clicking inside it
-    document.getElementById('notification-card').addEventListener('click', function (event) {
-      event.stopPropagation();
-    });
+    // // Add event listener to prevent the notification card from closing when clicking inside it
+    // document.getElementById('notification-card').addEventListener('click', function (event) {
+    //   event.stopPropagation();
+    // });
   
-    // JavaScript to show all or only the first four notifications when "See All Notifications" is clicked
-    document.getElementById('see-all-notifications').addEventListener('click', function (event) {
-      // Prevent the link from navigating (you may adjust this behavior as needed)
-      event.preventDefault();
+    // // JavaScript to show all or only the first four notifications when "See All Notifications" is clicked
+    // document.getElementById('see-all-notifications').addEventListener('click', function (event) {
+    //   // Prevent the link from navigating (you may adjust this behavior as needed)
+    //   event.preventDefault();
   
-      // Toggle between showing all and displaying only the first four notifications
-      showAllNotifications = !showAllNotifications;
+    //   // Toggle between showing all and displaying only the first four notifications
+    //   showAllNotifications = !showAllNotifications;
   
-      if (showAllNotifications) {
-        // Show all hidden notifications by removing the 'd-none' class
-        var hiddenItems = document.querySelectorAll('#notification-card .list-group-item.d-none');
-        hiddenItems.forEach(function (item) {
-          item.classList.remove('d-none');
-        });
-      } else {
-        // Show only the first four notifications
-        showFirstFourNotifications();
-      }
+    //   if (showAllNotifications) {
+    //     // Show all hidden notifications by removing the 'd-none' class
+    //     var hiddenItems = document.querySelectorAll('#notification-card .list-group-item.d-none');
+    //     hiddenItems.forEach(function (item) {
+    //       item.classList.remove('d-none');
+    //     });
+    //   } else {
+    //     // Show only the first four notifications
+    //     showFirstFourNotifications();
+    //   }
   
-      // Toggle the visibility of the notification card
-      toggleNotificationCard();
-    });
+    //   // Toggle the visibility of the notification card
+    //   toggleNotificationCard();
+    // });
   
-    // Show only the first four notifications initially
-    showFirstFourNotifications();
+    // // Show only the first four notifications initially
+    // showFirstFourNotifications();
 </script>
   
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>

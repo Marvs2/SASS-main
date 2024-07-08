@@ -39,10 +39,12 @@ img {
   padding: 1em;
 }
 .card {
+  height: 900px;
   margin: 12px 5px;
   border-radius: 10px;
   box-shadow: 2px 6px 8px 0 rgba(22, 22, 26, 0.18);
   font-size: 0.9em;
+  flex: 1 1 300px; /* Adjust the flex property as needed */
 }
 
 .carousel-control-prev,
@@ -71,6 +73,11 @@ img {
   background-color: #ad1212;
   color: white;
 }
+.card-body {
+  height: 200px; /* Set a fixed height for the card bodies */
+  overflow: auto; /* Hide overflow content */
+}
+
 
 .card-title{
   justify-content: center;
@@ -155,7 +162,7 @@ header .navigation .menu {
 }
 
  .profile {
-  padding-left: 105px;
+  padding-left: 10px;
  }
 
 .menu-item > a:hover {
@@ -573,7 +580,7 @@ a {
     header .navigation .menu {
         position: fixed;
         display: block;
-        background: #28293a;
+        background: #333aa6;
         min-width: 100px;
         height: 100%;
         top: 0;
@@ -600,7 +607,7 @@ a {
         position: relative;
         top: 0;
         transform: translateX(10px);
-        background: #292a3d;
+        background: #a6abfc;
         border-radius: 5px;
         overflow: hidden;
         display: none;
@@ -666,9 +673,10 @@ a {
     }
 
     .menu-btn{
-      background: url(/static/images/menu.png)no-repeat;
+      background: url(/static/images/menu-btn2.png)no-repeat;
       width: 30px;
-      height: 20px;
+      height: 35px;
+      color: #101be9;
       background-size: 30px;
       background-position: center;
       cursor: pointer;
